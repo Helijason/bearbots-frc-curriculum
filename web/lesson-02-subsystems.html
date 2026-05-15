@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 2 — What Is a Subsystem? | FRC Programming Curriculum</title>
+  <link rel="stylesheet" href="frc-curriculum.css">
+</head>
+<body>
+
+<header class="site-header">
+  <a class="logo" href="index.html">FRC Programming Curriculum</a>
+  <span class="lesson-label">Module 2 &mdash; Lesson 2</span>
+  <nav class="site-nav">
+    <a href="index.html">All lessons</a>
+    <a href="lesson-01-vscode-template.html">&larr; Lesson 1</a>
+    <a href="lesson-03-io-pattern.html">Lesson 3 &rarr;</a>
+  </nav>
+</header>
+
+<div class="page-container">
+
+  <div class="lesson-header">
+    <div class="lesson-meta">Module 2 &mdash; Lesson 2</div>
+    <h1 class="lesson-title">What is a subsystem?</h1>
+    <div class="lesson-subtitle">Or: why your robot can't just be one giant pile of code held together by hope and zip ties.</div>
+    <div class="lesson-info-bar">
+      <div class="info-item"><div class="info-dot"></div> ~45 minutes</div>
+      <div class="info-item"><div class="info-dot"></div> Hardware: none — VSCode + simulator</div>
+      <div class="info-item"><div class="info-dot"></div> Tools: VSCode WPILib tools, Simulator, AdvantageScope</div>
+    </div>
+  </div>
+
+  <nav class="section-nav">
+    <button class="section-nav-btn active" data-section="concept">Part 1 &mdash; The concept</button>
+    <button class="section-nav-btn" data-section="tools">Part 2 &mdash; Creating subsystems</button>
+    <button class="section-nav-btn" data-section="challenge">Part 3 &mdash; Try it yourself</button>
+    <button class="section-nav-btn" data-section="lab">Part 4 &mdash; Fix the broken robot</button>
+  </nav>
+
+  <!-- ═══════════════════════════════════════════════════════
+       PART 1 — CONCEPT
+       ═══════════════════════════════════════════════════════ -->
+  <div class="lesson-section active" id="section-concept">
+
+    <p>It's week 5. Your robot has a drivetrain, an indexer, a shooter, and a climber. Every mechanism is controlled by code. If you put all that code in one file, that file is about 1,200 lines long. Two programmers are trying to edit it at the same time. Nobody is sure which lines control what. The robot match starts in 10 minutes.</p>
+    <p>This is the situation that subsystems exist to prevent.</p>
+
+    <div class="hf-box hf-brain">
+      <span class="hf-label">Your brain is probably thinking this right now</span>
+      <p>"That sounds like a people problem, not a code problem. Can't everyone just be careful?"</p>
+      <p>They can try. They will fail. Code structure isn't about discipline — it's about making the right thing easy and the wrong thing hard. Subsystems make it structurally impossible to accidentally edit the shooter while you're debugging the climber.</p>
+    </div>
+
+    <h2>The cafeteria analogy</h2>
+    <p>Imagine your school cafeteria. There's a pizza station, a salad bar, and a dessert section. Each one does its own job. The pizza station doesn't also handle dessert. If the pizza oven breaks, the ice cream is fine.</p>
+    <p>Your robot works the same way. Each <strong>subsystem</strong> owns exactly one mechanism and controls it completely. If the shooter breaks, the drivetrain keeps driving.</p>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <h4>Drivetrain</h4>
+        <p>Moves the robot around the field</p>
+        <p class="aside">Gets blamed for everything</p>
+      </div>
+      <div class="info-card">
+        <h4>Indexer</h4>
+        <p>Moves game pieces through the robot</p>
+        <p class="aside">Jams exactly when you need it not to</p>
+      </div>
+      <div class="info-card">
+        <h4>Shooter</h4>
+        <p>Launches game pieces at a target</p>
+        <p class="aside">Always "almost working" during comp</p>
+      </div>
+      <div class="info-card">
+        <h4>Climber</h4>
+        <p>Lifts the robot at end of match</p>
+        <p class="aside">Never tested until week 6</p>
+      </div>
+    </div>
+
+    <h2>Three reasons that aren't just "because mentor said so"</h2>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">Reason 1 — One job, one place</span>
+      <p>If the indexer is broken, you look in one file. Not everywhere. When you're debugging at 2am before competition, "one file" feels like a gift from the universe.</p>
+    </div>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">Reason 2 — Teammates can work in parallel</span>
+      <p>Two people editing the same file is a merge conflict waiting to ruin someone's day. With subsystems, one programmer works on the shooter while another works on the drivetrain — different files, no conflict.</p>
+    </div>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">Reason 3 — WPILib enforces it</span>
+      <p>The CommandScheduler prevents two commands from using the same subsystem at the same time. If one command is driving, it won't let another command accidentally also try to drive. This prevents the robot from doing contradictory things simultaneously. It has better conflict resolution than most group projects.</p>
+    </div>
+
+    <h2>What a subsystem looks like in code</h2>
+
+    <div class="code-block">
+      <pre>
+<span class="kw">public class</span> Indexer <span class="kw">extends</span> SubsystemBase {
+
+    <span class="cm">// All indexer code lives here.</span>
+    <span class="cm">// Nothing else touches the indexer motor.</span>
+    <span class="cm">// If someone adds drivetrain code here,</span>
+    <span class="cm">// that person buys the team snacks.</span>
+
+    <span class="kw">@Override</span>
+    <span class="kw">public void</span> periodic() {
+        <span class="cm">// Runs every 20ms. Update sensors, log data.</span>
+    }
+}
+      </pre>
+    </div>
+    <div class="code-annotation">Extending SubsystemBase registers this subsystem with the CommandScheduler automatically. That's the only requirement.</div>
+
+    <h2>LoggedRobot, TimedRobot, and the command framework</h2>
+    <p>A question you might have from Lesson 1: if we extend <code>LoggedRobot</code>, where does the command framework come from?</p>
+
+    <div class="chat-thread">
+      <div class="bubble bubble-q">
+        <div class="bubble-who">Student</div>
+        Is there a CommandRobot class we're supposed to extend?
+      </div>
+      <div class="bubble bubble-a">
+        <div class="bubble-who">Good question, common confusion</div>
+        No. The inheritance chain is: your Robot extends LoggedRobot, which extends TimedRobot. The command framework isn't a base class — it's a system that runs because you call CommandScheduler.getInstance().run() in robotPeriodic(). That one line is what makes the whole framework go.
+      </div>
+      <div class="bubble bubble-q">
+        <div class="bubble-who">Student</div>
+        So the command framework isn't built into the robot class at all?
+      </div>
+      <div class="bubble bubble-a">
+        <div class="bubble-who">Exactly</div>
+        It's opt-in. You could have a TimedRobot with no commands at all — just raw periodic methods. Command-based is a pattern we choose to use by running the scheduler. AdvantageKit's LoggedRobot wraps each loop cycle to capture data. These are two separate systems that work together.
+      </div>
+    </div>
+
+    <div class="hf-box hf-sidebar">
+      <span class="hf-label">There are no dumb questions</span>
+      <p><strong>Q: Can a subsystem control two mechanisms?</strong></p>
+      <p>Technically yes. It's almost always a bad idea. If two mechanisms are so tightly coupled that they must always be controlled together, they might belong in one subsystem. Otherwise separate them.</p>
+      <p><strong>Q: How does a subsystem communicate with another subsystem?</strong></p>
+      <p>Through commands in RobotContainer. Subsystems don't talk to each other directly — that would create dependencies that make debugging much harder. Commands coordinate between subsystems.</p>
+      <p><strong>Q: What's the difference between periodic() and a command?</strong></p>
+      <p>periodic() runs every loop cycle regardless — use it for reading sensors and logging. Commands run when scheduled — use them for actions triggered by buttons or autonomous. Sensor reading goes in periodic(). Motor control goes in commands.</p>
+    </div>
+
+    <div class="hf-box hf-brain">
+      <span class="hf-label">Brain power — before you move on</span>
+      <p>Your robot has a turret that rotates horizontally and an arm that raises vertically. They're on the same mechanism. Are they one subsystem or two? Write your answer and your reasoning before reading Part 2. There's no single right answer — but there is a better answer.</p>
+    </div>
+
+  </div><!-- /section-concept -->
+
+
+  <!-- ═══════════════════════════════════════════════════════
+       PART 2 — CREATING SUBSYSTEMS WITH TOOLS
+       ═══════════════════════════════════════════════════════ -->
+  <div class="lesson-section" id="section-tools">
+
+    <p>Always use the WPILib tools to create subsystem files. Never create them by hand. The tools generate the right package declaration, imports, and class structure — getting these wrong causes confusing build errors that waste time.</p>
+
+    <h2>Creating a subsystem file</h2>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">How to create a new subsystem using WPILib tools</span>
+      <p><strong>1.</strong> In VSCode's Explorer panel, right-click the folder where you want the file</p>
+      <p>&nbsp;&nbsp;&nbsp;&nbsp;(e.g., <code>src/main/java/frc/robot/subsystems/</code>)</p>
+      <p><strong>2.</strong> Select <strong>Create a new class/command</strong></p>
+      <p><strong>3.</strong> Select <strong>SubsystemBase</strong> from the list</p>
+      <p><strong>4.</strong> Type the name of your subsystem (e.g., <code>Indexer</code>)</p>
+      <p><strong>5.</strong> Press Enter — the file is created with the correct structure</p>
+      <p>Alternatively: <code>Ctrl+Shift+P</code> &rarr; <code>WPILib: Create a new class</code></p>
+    </div>
+
+    <h2>What the tool generates</h2>
+    <p>The generated file looks exactly like this. Understand every line before adding anything:</p>
+
+    <div class="code-block">
+      <pre>
+<span class="kw">package</span> frc.robot.subsystems;  <span class="cm">// matches your folder structure</span>
+
+<span class="kw">import</span> edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+<span class="kw">public class</span> Indexer <span class="kw">extends</span> SubsystemBase {
+
+    <span class="kw">public</span> Indexer() {
+        <span class="cm">// Constructor — runs once when subsystem is created</span>
+        <span class="cm">// Good place to configure hardware (motors, sensors)</span>
+    }
+
+    <span class="kw">@Override</span>
+    <span class="kw">public void</span> periodic() {
+        <span class="cm">// Runs every 20ms (50Hz)</span>
+        <span class="cm">// Read sensors, log data, update state</span>
+        <span class="cm">// DO NOT put motor control here — use commands</span>
+    }
+}
+      </pre>
+    </div>
+
+    <div class="hf-box hf-warning">
+      <span class="hf-label">Common mistake — motor control in periodic()</span>
+      <p>New students often put motor control code directly in periodic(). This runs every loop cycle regardless — the motor will run forever with no way to stop it. Motor control belongs in commands. Sensor reading and logging belong in periodic().</p>
+    </div>
+
+    <h2>Registering your subsystem in RobotContainer</h2>
+    <p>Creating the file isn't enough. You need to instantiate it in RobotContainer — otherwise it never exists.</p>
+
+    <div class="code-block">
+      <pre>
+<span class="kw">public class</span> RobotContainer {
+
+    <span class="cm">// Declare subsystems here</span>
+    <span class="kw">private final</span> Indexer indexer = <span class="kw">new</span> Indexer();
+
+    <span class="kw">public</span> RobotContainer() {
+        configureBindings();
+    }
+
+    <span class="kw">private void</span> configureBindings() {
+        <span class="cm">// Wire buttons to commands here</span>
+        <span class="cm">// controller.a().onTrue(indexer.someCommand());</span>
+    }
+}
+      </pre>
+    </div>
+
+    <h2>Verifying your subsystem in the simulator</h2>
+    <p>After creating and registering a subsystem, verify it loaded correctly before writing any logic:</p>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">Subsystem verification workflow</span>
+      <p><strong>1.</strong> Build: <code>Ctrl+Shift+P</code> &rarr; <code>WPILib: Build Robot Code</code> — must succeed with no errors</p>
+      <p><strong>2.</strong> Simulate: <code>Ctrl+Shift+P</code> &rarr; <code>WPILib: Simulate Robot Code</code> &rarr; select halsim_gui</p>
+      <p><strong>3.</strong> Connect AdvantageScope: File &rarr; Connect to Simulator</p>
+      <p><strong>4.</strong> Enable in Teleop in the Simulation GUI</p>
+      <p><strong>5.</strong> In AdvantageScope's left panel, look for your subsystem's log key folder</p>
+      <p>If the folder appears &mdash; your subsystem is loaded and logging correctly.</p>
+      <p>If the folder doesn't appear &mdash; check that you instantiated it in RobotContainer AND that Logger.processInputs() is called in periodic().</p>
+    </div>
+
+    <h2>Driving in simulation to verify commands work</h2>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">Full sim + AdvantageScope workflow</span>
+      <p><strong>1.</strong> Launch simulator &rarr; Simulation GUI opens</p>
+      <p><strong>2.</strong> Joysticks panel: drag <strong>Keyboard 0</strong> (or your controller) to <strong>Joystick[0]</strong></p>
+      <p><strong>3.</strong> Open AdvantageScope &rarr; File &rarr; Connect to Simulator</p>
+      <p><strong>4.</strong> Robot State panel &rarr; <strong>Teleoperated</strong> &rarr; <strong>Enable</strong></p>
+      <p><strong>5.</strong> Click back on the Simulation GUI window (keyboard only works when this window is focused)</p>
+      <p><strong>6.</strong> Drive with W/A/S/D keys or controller left stick</p>
+      <p><strong>7.</strong> In AdvantageScope, drag <code>Drive/LeftPositionMeters</code> to a graph &mdash; should move when driving</p>
+    </div>
+
+    <div class="hf-box hf-brain">
+      <span class="hf-label">Do this right now</span>
+      <p>Create a new subsystem called <code>Indexer</code> using the WPILib tool. Register it in RobotContainer. Build, simulate, connect AdvantageScope, and verify the build succeeds without errors. Don't add any logic — just confirm the subsystem exists and loads.</p>
+    </div>
+
+  </div><!-- /section-tools -->
+
+
+  <!-- ═══════════════════════════════════════════════════════
+       PART 3 — TIERED CHALLENGE
+       ═══════════════════════════════════════════════════════ -->
+  <div class="lesson-section" id="section-challenge">
+
+    <p>Time to build something. Each tier uses the WPILib tools — no hand-crafting files. The command palette is your friend.</p>
+
+    <div class="tier-tabs">
+      <button class="tier-tab bronze active" data-tier="bronze">Bronze &mdash; I know what a subsystem is</button>
+      <button class="tier-tab silver" data-tier="silver">Silver &mdash; I can create one</button>
+      <button class="tier-tab gold" data-tier="gold">Gold &mdash; I understand why</button>
+    </div>
+
+    <div>
+
+      <div class="tier-panel bronze active">
+        <span class="tier-label">Bronze &mdash; identify and create</span>
+        <p>Given the description below, identify which mechanisms should be subsystems. Then create the file for one of them using the WPILib tool.</p>
+
+        <div class="hf-box hf-script" style="margin:0.75rem 0;">
+          <span class="hf-label">Robot description</span>
+          <p>Your robot has: two drive motors, a motor that spins a flywheel to shoot balls, a servo that adjusts the shooter angle, a sensor that detects when a ball is loaded, and an LED strip that shows robot status.</p>
+        </div>
+
+        <ul class="task-list">
+          <li>List every mechanism. Which ones should be separate subsystems? Which ones might share a subsystem?</li>
+          <li>Create the <code>Shooter</code> subsystem file using <code>WPILib: Create a new class</code> &rarr; SubsystemBase</li>
+          <li>Register it in RobotContainer. Build and verify no errors.</li>
+          <li>Add one <code>System.out.println()</code> inside <code>periodic()</code>. Run the sim. Does it print?</li>
+        </ul>
+        <div class="toggle-row">
+          <button class="toggle-btn" data-target="b2-hint" data-open="Show hint" data-closed="Hide hint">Show hint</button>
+          <button class="toggle-btn" data-target="b2-ans" data-open="Show suggested answer" data-closed="Hide answer">Show suggested answer</button>
+        </div>
+        <div class="toggle-content hint" id="b2-hint">
+          Think about which mechanisms need to be controlled independently. The servo adjusts the shooter angle — does it make sense to control it separately from the flywheel, or are they always used together?
+        </div>
+        <div class="toggle-content answer" id="b2-ans">
+          Suggested: DriveSubsystem (two drive motors), ShooterSubsystem (flywheel + angle servo — they're tightly coupled), LEDSubsystem (optional — LEDs often get their own subsystem for state management). The ball sensor belongs inside whichever subsystem needs to read it, not its own subsystem.
+        </div>
+      </div>
+
+      <div class="tier-panel silver">
+        <span class="tier-label">Silver &mdash; build a minimal working subsystem</span>
+        <p>Create a complete minimal subsystem that: stores a goal state, changes state via a command, and logs the current state to AdvantageScope.</p>
+        <ul class="task-list">
+          <li>Create <code>IndexerSubsystem</code> using the WPILib tool</li>
+          <li>Add an enum <code>IndexerGoal</code> with values <code>IDLE</code> and <code>ACTIVE</code></li>
+          <li>Add a private <code>IndexerGoal goal</code> field defaulting to <code>IDLE</code></li>
+          <li>Add <code>@AutoLogOutput</code> annotation to the goal field so it appears in AdvantageScope</li>
+          <li>Add a <code>setGoalCommand(IndexerGoal goal)</code> method returning a <code>runOnce()</code> command</li>
+          <li>Wire a controller button to <code>setGoalCommand(IndexerGoal.ACTIVE)</code> in RobotContainer</li>
+          <li>Run sim, drive, press the button — watch the goal change in AdvantageScope</li>
+        </ul>
+        <div class="toggle-row">
+          <button class="toggle-btn" data-target="s2-hint" data-open="Show hint" data-closed="Hide hint">Show hint</button>
+        </div>
+        <div class="toggle-content hint" id="s2-hint">
+          <code>@AutoLogOutput</code> is an AdvantageKit annotation — add it directly above the field declaration. For the controller binding in RobotContainer: <code>driverController.a().onTrue(indexer.setGoalCommand(IndexerGoal.ACTIVE));</code>. The goal should appear in AdvantageScope as <code>IndexerSubsystem/Goal</code>.
+        </div>
+      </div>
+
+      <div class="tier-panel gold">
+        <span class="tier-label">Gold &mdash; design the full subsystem structure</span>
+        <p>Given this season's game, design the complete subsystem architecture before writing any code. This is what senior programmers do before week 1.</p>
+        <ul class="task-list">
+          <li>List every mechanism on the robot (real or hypothetical)</li>
+          <li>Group them into subsystems with clear ownership boundaries</li>
+          <li>For each subsystem, define: what it reads (sensors/inputs), what it controls (motors/outputs), what goals/states it has, and what commands it exposes</li>
+          <li>Identify any cases where two subsystems need to coordinate — how do they do it without talking directly?</li>
+          <li>Create the file structure using WPILib tools — all subsystem shells, no implementation yet</li>
+          <li>Verify the project builds with all shells registered in RobotContainer</li>
+        </ul>
+        <div class="toggle-row">
+          <button class="toggle-btn" data-target="g2-hint" data-open="Show hint" data-closed="Hide hint">Show hint</button>
+        </div>
+        <div class="toggle-content hint" id="g2-hint">
+          Subsystems coordinate through commands, not direct method calls. If the shooter needs to wait for the indexer to be ready, that's a command that requires both subsystems — not a method call from one subsystem to another. That distinction matters for scheduling.
+        </div>
+      </div>
+
+    </div>
+
+  </div><!-- /section-challenge -->
+
+
+  <!-- ═══════════════════════════════════════════════════════
+       PART 4 — BROKEN ROBOT LAB
+       ═══════════════════════════════════════════════════════ -->
+  <div class="lesson-section" id="section-lab">
+
+    <p class="bug-lab-intro">
+      Someone put all the robot logic in one place. The robot compiles. It even runs. But something is deeply wrong with the structure — and that wrongness will cause real problems the moment the robot gets more complex. Find the <strong>3 structural bugs</strong> hiding in the highlighted lines.
+    </p>
+
+    <div class="bug-lab" data-lab="lesson-2">
+
+      <div class="bug-progress">
+        <span>Bugs found:</span>
+        <div class="bug-dot"></div>
+        <div class="bug-dot"></div>
+        <div class="bug-dot"></div>
+        <span class="bug-progress-count">0 / 3</span>
+      </div>
+
+      <div class="code-lab">
+        <div class="code-lab-line"><span class="line-num">1</span><span class="line-code"><span class="kw">public class</span> DriveSubsystem <span class="kw">extends</span> SubsystemBase {</span></div>
+        <div class="code-lab-line"><span class="line-num">2</span><span class="line-code">&nbsp;&nbsp;<span class="kw">private final</span> XRPMotor leftMotor = <span class="kw">new</span> XRPMotor(<span class="num">0</span>);</span></div>
+        <div class="code-lab-line"><span class="line-num">3</span><span class="line-code">&nbsp;&nbsp;<span class="kw">private final</span> XRPMotor rightMotor = <span class="kw">new</span> XRPMotor(<span class="num">1</span>);</span></div>
+        <div class="code-lab-line"><span class="line-num">4</span><span class="line-code">&nbsp;&nbsp;<span class="kw">private final</span> XRPMotor indexerMotor = <span class="kw">new</span> XRPMotor(<span class="num">2</span>);</span></div>
+        <div class="code-lab-line bug-line" data-bug="1"><span class="line-num">5</span><span class="line-code">&nbsp;&nbsp;<span class="cm">// indexer motor lives here because it was convenient</span></span></div>
+        <div class="code-lab-line"><span class="line-num">6</span><span class="line-code">&nbsp;</span></div>
+        <div class="code-lab-line"><span class="line-num">7</span><span class="line-code">&nbsp;&nbsp;<span class="kw">@Override</span></span></div>
+        <div class="code-lab-line"><span class="line-num">8</span><span class="line-code">&nbsp;&nbsp;<span class="kw">public void</span> periodic() {</span></div>
+        <div class="code-lab-line bug-line" data-bug="2"><span class="line-num">9</span><span class="line-code">&nbsp;&nbsp;&nbsp;&nbsp;leftMotor.set(<span class="num">0.5</span>); rightMotor.set(<span class="num">0.5</span>); <span class="cm">// always drive forward</span></span></div>
+        <div class="code-lab-line"><span class="line-num">10</span><span class="line-code">&nbsp;&nbsp;}</span></div>
+        <div class="code-lab-line"><span class="line-num">11</span><span class="line-code">&nbsp;</span></div>
+        <div class="code-lab-line"><span class="line-num">12</span><span class="line-code">&nbsp;&nbsp;<span class="kw">public</span> Command runIndexer() {</span></div>
+        <div class="code-lab-line"><span class="line-num">13</span><span class="line-code">&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span> runOnce(() -> indexerMotor.set(<span class="num">0.5</span>));</span></div>
+        <div class="code-lab-line bug-line" data-bug="3"><span class="line-num">14</span><span class="line-code">&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm">// this command requires DriveSubsystem — correct!</span></span></div>
+        <div class="code-lab-line"><span class="line-num">15</span><span class="line-code">&nbsp;&nbsp;}</span></div>
+        <div class="code-lab-line"><span class="line-num">16</span><span class="line-code">}</span></div>
+      </div>
+
+      <div class="bug-reveal" data-bug="1">
+        <h4>Bug 1 &mdash; Indexer motor living inside DriveSubsystem</h4>
+        <div class="bug-joke">It was convenient. It is not correct. "Convenient" and "correct" are different things that feel the same until 11pm before competition.</div>
+        <p>The indexer motor belongs in an <code>IndexerSubsystem</code> — not in <code>DriveSubsystem</code>. When the indexer breaks, you'll search DriveSubsystem for the bug. When a command tries to run the indexer, it will accidentally require the drive subsystem, preventing the robot from driving at the same time. Move the indexer motor to its own subsystem.</p>
+        <div class="bug-fix-label">Fix</div>
+        <div class="bug-fix">Create IndexerSubsystem.java (WPILib tool → SubsystemBase) and move indexerMotor there.</div>
+      </div>
+
+      <div class="bug-reveal" data-bug="2">
+        <h4>Bug 2 &mdash; Motor control in periodic()</h4>
+        <div class="bug-joke">The robot drives forward. Forever. Without stopping. Even in autonomous. Even when disabled. This is what "always" means in robot code.</div>
+        <p>Motor control in <code>periodic()</code> runs every loop cycle regardless of mode or state. The robot will drive forward the moment it's enabled and never stop. Motor control belongs in commands — which can be started, stopped, and interrupted. <code>periodic()</code> is for reading sensors and logging, not commanding actuators.</p>
+        <div class="bug-fix-label">Fix</div>
+        <div class="bug-fix">Move motor control into a command. Set it as the default command in RobotContainer.</div>
+      </div>
+
+      <div class="bug-reveal" data-bug="3">
+        <h4>Bug 3 &mdash; runIndexer() requires DriveSubsystem, not IndexerSubsystem</h4>
+        <div class="bug-joke">The comment says "requires DriveSubsystem — correct!" The comment is not correct.</div>
+        <p>Because <code>runIndexer()</code> is defined inside <code>DriveSubsystem</code>, WPILib treats it as requiring the drive subsystem. This means running the indexer will lock out any drive commands — the robot can't drive while indexing. Commands should live in the subsystem that owns the hardware they control. Indexer commands belong in IndexerSubsystem.</p>
+        <div class="bug-fix-label">Fix</div>
+        <div class="bug-fix">Move runIndexer() to IndexerSubsystem. It will then correctly require only the indexer.</div>
+      </div>
+
+      <div class="success-banner">
+        All 3 bugs found. Wrong subsystem ownership, motor control in periodic(), and misattributed command requirements — these are the three structural mistakes that haunt teams for entire seasons. You'll recognize all three on sight. That's genuinely useful.
+      </div>
+
+    </div>
+
+  </div><!-- /section-lab -->
+
+</div><!-- /page-container -->
+
+<footer class="site-footer">
+  FRC Programming Curriculum &mdash; Lesson 2: What is a subsystem?
+</footer>
+
+<script src="frc-curriculum.js"></script>
+</body>
+</html>
