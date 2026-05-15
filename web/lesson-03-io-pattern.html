@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 3 — The IO Pattern | FRC Programming Curriculum</title>
+  <link rel="stylesheet" href="frc-curriculum.css">
+</head>
+<body>
+
+<header class="site-header">
+  <a class="logo" href="index.html">FRC Programming Curriculum</a>
+  <span class="lesson-label">Module 2 &mdash; Lesson 3</span>
+  <nav class="site-nav">
+    <a href="index.html">All lessons</a>
+    <a href="lesson-02-subsystems.html">&larr; Lesson 2</a>
+    <a href="lesson-04-logging.html">Lesson 4 &rarr;</a>
+  </nav>
+</header>
+
+<div class="page-container">
+
+  <div class="lesson-header">
+    <div class="lesson-meta">Module 2 &mdash; Lesson 3</div>
+    <h1 class="lesson-title">Why does the robot need two files for one motor?</h1>
+    <div class="lesson-subtitle">Or: the question every student asks, followed by the answer that actually makes sense.</div>
+    <div class="lesson-info-bar">
+      <div class="info-item"><div class="info-dot"></div> ~45 minutes</div>
+      <div class="info-item"><div class="info-dot"></div> Hardware: XRP robot</div>
+      <div class="info-item"><div class="info-dot"></div> Prereq: Lesson 2 — Subsystems</div>
+      <div class="info-item"><div class="info-dot"></div> Java &middot; AdvantageKit</div>
+    </div>
+  </div>
+
+  <nav class="section-nav">
+    <button class="section-nav-btn active" data-section="concept">Part 1 &mdash; The concept</button>
+    <button class="section-nav-btn" data-section="challenge">Part 2 &mdash; Try it yourself</button>
+    <button class="section-nav-btn" data-section="lab">Part 3 &mdash; Fix the broken robot</button>
+  </nav>
+
+  <!-- ═══════════════════════════════════════════════════════
+       PART 1 — CONCEPT
+       ═══════════════════════════════════════════════════════ -->
+  <div class="lesson-section active" id="section-concept">
+
+    <p>
+      You're staring at the project. There's <code>DriveSubsystem.java</code>,
+      <code>DriveIO.java</code>, and <code>DriveIOXRP.java</code>.
+      They all seem to be about driving. You're pretty sure you only have one drivetrain.
+    </p>
+    <p>
+      Your brain is correct. You do only have one drivetrain.
+      So why three files?
+    </p>
+    <p>
+      Here's the short answer: <strong>your subsystem should not know what hardware it's running on.</strong>
+    </p>
+
+    <div class="hf-box hf-brain">
+      <span class="hf-label">Your brain is probably thinking this right now</span>
+      <p>"That sounds insane. Of course the drivetrain code knows it's a drivetrain. I can see the motors right there."</p>
+      <p>Totally fair. Keep reading. We'll get there.</p>
+    </div>
+
+    <h2>Imagine this scenario</h2>
+
+    <p>
+      It's 11pm. Competition is in 9 hours. Your mentor walks in and says the team switched
+      from XRP motors to TalonFX motors over the weekend.
+      How many files do you have to change?
+    </p>
+    <p>
+      If your subsystem knew about the hardware directly:
+      <strong>every single file that touched a motor.</strong> All of them. At 11pm. Good luck.
+    </p>
+    <p>
+      If your subsystem talks to an interface instead:
+      <strong>one file.</strong> Swap the implementation. Go to sleep. Revolutionary.
+    </p>
+
+    <div class="chat-thread">
+      <div class="bubble bubble-q">
+        <div class="bubble-who">Student</div>
+        But can't I just use an if-statement? Like, if it's an XRP do this, else do that?
+      </div>
+      <div class="bubble bubble-a">
+        <div class="bubble-who">Also a valid question</div>
+        You can! It will work. It will also mean your XRP code and your TalonFX code live
+        in the same method, tangled together, each one quietly breaking the other in ways
+        that only reveal themselves at competition. The IO pattern is just a cleaner
+        if-statement that scales to a whole season without making you cry.
+      </div>
+      <div class="bubble bubble-q">
+        <div class="bubble-who">Student</div>
+        Does every subsystem really need this? My indexer has one motor.
+      </div>
+      <div class="bubble bubble-a">
+        <div class="bubble-who">Yes. Especially that one.</div>
+        One motor now. One motor, two sensors, a limit switch, and a current spike detector
+        by week 4. The pattern costs you five minutes upfront and saves you two hours later.
+        AdvantageKit also requires it for logging to work, so there's that.
+      </div>
+    </div>
+
+    <h2>The pattern in plain English</h2>
+    <p>Three files. Three jobs. They never swap jobs.</p>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <h4>DriveIO.java</h4>
+        <p>The contract. Defines what a drivetrain can do. Knows nothing about actual hardware.</p>
+        <p class="aside">Think: job description</p>
+      </div>
+      <div class="info-card">
+        <h4>DriveIOXRP.java</h4>
+        <p>The XRP version. Talks to real XRP hardware. Implements the contract.</p>
+        <p class="aside">Think: the person doing the job</p>
+      </div>
+      <div class="info-card">
+        <h4>DriveSubsystem.java</h4>
+        <p>The boss. Calls methods on DriveIO. Has no idea who's on the other end. Doesn't care.</p>
+        <p class="aside">Think: the manager</p>
+      </div>
+    </div>
+
+    <h2>What this looks like in code</h2>
+
+    <div class="code-block">
+      <pre>
+<span class="kw">public interface</span> DriveIO {
+    <span class="kw">void</span> updateInputs(DriveIOInputs inputs);
+    <span class="kw">void</span> setVoltage(<span class="kw">double</span> left, <span class="kw">double</span> right);
+    <span class="kw">void</span> stop();
+}
+      </pre>
+    </div>
+    <div class="code-annotation">
+      This file has zero imports. It doesn't know about XRPDrivetrain.
+      It doesn't know about TalonFX. It knows about nothing. That's the whole point.
+    </div>
+
+    <div class="code-block">
+      <pre>
+<span class="kw">public class</span> DriveIOXRP <span class="kw">implements</span> DriveIO {
+    <span class="kw">private final</span> XRPDrivetrain drivetrain = <span class="kw">new</span> XRPDrivetrain();
+    <span class="kw">private final</span> XRPGyro gyro = <span class="kw">new</span> XRPGyro();
+
+    <span class="kw">@Override</span>
+    <span class="kw">public void</span> setVoltage(<span class="kw">double</span> left, <span class="kw">double</span> right) {
+        drivetrain.tankDrive(left / <span class="num">12.0</span>, right / <span class="num">12.0</span>);
+    }
+}
+      </pre>
+    </div>
+    <div class="code-annotation">
+      This one knows it's an XRP. It's the only one that gets to know that.
+      Guard this privilege carefully.
+    </div>
+
+    <div class="code-block">
+      <pre>
+<span class="kw">public class</span> DriveSubsystem <span class="kw">extends</span> SubsystemBase {
+    <span class="kw">private final</span> DriveIO io; <span class="cm">// could be XRP, TalonFX, sim, anything</span>
+
+    <span class="kw">public</span> DriveSubsystem(DriveIO io) {
+        <span class="kw">this</span>.io = io; <span class="cm">// doesn't ask. doesn't care.</span>
+    }
+
+    <span class="kw">@Override</span>
+    <span class="kw">public void</span> periodic() {
+        io.updateInputs(inputs);
+        Logger.processInputs(<span class="str">"Drive"</span>, inputs);
+    }
+}
+      </pre>
+    </div>
+    <div class="code-annotation">
+      Look at this class. Find the word XRP anywhere in it. You can't.
+      This is the pattern working correctly.
+    </div>
+
+    <div class="hf-box hf-sidebar">
+      <span class="hf-label">There are no dumb questions</span>
+      <p><strong>Q: What happens in simulation if I don't have a DriveIOSim?</strong></p>
+      <p>You use an empty default implementation &mdash; a DriveIO that does nothing.
+        The robot runs, nothing moves, and AdvantageKit still logs everything.
+        Great for testing command logic without hardware.</p>
+      <p><strong>Q: Do I write a new DriveIO interface for every robot?</strong></p>
+      <p>No. One interface, multiple implementations. The interface is the contract &mdash;
+        it doesn't change just because the hardware does. This is the whole point.</p>
+      <p><strong>Q: What if I forget to implement a method from the interface?</strong></p>
+      <p>Java will refuse to compile. Loudly. This is actually a feature &mdash;
+        the compiler is your mean but honest friend who catches mistakes before the robot does.</p>
+    </div>
+
+    <div class="hf-box hf-brain">
+      <span class="hf-label">Brain power &mdash; before you move on</span>
+      <p>
+        Without looking at any code: what are the three files you'd need to create
+        for a brand new <code>Climber</code> subsystem?
+        What would each one be called? What's one method each one would need?
+      </p>
+      <p>Sketch it out. Take 60 seconds. Your future self at 11pm before competition will thank you.</p>
+    </div>
+
+    <h2>Quick check</h2>
+    <p>Which of these should NOT be imported inside <code>DriveSubsystem.java</code>?</p>
+    <div class="quiz-feedback" id="quiz-feedback-1"></div>
+    <div class="quiz-options">
+      <button class="quiz-btn"
+        data-quiz="1" data-correct="false"
+        data-feedback-wrong="DriveIO is exactly what DriveSubsystem should import — it's the interface."
+        data-feedback-correct="">DriveIO</button>
+      <button class="quiz-btn"
+        data-quiz="1" data-correct="false"
+        data-feedback-wrong="CommandScheduler is a WPILib class, not hardware-specific. Fine to import."
+        data-feedback-correct="">CommandScheduler</button>
+      <button class="quiz-btn"
+        data-quiz="1" data-correct="true"
+        data-feedback-correct="Correct! XRPDrivetrain is hardware-specific. If DriveSubsystem imports it, the pattern is broken. Only DriveIOXRP gets to know about XRP hardware."
+        data-feedback-wrong="">XRPDrivetrain</button>
+      <button class="quiz-btn"
+        data-quiz="1" data-correct="false"
+        data-feedback-wrong="SubsystemBase is the WPILib base class — DriveSubsystem must extend it."
+        data-feedback-correct="">SubsystemBase</button>
+    </div>
+
+  </div><!-- /section-concept -->
+
+
+  <!-- ═══════════════════════════════════════════════════════
+       PART 2 — TIERED CHALLENGE
+       ═══════════════════════════════════════════════════════ -->
+  <div class="lesson-section" id="section-challenge">
+
+    <p>
+      Time to write some code. Pick your level honestly.
+      The robot doesn't care about your ego.
+      The robot cares about <code>setVoltage()</code> being implemented correctly.
+    </p>
+
+    <div class="tier-tabs">
+      <button class="tier-tab bronze active" data-tier="bronze">Bronze &mdash; I read Part 1</button>
+      <button class="tier-tab silver" data-tier="silver">Silver &mdash; I understood Part 1</button>
+      <button class="tier-tab gold" data-tier="gold">Gold &mdash; I could have written Part 1</button>
+    </div>
+
+    <div>
+
+      <!-- BRONZE -->
+      <div class="tier-panel bronze active">
+        <span class="tier-label">Bronze &mdash; modify and observe</span>
+        <p>
+          The code below drives both motors at 6 volts forward. Your job:
+          change the numbers and watch what happens. This is science.
+          Very low-stakes science. The robot is your lab.
+        </p>
+        <div class="code-block">
+          <pre>
+<span class="cm">// In DriveSubsystem.java</span>
+<span class="kw">public void</span> driveForward() {
+    io.setVoltage(<span class="num">6.0</span>, <span class="num">6.0</span>); <span class="cm">// left motor, right motor</span>
+}
+          </pre>
+        </div>
+        <ul class="task-list">
+          <li>Change both values to <code>3.0</code>. Write down what you <em>expect</em> to happen before you run it. Then run it. Were you right?</li>
+          <li>Set left to <code>6.0</code> and right to <code>-6.0</code>. Describe what the robot does using only words your grandparent would understand.</li>
+          <li>Set both to <code>13.0</code>. Does anything weird happen? Check the actual value the motor receives.</li>
+        </ul>
+        <div class="toggle-row">
+          <button class="toggle-btn" data-target="b-hint" data-open="I am stumped" data-closed="Hide hint">I am stumped</button>
+          <button class="toggle-btn" data-target="b-ans" data-open="Show answers" data-closed="Hide answers">Show answers</button>
+        </div>
+        <div class="toggle-content hint" id="b-hint">
+          Voltage is how hard the motor pushes. 12V is full power. 0V is stopped.
+          Negative reverses direction. Anything above 12V gets clamped &mdash;
+          the motor has opinions about physics.
+        </div>
+        <div class="toggle-content answer" id="b-ans">
+          3V = slower (half speed). Left 6 / Right -6 = spin in place &mdash; this is called tank turning, not a malfunction.
+          13V gets clamped to 12V automatically &mdash; same as full speed. The hardware protects itself.
+        </div>
+      </div>
+
+      <!-- SILVER -->
+      <div class="tier-panel silver">
+        <span class="tier-label">Silver &mdash; fill in the blanks</span>
+        <p>
+          Someone deleted the most critical part of <code>setVoltage()</code>.
+          The blanks are where the logic lived. The robot is currently very confused.
+        </p>
+        <div class="code-block">
+          <pre>
+<span class="kw">@Override</span>
+<span class="kw">public void</span> setVoltage(<span class="kw">double</span> leftVolts, <span class="kw">double</span> rightVolts) {
+    drivetrain.tankDrive(
+        leftVolts  <span style="color: var(--red);">/ _____</span>,  <span class="cm">// not a guess</span>
+        rightVolts <span style="color: var(--red);">/ _____</span>   <span class="cm">// same number, promise</span>
+    );
+}
+          </pre>
+        </div>
+        <ul class="task-list">
+          <li>What goes in the blanks? What are the units of <code>tankDrive()</code>? Check the docs before guessing.</li>
+          <li>Where did that number come from? Write one sentence explaining the reasoning.</li>
+          <li>Test it in sim. If the robot drives into the wall at full speed, something's wrong with your number.</li>
+        </ul>
+        <div class="toggle-row">
+          <button class="toggle-btn" data-target="s-hint" data-open="Nudge me" data-closed="Hide hint">Nudge me</button>
+          <button class="toggle-btn" data-target="s-ans" data-open="Show answer" data-closed="Hide answer">Show answer</button>
+        </div>
+        <div class="toggle-content hint" id="s-hint">
+          <code>tankDrive()</code> wants values from -1.0 to 1.0 (percent output, not volts).
+          A full battery is 12V. To convert volts to percent: divide by 12.
+          This is the most important division you'll do today.
+        </div>
+        <div class="toggle-content answer" id="s-ans">
+          Both blanks = 12.0. tankDrive() wants -1.0 to 1.0. Dividing by 12 converts volts to that range.
+          6V / 12 = 0.5 = 50% speed. This math will come up again. Remember it.
+        </div>
+      </div>
+
+      <!-- GOLD -->
+      <div class="tier-panel gold">
+        <span class="tier-label">Gold &mdash; build from scratch</span>
+        <p>
+          Here's the contract. Your job is to fulfill it.
+          No skeleton. No blanks. Just the interface, your knowledge, and Java's unforgiving compiler.
+        </p>
+        <div class="code-block">
+          <pre>
+<span class="cm">// DriveIO.java &mdash; do not modify this file</span>
+<span class="kw">public interface</span> DriveIO {
+    <span class="kw">void</span> updateInputs(DriveIOInputs inputs);
+    <span class="kw">void</span> setVoltage(<span class="kw">double</span> left, <span class="kw">double</span> right);
+    <span class="kw">void</span> stop(); <span class="cm">// 0.0, not 1.0. learn from history.</span>
+}
+          </pre>
+        </div>
+        <ul class="task-list">
+          <li>Create <code>DriveIOXRP.java</code> implementing every method</li>
+          <li>Log velocity, position in meters, and gyro heading in <code>updateInputs()</code></li>
+          <li>Verify in AdvantageScope &mdash; if velocity never changes, something is wrong with your logging, not the motor</li>
+          <li>Bonus: add a <code>resetEncoders()</code> method to the interface and both files. Justify why it belongs on the interface.</li>
+        </ul>
+        <div class="toggle-row">
+          <button class="toggle-btn" data-target="g-hint" data-open="I am humble enough for a hint" data-closed="Hide hint">I am humble enough for a hint</button>
+        </div>
+        <div class="toggle-content hint" id="g-hint">
+          XRP encoders return inches &mdash; multiply by 0.0254 for meters.
+          <code>getAngleZ()</code> gives gyro heading in degrees.
+          If your robot drives sideways in sim, check which encoder method you're calling &mdash;
+          there are two and they are not the same.
+        </div>
+      </div>
+
+    </div><!-- /tier panels -->
+
+  </div><!-- /section-challenge -->
+
+
+  <!-- ═══════════════════════════════════════════════════════
+       PART 3 — BROKEN ROBOT LAB
+       ═══════════════════════════════════════════════════════ -->
+  <div class="lesson-section" id="section-lab">
+
+    <p class="bug-lab-intro">
+      This code compiles perfectly. The robot boots without errors.
+      And yet &mdash; something is deeply, specifically wrong with it.
+      There are <strong>3 bugs</strong> in the highlighted lines.
+      Click each one to find out what past-you did and why future-you is not happy about it.
+    </p>
+
+    <div class="bug-lab" data-lab="lesson-3">
+
+      <div class="bug-progress">
+        <span>Bugs found:</span>
+        <div class="bug-dot"></div>
+        <div class="bug-dot"></div>
+        <div class="bug-dot"></div>
+        <span class="bug-progress-count">0 / 3</span>
+      </div>
+
+      <div class="code-lab">
+
+        <div class="code-lab-line">
+          <span class="line-num">1</span>
+          <span class="line-code"><span class="kw">public class</span> DriveIOXRP <span class="kw">implements</span> DriveIO {</span>
+        </div>
+        <div class="code-lab-line">
+          <span class="line-num">2</span>
+          <span class="line-code">&nbsp;&nbsp;<span class="kw">private final</span> XRPDrivetrain drivetrain = <span class="kw">new</span> XRPDrivetrain();</span>
+        </div>
+        <div class="code-lab-line">
+          <span class="line-num">3</span>
+          <span class="line-code">&nbsp;&nbsp;<span class="kw">private final</span> XRPGyro gyro = <span class="kw">new</span> XRPGyro();</span>
+        </div>
+        <div class="code-lab-line">
+          <span class="line-num">4</span>
+          <span class="line-code">&nbsp;</span>
+        </div>
+        <div class="code-lab-line">
+          <span class="line-num">5</span>
+          <span class="line-code">&nbsp;&nbsp;<span class="kw">@Override</span></span>
+        </div>
+        <div class="code-lab-line">
+          <span class="line-num">6</span>
+          <span class="line-code">&nbsp;&nbsp;<span class="kw">public void</span> updateInputs(DriveIOInputs inputs) {</span>
+        </div>
+        <div class="code-lab-line bug-line" data-bug="1">
+          <span class="line-num">7</span>
+          <span class="line-code">&nbsp;&nbsp;&nbsp;&nbsp;inputs.leftPositionMeters = drivetrain.getLeftDistanceInch();</span>
+        </div>
+        <div class="code-lab-line">
+          <span class="line-num">8</span>
+          <span class="line-code">&nbsp;&nbsp;&nbsp;&nbsp;inputs.gyroYawDegrees = gyro.getAngleZ();</span>
+        </div>
+        <div class="code-lab-line">
+          <span class="line-num">9</span>
+          <span class="line-code">&nbsp;&nbsp;}</span>
+        </div>
+        <div class="code-lab-line">
+          <span class="line-num">10</span>
+          <span class="line-code">&nbsp;</span>
+        </div>
+        <div class="code-lab-line">
+          <span class="line-num">11</span>
+          <span class="line-code">&nbsp;&nbsp;<span class="kw">@Override</span></span>
+        </div>
+        <div class="code-lab-line">
+          <span class="line-num">12</span>
+          <span class="line-code">&nbsp;&nbsp;<span class="kw">public void</span> setVoltage(<span class="kw">double</span> left, <span class="kw">double</span> right) {</span>
+        </div>
+        <div class="code-lab-line bug-line" data-bug="2">
+          <span class="line-num">13</span>
+          <span class="line-code">&nbsp;&nbsp;&nbsp;&nbsp;drivetrain.tankDrive(left, right);</span>
+        </div>
+        <div class="code-lab-line">
+          <span class="line-num">14</span>
+          <span class="line-code">&nbsp;&nbsp;}</span>
+        </div>
+        <div class="code-lab-line">
+          <span class="line-num">15</span>
+          <span class="line-code">&nbsp;</span>
+        </div>
+        <div class="code-lab-line">
+          <span class="line-num">16</span>
+          <span class="line-code">&nbsp;&nbsp;<span class="kw">@Override</span></span>
+        </div>
+        <div class="code-lab-line">
+          <span class="line-num">17</span>
+          <span class="line-code">&nbsp;&nbsp;<span class="kw">public void</span> stop() {</span>
+        </div>
+        <div class="code-lab-line bug-line" data-bug="3">
+          <span class="line-num">18</span>
+          <span class="line-code">&nbsp;&nbsp;&nbsp;&nbsp;drivetrain.tankDrive(<span class="num">0.0</span>, <span class="num">0.0</span>); <span class="cm">// stopping!</span></span>
+        </div>
+        <div class="code-lab-line">
+          <span class="line-num">19</span>
+          <span class="line-code">&nbsp;&nbsp;}</span>
+        </div>
+        <div class="code-lab-line">
+          <span class="line-num">20</span>
+          <span class="line-code">}</span>
+        </div>
+
+      </div><!-- /code-lab -->
+
+      <div class="bug-reveal" data-bug="1">
+        <h4>Bug 1 &mdash; The position is in the wrong units</h4>
+        <div class="bug-joke">AdvantageScope showed the robot traveled 47 meters. The gym is 28 meters long. Concerning.</div>
+        <p>
+          <code>getLeftDistanceInch()</code> returns inches. Your input field is named
+          <code>leftPositionMeters</code>. These are not the same unit.
+          The robot logged a position wrong by a factor of 39.37, which is a fun number
+          until you're trying to run an autonomous routine.
+        </p>
+        <div class="bug-fix-label">Fix</div>
+        <div class="bug-fix">inputs.leftPositionMeters = drivetrain.getLeftDistanceInch() * 0.0254;</div>
+      </div>
+
+      <div class="bug-reveal" data-bug="2">
+        <h4>Bug 2 &mdash; Passing volts where the method wants percent</h4>
+        <div class="bug-joke">Commanded 6 volts. Robot received 6. tankDrive() interpreted this as 600% output and had a great time.</div>
+        <p>
+          <code>tankDrive()</code> expects values from -1.0 to 1.0. Passing raw volts means
+          passing values up to 12. The motor clamps to 1.0 (full speed) for anything above that.
+          You've built a robot with two speeds: stopped and absolutely floored.
+        </p>
+        <div class="bug-fix-label">Fix</div>
+        <div class="bug-fix">drivetrain.tankDrive(left / 12.0, right / 12.0);</div>
+      </div>
+
+      <div class="bug-reveal" data-bug="3">
+        <h4>Bug 3 &mdash; stop() works, but it works the wrong way</h4>
+        <div class="bug-joke">This one actually stops the robot. It just stops it in a way that will cause problems when you switch to real hardware.</div>
+        <p>
+          Calling <code>tankDrive(0, 0)</code> works in XRP simulation, but it bypasses
+          the hardware's native stop behavior. The idiomatic call that signals intent clearly
+          &mdash; and lets the hardware handle braking correctly &mdash; is
+          <code>drivetrain.stopMotor()</code>. Using <code>tankDrive(0, 0)</code> is like
+          turning off your car by shifting to neutral and coasting instead of pressing the brake.
+          Works, technically. Correct? Not quite.
+        </p>
+        <div class="bug-fix-label">Fix</div>
+        <div class="bug-fix">drivetrain.stopMotor();</div>
+      </div>
+
+      <div class="success-banner">
+        All 3 bugs found. Units mismatch, wrong value range, and a stop method with
+        the wrong approach &mdash; these are real categories that FRC teams debug every season.
+        You now recognize all three on sight.
+        That's genuinely useful and it took you about 5 minutes. Good trade.
+      </div>
+
+    </div><!-- /bug-lab -->
+
+  </div><!-- /section-lab -->
+
+</div><!-- /page-container -->
+
+<footer class="site-footer">
+  FRC Programming Curriculum &mdash; Built with AdvantageKit &middot; Java &middot; WPILib
+</footer>
+
+<script src="frc-curriculum.js"></script>
+</body>
+</html>

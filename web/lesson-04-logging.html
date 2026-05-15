@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 4 — Logging and AdvantageScope | FRC Programming Curriculum</title>
+  <link rel="stylesheet" href="frc-curriculum.css">
+</head>
+<body>
+
+<header class="site-header">
+  <a class="logo" href="index.html">FRC Programming Curriculum</a>
+  <span class="lesson-label">Module 2 &mdash; Lesson 4</span>
+  <nav class="site-nav">
+    <a href="index.html">All lessons</a>
+    <a href="lesson-03-io-pattern.html">&larr; Lesson 3</a>
+    <a href="lesson-05-autonomous.html">Lesson 5 &rarr;</a>
+  </nav>
+</header>
+
+<div class="page-container">
+
+  <div class="lesson-header">
+    <div class="lesson-meta">Module 2 &mdash; Lesson 4</div>
+    <h1 class="lesson-title">How do I debug a robot that isn't here?</h1>
+    <div class="lesson-subtitle">Logging is what turns "it broke at competition" into "I can see exactly what happened, frame by frame, on my couch."</div>
+    <div class="lesson-info-bar">
+      <div class="info-item"><div class="info-dot"></div> ~45 minutes</div>
+      <div class="info-item"><div class="info-dot"></div> Hardware: XRP robot</div>
+      <div class="info-item"><div class="info-dot"></div> Prereq: Lesson 3 &mdash; The IO pattern</div>
+      <div class="info-item"><div class="info-dot"></div> Java &middot; AdvantageKit &middot; AdvantageScope</div>
+    </div>
+  </div>
+
+  <nav class="section-nav">
+    <button class="section-nav-btn active" data-section="concept">Part 1 &mdash; The concept</button>
+    <button class="section-nav-btn" data-section="scope">Part 2 &mdash; AdvantageScope deep dive</button>
+    <button class="section-nav-btn" data-section="challenge">Part 3 &mdash; Try it yourself</button>
+    <button class="section-nav-btn" data-section="lab">Part 4 &mdash; Fix the broken robot</button>
+  </nav>
+
+  <!-- ═══════════════════════════════════════════════════════
+       PART 1 — THE CONCEPT
+       ═══════════════════════════════════════════════════════ -->
+  <div class="lesson-section active" id="section-concept">
+
+    <p>In Lesson 3 you wrote three files that magically logged everything to AdvantageScope. You called <code>Logger.processInputs()</code> in <code>periodic()</code> and trusted it. Today, we open the hood and look at what's actually happening &mdash; because the moment something doesn't get logged, you'll need to know why.</p>
+
+    <div class="hf-box hf-brain">
+      <span class="hf-label">Your brain is probably thinking this right now</span>
+      <p>"The robot drives. The graph shows numbers. Why are we still talking about logging?"</p>
+      <p>Because the bug that costs you the most points this season won't happen during practice. It'll happen during a quals match, in front of a referee, with no time to debug. Your only witness will be the log file. If you didn't log the right thing, or you logged it wrong, you'll never know what happened. Logging discipline is the difference between fixing a bug in 10 minutes and re-creating it for hours.</p>
+    </div>
+
+    <h2>The 60-second recap of Lesson 3</h2>
+    <p>The IO pattern split your subsystem into three files: an interface, an implementation, and the subsystem class. The point was hardware independence. The hidden bonus &mdash; the one we're going to use today &mdash; is that the IO pattern is also what makes deterministic logging and replay work. Same struct of inputs, every cycle, written to a file you can read later.</p>
+
+    <h2>What @AutoLog actually does</h2>
+    <p>You wrote <code>@AutoLog</code> at the top of <code>DriveIOInputs</code> in Lesson 3. You probably assumed it was decoration. It is doing real work.</p>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">@AutoLog is a Java annotation processor</span>
+      <p>When you compile your project, AdvantageKit's annotation processor sees <code>@AutoLog</code> on your class and <strong>generates a brand-new sibling class</strong> next to it called <code>DriveIOInputsAutoLogged</code>.</p>
+      <p>That generated class extends yours and adds two methods you never wrote: <code>toLog(LogTable)</code> and <code>fromLog(LogTable)</code>. Those methods are how AdvantageKit serializes your inputs to the log file and reads them back during replay.</p>
+      <p>You never see the generated file in your editor. It lives in <code>build/generated/</code>. It's regenerated every time you build.</p>
+    </div>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <h4>You write</h4>
+        <p><code>@AutoLog<br>public class DriveIOInputs {<br>&nbsp;&nbsp;public double leftPos;<br>&nbsp;&nbsp;public double rightPos;<br>}</code></p>
+      </div>
+      <div class="info-card">
+        <h4>Compiler generates</h4>
+        <p><code>public class DriveIOInputsAutoLogged extends DriveIOInputs {<br>&nbsp;&nbsp;void toLog(LogTable t) { ... }<br>&nbsp;&nbsp;void fromLog(LogTable t) { ... }<br>}</code></p>
+        <p class="aside">You use the generated one in your subsystem.</p>
+      </div>
+      <div class="info-card">
+        <h4>Why it matters</h4>
+        <p>If <code>@AutoLog</code> is missing, no AutoLogged class exists. Your inputs aren't logged. AdvantageScope shows nothing. Your subsystem might still work &mdash; but you're flying blind.</p>
+      </div>
+    </div>
+
+    <h2>Inputs vs outputs &mdash; two annotations, two purposes</h2>
+
+    <p>Logging in AdvantageKit splits cleanly into two categories. Knowing which is which is half the battle.</p>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <h4>&#128229; Inputs &mdash; @AutoLog on a class</h4>
+        <p>Things you <em>read</em>: encoder positions, gyro angles, current draw, button states.</p>
+        <p>Wrap them in a struct, slap <code>@AutoLog</code> on the struct, and AdvantageKit logs every field automatically.</p>
+        <p class="aside">These are the values that change because the world changed.</p>
+      </div>
+      <div class="info-card">
+        <h4>&#128228; Outputs &mdash; @AutoLogOutput on a field</h4>
+        <p>Things you <em>decide</em>: target velocity, calculated pose, autonomous mode name, "is the shooter ready?" booleans.</p>
+        <p>Put <code>@AutoLogOutput</code> on a field directly &mdash; AdvantageKit logs the value every time it changes.</p>
+        <p class="aside">These are the values that change because your code decided.</p>
+      </div>
+    </div>
+
+    <div class="hf-box hf-sidebar">
+      <span class="hf-label">When to use which</span>
+      <p><strong>Reading a sensor?</strong> It's an input. Goes in the Inputs struct.</p>
+      <p><strong>Computing a value from sensor readings?</strong> It's an output. Goes on a <code>@AutoLogOutput</code> field, or use <code>Logger.recordOutput("Drive/AveragePosition", value)</code> directly.</p>
+      <p><strong>Setting a motor voltage?</strong> The voltage you decided is an output (log it). The current the motor reports back is an input (log it via the inputs struct).</p>
+      <p>Inputs and outputs go to <em>different folders</em> in the AdvantageScope sidebar. You'll see <code>RealOutputs/</code>, <code>ReplayOutputs/</code>, and the AdvantageKit-prefixed input folders.</p>
+    </div>
+
+    <h2>The order matters &mdash; updateInputs THEN processInputs</h2>
+
+    <p>This is the mistake everyone makes once. Once.</p>
+
+    <div class="hf-box hf-warning">
+      <span class="hf-label">The order is not optional</span>
+      <p>In your subsystem's <code>periodic()</code>, the two lines must be in this exact order:</p>
+      <div class="code-block"><pre>
+io.updateInputs(inputs);                    <span class="cm">// Step 1: read hardware into struct</span>
+Logger.processInputs(<span class="st">"Drive"</span>, inputs);     <span class="cm">// Step 2: log the struct (or read from log in REPLAY)</span></pre></div>
+      <p>If you swap them, you log whatever was in the struct from the <em>previous</em> cycle &mdash; or zeros if it's the first cycle. Your data is always one tick stale. You will not notice this immediately. You will notice it three weeks later when your odometry is off by exactly 20 milliseconds and you can't figure out why.</p>
+    </div>
+
+    <h2>Three modes, one code path</h2>
+    <p>This is where AdvantageKit's architecture pays off. The same <code>periodic()</code> method behaves three different ways, controlled by <code>Constants.currentMode</code>:</p>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <h4>REAL</h4>
+        <p><code>updateInputs()</code> reads from real hardware.</p>
+        <p><code>processInputs()</code> writes the struct to a log file on the roboRIO USB drive.</p>
+        <p class="aside">What runs at competition.</p>
+      </div>
+      <div class="info-card">
+        <h4>SIM</h4>
+        <p><code>updateInputs()</code> reads from your physics sim.</p>
+        <p><code>processInputs()</code> writes to a log file on your laptop.</p>
+        <p class="aside">What runs when you Ctrl+Shift+P &rarr; Simulate.</p>
+      </div>
+      <div class="info-card">
+        <h4>REPLAY</h4>
+        <p><code>updateInputs()</code> does nothing &mdash; the IO is a no-op stub.</p>
+        <p><code>processInputs()</code> reads <em>from</em> the log file <em>into</em> the struct, overwriting whatever was there.</p>
+        <p class="aside">Magic.</p>
+      </div>
+    </div>
+
+    <div class="hf-box hf-brain">
+      <span class="hf-label">Why replay is the killer feature</span>
+      <p>Imagine you saved the log from yesterday's match. The robot crashed at second 42. You're sitting at home with a laptop and no XRP. You set <code>Constants.currentMode = REPLAY</code>, hand AdvantageKit the log file, and run your robot code. Your subsystems get the exact same sensor inputs as during the match &mdash; <em>byte for byte</em>. You can put a breakpoint anywhere. You can change the logic and see what would have happened. You can do this on a plane.</p>
+      <p>This is impossible without disciplined logging. It's why we care about the order of those two lines.</p>
+    </div>
+
+    <div class="chat-thread">
+      <div class="bubble bubble-q">
+        <div class="bubble-who">Student</div>
+        Why don't we just use SmartDashboard? It's simpler.
+      </div>
+      <div class="bubble bubble-a">
+        <div class="bubble-who">Fair question</div>
+        SmartDashboard publishes to NetworkTables in real time &mdash; great for live dashboards, useless after the match. Once the robot powers off, the values are gone. AdvantageKit writes a binary log file that survives. You can replay it, scrub through it, share it with another programmer over Slack. Use both: SmartDashboard for live driver displays, AdvantageKit for everything you might want to debug later.
+      </div>
+      <div class="bubble bubble-q">
+        <div class="bubble-who">Student</div>
+        Doesn't logging slow the robot down?
+      </div>
+      <div class="bubble bubble-a">
+        <div class="bubble-who">Negligibly</div>
+        AdvantageKit logs at the same 50Hz rate as the robot loop. Each cycle is a few hundred numbers. The serialization is fast and the file write is buffered. On a real robot, log files end up around 2&ndash;5 MB per match. The performance hit is in the noise &mdash; you will never measure it.
+      </div>
+    </div>
+
+    <div class="hf-box hf-brain">
+      <span class="hf-label">Brain power &mdash; before you move on</span>
+      <p>Without looking back: name the two annotations you'd use, and explain when you'd reach for each one. Then say out loud: "updateInputs first, processInputs second." Memorize the order &mdash; it is the bug you will hit otherwise.</p>
+    </div>
+
+  </div><!-- /section-concept -->
+
+
+  <!-- ═══════════════════════════════════════════════════════
+       PART 2 — ADVANTAGESCOPE DEEP DIVE
+       ═══════════════════════════════════════════════════════ -->
+  <div class="lesson-section" id="section-scope">
+
+    <p>You've used AdvantageScope to drag a value onto a graph. That's about 5% of what it can do. The other 95% is the difference between "I can see the data" and "I can find any bug, any time, in any saved log." Today we cover the 95%.</p>
+
+    <div class="hf-box hf-brain">
+      <span class="hf-label">Your brain is probably thinking this right now</span>
+      <p>"This is a lot of UI. Do I need to memorize all of it?"</p>
+      <p>No. You need to know which features <em>exist</em>, so when you have a problem, you know what to reach for. Reading the manual once is faster than re-discovering features under stress at competition.</p>
+    </div>
+
+    <h2>Live mode vs log mode</h2>
+
+    <p>AdvantageScope has two ways to get data, and switching between them is a one-click operation that students conflate constantly.</p>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <h4>&#128279; Live &mdash; Connect to Robot/Sim</h4>
+        <p>Streams data <em>as it happens</em>. The timeline keeps growing. Use this when the robot or simulator is running right now.</p>
+        <p class="aside">File &rarr; Connect to Simulator (or to Robot)</p>
+      </div>
+      <div class="info-card">
+        <h4>&#128194; Log &mdash; Open Log File</h4>
+        <p>Loads a saved <code>.wpilog</code> file. The full timeline is available immediately &mdash; you can scrub anywhere, freely.</p>
+        <p class="aside">File &rarr; Open Log... (point at a file)</p>
+      </div>
+    </div>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">How to find your log files</span>
+      <p><strong>Sim logs:</strong> by default in <code>logs/</code> next to your project folder, named with the date and time.</p>
+      <p><strong>Real-robot logs:</strong> on the USB stick plugged into the roboRIO. Pull the USB after the match, plug it into your laptop.</p>
+      <p>If you don't see a <code>logs/</code> folder, the Logger isn't writing files &mdash; check <code>Logger.addDataReceiver(new WPILOGWriter())</code> is in your Robot constructor.</p>
+    </div>
+
+    <h2>The sidebar &mdash; how to find anything</h2>
+    <p>The left sidebar in AdvantageScope is a tree of every key in the log. There's a lot. Knowing the structure speeds up everything.</p>
+
+    <div style="display:flex; flex-direction:column; gap:0.5rem; margin: 1rem 0;">
+
+      <div class="info-card">
+        <h4>&#128194; <code>RealOutputs/</code></h4>
+        <p>Everything logged via <code>Logger.recordOutput()</code> when running on real hardware (or in SIM). This is where the values your code <em>decided</em> live: target velocities, computed poses, autonomous chooser selections.</p>
+      </div>
+
+      <div class="info-card">
+        <h4>&#128194; <code>ReplayOutputs/</code></h4>
+        <p>The same outputs, recomputed during a replay run. If they don't match <code>RealOutputs/</code> for the same timestamp, your code's behavior changed &mdash; on purpose (you fixed a bug) or by accident (you broke something).</p>
+      </div>
+
+      <div class="info-card">
+        <h4>&#128194; <code>AdvantageKit/RealOutputs/</code> + per-subsystem folders</h4>
+        <p>Inputs from your <code>@AutoLog</code> structs &mdash; e.g., <code>Drive/LeftPositionMeters</code>, <code>Shooter/CurrentAmps</code>. The folder name comes from the first arg of <code>Logger.processInputs("Drive", inputs)</code>.</p>
+      </div>
+
+      <div class="info-card">
+        <h4>&#128194; <code>NT/</code> and <code>DS/</code></h4>
+        <p>Anything published to NetworkTables (SmartDashboard, Shuffleboard) and driver-station state. Useful for cross-checking what the dashboard saw vs. what the robot actually did.</p>
+      </div>
+
+    </div>
+
+    <h2>The visualization tabs</h2>
+    <p>The big buttons across the top of AdvantageScope each open a different way of looking at the same data. The ones you'll use most:</p>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <h4>Line Graph</h4>
+        <p>Y-axis: numeric value. X-axis: time. Drag any number-valued key onto it. The 90% case.</p>
+        <p class="aside">Multiple keys on one graph let you compare directly.</p>
+      </div>
+      <div class="info-card">
+        <h4>Odometry / 2D Field</h4>
+        <p>Drop a <code>Pose2d</code> or array of poses onto a top-down field view. See where the robot was and where it thought it was.</p>
+        <p class="aside">Best way to debug autonomous routines.</p>
+      </div>
+      <div class="info-card">
+        <h4>Table</h4>
+        <p>Scrubbable spreadsheet view of every value at every timestamp. Slow for long logs but unbeatable for "what was the value at exactly t=42.0?"</p>
+      </div>
+      <div class="info-card">
+        <h4>Console</h4>
+        <p>All <code>System.out.println()</code> output from the robot. If you printed a debug message during a match, this is where it shows up.</p>
+      </div>
+    </div>
+
+    <h2>Time scrubbing</h2>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">How to scrub through a log</span>
+      <p><strong>1.</strong> Open a log file (or pause a live connection)</p>
+      <p><strong>2.</strong> The timeline at the bottom of the window shows the full duration</p>
+      <p><strong>3.</strong> Click anywhere on the timeline &mdash; every visualization jumps to that moment</p>
+      <p><strong>4.</strong> Use arrow keys to step frame-by-frame (one robot loop per arrow press)</p>
+      <p><strong>5.</strong> The play button replays at real-time speed; speed slider goes faster or slower</p>
+      <p>This is how you find the exact moment something went wrong.</p>
+    </div>
+
+    <h2>Replay mode &mdash; running new code on old data</h2>
+
+    <p>Replay is the killer feature. It lets you change your code, re-run it against a saved log, and see what would have happened &mdash; without touching the robot.</p>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">How to run a replay</span>
+      <p><strong>1.</strong> In <code>Constants.java</code>, set <code>simMode = Mode.REPLAY</code></p>
+      <p><strong>2.</strong> Set the path to the log file you want to replay (the project README has the exact line)</p>
+      <p><strong>3.</strong> Run <code>WPILib: Simulate Robot Code</code> as normal</p>
+      <p><strong>4.</strong> Your subsystems get the exact same input values as during the original run</p>
+      <p><strong>5.</strong> A <em>new</em> log gets written, with <code>ReplayOutputs/</code> populated from your code</p>
+      <p><strong>6.</strong> Open the new log in AdvantageScope &mdash; <code>RealOutputs/</code> and <code>ReplayOutputs/</code> let you compare</p>
+    </div>
+
+    <div class="hf-box hf-warning">
+      <span class="hf-label">Replay only works if logging was disciplined</span>
+      <p>If a sensor reading was never logged, replay can't reproduce it. If <code>processInputs()</code> wasn't called, the log is empty. If <code>@AutoLog</code> was missing, the struct didn't get serialized. Bad logging during the match means no debugging after &mdash; this is why the rules in Part 1 are not optional.</p>
+    </div>
+
+    <div class="hf-box hf-brain">
+      <span class="hf-label">Do this right now</span>
+      <p>Open AdvantageScope. Open one of your saved logs from Lesson 3. Drag a Drive input onto a Line Graph. Click somewhere in the timeline. Press the right arrow key. Watch the graph cursor move one tick at a time. That's the loop you'll use to debug everything for the rest of the season.</p>
+    </div>
+
+  </div><!-- /section-scope -->
+
+
+  <!-- ═══════════════════════════════════════════════════════
+       PART 3 — TIERED CHALLENGE
+       ═══════════════════════════════════════════════════════ -->
+  <div class="lesson-section" id="section-challenge">
+
+    <p>Three tiers, one log file. The Bronze challenge is observation. Silver adds a new logged value. Gold runs replay mode. Pick where you are; Gold subsumes the others.</p>
+
+    <div class="tier-tabs">
+      <button class="tier-tab bronze active" data-tier="bronze">Bronze &mdash; I can read a log</button>
+      <button class="tier-tab silver" data-tier="silver">Silver &mdash; I can add a new logged value</button>
+      <button class="tier-tab gold" data-tier="gold">Gold &mdash; I can replay a log</button>
+    </div>
+
+    <div>
+
+      <div class="tier-panel bronze active">
+        <span class="tier-label">Bronze &mdash; navigate a saved log</span>
+        <p>Drive your XRP for ~30 seconds, then open the saved log in AdvantageScope. Find each of the following without asking anyone.</p>
+        <ul class="task-list">
+          <li>Find <code>Drive/LeftPositionMeters</code> in the sidebar &mdash; what was the maximum value?</li>
+          <li>Drag <code>Drive/LeftPositionMeters</code> and <code>Drive/RightPositionMeters</code> onto the same graph. When did they diverge most?</li>
+          <li>Click a moment in the timeline where you were turning. Does the gyro value match what you'd expect?</li>
+          <li>Open the Console tab. Did anything get printed during the run? What?</li>
+          <li>Open the Table tab. Find a single timestamp and read off all the input values for that frame.</li>
+        </ul>
+        <div class="toggle-row">
+          <button class="toggle-btn" data-target="b1-hint" data-open="Show hint" data-closed="Hide hint">Show hint</button>
+        </div>
+        <div class="toggle-content hint" id="b1-hint">
+          If you don't see the Drive folder, your subsystem might not have called <code>Logger.processInputs("Drive", inputs)</code>. Check the broken robot lab in Part 4 &mdash; it covers the same bug.
+        </div>
+      </div>
+
+      <div class="tier-panel silver">
+        <span class="tier-label">Silver &mdash; add a new logged input</span>
+        <p>Add a derived value to your inputs class so it gets logged automatically. The XRP doesn't have a current sensor &mdash; instead, log a calculated total distance.</p>
+        <ul class="task-list">
+          <li>Open <code>DriveIOInputs.java</code></li>
+          <li>Add a new field: <code>public double totalDistanceMeters = 0.0;</code></li>
+          <li>In <code>DriveIOXRP.java</code>'s <code>updateInputs()</code> method, set the field to <code>(left + right) / 2.0</code></li>
+          <li>Build the project, simulate, drive for 10 seconds</li>
+          <li>Open the new log &mdash; verify <code>Drive/TotalDistanceMeters</code> appears in AdvantageScope</li>
+        </ul>
+        <div class="toggle-row">
+          <button class="toggle-btn" data-target="s1-hint" data-open="Show hint" data-closed="Hide hint">Show hint</button>
+          <button class="toggle-btn" data-target="s1-ans" data-open="Show solution" data-closed="Hide solution">Show solution</button>
+        </div>
+        <div class="toggle-content hint" id="s1-hint">
+          If you added the field but it doesn't appear in AdvantageScope, did you rebuild the project? <code>@AutoLog</code> is processed at compile time. Editing the inputs class without rebuilding means the AutoLogged class is stale.
+        </div>
+        <div class="toggle-content answer" id="s1-ans">
+          <pre>// In DriveIOInputs.java
+@AutoLog
+public class DriveIOInputs {
+    public double leftPositionMeters = 0.0;
+    public double rightPositionMeters = 0.0;
+    public double totalDistanceMeters = 0.0;   // new field
+}
+
+// In DriveIOXRP.java's updateInputs():
+inputs.leftPositionMeters = drivetrain.getLeftDistanceInch() * 0.0254;
+inputs.rightPositionMeters = drivetrain.getRightDistanceInch() * 0.0254;
+inputs.totalDistanceMeters =
+    (inputs.leftPositionMeters + inputs.rightPositionMeters) / 2.0;</pre>
+        </div>
+      </div>
+
+      <div class="tier-panel gold">
+        <span class="tier-label">Gold &mdash; run a replay</span>
+        <p>Take a log file from a sim run, switch to replay mode, and re-run your code against it. Verify the outputs match.</p>
+        <ul class="task-list">
+          <li>Drive in sim for ~10 seconds. Save the resulting log file.</li>
+          <li>In <code>Constants.java</code>, change <code>simMode</code> from <code>Mode.SIM</code> to <code>Mode.REPLAY</code></li>
+          <li>Set the replay log path to point at the file you just saved (check the project README for the exact constant name)</li>
+          <li>Run <code>WPILib: Simulate Robot Code</code></li>
+          <li>Open the resulting new log in AdvantageScope</li>
+          <li>Find a value that exists in both <code>RealOutputs/</code> and <code>ReplayOutputs/</code> &mdash; do they match?</li>
+          <li><strong>Bonus:</strong> change one line of code in your subsystem (e.g., scale a value by 2). Re-run the replay. Verify the <code>ReplayOutputs/</code> value now differs from <code>RealOutputs/</code> in exactly the way you expected.</li>
+        </ul>
+        <div class="toggle-row">
+          <button class="toggle-btn" data-target="g1-hint" data-open="Show hint" data-closed="Hide hint">Show hint</button>
+        </div>
+        <div class="toggle-content hint" id="g1-hint">
+          Replay outputs match real outputs when your code is unchanged &mdash; that's how you know replay is working. The interesting case is when they <em>don't</em> match: that tells you the change you made affected behavior. If they always match no matter what you do, your replay isn't actually running &mdash; double-check the mode constant and log path.
+        </div>
+      </div>
+
+    </div>
+
+  </div><!-- /section-challenge -->
+
+
+  <!-- ═══════════════════════════════════════════════════════
+       PART 4 — BROKEN ROBOT LAB
+       ═══════════════════════════════════════════════════════ -->
+  <div class="lesson-section" id="section-lab">
+
+    <p class="bug-lab-intro">
+      This <code>DriveSubsystem</code> compiles. The robot drives. The motors spin. And yet, when you open the log in AdvantageScope, the Drive folder is empty &mdash; or worse, full of values that look fine but don't match what the robot actually did. There are <strong>3 bugs</strong> hiding in the highlighted lines. Click each one to find out what went wrong.
+    </p>
+
+    <div class="bug-lab" data-lab="lesson-4">
+
+      <div class="bug-progress">
+        <span>Bugs found:</span>
+        <div class="bug-dot"></div>
+        <div class="bug-dot"></div>
+        <div class="bug-dot"></div>
+        <span class="bug-progress-count">0 / 3</span>
+      </div>
+
+      <div class="code-lab">
+        <div class="code-lab-line"><span class="line-num">1</span><span class="line-code"><span class="cm">// DriveIOInputs.java</span></span></div>
+        <div class="code-lab-line bug-line" data-bug="1"><span class="line-num">2</span><span class="line-code"><span class="kw">public class</span> DriveIOInputs {</span></div>
+        <div class="code-lab-line"><span class="line-num">3</span><span class="line-code">&nbsp;&nbsp;<span class="kw">public double</span> leftPositionMeters = 0.0;</span></div>
+        <div class="code-lab-line"><span class="line-num">4</span><span class="line-code">&nbsp;&nbsp;<span class="kw">public double</span> rightPositionMeters = 0.0;</span></div>
+        <div class="code-lab-line"><span class="line-num">5</span><span class="line-code">&nbsp;&nbsp;<span class="kw">public double</span> gyroYawDegrees = 0.0;</span></div>
+        <div class="code-lab-line"><span class="line-num">6</span><span class="line-code">}</span></div>
+        <div class="code-lab-line"><span class="line-num">7</span><span class="line-code">&nbsp;</span></div>
+        <div class="code-lab-line"><span class="line-num">8</span><span class="line-code"><span class="cm">// DriveSubsystem.java</span></span></div>
+        <div class="code-lab-line"><span class="line-num">9</span><span class="line-code"><span class="kw">public class</span> DriveSubsystem <span class="kw">extends</span> SubsystemBase {</span></div>
+        <div class="code-lab-line"><span class="line-num">10</span><span class="line-code">&nbsp;&nbsp;<span class="kw">private final</span> DriveIO io;</span></div>
+        <div class="code-lab-line"><span class="line-num">11</span><span class="line-code">&nbsp;&nbsp;<span class="kw">private final</span> DriveIOInputs inputs = <span class="kw">new</span> DriveIOInputs();</span></div>
+        <div class="code-lab-line"><span class="line-num">12</span><span class="line-code">&nbsp;</span></div>
+        <div class="code-lab-line"><span class="line-num">13</span><span class="line-code">&nbsp;&nbsp;<span class="kw">public</span> DriveSubsystem(DriveIO io) { <span class="kw">this</span>.io = io; }</span></div>
+        <div class="code-lab-line"><span class="line-num">14</span><span class="line-code">&nbsp;</span></div>
+        <div class="code-lab-line"><span class="line-num">15</span><span class="line-code">&nbsp;&nbsp;<span class="kw">@Override</span></span></div>
+        <div class="code-lab-line"><span class="line-num">16</span><span class="line-code">&nbsp;&nbsp;<span class="kw">public void</span> periodic() {</span></div>
+        <div class="code-lab-line bug-line" data-bug="2"><span class="line-num">17</span><span class="line-code">&nbsp;&nbsp;&nbsp;&nbsp;Logger.processInputs(<span class="st">"Drive"</span>, inputs);</span></div>
+        <div class="code-lab-line"><span class="line-num">18</span><span class="line-code">&nbsp;&nbsp;&nbsp;&nbsp;io.updateInputs(inputs);</span></div>
+        <div class="code-lab-line"><span class="line-num">19</span><span class="line-code">&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">double</span> avg = (inputs.leftPositionMeters + inputs.rightPositionMeters) / 2.0;</span></div>
+        <div class="code-lab-line bug-line" data-bug="3"><span class="line-num">20</span><span class="line-code">&nbsp;&nbsp;&nbsp;&nbsp;Logger.recordOutput(<span class="st">"avgPosition"</span>, avg);</span></div>
+        <div class="code-lab-line"><span class="line-num">21</span><span class="line-code">&nbsp;&nbsp;}</span></div>
+        <div class="code-lab-line"><span class="line-num">22</span><span class="line-code">}</span></div>
+      </div>
+
+      <div class="bug-reveal" data-bug="1">
+        <h4>Bug 1 &mdash; missing @AutoLog annotation</h4>
+        <div class="bug-joke">The class looks innocent. It even has fields. It's just not being processed by anyone.</div>
+        <p>Without <code>@AutoLog</code> at the top of <code>DriveIOInputs</code>, the AdvantageKit annotation processor never runs on it. The generated <code>DriveIOInputsAutoLogged</code> class doesn't exist. <code>Logger.processInputs()</code> needs that generated class to know how to serialize the struct. Without it, your inputs are silently never logged. AdvantageScope's Drive folder is empty.</p>
+        <div class="bug-fix-label">Fix</div>
+        <div class="bug-fix">@AutoLog<br>public class DriveIOInputs {</div>
+      </div>
+
+      <div class="bug-reveal" data-bug="2">
+        <h4>Bug 2 &mdash; processInputs called BEFORE updateInputs</h4>
+        <div class="bug-joke">The lines are in the wrong order. The robot logs whatever was in the struct from last cycle. Or zeros. Forever.</div>
+        <p>On the first call to <code>periodic()</code>, the inputs struct is full of default zeros. <code>processInputs("Drive", inputs)</code> writes those zeros to the log. <code>updateInputs(inputs)</code> then reads real values into the struct &mdash; but it's too late, the log has already been written for this cycle. Next cycle, you log <em>last</em> cycle's values. Your data is always one tick behind. The fix: swap the lines.</p>
+        <div class="bug-fix-label">Fix</div>
+        <div class="bug-fix">io.updateInputs(inputs);<br>Logger.processInputs("Drive", inputs);</div>
+      </div>
+
+      <div class="bug-reveal" data-bug="3">
+        <h4>Bug 3 &mdash; output key missing the subsystem prefix</h4>
+        <div class="bug-joke">The value gets logged, but it goes to the root namespace where you'll never find it &mdash; unless you know to look for the lonely "avgPosition" floating around with no folder.</div>
+        <p>The first argument to <code>Logger.recordOutput()</code> is the key path in the log. Conventions matter: every output should be prefixed with its subsystem name. <code>"avgPosition"</code> dumps the value into the root, where it will collide with any other subsystem that names something the same. <code>"Drive/AvgPosition"</code> puts it neatly inside the Drive folder where it belongs. AdvantageScope's sidebar tree is built on these slashes.</p>
+        <div class="bug-fix-label">Fix</div>
+        <div class="bug-fix">Logger.recordOutput("Drive/AvgPosition", avg);</div>
+      </div>
+
+      <div class="success-banner">
+        All 3 bugs found. Missing annotation, swapped order, missing prefix &mdash; these are the three logging bugs you'll see most often in real team code. The first two break logging entirely. The third buries your data where you can't find it. Fix them on sight from now on.
+      </div>
+
+    </div>
+
+  </div><!-- /section-lab -->
+
+</div><!-- /page-container -->
+
+<footer class="site-footer">
+  FRC Programming Curriculum &mdash; Lesson 4: Logging and AdvantageScope
+</footer>
+
+<script src="frc-curriculum.js"></script>
+</body>
+</html>
