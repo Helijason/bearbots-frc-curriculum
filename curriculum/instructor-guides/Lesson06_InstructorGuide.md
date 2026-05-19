@@ -36,7 +36,7 @@
 
 - VSCode open on projector with the Lesson 05 starter project, plus the L-shape lab code prepared as a separate branch
 - AdvantageScope installed; a known-good auto log from a previous run ready to demo
-- Digital handout open: `lesson-05-autonomous.html`
+- Digital handout open: `lesson-06-autonomous.html`
 - XRP robots available — students need physical hardware for Bronze and Gold tiers
 - Floor space — students will be running multi-step autos that travel ~2 meters
 

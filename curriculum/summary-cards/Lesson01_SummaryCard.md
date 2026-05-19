@@ -78,5 +78,5 @@ You'll run this loop hundreds of times.
 ---
 
 *FRC Programming Curriculum — Lesson 01*
-*Next: Lesson 02 — What did VSCode just create?*
+*Next: Lesson 02 — Understanding the WPILib project template, file responsibilities, and the simulator.*
 *Keep this. Collect all 7.*

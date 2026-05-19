@@ -1,6 +1,6 @@
 # FRC Programming Curriculum — Module 2, Lesson 04
 
-# Why Does the Robot Need Two Files for One Motor?
+# The IO Pattern and AdvantageKit Architecture
 
 *The IO Pattern and AdvantageKit Architecture — applied to the Bear Bots elevator, scoop, and arm.*
 
@@ -12,7 +12,7 @@
 
 | Field | Detail |
 |---|---|
-| **Target audience** | HS freshmen & sophomores, completed Lessons 1 and 2 |
+| **Target audience** | HS freshmen & sophomores, completed Lessons 02 and 03 |
 | **Hardware** | XRP robot with arm (existing), elevator + scoop (students wire today) |
 | **Session length** | 3 hours |
 | **Key tools** | WPILib VSCode, Simulator, AdvantageScope, WPILib XRP documentation |

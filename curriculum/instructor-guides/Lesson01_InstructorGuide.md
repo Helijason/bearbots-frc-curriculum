@@ -300,13 +300,13 @@ A: *"Yes. Every session. With the power cord. The whole curriculum is hands-on �
 
 - A reminder to bring laptop + power cord + reference card to Lesson 02
 - Backup laptop assignments — who's borrowing which machine
-- Optional: link to the digital handout (`lesson-00-setup.html`) for review
+- Optional: link to the digital handout (`lesson-01-setup.html`) for review
 
 ### Track for next session
 
 - Which students are on backup laptops
 - Which students had major issues — schedule 1-on-1 troubleshooting before Lesson 02
-- Any installer/USB issues that should be fixed before next year's Lesson 01
+- Lessons learned - record any issues that should be fixed before next year's Lesson 01
 
 ---
 

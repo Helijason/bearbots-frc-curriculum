@@ -3,40 +3,40 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lesson 5 — Autonomous routines | FRC Programming Curriculum</title>
+  <title>Lesson 06 — Autonomous routines | FRC Programming Curriculum</title>
   <link rel="stylesheet" href="frc-curriculum.css">
 </head>
 <body>
 
 <header class="site-header">
   <a class="logo" href="index.html">FRC Programming Curriculum</a>
-  <span class="lesson-label">Module 2 &mdash; Lesson 5</span>
+  <span class="lesson-label">Module 2 - Lesson 06</span>
   <nav class="site-nav">
     <a href="index.html">All lessons</a>
-    <a href="lesson-04-logging.html">&larr; Lesson 4</a>
-    <a href="lesson-06-sensors.html">Lesson 6 &rarr;</a>
+    <a href="lesson-05-logging.html">&larr; Lesson 05</a>
+    <a href="lesson-07-sensors.html">Lesson 07 &rarr;</a>
   </nav>
 </header>
 
 <div class="page-container">
 
   <div class="lesson-header">
-    <div class="lesson-meta">Module 2 &mdash; Lesson 5</div>
+    <div class="lesson-meta">Module 2 - Lesson 06</div>
     <h1 class="lesson-title">How does the robot know when it's done?</h1>
     <div class="lesson-subtitle">A command has a beginning, a middle, and an end. Autonomous is just commands ending in the right order.</div>
     <div class="lesson-info-bar">
       <div class="info-item"><div class="info-dot"></div> ~45 minutes</div>
       <div class="info-item"><div class="info-dot"></div> Hardware: XRP robot</div>
-      <div class="info-item"><div class="info-dot"></div> Prereq: Lesson 4 &mdash; Logging</div>
+      <div class="info-item"><div class="info-dot"></div> Prereq: Lesson 05 - Logging</div>
       <div class="info-item"><div class="info-dot"></div> Java &middot; WPILib commands</div>
     </div>
   </div>
 
   <nav class="section-nav">
-    <button class="section-nav-btn active" data-section="concept">Part 1 &mdash; The concept</button>
-    <button class="section-nav-btn" data-section="composition">Part 2 &mdash; Composition</button>
-    <button class="section-nav-btn" data-section="challenge">Part 3 &mdash; Try it yourself</button>
-    <button class="section-nav-btn" data-section="lab">Part 4 &mdash; Fix the broken robot</button>
+    <button class="section-nav-btn active" data-section="concept">Part 1 - The concept</button>
+    <button class="section-nav-btn" data-section="composition">Part 2 - Composition</button>
+    <button class="section-nav-btn" data-section="challenge">Part 3 - Try it yourself</button>
+    <button class="section-nav-btn" data-section="lab">Part 4 - Fix the broken robot</button>
   </nav>
 
   <!-- ═══════════════════════════════════════════════════════
@@ -44,14 +44,14 @@
        ═══════════════════════════════════════════════════════ -->
   <div class="lesson-section active" id="section-concept">
 
-    <p>Autonomous mode is the first 15 seconds of every match. The driver can't touch the controller. The robot has to know what to do, when to stop doing it, and when to do something else. None of that is possible if your code is just a list of motor commands. You need a structure that has a beginning, a middle, and an end &mdash; and you need to compose those structures into longer sequences.</p>
+    <p>Autonomous mode is the first 15 seconds of every match. The driver can't touch the controller. The robot has to know what to do, when to stop doing it, and when to do something else. None of that is possible if your code is just a list of motor commands. You need a structure that has a beginning, a middle, and an end - and you need to compose those structures into longer sequences.</p>
 
     <p>That structure is a <strong>Command</strong>. Today we learn what one looks like, why it's better than the alternatives, and how to combine them into routines that actually finish.</p>
 
     <div class="hf-box hf-brain">
       <span class="hf-label">Your brain is probably thinking this right now</span>
       <p>"Why don't I just put the autonomous code in <code>autonomousPeriodic()</code>? It runs every 20ms. I'll set the motors, then check the encoder, then turn off the motors when the distance is reached. Done."</p>
-      <p>You can do that. It works for one move. The second you want to <em>chain</em> moves &mdash; drive, then turn, then drive again &mdash; you're writing a state machine by hand. Every team that has tried this has eventually rewritten it as commands. Save yourself the rewrite.</p>
+      <p>You can do that. It works for one move. The second you want to <em>chain</em> moves - drive, then turn, then drive again - you're writing a state machine by hand. Every team that has tried this has eventually rewritten it as commands. Save yourself the rewrite.</p>
     </div>
 
     <h2>The four questions every command answers</h2>
@@ -62,7 +62,7 @@
       <div class="info-card">
         <h4>1. <code>initialize()</code></h4>
         <p>"What do I do at the very start?"</p>
-        <p>Runs once. Use it to record a starting position, reset a sensor, set a target value &mdash; anything that needs to happen <em>before</em> the loop begins.</p>
+        <p>Runs once. Use it to record a starting position, reset a sensor, set a target value - anything that needs to happen <em>before</em> the loop begins.</p>
         <p class="aside">Forgetting to record a start position is bug #1.</p>
       </div>
       <div class="info-card">
@@ -80,7 +80,7 @@
       <div class="info-card">
         <h4>4. <code>end(boolean interrupted)</code></h4>
         <p>"What do I clean up?"</p>
-        <p>Runs once when the command stops &mdash; whether <code>isFinished()</code> returned <code>true</code> or another command interrupted it. Stop the motors here.</p>
+        <p>Runs once when the command stops - whether <code>isFinished()</code> returned <code>true</code> or another command interrupted it. Stop the motors here.</p>
         <p class="aside">Forgetting to stop motors is bug #2.</p>
       </div>
     </div>
@@ -117,7 +117,7 @@
     }
 }</pre></div>
 
-    <p>Read it again, slowly. Match each method to one of the four questions. <code>addRequirements(drive)</code> is the only odd one &mdash; that's the command telling WPILib which subsystem it needs exclusive access to (more on that below).</p>
+    <p>Read it again, slowly. Match each method to one of the four questions. <code>addRequirements(drive)</code> is the only odd one - that's the command telling WPILib which subsystem it needs exclusive access to (more on that below).</p>
 
     <h2>Why this beats <code>autonomousPeriodic()</code></h2>
 
@@ -136,13 +136,13 @@
       </div>
       <div class="info-card">
         <h4>&#128229; Loggable</h4>
-        <p>The CommandScheduler logs every <code>initialize</code>, <code>execute</code>, and <code>end</code>. Open AdvantageScope, look at the Commands folder &mdash; you can see exactly which command was running, when. Compare to <code>periodic()</code>: nothing.</p>
+        <p>The CommandScheduler logs every <code>initialize</code>, <code>execute</code>, and <code>end</code>. Open AdvantageScope, look at the Commands folder - you can see exactly which command was running, when. Compare to <code>periodic()</code>: nothing.</p>
       </div>
     </div>
 
-    <h2>The CommandScheduler &mdash; what calls these methods?</h2>
+    <h2>The CommandScheduler - what calls these methods?</h2>
 
-    <p>You don't call <code>initialize()</code> yourself. WPILib has a <code>CommandScheduler</code> that runs every 20ms (the same line you put in <code>robotPeriodic()</code> back in Lesson 1). When you "schedule" a command &mdash; usually with <code>command.schedule()</code> or by binding it to a button &mdash; the scheduler takes ownership of running it.</p>
+    <p>You don't call <code>initialize()</code> yourself. WPILib has a <code>CommandScheduler</code> that runs every 20ms (the same line you put in <code>robotPeriodic()</code> back in Lesson 1). When you "schedule" a command - usually with <code>command.schedule()</code> or by binding it to a button - the scheduler takes ownership of running it.</p>
 
     <div class="hf-box hf-info">
       <span class="hf-label">The scheduler's lifecycle, every loop</span>
@@ -153,13 +153,13 @@
       <p>That's the whole loop. Every command, every cycle. You write the four methods; the scheduler does the rest.</p>
     </div>
 
-    <h2>Subsystem requirements &mdash; why <code>addRequirements()</code> matters</h2>
+    <h2>Subsystem requirements - why <code>addRequirements()</code> matters</h2>
 
-    <p><code>addRequirements(drive)</code> tells the scheduler "this command needs the drivetrain &mdash; nothing else can use it while I'm running." If a second command tries to grab the same subsystem, the scheduler interrupts the first one (calls <code>end(true)</code>) and starts the new one.</p>
+    <p><code>addRequirements(drive)</code> tells the scheduler "this command needs the drivetrain - nothing else can use it while I'm running." If a second command tries to grab the same subsystem, the scheduler interrupts the first one (calls <code>end(true)</code>) and starts the new one.</p>
 
     <div class="hf-box hf-warning">
       <span class="hf-label">Forget addRequirements and bad things happen</span>
-      <p>If <code>DriveDistance</code> doesn't declare a requirement on <code>drive</code>, and another command also drives the motors, the scheduler runs <em>both</em>. Both call <code>drive.drive()</code> in <code>execute()</code>. Whichever ran last wins for that cycle &mdash; effectively, your motors get random commands. The robot does something neither command intended.</p>
+      <p>If <code>DriveDistance</code> doesn't declare a requirement on <code>drive</code>, and another command also drives the motors, the scheduler runs <em>both</em>. Both call <code>drive.drive()</code> in <code>execute()</code>. Whichever ran last wins for that cycle - effectively, your motors get random commands. The robot does something neither command intended.</p>
       <p>Always add requirements. Always.</p>
     </div>
 
@@ -170,11 +170,11 @@
       </div>
       <div class="bubble bubble-a">
         <div class="bubble-who">Reason</div>
-        Because cleanup matters either way. If you were driving forward and got interrupted, the motors are still running &mdash; <code>end()</code> needs to stop them or the robot keeps going. The <code>interrupted</code> boolean is just a hint about <em>why</em> you're ending. The cleanup is the same.
+        Because cleanup matters either way. If you were driving forward and got interrupted, the motors are still running - <code>end()</code> needs to stop them or the robot keeps going. The <code>interrupted</code> boolean is just a hint about <em>why</em> you're ending. The cleanup is the same.
       </div>
       <div class="bubble bubble-q">
         <div class="bubble-who">Student</div>
-        What if my command really is instant &mdash; like "reset gyro"?
+        What if my command really is instant - like "reset gyro"?
       </div>
       <div class="bubble bubble-a">
         <div class="bubble-who">Use InstantCommand</div>
@@ -183,8 +183,8 @@
     </div>
 
     <div class="hf-box hf-brain">
-      <span class="hf-label">Brain power &mdash; before you move on</span>
-      <p>Out loud, name the four methods of a command and what each does. Then explain why <code>end()</code> exists separately from <code>isFinished()</code> &mdash; couldn't they be combined? (Answer: no &mdash; <code>end()</code> also runs when interrupted. <code>isFinished()</code> only signals "I'm ready to be done.")</p>
+      <span class="hf-label">Brain power - before you move on</span>
+      <p>Out loud, name the four methods of a command and what each does. Then explain why <code>end()</code> exists separately from <code>isFinished()</code> - couldn't they be combined? (Answer: no - <code>end()</code> also runs when interrupted. <code>isFinished()</code> only signals "I'm ready to be done.")</p>
     </div>
 
   </div><!-- /section-concept -->
@@ -195,7 +195,7 @@
        ═══════════════════════════════════════════════════════ -->
   <div class="lesson-section" id="section-composition">
 
-    <p>One command runs one move. Auto routines need <em>multiple</em> moves &mdash; drive forward, turn, drive forward, score. The way you combine commands is called <strong>composition</strong>, and it's the actual point of the command framework. If you understand composition, you can build any auto.</p>
+    <p>One command runs one move. Auto routines need <em>multiple</em> moves - drive forward, turn, drive forward, score. The way you combine commands is called <strong>composition</strong>, and it's the actual point of the command framework. If you understand composition, you can build any auto.</p>
 
     <div class="hf-box hf-brain">
       <span class="hf-label">Your brain is probably thinking this right now</span>
@@ -203,7 +203,7 @@
       <p>You can. People have. It works for two commands and falls apart at three. Composition is what WPILib gives you instead. It's what every team is using by championships. Learn it now.</p>
     </div>
 
-    <h2>SequentialCommandGroup &mdash; one after another</h2>
+    <h2>SequentialCommandGroup - one after another</h2>
 
     <p>This is the workhorse. Pass it commands in order; the group runs them one at a time, only moving to the next when the current one's <code>isFinished()</code> returns <code>true</code>.</p>
 
@@ -216,11 +216,11 @@
     );
 }</pre></div>
 
-    <p>That's a complete autonomous routine. Three commands, three lines, a robot that draws an L on the carpet. The group itself is also a command &mdash; it has its own <code>isFinished()</code> that returns <code>true</code> when the last child finishes. So you can put a <code>SequentialCommandGroup</code> inside another <code>SequentialCommandGroup</code> if you want.</p>
+    <p>That's a complete autonomous routine. Three commands, three lines, a robot that draws an L on the carpet. The group itself is also a command - it has its own <code>isFinished()</code> that returns <code>true</code> when the last child finishes. So you can put a <code>SequentialCommandGroup</code> inside another <code>SequentialCommandGroup</code> if you want.</p>
 
-    <h2>ParallelCommandGroup &mdash; all at once</h2>
+    <h2>ParallelCommandGroup - all at once</h2>
 
-    <p>Sometimes you want two commands running at the same time &mdash; drive forward <em>while</em> spinning up the shooter. <code>ParallelCommandGroup</code> runs them concurrently and finishes when <strong>all</strong> children finish.</p>
+    <p>Sometimes you want two commands running at the same time - drive forward <em>while</em> spinning up the shooter. <code>ParallelCommandGroup</code> runs them concurrently and finishes when <strong>all</strong> children finish.</p>
 
     <div class="code-block"><pre>
 <span class="kw">return new</span> ParallelCommandGroup(
@@ -230,7 +230,7 @@
 
     <div class="hf-box hf-warning">
       <span class="hf-label">Parallel groups can't share subsystems</span>
-      <p>If both children require the <em>same</em> subsystem, the scheduler will refuse to run them in parallel &mdash; only one command can own a subsystem at a time. Two commands needing the drivetrain in parallel? Doesn't work. Group them sequentially or compose them differently.</p>
+      <p>If both children require the <em>same</em> subsystem, the scheduler will refuse to run them in parallel - only one command can own a subsystem at a time. Two commands needing the drivetrain in parallel? Doesn't work. Group them sequentially or compose them differently.</p>
     </div>
 
     <h2>Two cousins of ParallelCommandGroup</h2>
@@ -248,7 +248,7 @@
       </div>
     </div>
 
-    <h2>Decorators &mdash; the fluent shortcuts</h2>
+    <h2>Decorators - the fluent shortcuts</h2>
 
     <p>Building command groups gets verbose. WPILib provides <em>decorator methods</em> on the <code>Command</code> class that read like English and produce the same composed structures.</p>
 
@@ -292,18 +292,18 @@ driveDist.andThen(turn).andThen(driveDist).withTimeout(15.0);</pre></div>
     <div class="hf-box hf-info">
       <span class="hf-label">A good autonomous lifecycle</span>
       <p><strong>autonomousInit()</strong> &rarr; pull command from chooser &rarr; schedule it.</p>
-      <p><strong>autonomousPeriodic()</strong> &rarr; usually empty &mdash; the scheduler is already running the command.</p>
+      <p><strong>autonomousPeriodic()</strong> &rarr; usually empty - the scheduler is already running the command.</p>
       <p><strong>teleopInit()</strong> &rarr; if the auto command is still running, cancel it (otherwise it'll fight the driver).</p>
       <p>Most of this is already in the starter project. You just write the commands.</p>
     </div>
 
     <div class="hf-box hf-sidebar">
       <span class="hf-label">Pattern recognition</span>
-      <p>Once you've internalized commands, almost every autonomous looks like this: a <code>SequentialCommandGroup</code> at the top, with each child being either a primitive command (<code>DriveDistance</code>, <code>TurnToAngle</code>) or a smaller group. Maybe a parallel group somewhere to run two mechanisms at once. Maybe a <code>WaitCommand</code> for delays. That's it. Once you've seen this shape three times, you'll see it everywhere &mdash; including in real team code at competition.</p>
+      <p>Once you've internalized commands, almost every autonomous looks like this: a <code>SequentialCommandGroup</code> at the top, with each child being either a primitive command (<code>DriveDistance</code>, <code>TurnToAngle</code>) or a smaller group. Maybe a parallel group somewhere to run two mechanisms at once. Maybe a <code>WaitCommand</code> for delays. That's it. Once you've seen this shape three times, you'll see it everywhere - including in real team code at competition.</p>
     </div>
 
     <div class="hf-box hf-brain">
-      <span class="hf-label">Brain power &mdash; before you move on</span>
+      <span class="hf-label">Brain power - before you move on</span>
       <p>Without looking back: name the three group types and one decorator. Sketch out (in pseudocode is fine) an autonomous that drives 1m, waits half a second, drives another meter, then turns 180 degrees. Then keep reading.</p>
     </div>
 
@@ -318,18 +318,18 @@ driveDist.andThen(turn).andThen(driveDist).withTimeout(15.0);</pre></div>
     <p>Three tiers, three layers of skill. Bronze is "I can run an auto and read the log." Silver is "I can write a new command from scratch." Gold is "I can compose them into a real routine."</p>
 
     <div class="tier-tabs">
-      <button class="tier-tab bronze active" data-tier="bronze">Bronze &mdash; Run an auto</button>
-      <button class="tier-tab silver" data-tier="silver">Silver &mdash; Write a TurnToAngle</button>
-      <button class="tier-tab gold" data-tier="gold">Gold &mdash; Compose the L-shape</button>
+      <button class="tier-tab bronze active" data-tier="bronze">Bronze - Run an auto</button>
+      <button class="tier-tab silver" data-tier="silver">Silver - Write a TurnToAngle</button>
+      <button class="tier-tab gold" data-tier="gold">Gold - Compose the L-shape</button>
     </div>
 
     <div>
 
       <div class="tier-panel bronze active">
-        <span class="tier-label">Bronze &mdash; run the existing DriveDistance command</span>
+        <span class="tier-label">Bronze - run the existing DriveDistance command</span>
         <p>The starter project already has <code>DriveDistance</code> and a working AutoChooser. Verify the chain works end-to-end and observe what the scheduler logs.</p>
         <ul class="task-list">
-          <li>Open <code>RobotContainer.java</code> &mdash; find the <code>autoChooser</code> setup. Note which command is the default.</li>
+          <li>Open <code>RobotContainer.java</code> - find the <code>autoChooser</code> setup. Note which command is the default.</li>
           <li>Run the simulator. Open AdvantageScope and connect.</li>
           <li>Set Robot State to Autonomous &rarr; Enable. Watch what the robot does.</li>
           <li>In AdvantageScope's sidebar, expand the <code>Commands</code> or <code>SmartDashboard/Auto Choice</code> folder. Find the timestamp where the command initialized and where it ended.</li>
@@ -339,12 +339,12 @@ driveDist.andThen(turn).andThen(driveDist).withTimeout(15.0);</pre></div>
           <button class="toggle-btn" data-target="b1-hint" data-open="Show hint" data-closed="Hide hint">Show hint</button>
         </div>
         <div class="toggle-content hint" id="b1-hint">
-          If the robot doesn't move when you enable autonomous, check the AutoChooser was set up before <code>autonomousInit()</code> runs. If you can't find the Commands folder in AdvantageScope, the scheduler logging may not be enabled &mdash; look for a <code>CommandScheduler.getInstance().onCommandInitialize(...)</code> setup in <code>Robot.java</code>.
+          If the robot doesn't move when you enable autonomous, check the AutoChooser was set up before <code>autonomousInit()</code> runs. If you can't find the Commands folder in AdvantageScope, the scheduler logging may not be enabled - look for a <code>CommandScheduler.getInstance().onCommandInitialize(...)</code> setup in <code>Robot.java</code>.
         </div>
       </div>
 
       <div class="tier-panel silver">
-        <span class="tier-label">Silver &mdash; write a TurnToAngle command</span>
+        <span class="tier-label">Silver - write a TurnToAngle command</span>
         <p>Write a new command that turns the robot by a given number of degrees relative to its starting heading, then ends. Use the same shape as <code>DriveDistance</code>.</p>
         <ul class="task-list">
           <li>Create <code>TurnToAngle.java</code> in the commands folder. Extend <code>Command</code>.</li>
@@ -360,7 +360,7 @@ driveDist.andThen(turn).andThen(driveDist).withTimeout(15.0);</pre></div>
           <button class="toggle-btn" data-target="s1-ans" data-open="Show solution" data-closed="Hide solution">Show solution</button>
         </div>
         <div class="toggle-content hint" id="s1-hint">
-          Two gotchas. First: the gyro might wrap around 180&deg; or 360&deg;. For small angles (under 180&deg;) you can ignore wrap-around, but check that you handle a 90&deg; turn correctly. Second: rotational sign matters. Positive rotation might mean clockwise on your robot or counter-clockwise &mdash; don't assume. Test both and pick the convention that matches the gyro reading.
+          Two gotchas. First: the gyro might wrap around 180&deg; or 360&deg;. For small angles (under 180&deg;) you can ignore wrap-around, but check that you handle a 90&deg; turn correctly. Second: rotational sign matters. Positive rotation might mean clockwise on your robot or counter-clockwise - don't assume. Test both and pick the convention that matches the gyro reading.
         </div>
         <div class="toggle-content answer" id="s1-ans">
           <pre>public class TurnToAngle extends Command {
@@ -396,7 +396,7 @@ driveDist.andThen(turn).andThen(driveDist).withTimeout(15.0);</pre></div>
       </div>
 
       <div class="tier-panel gold">
-        <span class="tier-label">Gold &mdash; compose an L-shape route</span>
+        <span class="tier-label">Gold - compose an L-shape route</span>
         <p>Build a routine that drives forward 1m, turns 90&deg;, then drives forward another 1m. Use a <code>SequentialCommandGroup</code> (or the <code>.andThen()</code> decorator). Add it to the AutoChooser. Verify the log shows three commands running back-to-back.</p>
         <ul class="task-list">
           <li>In <code>RobotContainer.java</code> (or a new <code>AutoRoutines.java</code>), write a method <code>driveLShape(DriveSubsystem drive)</code> that returns a <code>Command</code></li>
@@ -410,7 +410,7 @@ driveDist.andThen(turn).andThen(driveDist).withTimeout(15.0);</pre></div>
           <button class="toggle-btn" data-target="g1-hint" data-open="Show hint" data-closed="Hide hint">Show hint</button>
         </div>
         <div class="toggle-content hint" id="g1-hint">
-          If the L-shape ends prematurely, one of your child commands is finishing too early &mdash; probably <code>TurnToAngle</code> with a sign issue. If it never ends, one is finishing too late &mdash; probably <code>DriveDistance</code> with a wrong target. The Commands folder in AdvantageScope shows you exactly which child is hanging.
+          If the L-shape ends prematurely, one of your child commands is finishing too early - probably <code>TurnToAngle</code> with a sign issue. If it never ends, one is finishing too late - probably <code>DriveDistance</code> with a wrong target. The Commands folder in AdvantageScope shows you exactly which child is hanging.
         </div>
       </div>
 
@@ -428,7 +428,7 @@ driveDist.andThen(turn).andThen(driveDist).withTimeout(15.0);</pre></div>
       The L-shape autonomous below was someone's first attempt. They ran it. The robot did something but not what they wanted. There are <strong>3 bugs</strong> hiding in this code, two in the command itself and one in how the routine is composed. Click each highlighted line to find out what went wrong.
     </p>
 
-    <div class="bug-lab" data-lab="lesson-5">
+    <div class="bug-lab" data-lab="lesson-06">
 
       <div class="bug-progress">
         <span>Bugs found:</span>
@@ -469,31 +469,31 @@ driveDist.andThen(turn).andThen(driveDist).withTimeout(15.0);</pre></div>
       </div>
 
       <div class="bug-reveal" data-bug="1">
-        <h4>Bug 1 &mdash; ParallelCommandGroup instead of SequentialCommandGroup</h4>
+        <h4>Bug 1 - ParallelCommandGroup instead of SequentialCommandGroup</h4>
         <div class="bug-joke">All three commands fire at once. They all want the drivetrain. The scheduler can only give it to one. The other two get rejected. The robot ends up doing whichever one happened to win the race.</div>
-        <p>Two of the three children require the same subsystem (the drivetrain). A <code>ParallelCommandGroup</code> tries to run them all simultaneously, but the scheduler only allows one command per subsystem at a time &mdash; so the group fails to start, or only the first child runs. Either way: not what was intended. The fix is one word.</p>
+        <p>Two of the three children require the same subsystem (the drivetrain). A <code>ParallelCommandGroup</code> tries to run them all simultaneously, but the scheduler only allows one command per subsystem at a time - so the group fails to start, or only the first child runs. Either way: not what was intended. The fix is one word.</p>
         <div class="bug-fix-label">Fix</div>
         <div class="bug-fix">return new SequentialCommandGroup(...)</div>
       </div>
 
       <div class="bug-reveal" data-bug="2">
-        <h4>Bug 2 &mdash; isFinished() always returns false</h4>
+        <h4>Bug 2 - isFinished() always returns false</h4>
         <div class="bug-joke">The command runs forever. The robot drives off the field. Then off the table. Then off the planet. Theoretically.</div>
-        <p>The command needs to return <code>true</code> when the robot has traveled the requested distance. Hard-coded <code>false</code> means it never reaches that condition &mdash; the command stays scheduled, <code>execute()</code> keeps running, motors keep going. The next command in the sequence never starts.</p>
+        <p>The command needs to return <code>true</code> when the robot has traveled the requested distance. Hard-coded <code>false</code> means it never reaches that condition - the command stays scheduled, <code>execute()</code> keeps running, motors keep going. The next command in the sequence never starts.</p>
         <div class="bug-fix-label">Fix</div>
         <div class="bug-fix">return drive.getLeftPositionMeters() - startMeters >= targetMeters;</div>
       </div>
 
       <div class="bug-reveal" data-bug="3">
-        <h4>Bug 3 &mdash; end() doesn't stop the motors</h4>
+        <h4>Bug 3 - end() doesn't stop the motors</h4>
         <div class="bug-joke">The command technically ends. The scheduler removes it. But the last value sent to the motors is still 0.5. The motors keep running. The robot keeps driving. The command's gone but its motor commands aren't.</div>
-        <p>When a command ends &mdash; either by finishing or being interrupted &mdash; <code>end()</code> is your one chance to clean up. Motors don't auto-stop just because the command stopped calling <code>execute()</code>. Whatever they were last set to, they stay there. Always call <code>drive.stop()</code> (or set the motors to 0) in <code>end()</code>.</p>
+        <p>When a command ends - either by finishing or being interrupted - <code>end()</code> is your one chance to clean up. Motors don't auto-stop just because the command stopped calling <code>execute()</code>. Whatever they were last set to, they stay there. Always call <code>drive.stop()</code> (or set the motors to 0) in <code>end()</code>.</p>
         <div class="bug-fix-label">Fix</div>
         <div class="bug-fix">@Override public void end(boolean interrupted) { drive.stop(); }</div>
       </div>
 
       <div class="success-banner">
-        All 3 bugs found. Wrong group type, missing termination condition, missing cleanup &mdash; these are the three bugs you'll hit when writing your first auto. Once you've seen them, you'll spot them in seconds. The next time someone on your team writes a command that "doesn't end", you'll know exactly where to look.
+        All 3 bugs found. Wrong group type, missing termination condition, missing cleanup - these are the three bugs you'll hit when writing your first auto. Once you've seen them, you'll spot them in seconds. The next time someone on your team writes a command that "doesn't end", you'll know exactly where to look.
       </div>
 
     </div>
@@ -503,7 +503,7 @@ driveDist.andThen(turn).andThen(driveDist).withTimeout(15.0);</pre></div>
 </div><!-- /page-container -->
 
 <footer class="site-footer">
-  FRC Programming Curriculum &mdash; Lesson 5: Autonomous routines
+  FRC Programming Curriculum - Lesson 06: Autonomous routines
 </footer>
 
 <script src="frc-curriculum.js"></script>

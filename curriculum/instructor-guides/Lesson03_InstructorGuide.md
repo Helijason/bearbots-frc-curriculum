@@ -39,7 +39,7 @@
 - Lesson 02 starter project open in VSCode on projector
 - Simulator confirmed working from Lesson 02
 - AdvantageScope confirmed connecting from Lesson 02
-- Digital handout open: `lesson-02-subsystems.html`
+- Digital handout open: `lesson-03-subsystems.html`
 
 > **The most important hook for this lesson**
 >

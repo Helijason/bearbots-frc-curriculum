@@ -38,7 +38,7 @@
 - VSCode open on projector with a freshly generated WPILib project
 - AdvantageScope installed on instructor laptop and all student laptops
 - Student laptops have WPILib 2024 installed
-- Digital handout open in browser: `lesson-01-vscode-template.html`
+- Digital handout open in browser: `lesson-02-vscode-template.html`
 
 > **The most important instructor mindset for this lesson**
 >
