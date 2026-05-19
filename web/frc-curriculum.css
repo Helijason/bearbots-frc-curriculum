@@ -212,7 +212,7 @@ h3 {
 
 p { margin-bottom: 0.9rem; font-size: 0.95rem; }
 
-strong { font-weight: 600; color: var(--dark); }
+strong { font-weight: 750; color: inherit; }
 
 code {
   font-family: var(--font-mono);
@@ -233,8 +233,8 @@ code {
 }
 
 .hf-box .hf-label {
-  font-size: 0.7rem;
-  font-weight: 700;
+  font-size: 0.9rem;
+  font-weight: 900;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   margin-bottom: 0.6rem;
@@ -310,7 +310,7 @@ code {
 }
 
 .bubble .bubble-who {
-  font-size: 0.65rem;
+  font-size: 0.8rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;

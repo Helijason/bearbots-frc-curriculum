@@ -13,7 +13,7 @@
 | Field | Detail |
 |---|---|
 | **Target audience** | Students who completed Lesson 06 and have run a working autonomous routine |
-| **Hardware** | XRP robot — same setup as Lessons 3–5 |
+| **Hardware** | XRP robot — same setup as Lessons 04–06 |
 | **Session length** | 45 minutes (the closer) |
 | **Key tools** | Encoder/gyro reads via the IO layer, WPILib `PIDController`, AdvantageScope for tuning |
 
@@ -36,7 +36,7 @@
 
 - VSCode open on projector with the Lesson 06 starter project, plus the open-loop `DriveDistance` you've been using
 - AdvantageScope open and ready, with a saved sim log from Lesson 06 to show 'overshoot' visually
-- Digital handout open: `lesson-06-sensors.html`
+- Digital handout open: `lesson-07-sensors.html`
 - XRPs available — students will tune kP on hardware
 - Same floor space as Lesson 06 (1–2 meter runs)
 
@@ -52,7 +52,7 @@
 >
 > Resist teaching all of PID. Cover P only. Ship students out the door with a working closed-loop command and the correct intuition, not a half-understood textbook chapter on integral and derivative terms. They'll meet I and D when they need them, and by then they'll have the framework to absorb them quickly.
 >
-> This is also the lesson where students should feel the curriculum land. After the code review, take 30 seconds to tell them what they just accomplished — six lessons, foundational FRC programming, a working mental model. They earned it.
+> This is also the lesson where students should feel the curriculum land. After the code review, take 30 seconds to tell them what they just accomplished — seven lessons, foundational FRC programming, a working mental model. They earned it.
 
 ---
 

@@ -3,39 +3,39 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lesson 3 — The IO Pattern | FRC Programming Curriculum</title>
+  <title>Lesson 04 — The IO Pattern | FRC Programming Curriculum</title>
   <link rel="stylesheet" href="frc-curriculum.css">
 </head>
 <body>
 
 <header class="site-header">
   <a class="logo" href="index.html">FRC Programming Curriculum</a>
-  <span class="lesson-label">Module 2 &mdash; Lesson 3</span>
+  <span class="lesson-label">Module 2 - Lesson 04</span>
   <nav class="site-nav">
     <a href="index.html">All lessons</a>
-    <a href="lesson-02-subsystems.html">&larr; Lesson 2</a>
-    <a href="lesson-04-logging.html">Lesson 4 &rarr;</a>
+    <a href="lesson-02-subsystems.html">&larr; Lesson 02</a>
+    <a href="lesson-05-logging.html">Lesson 05 &rarr;</a>
   </nav>
 </header>
 
 <div class="page-container">
 
   <div class="lesson-header">
-    <div class="lesson-meta">Module 2 &mdash; Lesson 3</div>
+    <div class="lesson-meta">Module 2 - Lesson 04</div>
     <h1 class="lesson-title">Why does the robot need two files for one motor?</h1>
     <div class="lesson-subtitle">Or: the question every student asks, followed by the answer that actually makes sense.</div>
     <div class="lesson-info-bar">
       <div class="info-item"><div class="info-dot"></div> ~45 minutes</div>
       <div class="info-item"><div class="info-dot"></div> Hardware: XRP robot</div>
-      <div class="info-item"><div class="info-dot"></div> Prereq: Lesson 2 — Subsystems</div>
+      <div class="info-item"><div class="info-dot"></div> Prereq: Lesson 02 — Subsystems</div>
       <div class="info-item"><div class="info-dot"></div> Java &middot; AdvantageKit</div>
     </div>
   </div>
 
   <nav class="section-nav">
-    <button class="section-nav-btn active" data-section="concept">Part 1 &mdash; The concept</button>
-    <button class="section-nav-btn" data-section="challenge">Part 2 &mdash; Try it yourself</button>
-    <button class="section-nav-btn" data-section="lab">Part 3 &mdash; Fix the broken robot</button>
+    <button class="section-nav-btn active" data-section="concept">Part 1 - The concept</button>
+    <button class="section-nav-btn" data-section="challenge">Part 2 - Try it yourself</button>
+    <button class="section-nav-btn" data-section="lab">Part 3 - Fix the broken robot</button>
   </nav>
 
   <!-- ═══════════════════════════════════════════════════════
@@ -182,19 +182,19 @@
     <div class="hf-box hf-sidebar">
       <span class="hf-label">There are no dumb questions</span>
       <p><strong>Q: What happens in simulation if I don't have a DriveIOSim?</strong></p>
-      <p>You use an empty default implementation &mdash; a DriveIO that does nothing.
+      <p>You use an empty default implementation - a DriveIO that does nothing.
         The robot runs, nothing moves, and AdvantageKit still logs everything.
         Great for testing command logic without hardware.</p>
       <p><strong>Q: Do I write a new DriveIO interface for every robot?</strong></p>
-      <p>No. One interface, multiple implementations. The interface is the contract &mdash;
+      <p>No. One interface, multiple implementations. The interface is the contract -
         it doesn't change just because the hardware does. This is the whole point.</p>
       <p><strong>Q: What if I forget to implement a method from the interface?</strong></p>
-      <p>Java will refuse to compile. Loudly. This is actually a feature &mdash;
+      <p>Java will refuse to compile. Loudly. This is actually a feature -
         the compiler is your mean but honest friend who catches mistakes before the robot does.</p>
     </div>
 
     <div class="hf-box hf-brain">
-      <span class="hf-label">Brain power &mdash; before you move on</span>
+      <span class="hf-label">Brain power - before you move on</span>
       <p>
         Without looking at any code: what are the three files you'd need to create
         for a brand new <code>Climber</code> subsystem?
@@ -240,16 +240,16 @@
     </p>
 
     <div class="tier-tabs">
-      <button class="tier-tab bronze active" data-tier="bronze">Bronze &mdash; I read Part 1</button>
-      <button class="tier-tab silver" data-tier="silver">Silver &mdash; I understood Part 1</button>
-      <button class="tier-tab gold" data-tier="gold">Gold &mdash; I could have written Part 1</button>
+      <button class="tier-tab bronze active" data-tier="bronze">Bronze - I read Part 1</button>
+      <button class="tier-tab silver" data-tier="silver">Silver - I understood Part 1</button>
+      <button class="tier-tab gold" data-tier="gold">Gold - I could have written Part 1</button>
     </div>
 
     <div>
 
       <!-- BRONZE -->
       <div class="tier-panel bronze active">
-        <span class="tier-label">Bronze &mdash; modify and observe</span>
+        <span class="tier-label">Bronze - modify and observe</span>
         <p>
           The code below drives both motors at 6 volts forward. Your job:
           change the numbers and watch what happens. This is science.
@@ -274,18 +274,18 @@
         </div>
         <div class="toggle-content hint" id="b-hint">
           Voltage is how hard the motor pushes. 12V is full power. 0V is stopped.
-          Negative reverses direction. Anything above 12V gets clamped &mdash;
+          Negative reverses direction. Anything above 12V gets clamped -
           the motor has opinions about physics.
         </div>
         <div class="toggle-content answer" id="b-ans">
-          3V = slower (half speed). Left 6 / Right -6 = spin in place &mdash; this is called tank turning, not a malfunction.
-          13V gets clamped to 12V automatically &mdash; same as full speed. The hardware protects itself.
+          3V = slower (half speed). Left 6 / Right -6 = spin in place - this is called tank turning, not a malfunction.
+          13V gets clamped to 12V automatically - same as full speed. The hardware protects itself.
         </div>
       </div>
 
       <!-- SILVER -->
       <div class="tier-panel silver">
-        <span class="tier-label">Silver &mdash; fill in the blanks</span>
+        <span class="tier-label">Silver - fill in the blanks</span>
         <p>
           Someone deleted the most critical part of <code>setVoltage()</code>.
           The blanks are where the logic lived. The robot is currently very confused.
@@ -323,14 +323,14 @@
 
       <!-- GOLD -->
       <div class="tier-panel gold">
-        <span class="tier-label">Gold &mdash; build from scratch</span>
+        <span class="tier-label">Gold - build from scratch</span>
         <p>
           Here's the contract. Your job is to fulfill it.
           No skeleton. No blanks. Just the interface, your knowledge, and Java's unforgiving compiler.
         </p>
         <div class="code-block">
           <pre>
-<span class="cm">// DriveIO.java &mdash; do not modify this file</span>
+<span class="cm">// DriveIO.java - do not modify this file</span>
 <span class="kw">public interface</span> DriveIO {
     <span class="kw">void</span> updateInputs(DriveIOInputs inputs);
     <span class="kw">void</span> setVoltage(<span class="kw">double</span> left, <span class="kw">double</span> right);
@@ -341,16 +341,16 @@
         <ul class="task-list">
           <li>Create <code>DriveIOXRP.java</code> implementing every method</li>
           <li>Log velocity, position in meters, and gyro heading in <code>updateInputs()</code></li>
-          <li>Verify in AdvantageScope &mdash; if velocity never changes, something is wrong with your logging, not the motor</li>
+          <li>Verify in AdvantageScope - if velocity never changes, something is wrong with your logging, not the motor</li>
           <li>Bonus: add a <code>resetEncoders()</code> method to the interface and both files. Justify why it belongs on the interface.</li>
         </ul>
         <div class="toggle-row">
           <button class="toggle-btn" data-target="g-hint" data-open="I am humble enough for a hint" data-closed="Hide hint">I am humble enough for a hint</button>
         </div>
         <div class="toggle-content hint" id="g-hint">
-          XRP encoders return inches &mdash; multiply by 0.0254 for meters.
+          XRP encoders return inches - multiply by 0.0254 for meters.
           <code>getAngleZ()</code> gives gyro heading in degrees.
-          If your robot drives sideways in sim, check which encoder method you're calling &mdash;
+          If your robot drives sideways in sim, check which encoder method you're calling -
           there are two and they are not the same.
         </div>
       </div>
@@ -367,12 +367,12 @@
 
     <p class="bug-lab-intro">
       This code compiles perfectly. The robot boots without errors.
-      And yet &mdash; something is deeply, specifically wrong with it.
+      And yet - something is deeply, specifically wrong with it.
       There are <strong>3 bugs</strong> in the highlighted lines.
       Click each one to find out what past-you did and why future-you is not happy about it.
     </p>
 
-    <div class="bug-lab" data-lab="lesson-3">
+    <div class="bug-lab" data-lab="lesson-04">
 
       <div class="bug-progress">
         <span>Bugs found:</span>
@@ -468,7 +468,7 @@
       </div><!-- /code-lab -->
 
       <div class="bug-reveal" data-bug="1">
-        <h4>Bug 1 &mdash; The position is in the wrong units</h4>
+        <h4>Bug 1 - The position is in the wrong units</h4>
         <div class="bug-joke">AdvantageScope showed the robot traveled 47 meters. The gym is 28 meters long. Concerning.</div>
         <p>
           <code>getLeftDistanceInch()</code> returns inches. Your input field is named
@@ -481,7 +481,7 @@
       </div>
 
       <div class="bug-reveal" data-bug="2">
-        <h4>Bug 2 &mdash; Passing volts where the method wants percent</h4>
+        <h4>Bug 2 - Passing volts where the method wants percent</h4>
         <div class="bug-joke">Commanded 6 volts. Robot received 6. tankDrive() interpreted this as 600% output and had a great time.</div>
         <p>
           <code>tankDrive()</code> expects values from -1.0 to 1.0. Passing raw volts means
@@ -493,12 +493,12 @@
       </div>
 
       <div class="bug-reveal" data-bug="3">
-        <h4>Bug 3 &mdash; stop() works, but it works the wrong way</h4>
+        <h4>Bug 3 - stop() works, but it works the wrong way</h4>
         <div class="bug-joke">This one actually stops the robot. It just stops it in a way that will cause problems when you switch to real hardware.</div>
         <p>
           Calling <code>tankDrive(0, 0)</code> works in XRP simulation, but it bypasses
           the hardware's native stop behavior. The idiomatic call that signals intent clearly
-          &mdash; and lets the hardware handle braking correctly &mdash; is
+          - and lets the hardware handle braking correctly - is
           <code>drivetrain.stopMotor()</code>. Using <code>tankDrive(0, 0)</code> is like
           turning off your car by shifting to neutral and coasting instead of pressing the brake.
           Works, technically. Correct? Not quite.
@@ -509,7 +509,7 @@
 
       <div class="success-banner">
         All 3 bugs found. Units mismatch, wrong value range, and a stop method with
-        the wrong approach &mdash; these are real categories that FRC teams debug every season.
+        the wrong approach - these are real categories that FRC teams debug every season.
         You now recognize all three on sight.
         That's genuinely useful and it took you about 5 minutes. Good trade.
       </div>
@@ -521,7 +521,7 @@
 </div><!-- /page-container -->
 
 <footer class="site-footer">
-  FRC Programming Curriculum &mdash; Built with AdvantageKit &middot; Java &middot; WPILib
+  FRC Programming Curriculum - Built with AdvantageKit &middot; Java &middot; WPILib
 </footer>
 
 <script src="frc-curriculum.js"></script>

@@ -35,7 +35,7 @@
 
 - VSCode open on projector with the Lesson 04 starter project
 - AdvantageScope installed; a saved log from a prior session ready to demo (best: a log with visible bugs/anomalies)
-- Digital handout open: `lesson-04-logging.html`
+- Digital handout open: `lesson-05-logging.html`
 - Student laptops have XRPs available — a few will need to drive briefly during practice
 
 ### Have ready
