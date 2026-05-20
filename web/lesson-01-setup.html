@@ -22,7 +22,7 @@
   <div class="lesson-header">
     <div class="lesson-meta">Module 1 - Lesson 01</div>
     <h1 class="lesson-title">Setup + first drive</h1>
-    <div class="lesson-subtitle">Get everything installed, run your first robot code, and watch a number move on a graph. The whole rest of the curriculum builds on this.</div>
+    <div class="lesson-subtitle">Get everything installed, run your first robot code, and drive in the simulator. The whole rest of the curriculum builds on this.</div>
     <div class="lesson-info-bar">
       <div class="info-item"><div class="info-dot"></div> ~2-3 hours</div>
       <div class="info-item"><div class="info-dot"></div> Hardware: your laptop only</div>
@@ -42,7 +42,7 @@
        ═══════════════════════════════════════════════════════ -->
   <div class="lesson-section active" id="section-install">
 
-    <p>You're about to install two things, build a project you didn't write, and drive a robot that doesn't physically exist. By the end of today, all of that will work - and you'll never have to think about installation again for the rest of the curriculum.</p>
+    <p>You're about to install WPILib VS Code and WPILib start tools, build a project, and drive a robot that doesn't physically exist.</p>
 
     <div class="hf-box hf-brain">
       <span class="hf-label">Installation: </span>
@@ -56,22 +56,22 @@
       <div class="info-card">
         <h4>1. WPILib + VS Code installed</h4>
         <p>The official FRC editor with all the robot tools built in.</p>
-        <p class="aside">Includes Java, libraries, build tools - one big installer.</p>
+        <p class="aside">Includes Java, libraries, build tools - one big install.</p>
       </div>
       <div class="info-card">
-        <h4>2. AdvantageScope launches</h4>
+        <h4>2. Starter project builds</h4>
+        <p>Open the project, hit build, see <code>BUILD SUCCESSFUL</code>.</p>
+        <p class="aside">If this works, your code is ready to run in simulation.</p>
+      </div>
+      <div class="info-card">
+        <h4>3. Simulator runs</h4>
+        <p>Simulate the robot code that was just built, control robot modes, map joystick or keyboard to control the robot, and see robot data.</p>
+        <p class="aside">No XRP needed today.</p>
+      </div>
+      <div class="info-card">
+        <h4>4. AdvantageScope launches</h4>
         <p>Included with WPILib. Lets you see what the robot is doing in real time.</p>
         <p class="aside">If WPILib is the workshop, AdvantageScope is the dashboard.</p>
-      </div>
-      <div class="info-card">
-        <h4>3. Starter project builds</h4>
-        <p>Open the project, hit build, see <code>BUILD SUCCESSFUL</code>.</p>
-        <p class="aside">If this works, your environment is alive.</p>
-      </div>
-      <div class="info-card">
-        <h4>4. Simulator runs</h4>
-        <p>Press a button, a window pops up, the robot is running.</p>
-        <p class="aside">No XRP needed today.</p>
       </div>
       <div class="info-card">
         <h4>5. AdvantageScope shows values</h4>
@@ -79,7 +79,12 @@
         <p class="aside">If the number moves when you drive, everything is wired up correctly.</p>
       </div>
       <div class="info-card">
-        <h4>6. You can find the reference card</h4>
+        <h4>6. AdvantageScope simulates in 2D/3D</h4>
+        <p>Add the robot pose to the 2D/3D view and control the robot!</p>
+        <p class="aside">If the robot moves on the screen when you drive, your pose data is making it all the way through.</p>
+      </div>
+      <div class="info-card">
+        <h4>7. You can find the reference card</h4>
         <p>Two-page PDF cheat sheet. Saved somewhere you'll actually find it again.</p>
         <p class="aside">You'll use this every session from now on.</p>
       </div>
@@ -87,7 +92,7 @@
 
     <div class="hf-box hf-warning">
       <span class="hf-label">Operating system support</span>
-      <p><strong>Windows and Mac are supported.</strong> Instructions below cover both. The screenshots are Windows; Mac steps are called out where they differ.</p>
+      <p><strong>Windows, Mac, and Linux are supported.</strong> Instructions below cover windows.</p>
     </div>
 
     <div class="hf-box hf-info">
@@ -97,15 +102,16 @@
     </div>
 
     <h2>What's on the USB drive</h2>
-    <p>Everything you need is on the USB drive your mentor gave you. <strong>Copy all three files to your laptop before you start.</strong></p>
+    <p>Everything you need is on the USB drive your mentor gave you. <strong>Copy all four files to your laptop before you start.</strong></p>
 
     <ul class="task-list">
-      <li><strong>WPILib installer</strong> - Windows <code>.exe</code> or Mac <code>.dmg</code></li>
+      <li><strong>WPILib installer</strong> - Windows <code>.exe</code></li>
+      <li><strong>VS Code zip file</strong> - Windows <code>.zip</code></li>
       <li><strong>Starter project ZIP</strong> - <code>FRC-XRP-Starter.zip</code></li>
       <li><strong>Reference card</strong> - <code>XRP-Reference-Card.pdf</code></li>
     </ul>
 
-    <p>Pick the right OS version. If you grab the wrong one, the installer just won't run.</p>
+    <p>Pick the right OS version. If you grab the wrong one, the installer won't run.</p>
 
     <h2>Install WPILib + VS Code</h2>
 
@@ -122,20 +128,14 @@
       <p><strong>2.</strong> If Windows asks "Do you want to allow this app to make changes?" &rarr; click <strong>Yes</strong></p>
       <p><strong>3.</strong> If Windows SmartScreen blocks it &rarr; click <strong>More info</strong>, then <strong>Run anyway</strong></p>
       <p><strong>4.</strong> Keep the default install path. Don't change it.</p>
-      <p><strong>5.</strong> When asked: <strong>Download VS Code</strong>. Check every tool option (C++, Java, all of it).</p>
-      <p><strong>6.</strong> Click <strong>Execute Install</strong> and wait. The progress bar moves slowly.</p>
+      <p><strong>5.</strong> When asked: <strong>Select the install mode you would like.</strong>. Select Everything.</p>
+      <img src="images/installer-options.webp" alt="WPILib installer, install mode.">
+      <p><strong>6.</strong> When asked: <strong>Download VS Code</strong>. Select existing VS Code archive for offline install on this computer.</p>
+      <img src="images/installer-vscode-download.webp" alt="WPILib installer VS Code download option">
+      <p><strong>7.</strong> Click <strong>Execute Install</strong> and wait. The progress bar moves slowly.</p>
     </div>
 
-    <div class="hf-box hf-info">
-      <span class="hf-label">On Mac</span>
-      <p><strong>1.</strong> Double-click <code>WPILib_macOS-2026.x.x.dmg</code> to mount it</p>
-      <p><strong>2.</strong> Drag the WPILib installer to your Applications folder</p>
-      <p><strong>3.</strong> Open it from Applications</p>
-      <p><strong>4.</strong> If macOS says "cannot be opened because it is from an unidentified developer" &rarr; right-click the installer, choose <strong>Open</strong>, then click <strong>Open</strong> again</p>
-      <p><strong>5.</strong> Same options as Windows: keep defaults, install all tools, download VS Code.</p>
-    </div>
-
-    <p>When the installer finishes, launch <strong>WPILib VS Code 2026</strong> from your Start menu (Windows) or Applications folder (Mac). VS Code opens with a WPILib theme - that's how you know it's the right one.</p>
+    <p>When the installer finishes, launch <strong>WPILib VS Code 2026</strong> from your Start menu (Windows). VS Code opens with a WPILib theme - that's how you know it's the right one.</p>
 
     <div class="hf-box hf-warning">
       <span class="hf-label">Important: WPILib VS Code is its own installation</span>
@@ -166,14 +166,14 @@
        ═══════════════════════════════════════════════════════ -->
   <div class="lesson-section" id="section-project">
 
-    <p>The starter project is a complete, working robot program. You didn't write any of it. Today you're just opening it and verifying your environment can compile it. You'll explore what's actually inside in Lesson 02.</p>
+    <p>The starter project is a complete, working robot program. You didn't write any of it. Today you're opening it and verifying your environment can compile it and run in the simulator. You'll explore what's actually inside in Lesson 02.</p>
 
     <h2>Step 1 - Extract the ZIP</h2>
 
     <ul class="task-list">
       <li>Find <code>FRC-XRP-Starter.zip</code> on your USB drive</li>
       <li>Copy it to your <strong>Documents</strong> folder (or wherever you keep code)</li>
-      <li>Right-click &rarr; <strong>Extract All</strong> on Windows, or double-click on Mac</li>
+      <li>Right-click &rarr; <strong>Extract All</strong> on Windows</li>
       <li>You should now have a folder named <code>FRC-XRP-Starter</code></li>
     </ul>
 
@@ -201,7 +201,7 @@
 
     <div class="hf-box hf-info">
       <span class="hf-label">How to build</span>
-      <p><strong>1.</strong> Press <code>Ctrl+Shift+P</code> (Windows) or <code>Cmd+Shift+P</code> (Mac)</p>
+      <p><strong>1.</strong> Press <code>Ctrl+Shift+P</code> (Windows)</p>
       <p><strong>2.</strong> Type <code>WPILib: Build Robot Code</code></p>
       <p><strong>3.</strong> Press <strong>Enter</strong></p>
       <p><strong>4.</strong> Watch the terminal at the bottom of VS Code</p>
@@ -243,7 +243,7 @@
 
     <div class="hf-box hf-info">
       <span class="hf-label">How to launch</span>
-      <p><strong>1.</strong> In VS Code, press <code>Ctrl+Shift+P</code> (Windows) or <code>Cmd+Shift+P</code> (Mac)</p>
+      <p><strong>1.</strong> In VS Code, press <code>Ctrl+Shift+P</code> (Windows)</p>
       <p><strong>2.</strong> Type <code>WPILib: Simulate Robot Code</code></p>
       <p><strong>3.</strong> Press <strong>Enter</strong></p>
       <p><strong>4.</strong> When prompted, check <strong>halsim_gui</strong> and click OK</p>

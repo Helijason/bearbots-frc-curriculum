@@ -281,6 +281,12 @@ code {
 .hf-warning .hf-label { color: var(--red); }
 .hf-warning p { color: var(--red); }
 
+.hf-box img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
 /* Script — gray */
 .hf-script {
   background: var(--gray-bg);
