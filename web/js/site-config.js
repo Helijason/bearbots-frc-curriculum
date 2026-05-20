@@ -3,8 +3,11 @@
    ============================================================ */
  
 const SITE_CONFIG = {
-  workInProgress: true,   // ← flip to false to hide WIP banner + badge
-  siteName: "BearBots 6964 - FRC Programming Curriculum",
+  workInProgress: true,   // ← true - display work in progress banner and badge. flip to false to hide.
+  wipBadgeText: "WIP2",
+  siteName: "BearBots 6964 - FRC Programming Curriculum******",
+  siteSubtitle: "Project-based learning for FRC student programmers. Java, AdvantageKit, XRP hardware.",
+  banner: "🚧 Work in Progress — content may change",
  
   lessons: {
     "01": {
@@ -16,6 +19,7 @@ const SITE_CONFIG = {
       hardware: "No hardware needed",
       duration: "~2-3 hours",
       filename: "lesson-01-setup.html",
+      status: "soon",  // "ready", "current", "soon"
       prev: null,
       next: "02"
     },
@@ -28,6 +32,7 @@ const SITE_CONFIG = {
       hardware: "No hardware needed",
       duration: "~2-3 hours",
       filename: "lesson-02-vscode-template.html",
+      status: "soon",  // "ready", "current", "soon"
       prev: "01",
       next: "03"
     },
@@ -40,11 +45,12 @@ const SITE_CONFIG = {
       hardware: "No hardware needed",
       duration: "~2-3 hours",
       filename: "lesson-03-subsystems.html",
+      status: "soon",  // "ready", "current", "soon"
       prev: "02",
       next: "04"
     },
     "04": {
-      module: 1,
+      module: 2,
       lesson: "04",
       title: "The IO Pattern and AdvantageKit Architecture",
       subtitle: "The IO pattern and AdvantageKit architecture. The most important concept in the curriculum.",
@@ -52,11 +58,12 @@ const SITE_CONFIG = {
       hardware: "XRP robot",
       duration: "~2-3 hours",
       filename: "lesson-04-io-pattern.html",
+      status: "soon",  // "ready", "current", "soon"
       prev: "03",
       next: "05"
     },
     "05": {
-      module: 1,
+      module: 2,
       lesson: "05",
       title: "How do I debug a robot that isn't here?",
       subtitle: "@AutoLog, AdvantageScope navigation, and replay mode. Turn \"it broke at competition\" into \"I can see exactly what happened.\"",
@@ -64,11 +71,12 @@ const SITE_CONFIG = {
       hardware: "XRP robot",
       duration: "~2-3 hours",
       filename: "lesson-05-logging.html",
+      status: "soon",  // "ready", "current", "soon"
       prev: "04",
       next: "06"
     },
     "06": {
-      module: 1,
+      module: 2,
       lesson: "06",
       title: "How does the robot know when it's done?",
       subtitle: "Commands, the four lifecycle methods, composition with SequentialCommandGroup, and the AutoChooser pattern.",
@@ -76,11 +84,12 @@ const SITE_CONFIG = {
       hardware: "XRP robot",
       duration: "~2-3 hours",
       filename: "lesson-06-autonomous.html",
+      status: "soon",  // "ready", "current", "soon"
       prev: "05",
       next: "07"
     },
     "07": {
-      module: 1,
+      module: 2,
       lesson: "07",
       title: "Why doesn't it stop where I told it to?",
       subtitle: "Encoders, gyro, P-control tuning. Continued work on competition program.",
@@ -88,6 +97,7 @@ const SITE_CONFIG = {
       hardware: "XRP robot",
       duration: "~2-3 hours",
       filename: "lesson-07-sensors.html",
+      status: "soon",  // "ready", "current", "soon"
       prev: "06",
       next: null
     }
