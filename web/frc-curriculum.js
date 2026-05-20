@@ -2,6 +2,11 @@
    FRC Programming Curriculum — Shared JavaScript
    ============================================================ */
  
+/* ── Site Config ──────────────────────────────────────────── */
+const SITE_CONFIG = {
+  workInProgress: true   // ← flip to false to hide WIP banner + badge
+};
+ 
 /* ── Section Navigation ───────────────────────────────────── */
 function initSectionNav() {
   const btns = document.querySelectorAll('.section-nav-btn');
@@ -119,6 +124,7 @@ function initBugLab() {
  
 /* ── Init All ─────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', () => {
+  if (SITE_CONFIG.workInProgress) document.body.classList.add('wip');
   initSectionNav();
   initTierTabs();
   initToggles();
