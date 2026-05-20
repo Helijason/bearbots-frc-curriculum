@@ -87,13 +87,13 @@
 
     <div class="info-grid">
       <div class="info-card">
-        <h4>&#128229; Inputs - @AutoLog on a class</h4>
+        <h4>Inputs - @AutoLog on a class</h4>
         <p>Things you <em>read</em>: encoder positions, gyro angles, current draw, button states.</p>
         <p>Wrap them in a struct, slap <code>@AutoLog</code> on the struct, and AdvantageKit logs every field automatically.</p>
         <p class="aside">These are the values that change because the world changed.</p>
       </div>
       <div class="info-card">
-        <h4>&#128228; Outputs - @AutoLogOutput on a field</h4>
+        <h4>Outputs - @AutoLogOutput on a field</h4>
         <p>Things you <em>decide</em>: target velocity, calculated pose, autonomous mode name, "is the shooter ready?" booleans.</p>
         <p>Put <code>@AutoLogOutput</code> on a field directly - AdvantageKit logs the value every time it changes.</p>
         <p class="aside">These are the values that change because your code decided.</p>
@@ -197,12 +197,12 @@ Logger.processInputs(<span class="st">"Drive"</span>, inputs);     <span class="
 
     <div class="info-grid">
       <div class="info-card">
-        <h4>&#128279; Live - Connect to Robot/Sim</h4>
+        <h4>Live - Connect to Robot/Sim</h4>
         <p>Streams data <em>as it happens</em>. The timeline keeps growing. Use this when the robot or simulator is running right now.</p>
         <p class="aside">File &rarr; Connect to Simulator (or to Robot)</p>
       </div>
       <div class="info-card">
-        <h4>&#128194; Log - Open Log File</h4>
+        <h4>Log - Open Log File</h4>
         <p>Loads a saved <code>.wpilog</code> file. The full timeline is available immediately - you can scrub anywhere, freely.</p>
         <p class="aside">File &rarr; Open Log... (point at a file)</p>
       </div>
@@ -221,22 +221,22 @@ Logger.processInputs(<span class="st">"Drive"</span>, inputs);     <span class="
     <div style="display:flex; flex-direction:column; gap:0.5rem; margin: 1rem 0;">
 
       <div class="info-card">
-        <h4>&#128194; <code>RealOutputs/</code></h4>
+        <h4><code>RealOutputs/</code></h4>
         <p>Everything logged via <code>Logger.recordOutput()</code> when running on real hardware (or in SIM). This is where the values your code <em>decided</em> live: target velocities, computed poses, autonomous chooser selections.</p>
       </div>
 
       <div class="info-card">
-        <h4>&#128194; <code>ReplayOutputs/</code></h4>
+        <h4><code>ReplayOutputs/</code></h4>
         <p>The same outputs, recomputed during a replay run. If they don't match <code>RealOutputs/</code> for the same timestamp, your code's behavior changed - on purpose (you fixed a bug) or by accident (you broke something).</p>
       </div>
 
       <div class="info-card">
-        <h4>&#128194; <code>AdvantageKit/RealOutputs/</code> + per-subsystem folders</h4>
+        <h4><code>AdvantageKit/RealOutputs/</code> + per-subsystem folders</h4>
         <p>Inputs from your <code>@AutoLog</code> structs - e.g., <code>Drive/LeftPositionMeters</code>, <code>Shooter/CurrentAmps</code>. The folder name comes from the first arg of <code>Logger.processInputs("Drive", inputs)</code>.</p>
       </div>
 
       <div class="info-card">
-        <h4>&#128194; <code>NT/</code> and <code>DS/</code></h4>
+        <h4><code>NT/</code> and <code>DS/</code></h4>
         <p>Anything published to NetworkTables (SmartDashboard, Shuffleboard) and driver-station state. Useful for cross-checking what the dashboard saw vs. what the robot actually did.</p>
       </div>
 
@@ -473,10 +473,22 @@ inputs.totalDistanceMeters =
 
   </div><!-- /section-lab -->
 
-</div><!-- /page-container -->
+  <nav class="section-nav section-nav--bottom">
+    <button class="section-nav-btn active" data-section="concept">Part 1 - The concept</button>
+    <button class="section-nav-btn" data-section="scope">Part 2 - AdvantageScope deep dive</button>
+    <button class="section-nav-btn" data-section="challenge">Part 3 - Try it yourself</button>
+    <button class="section-nav-btn" data-section="lab">Part 4 - Fix the broken robot</button>
+  </nav>
 
+</div><!-- /page-container -->
 <footer class="site-footer">
-  FRC Programming Curriculum - Lesson 05: Logging and AdvantageScope
+  <a class="logo" href="index.html">FRC Programming Curriculum</a>
+  <span class="lesson-label">Module 2 - Lesson 05</span>
+  <nav class="site-nav">
+    <a href="index.html">All lessons</a>
+    <a href="lesson-04-io-pattern.html">&larr; Lesson 04</a>
+    <a href="lesson-06-autonomous.html">Lesson 06 &rarr;</a>
+  </nav>
 </footer>
 
 <script src="frc-curriculum.js"></script>

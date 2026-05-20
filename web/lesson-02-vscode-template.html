@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lesson 02 — What Did VSCode Just Create? | FRC Programming Curriculum</title>
+  <title>Lesson 02 — What Did VS Code Just Create? | FRC Programming Curriculum</title>
   <link rel="stylesheet" href="frc-curriculum.css">
 </head>
 <body>
@@ -14,7 +14,7 @@
   <nav class="site-nav">
     <a href="index.html">All lessons</a>
     <a href="lesson-01-setup.html">&larr; Lesson 01</a>
-    <a href="lesson-02-subsystems.html">Lesson 02 &rarr;</a>
+    <a href="lesson-03-subsystems.html">Lesson 03 &rarr;</a>
   </nav>
 </header>
 
@@ -22,12 +22,12 @@
 
   <div class="lesson-header">
     <div class="lesson-meta">Module 2 - Lesson 02</div>
-    <h1 class="lesson-title">What did VSCode just create?</h1>
+    <h1 class="lesson-title">What did VS Code just create?</h1>
     <div class="lesson-subtitle">Seven files appeared. You didn't write any of them. Let's figure out what they are before we break anything.</div>
     <div class="lesson-info-bar">
       <div class="info-item"><div class="info-dot"></div> ~45 minutes</div>
-      <div class="info-item"><div class="info-dot"></div> Hardware: none — VSCode only</div>
-      <div class="info-item"><div class="info-dot"></div> Tools: VSCode, WPILib, Simulator, AdvantageScope</div>
+      <div class="info-item"><div class="info-dot"></div> Hardware: none — VS Code only</div>
+      <div class="info-item"><div class="info-dot"></div> Tools: VS Code, WPILib, Simulator, AdvantageScope</div>
     </div>
   </div>
 
@@ -43,7 +43,7 @@
        ═══════════════════════════════════════════════════════ -->
   <div class="lesson-section active" id="section-concept">
 
-    <p>You just ran <code>WPILib: Create a new project</code> and VSCode generated a bunch of files. Your instinct is probably to start editing them immediately. Resist that instinct for about 20 minutes. Let's understand what we have first.</p>
+    <p>You just ran <code>WPILib: Create a new project</code> and VS Code generated a bunch of files. Your instinct is probably to start editing them immediately. Resist that instinct for about 20 minutes. Let's understand what we have first.</p>
 
     <div class="hf-box hf-brain">
       <span class="hf-label">Your brain is probably thinking this right now</span>
@@ -61,7 +61,7 @@
       <p><strong>3.</strong> Select: Template &rarr; Java &rarr; Command Robot Skeleton (Advanced)</p>
       <p><strong>4.</strong> Enter your team number, project name, and save location</p>
       <p><strong>5.</strong> Click Generate Project</p>
-      <p>VSCode will open the new project automatically. Wait for the build to finish before touching anything.</p>
+      <p>VS Code will open the new project automatically. Wait for the build to finish before touching anything.</p>
     </div>
 
     <h2>The files — what each one does</h2>
@@ -70,7 +70,7 @@
     <div style="display:flex; flex-direction:column; gap:0.5rem; margin: 1rem 0;">
 
       <div class="info-card" style="cursor:pointer;" onclick="toggleFile('main')">
-        <h4>&#128196; Main.java &nbsp;<span style="font-size:0.75rem;color:var(--muted);font-weight:400;">click to expand</span></h4>
+        <h4>Main.java &nbsp;<span style="font-size:0.75rem;color:var(--muted);font-weight:400;">click to expand</span></h4>
         <p>The entry point. Starts the robot.</p>
       </div>
       <div id="file-main" style="display:none; background:var(--code-bg); border:1px solid var(--code-border); border-radius:var(--radius); padding:1rem; margin-top:-0.25rem;">
@@ -83,7 +83,7 @@
       </div>
 
       <div class="info-card" style="cursor:pointer;" onclick="toggleFile('robot')">
-        <h4>&#128196; Robot.java &nbsp;<span style="font-size:0.75rem;color:var(--muted);font-weight:400;">click to expand</span></h4>
+        <h4>Robot.java &nbsp;<span style="font-size:0.75rem;color:var(--muted);font-weight:400;">click to expand</span></h4>
         <p>The lifecycle manager. Controls what happens in each robot mode.</p>
       </div>
       <div id="file-robot" style="display:none; background:var(--code-bg); border:1px solid var(--code-border); border-radius:var(--radius); padding:1rem; margin-top:-0.25rem;">
@@ -98,7 +98,7 @@
       </div>
 
       <div class="info-card" style="cursor:pointer;" onclick="toggleFile('container')">
-        <h4>&#128196; RobotContainer.java &nbsp;<span style="font-size:0.75rem;color:var(--muted);font-weight:400;">click to expand</span></h4>
+        <h4>RobotContainer.java &nbsp;<span style="font-size:0.75rem;color:var(--muted);font-weight:400;">click to expand</span></h4>
         <p>The switchboard. Creates subsystems and wires up buttons.</p>
       </div>
       <div id="file-container" style="display:none; background:var(--code-bg); border:1px solid var(--code-border); border-radius:var(--radius); padding:1rem; margin-top:-0.25rem;">
@@ -108,7 +108,7 @@
       </div>
 
       <div class="info-card" style="cursor:pointer;" onclick="toggleFile('constants')">
-        <h4>&#128196; Constants.java &nbsp;<span style="font-size:0.75rem;color:var(--muted);font-weight:400;">click to expand</span></h4>
+        <h4>Constants.java &nbsp;<span style="font-size:0.75rem;color:var(--muted);font-weight:400;">click to expand</span></h4>
         <p>The number vault. Motor IDs, speeds, PID values — all in one place.</p>
       </div>
       <div id="file-constants" style="display:none; background:var(--code-bg); border:1px solid var(--code-border); border-radius:var(--radius); padding:1rem; margin-top:-0.25rem;">
@@ -121,7 +121,7 @@
       </div>
 
       <div class="info-card" style="cursor:pointer;" onclick="toggleFile('gradle')">
-        <h4>&#128196; build.gradle &nbsp;<span style="font-size:0.75rem;color:var(--muted);font-weight:400;">click to expand</span></h4>
+        <h4>build.gradle &nbsp;<span style="font-size:0.75rem;color:var(--muted);font-weight:400;">click to expand</span></h4>
         <p>The build recipe. Tells Java what libraries to include.</p>
       </div>
       <div id="file-gradle" style="display:none; background:var(--code-bg); border:1px solid var(--code-border); border-radius:var(--radius); padding:1rem; margin-top:-0.25rem;">
@@ -293,7 +293,7 @@
        ═══════════════════════════════════════════════════════ -->
   <div class="lesson-section" id="section-challenge">
 
-    <p>Time to use the WPILib tools. All three tiers use <code>Ctrl+Shift+P</code> as the starting point — get comfortable with the command palette. It's the fastest way to do almost everything in VSCode.</p>
+    <p>Time to use the WPILib tools. All three tiers use <code>Ctrl+Shift+P</code> as the starting point — get comfortable with the command palette. It's the fastest way to do almost everything in VS Code.</p>
 
     <div class="tier-tabs">
       <button class="tier-tab bronze active" data-tier="bronze">Bronze - I used the palette once</button>
@@ -335,7 +335,7 @@
           <button class="toggle-btn" data-target="s1-ans" data-open="Show AdvantageKit URL" data-closed="Hide URL">Show AdvantageKit URL</button>
         </div>
         <div class="toggle-content hint" id="s1-hint">
-          After changing to LoggedRobot, you'll need to add the Logger setup block in the Robot constructor. Check your reference card for the three-mode switch pattern. If you get import errors, let VSCode's quick fix (Ctrl+.) resolve them automatically.
+          After changing to LoggedRobot, you'll need to add the Logger setup block in the Robot constructor. Check your reference card for the three-mode switch pattern. If you get import errors, let VS Code's quick fix (Ctrl+.) resolve them automatically.
         </div>
         <div class="toggle-content answer" id="s1-ans">
           https://raw.githubusercontent.com/Mechanical-Advantage/AdvantageKit/main/vendordep/AdvantageKit.json
@@ -436,10 +436,22 @@
 
   </div><!-- /section-lab -->
 
-</div><!-- /page-container -->
+  <nav class="section-nav section-nav--bottom">
+    <button class="section-nav-btn active" data-section="concept">Part 1 - The files</button>
+    <button class="section-nav-btn" data-section="simulator">Part 2 - The simulator</button>
+    <button class="section-nav-btn" data-section="challenge">Part 3 - Try it yourself</button>
+    <button class="section-nav-btn" data-section="lab">Part 4 - Fix the broken robot</button>
+  </nav>
 
+</div><!-- /page-container -->
 <footer class="site-footer">
-  FRC Programming Curriculum - Lesson 02: What did VSCode just create?
+  <a class="logo" href="index.html">FRC Programming Curriculum</a>
+  <span class="lesson-label">Module 2 - Lesson 02</span>
+  <nav class="site-nav">
+    <a href="index.html">All lessons</a>
+    <a href="lesson-01-setup.html">&larr; Lesson 01</a>
+    <a href="lesson-03-subsystems.html">Lesson 03 &rarr;</a>
+  </nav>
 </footer>
 
 <script src="frc-curriculum.js"></script>

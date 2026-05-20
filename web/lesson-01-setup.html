@@ -45,9 +45,8 @@
     <p>You're about to install two things, build a project you didn't write, and drive a robot that doesn't physically exist. By the end of today, all of that will work - and you'll never have to think about installation again for the rest of the curriculum.</p>
 
     <div class="hf-box hf-brain">
-      <span class="hf-label">Your brain is probably thinking this right now</span>
-      <p>"Two to three hours just to install some software? Really?"</p>
-      <p>Yes, really. The first time installing WPILib is slow. The first time setting up AdvantageScope is fiddly. The first time building a project, Gradle has to download dependencies. After today, all of this is fast - but today, it's slow. Plan for it.</p>
+      <span class="hf-label">Installation: </span>
+      <p>WPILib is a big install. Gradle downloads every dependency on the first build. It's slow, but these are the tools we need!</p>
     </div>
 
     <h2>What "done" looks like today</h2>
@@ -77,7 +76,7 @@
       <div class="info-card">
         <h4>5. AdvantageScope shows values</h4>
         <p>Connect to the simulator, drag a value onto the graph, watch it move.</p>
-        <p class="aside">This is the moment everything clicks.</p>
+        <p class="aside">If the number moves when you drive, everything is wired up correctly.</p>
       </div>
       <div class="info-card">
         <h4>6. You can find the reference card</h4>
@@ -94,7 +93,7 @@
     <div class="hf-box hf-info">
       <span class="hf-label">If your install fails</span>
       <p>It happens. Java gets confused, firewalls block downloads, antivirus quarantines installers. If yours breaks and you've spent more than 15 minutes on one issue, switch to a backup laptop and keep going. You can troubleshoot your own machine later with a mentor.</p>
-      <p>The point of today is everyone leaves with a working setup - not necessarily on their own laptop.</p>
+      <p>Everyone leaves with something working - even if it's on a borrowed laptop.</p>
     </div>
 
     <h2>What's on the USB drive</h2>
@@ -119,7 +118,7 @@
 
     <div class="hf-box hf-info">
       <span class="hf-label">On Windows</span>
-      <p><strong>1.</strong> Double-click <code>WPILib_Windows-2025.x.x.exe</code> on your USB drive (the version number may differ)</p>
+      <p><strong>1.</strong> Double-click <code>WPILib_Windows-2026.x.x.exe</code> on your USB drive (the version number may differ)</p>
       <p><strong>2.</strong> If Windows asks "Do you want to allow this app to make changes?" &rarr; click <strong>Yes</strong></p>
       <p><strong>3.</strong> If Windows SmartScreen blocks it &rarr; click <strong>More info</strong>, then <strong>Run anyway</strong></p>
       <p><strong>4.</strong> Keep the default install path. Don't change it.</p>
@@ -129,7 +128,7 @@
 
     <div class="hf-box hf-info">
       <span class="hf-label">On Mac</span>
-      <p><strong>1.</strong> Double-click <code>WPILib_macOS-2025.x.x.dmg</code> to mount it</p>
+      <p><strong>1.</strong> Double-click <code>WPILib_macOS-2026.x.x.dmg</code> to mount it</p>
       <p><strong>2.</strong> Drag the WPILib installer to your Applications folder</p>
       <p><strong>3.</strong> Open it from Applications</p>
       <p><strong>4.</strong> If macOS says "cannot be opened because it is from an unidentified developer" &rarr; right-click the installer, choose <strong>Open</strong>, then click <strong>Open</strong> again</p>
@@ -139,7 +138,7 @@
     <p>When the installer finishes, launch <strong>WPILib VS Code 2026</strong> from your Start menu (Windows) or Applications folder (Mac). VS Code opens with a WPILib theme - that's how you know it's the right one.</p>
 
     <div class="hf-box hf-warning">
-      <span class="hf-label">Important: there are two VS Codes now</span>
+      <span class="hf-label">Important: WPILib VS Code is its own installation</span>
       <p>If you already had VS Code installed, you now have <strong>two of them</strong>. Regular VS Code and WPILib VS Code. They look almost identical, but only the WPILib one has the robot tools.</p>
       <p><strong>Always use WPILib VS Code 2026 for this curriculum.</strong> Pin it to your taskbar or dock so you don't accidentally open the wrong one.</p>
     </div>
@@ -236,9 +235,8 @@
     <p>This is the part you've been working toward. You're going to start the simulator, drive a virtual robot with your keyboard, and see logged values move in real time on a graph. After this, everything else in the curriculum is downhill.</p>
 
     <div class="hf-box hf-brain">
-      <span class="hf-label">Your brain is probably thinking this right now</span>
-      <p>"Why are we driving a robot that doesn't exist?"</p>
-      <p>Because 90% of bugs are logic bugs, not hardware bugs. The simulator catches them faster, cheaper, and without risk of the robot driving into the scoring table in front of the head referee. This is the same workflow real teams use to test code on competition robots.</p>
+      <span class="hf-label">Why drive a robot that doesn't exist?</span>
+      <p>90% of bugs are logic bugs, not hardware bugs. The simulator catches them faster and cheaper, without risk of the robot driving into the scoring table in front of the head referee. Real teams do this. It's not a beginner shortcut.</p>
     </div>
 
     <h2>Step 1 - Start the simulator</h2>
@@ -248,8 +246,9 @@
       <p><strong>1.</strong> In VS Code, press <code>Ctrl+Shift+P</code> (Windows) or <code>Cmd+Shift+P</code> (Mac)</p>
       <p><strong>2.</strong> Type <code>WPILib: Simulate Robot Code</code></p>
       <p><strong>3.</strong> Press <strong>Enter</strong></p>
-      <p><strong>4.</strong> Wait for the build (it's quick this time - already compiled)</p>
-      <p><strong>5.</strong> A new window will appear: the <strong>Simulation GUI</strong></p>
+      <p><strong>4.</strong> When prompted, check <strong>halsim_gui</strong> and click OK</p>
+      <p><strong>5.</strong> Wait for the build (it's quick this time - already compiled)</p>
+      <p><strong>6.</strong> A new window will appear: the <strong>Simulation GUI</strong></p>
     </div>
 
     <h2>Step 2 - Set up keyboard driving</h2>
@@ -362,8 +361,6 @@
        ═══════════════════════════════════════════════════════ -->
   <div class="lesson-section" id="section-verify">
 
-    <p>Two things left: save the reference card, then run through the checklist before you leave.</p>
-
     <h2>Save the reference card</h2>
 
     <p>The reference card is a two-page cheat sheet for the XRP curriculum. It has the most-used methods, the unit conversions you'll forget, and the core patterns for writing subsystems. You'll use it constantly. Memorizing it is not the goal - knowing where to look things up is.</p>
@@ -387,7 +384,7 @@
 
     <div class="hf-box hf-info">
       <span class="hf-label">A habit to build</span>
-      <p>Before you ask a mentor "how do I do X?", check the reference card first. You'll get faster, and you'll start internalizing the patterns. The students who finish this curriculum strongest are the ones who build the habit of looking things up before asking.</p>
+      <p>Before you ask a mentor "how do I do X?", check the reference card first. The best programmers look things up first. Build that habit now.</p>
     </div>
 
     <h2>Setup checklist - before you leave today</h2>
@@ -428,16 +425,27 @@
     </div>
 
     <div class="hf-box hf-brain">
-      <span class="hf-label">Before you move on</span>
-      <p>You just installed a complete development environment, compiled real robot code, drove a simulated robot, and watched live data update on a graph. That's a lot. Take a minute, breathe, and remember: every session from here on, this stuff is already done.</p>
+      <span class="hf-label">You're done with setup</span>
+      <p>You installed a development environment, compiled real robot code, drove a simulated robot, and watched live data on a graph. Every session from here on, this is already done.</p>
     </div>
 
   </div><!-- /section-verify -->
 
-</div><!-- /page-container -->
+  <nav class="section-nav section-nav--bottom">
+    <button class="section-nav-btn active" data-section="install">Part 1 - Install the tools</button>
+    <button class="section-nav-btn" data-section="project">Part 2 - The starter project</button>
+    <button class="section-nav-btn" data-section="drive">Part 3 - Your first drive</button>
+    <button class="section-nav-btn" data-section="verify">Part 4 - Verify and reference</button>
+  </nav>
 
+</div><!-- /page-container -->
 <footer class="site-footer">
-  FRC Programming Curriculum - Lesson 01: Setup + First Drive
+  <a class="logo" href="index.html">FRC Programming Curriculum</a>
+  <span class="lesson-label">Module 1 - Lesson 01</span>
+  <nav class="site-nav">
+    <a href="index.html">All lessons</a>
+    <a href="lesson-02-vscode-template.html">Lesson 02 &rarr;</a>
+  </nav>
 </footer>
 
 <script src="frc-curriculum.js"></script>
