@@ -16,9 +16,13 @@ function initPage() {
 
   // Site name — all .logo elements (header + footer)
   document.querySelectorAll('.logo').forEach(el => {
-    const badge = el.querySelector('.wip-badge');
     el.textContent = SITE_CONFIG.siteName;
-    if (badge) el.appendChild(badge);
+    if (SITE_CONFIG.workInProgress) {
+      const badge = document.createElement('span');
+      badge.className = 'wip-badge';
+      badge.textContent = SITE_CONFIG.wipBadgeText;
+      el.appendChild(badge);
+    }
   });
 
   // WIP badge text — must be after logo block to avoid being wiped
@@ -90,6 +94,25 @@ function initPage() {
   // lesson-subtitle
   document.querySelectorAll('.lesson-subtitle').forEach(el => el.textContent = lesson.subtitle);
  
+  // lesson-info-bar
+  document.querySelectorAll('.lesson-info-bar').forEach(bar => {
+    bar.innerHTML = '';
+    const items = [
+      lesson.duration,
+      lesson.hardware,
+      lesson.prereq || null,
+      lesson.tools
+    ];
+    items.forEach(text => {
+      if (!text) return;
+      const div = document.createElement('div');
+      div.className = 'info-item';
+      div.innerHTML = '<div class="info-dot"></div>';
+      div.appendChild(document.createTextNode(' ' + text));
+      bar.appendChild(div);
+    });
+  });
+  
   // prev/next nav links — all .site-nav elements (header + footer)
   document.querySelectorAll('.site-nav').forEach(nav => {
     nav.innerHTML = '<a href="index.html">All lessons</a>';
