@@ -8,14 +8,23 @@ function initPage() {
   const lesson   = lessonId && SITE_CONFIG.lessons ? SITE_CONFIG.lessons[lessonId] : null;
  
   // WIP
-  if (SITE_CONFIG.workInProgress) document.body.classList.add('wip');
- 
+  if (SITE_CONFIG.workInProgress) {
+    document.body.classList.add('wip');
+    const banner = document.querySelector('.wip-banner');
+    if (banner) banner.textContent = SITE_CONFIG.banner;
+  }
+
   // Site name — all .logo elements (header + footer)
   document.querySelectorAll('.logo').forEach(el => {
     const badge = el.querySelector('.wip-badge');
     el.textContent = SITE_CONFIG.siteName;
     if (badge) el.appendChild(badge);
   });
+
+  // WIP badge text — must be after logo block to avoid being wiped
+  if (SITE_CONFIG.workInProgress) {
+    document.querySelectorAll('.wip-badge').forEach(el => el.textContent = SITE_CONFIG.wipBadgeText);
+  }
  
   // Page <title>
   if (lesson) {
@@ -23,9 +32,50 @@ function initPage() {
   } else {
     document.title = SITE_CONFIG.siteName;
   }
+
+  // Index page — populate module cards
+  document.querySelectorAll('.module-card').forEach(card => {
+    const l = SITE_CONFIG.lessons[card.dataset.lesson];
+    if (!l) return;
+
+    card.href = l.filename;
+
+    const badgeMap = {
+      ready:   { label: "Ready",   cls: "badge-ready" },
+      current: { label: "Current", cls: "badge-current" },
+      soon:    { label: "Soon",    cls: "badge-soon" }
+    };
+    const badge = card.querySelector('.card-badge');
+    if (badge && l.status) {
+      const b = badgeMap[l.status];
+      badge.textContent = b.label;
+      badge.className = `card-badge ${b.cls}`;
+    }
+
+    const h3 = document.createElement('h3');
+    h3.textContent = `Lesson ${l.lesson} - ${l.title}`;
+    card.appendChild(h3);
+
+    const p = document.createElement('p');
+    p.textContent = l.description;
+    card.appendChild(p);
+
+    const meta = document.createElement('div');
+    meta.className = 'card-meta';
+    meta.textContent = `${l.hardware} · ${l.duration}`;
+    card.appendChild(meta);
+  });
+
+  const hero = document.querySelector('.course-hero');
+  if (hero) {
+    const h1 = hero.querySelector('h1');
+    const p = hero.querySelector('p');
+    if (h1) h1.textContent = SITE_CONFIG.siteName;
+    if (p) p.textContent = SITE_CONFIG.siteSubtitle;
+  }
  
   if (!lesson) return;
- 
+
   const labelText = `Module ${lesson.module} - Lesson ${lesson.lesson}`;
  
   // lesson-label (header + footer)

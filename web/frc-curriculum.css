@@ -700,14 +700,14 @@ code {
   padding: 0.2rem 0.6rem;
   border-radius: 20px;
   display: inline-block;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0;
 }
  
 .badge-ready    { background: var(--teal-light); color: var(--teal); }
 .badge-current  { background: var(--teal); color: var(--white); }
 .badge-soon     { background: var(--gray-bg); color: var(--muted); }
  
-.module-card h3 { font-size: 1rem; font-weight: 600; color: var(--dark); margin-bottom: 0.35rem; }
+.module-card h3 { font-size: 1rem; font-weight: 600; color: var(--dark); margin: 0.5rem 0rem 0.5rem 0 !important; }
 .module-card p  { font-size: 0.82rem; color: var(--muted); line-height: 1.5; }
 .module-card .card-meta { font-size: 0.75rem; color: var(--muted); margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--gray-border); }
  
