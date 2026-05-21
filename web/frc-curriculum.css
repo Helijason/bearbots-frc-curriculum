@@ -139,7 +139,7 @@ body {
  
 /* ── Lesson Header ────────────────────────────────────────── */
 .lesson-header {
-  margin-bottom: 2.5rem;
+  margin-bottom: 0.0rem;
   padding-bottom: 1.5rem;
   border-bottom: 3px solid var(--teal);
 }
@@ -179,7 +179,7 @@ body {
   align-items: center;
   gap: 0.4rem;
   font-size: 0.85rem;
-  color: var(--muted);
+  color: var(--dark);
 }
  
 .lesson-info-bar .info-dot {
@@ -199,7 +199,7 @@ body {
   position: sticky;
   top: 52px;
   background: #F8F9FA;
-  padding: 0.75rem 0;
+  padding: 1.25rem 0;
   z-index: 50;
   border-bottom: 1px solid var(--gray-border);
 }
@@ -659,7 +659,7 @@ code {
 .course-hero {
   background: linear-gradient(135deg, var(--teal) 0%, #0F4A52 100%);
   color: var(--white);
-  padding: 3rem 2rem;
+  padding: 0.5rem 0rem;
   text-align: center;
   margin-bottom: 2.5rem;
 }
@@ -705,6 +705,7 @@ code {
  
 .badge-ready    { background: var(--teal-light); color: var(--teal); }
 .badge-current  { background: var(--teal); color: var(--white); }
+.badge-review  { background: var(--red); color: var(--white); }
 .badge-soon     { background: var(--gray-bg); color: var(--muted); }
  
 .module-card h3 { font-size: 1rem; font-weight: 600; color: var(--dark); margin: 0.5rem 0rem 0.5rem 0 !important; }

@@ -14,21 +14,32 @@ function initPage() {
     if (banner) banner.textContent = SITE_CONFIG.banner;
   }
 
-  // Site name — all .logo elements (header + footer)
-  document.querySelectorAll('.logo').forEach(el => {
-    el.textContent = SITE_CONFIG.siteName;
+  // Build header/footer contents from config
+  function buildNavBar(el) {
+    const logo = document.createElement('a');
+    logo.className = 'logo';
+    logo.href = 'index.html';
+    logo.textContent = SITE_CONFIG.siteName;
     if (SITE_CONFIG.workInProgress) {
       const badge = document.createElement('span');
       badge.className = 'wip-badge';
       badge.textContent = SITE_CONFIG.wipBadgeText;
-      el.appendChild(badge);
+      logo.appendChild(badge);
     }
-  });
-
-  // WIP badge text — must be after logo block to avoid being wiped
-  if (SITE_CONFIG.workInProgress) {
-    document.querySelectorAll('.wip-badge').forEach(el => el.textContent = SITE_CONFIG.wipBadgeText);
+    const label = document.createElement('span');
+    label.className = 'lesson-label';
+    const nav = document.createElement('nav');
+    nav.className = 'site-nav';
+    el.appendChild(logo);
+    el.appendChild(label);
+    el.appendChild(nav);
   }
+
+  const header = document.querySelector('header.site-header');
+  if (header) buildNavBar(header);
+
+  const footer = document.querySelector('footer.site-footer');
+  if (footer) buildNavBar(footer);
  
   // Page <title>
   if (lesson) {
@@ -47,6 +58,7 @@ function initPage() {
     const badgeMap = {
       ready:   { label: "Ready",   cls: "badge-ready" },
       current: { label: "Current", cls: "badge-current" },
+      review:  { label: "Review", cls: "badge-review" },
       soon:    { label: "Soon",    cls: "badge-soon" }
     };
     const badge = card.querySelector('.card-badge');
@@ -98,21 +110,28 @@ function initPage() {
   document.querySelectorAll('.lesson-info-bar').forEach(bar => {
     bar.innerHTML = '';
     const items = [
-      lesson.duration,
-      lesson.hardware,
-      lesson.prereq || null,
-      lesson.tools
+      { text: lesson.duration, label: 'Duration' },
+      { text: lesson.hardware, label: 'Hardware:' },
+      { text: lesson.prereq, label: 'Prereq:' },
+      { text: lesson.tools, label: 'Tools:' }
     ];
-    items.forEach(text => {
+    items.forEach(({ text, label }) => {
       if (!text) return;
       const div = document.createElement('div');
       div.className = 'info-item';
       div.innerHTML = '<div class="info-dot"></div>';
-      div.appendChild(document.createTextNode(' ' + text));
+      if (label) {
+        const strong = document.createElement('strong');
+        strong.textContent = ' ' + label + ' ';
+        div.appendChild(strong);
+        div.appendChild(document.createTextNode(text));
+      } else {
+        div.appendChild(document.createTextNode(' ' + text));
+      }
       bar.appendChild(div);
     });
   });
-  
+
   // prev/next nav links — all .site-nav elements (header + footer)
   document.querySelectorAll('.site-nav').forEach(nav => {
     nav.innerHTML = '<a href="index.html">All lessons</a>';
