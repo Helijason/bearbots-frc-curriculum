@@ -691,6 +691,7 @@ code {
 .module-card:hover { border-color: var(--teal-mid); box-shadow: var(--shadow); transform: translateY(-2px); }
 .module-card.current { border-color: var(--teal); border-width: 2px; }
 .module-card.coming-soon { opacity: 0.55; pointer-events: none; }
+.nav-locked { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
  
 .module-card .card-badge {
   font-size: 0.65rem;
