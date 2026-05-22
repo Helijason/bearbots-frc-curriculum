@@ -15,17 +15,18 @@
 | **Target audience** | HS freshmen & sophomores, brand new to FRC programming |
 | **Hardware** | Student laptops only — no XRP needed today |
 | **Session length** | 2–3 hours (one extended session, not 45 minutes) |
-| **Key tools** | WPILib installer, AdvantageScope, USB drive with starter project |
+| **Key tools** | WPILib installer (includes AdvantageScope), USB drive with starter project |
 
 ---
 
 ## Learning Objectives
 
 - Students have WPILib + VS Code installed and can launch WPILib VS Code
-- Students have AdvantageScope installed and can open it
+- Students have AdvantageScope installed (included with WPILib) and can open it
 - Students can build the starter project to `BUILD SUCCESSFUL`
 - Students can launch the simulator, enable teleop, and drive with the keyboard
 - Students can connect AdvantageScope and watch logged values change in real time
+- Students can view the robot pose in AdvantageScope's 2D/3D view
 - Students know where the reference card lives and have skimmed it once
 
 ---
@@ -34,15 +35,14 @@
 
 ### USB drive contents — prepare ONE per student (or one per pair)
 
-- WPILib installer — Windows `.exe` and Mac `.dmg` (both)
-- AdvantageScope installer — Windows `.exe` and Mac `.dmg` (both)
+- WPILib installer — Windows `.exe` + VS Code `.zip` (offline install)
 - Starter project ZIP — `FRC-XRP-Starter.zip`
 - Reference card PDF — `XRP-Reference-Card.pdf`
 
 ### Download locations
 
 - WPILib: https://docs.wpilib.org/ → Installation
-- AdvantageScope: https://github.com/Mechanical-Advantage/AdvantageScope/releases
+- AdvantageScope is bundled with WPILib — no separate download needed
 
 ### Backup laptops
 
@@ -67,14 +67,14 @@
 | Time | Phase | You do | Students do |
 |---|---|---|---|
 | **0–10 min** | **Hook + setup** | Frame the day. Hand out USB drives. Verify everyone has one. | Plug in laptop. Copy USB contents to Documents folder. |
-| **10–60 min** | **Install WPILib** | Live-demo on projector. Circulate. Triage stuck students into backup laptops after 15 min. | Run installer. Choose options. Wait. Launch WPILib VS Code. |
-| **60–80 min** | **Install AdvantageScope** | Demo on projector. This one is fast — keep momentum going. | Install AdvantageScope. Verify it opens. |
-| **80–110 min** | **Build the starter** | Demo: open folder, build, see `BUILD SUCCESSFUL`. Watch for VS-Code-vs-WPILib-VS-Code mistakes. | Extract ZIP. Open in WPILib VS Code. Build. See `BUILD SUCCESSFUL`. |
-| **110–150 min** | **First drive** | Demo simulator + AdvantageScope flow on projector first. This is the payoff — everyone must reach it. | Launch sim. Enable teleop. Drive with WASD. Connect AdvantageScope. Watch values move. |
-| **150–180 min** | **Reference card + wrap** | Walk through reference card sections. Run end-of-session checklist student by student. | Save reference card. Run through checklist. Pack up laptop. |
+| **10–60 min** | **Install WPILib** | Live-demo on projector. Circulate. Triage stuck students into backup laptops after 15 min. | Run installer. Choose options. Wait. Launch WPILib VS Code 2026. Verify AdvantageScope opens (bundled). |
+| **60–100 min** | **Build the starter** | Demo: open folder, build, see `BUILD SUCCESSFUL`. Watch for VS-Code-vs-WPILib-VS-Code mistakes. | Extract ZIP. Open in WPILib VS Code. Build. See `BUILD SUCCESSFUL`. |
+| **100–150 min** | **First drive** | Demo simulator + AdvantageScope flow on projector first. This is the payoff — everyone must reach it. | Launch sim. Enable teleop. Drive with WASD/arrows. Connect AdvantageScope. Watch values move. |
+| **150–170 min** | **2D/3D pose view** | Demo adding robot pose to AdvantageScope's 2D/3D tab. | Add pose field. Watch robot move on screen as they drive. |
+| **170–180 min** | **Reference card + wrap** | Walk through reference card sections. Run end-of-session checklist student by student. | Save reference card. Run through checklist. Pack up laptop. |
 
 > **90-minute compressed version**
-> If you only have 90 minutes (single class period), accept that some students will leave with incomplete setups. Skip the AdvantageScope deep-dive and the reference card walkthrough. Get everyone through Install → Build → First Drive at minimum. Schedule a follow-up for AdvantageScope and the reference card before Lesson 02.
+> If you only have 90 minutes (single class period), accept that some students will leave with incomplete setups. Skip the 2D/3D pose view and the reference card walkthrough. Get everyone through Install → Build → First Drive at minimum. Schedule a follow-up for the pose view and the reference card before Lesson 02.
 
 ---
 
@@ -104,11 +104,13 @@ Don't pretend this isn't a slow session. It is. Tell students up front.
 
 ### What students do
 
-- Run the WPILib installer (`.exe` on Windows, `.dmg` on Mac)
-- Accept Windows SmartScreen / Mac unidentified-developer warnings
-- Choose options: keep default install path, download VS Code, install all tools
+- Run the WPILib installer (`.exe` on Windows)
+- Select the existing VS Code archive for offline install when prompted
+- Accept Windows SmartScreen warnings
+- Choose options: keep default install path, install everything
 - Wait 10–15 minutes for extraction
-- Launch WPILib VS Code 2025 (purple theme = correct one)
+- Launch WPILib VS Code 2026 (purple theme = correct one)
+- Open AdvantageScope (bundled with WPILib — no separate install needed)
 
 ### What you do
 
@@ -123,40 +125,17 @@ Don't pretend this isn't a slow session. It is. Tell students up front.
 | **"Not enough disk space"** | Free up ~5 GB or use a backup laptop. |
 | **Installer hangs at extraction** | Wait longer — first install is genuinely slow. After 20 minutes of no progress, restart it. |
 | **VS Code won't launch after install** | Restart computer, then try again. If still failing, use a backup laptop. |
-| **Java errors on Mac** | Install Xcode Command Line Tools: `xcode-select --install` |
 | **Windows SmartScreen blocks installer** | Click "More info" → "Run anyway". |
-| **Already had VS Code; opened wrong one** | WPILib VS Code is purple-themed. Pin it to taskbar/dock to avoid the mistake again. |
+| **Already had VS Code; opened wrong one** | WPILib VS Code is purple-themed. Pin it to taskbar to avoid the mistake again. |
+| **AdvantageScope won't open** | It's under the WPILib install folder. Check Start menu for "AdvantageScope". |
 
 > **Pacing check — by 60 minutes**
 >
-> Most students should have WPILib installed and WPILib VS Code launched. Anyone still stuck should be on a backup laptop now — not still troubleshooting their own machine.
+> Most students should have WPILib installed, WPILib VS Code launched, and AdvantageScope verified open. Anyone still stuck should be on a backup laptop now.
 
 ---
 
-## Phase 3 — Install AdvantageScope (60–80 min)
-
-*The fast one. After the WPILib slog, this should feel like a quick win. Keep momentum.*
-
-### What students do
-
-- Run the AdvantageScope installer
-- Open AdvantageScope and verify the main window appears
-
-### Common issues — AdvantageScope
-
-| Issue | Solution |
-|---|---|
-| **Mac blocks AdvantageScope** | System Preferences → Security & Privacy → click "Open Anyway". |
-| **Installer not found on USB drive** | Verify the USB drive copied correctly. Use a known-good drive if needed. |
-| **App opens but window is blank** | Resize the window. Some Mac displays render the splash off-screen at first. |
-
-> **Pacing check — by 80 minutes**
->
-> Both tools installed for everyone. Anyone not at this point is on a backup laptop. From here on, no one should be doing installs.
-
----
-
-## Phase 4 — Build the Starter Project (80–110 min)
+## Phase 3 — Build the Starter Project (60–100 min)
 
 *First time real code touches their laptop. Watch for the WPILib-VS-Code-vs-regular-VS-Code mistake. Demo on projector first.*
 
@@ -187,13 +166,13 @@ Walk the room. Catch these mistakes early:
 | **Build runs but no terminal output** | Terminal panel collapsed. Click the Terminal tab at bottom. |
 | **"Trust the authors" dialog never closes** | Click in the editor area first to give it focus, then click Yes. |
 
-> **Pacing check — by 110 minutes**
+> **Pacing check — by 100 minutes**
 >
 > Everyone has `BUILD SUCCESSFUL` on their screen. If anyone is still stuck on the build, switch them to a backup laptop now — they need to make it to the first drive in this session.
 
 ---
 
-## Phase 5 — First Drive + AdvantageScope (110–150 min)
+## Phase 4 — First Drive + AdvantageScope (100–150 min)
 
 *This is the payoff. Make sure everyone gets here. Demo every step on the projector first — then watch students replicate. The wow moment is when the AdvantageScope graph spikes as they hold W.*
 
@@ -213,6 +192,7 @@ Run this top-to-bottom on the projector. Don't skip steps. Students follow along
 - In Simulation GUI → System Joysticks panel → drag `Keyboard 0` to `Joystick[0]` slot
 - Robot State panel → Teleoperated → Enable
 - Click Simulation GUI window — keyboard only works when this window has focus
+- Keys: W/↑ forward, S/↓ backward, A/← turn left, D/→ turn right
 
 #### Step 3 — Connect AdvantageScope
 
@@ -245,7 +225,32 @@ Run this top-to-bottom on the projector. Don't skip steps. Students follow along
 
 ---
 
-## Phase 6 — Reference Card + Wrap-Up (150–180 min)
+## Phase 5 — 2D/3D Pose View (150–170 min)
+
+*The bonus wow. AdvantageScope can render the robot's position on a field view. This is where simulation stops feeling abstract.*
+
+### What students do
+
+- In AdvantageScope, open a new tab → select **2D Field** (or **3D Field**)
+- In the left sidebar, find the `Drive/Pose` field (or similar pose field logged by the starter project)
+- Drag it onto the 2D/3D view
+- Switch to the Simulation GUI and drive — the robot icon on the field should move
+
+### Common issues — 2D/3D pose
+
+| Issue | Solution |
+|---|---|
+| **No Pose field visible** | Robot must be enabled and running. Check the sidebar for any field with "Pose" in the name. |
+| **Robot doesn't move on field** | Verify the correct field is dragged — not a velocity or encoder field. |
+| **2D view shows robot but it's off the field** | Field image may need to be selected. Check AdvantageScope's field dropdown. |
+
+> **Pacing check — by 170 minutes**
+>
+> Students have seen the robot move on the 2D/3D view. If time is short, this phase is the first to cut.
+
+---
+
+## Phase 6 — Reference Card + Wrap-Up (170–180 min)
 
 *Cool down. Students are tired. Make this section short and concrete — checklist, save the reference card, send them home with a clear sense of what they accomplished.*
 
@@ -267,11 +272,12 @@ Walk through each student. Verify each item before they pack up:
 - [ ] Starter project builds successfully
 - [ ] Simulator runs and responds to keyboard
 - [ ] AdvantageScope shows values when driving
+- [ ] AdvantageScope 2D/3D view shows robot moving
 - [ ] Reference card saved
 
 > **Script — what to say at the end**
 >
-> *"You just installed a complete development environment, compiled real robot code, drove a simulated robot, and watched live data update on a graph. That's a lot. Next lesson, we'll look at what VSCode actually created for us — and why the code is structured the way it is. Bring your laptop, your power cord, and the reference card."*
+> *"You just installed a complete development environment, compiled real robot code, drove a simulated robot, watched live data update on a graph, and saw the robot move on a 2D field view. That's a lot. Next lesson, we'll look at what VS Code actually created for us — and why the code is structured the way it is. Bring your laptop, your power cord, and the reference card."*
 
 ---
 
@@ -284,7 +290,7 @@ A: *"VS Code is where you write code. AdvantageScope is where you see what the r
 A: *"Lesson 04. Today is about getting your laptop ready. The simulator lets us write and test code before we touch any hardware — that's how real teams work too."*
 
 **Q: What if I already have VS Code installed?**
-A: *"WPILib VS Code is different from regular VS Code — it has robot-specific tools built in. You need the WPILib version. Pin it to your taskbar or dock so you don't accidentally open the wrong one."*
+A: *"WPILib VS Code is different from regular VS Code — it has robot-specific tools built in. You need the WPILib version. Pin it to your taskbar so you don't accidentally open the wrong one."*
 
 **Q: My install is stuck. Should I cancel?**
 A: *"If the progress bar moved at all in the last 10 minutes, no — wait. If it's been frozen for more than 15 minutes with no disk activity, cancel and try again. After two failed attempts, switch to a backup laptop."*
@@ -306,7 +312,7 @@ A: *"Yes. Every session. With the power cord. The whole curriculum is hands-on �
 
 - Which students are on backup laptops
 - Which students had major issues — schedule 1-on-1 troubleshooting before Lesson 02
-- Lessons learned - record any issues that should be fixed before next year's Lesson 01
+- Lessons learned — record any issues that should be fixed before next year's Lesson 01
 
 ---
 
@@ -318,6 +324,7 @@ By the end of this session:
 - 100% of students have a working setup — own laptop or backup
 - 100% of students have seen the simulator run successfully
 - 100% of students have seen values change in AdvantageScope
+- 100% of students have seen the robot move in AdvantageScope's 2D/3D view
 
 > If these metrics aren't met, do not proceed to Lesson 02 yet. Schedule a follow-up session and finish the setup. Lesson 02 assumes a working environment.
 

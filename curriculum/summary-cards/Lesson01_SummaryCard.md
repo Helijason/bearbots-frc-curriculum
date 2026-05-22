@@ -17,9 +17,9 @@
 | Concept | Role | What it does |
 |---|---|---|
 | **WPILib + VS Code** | Editor | The FRC editor. Java + libraries. Purple = correct. |
-| **AdvantageScope** | Dashboard | Sees the robot. Real-time graphs. Logs for replay. |
+| **AdvantageScope** | Dashboard | Bundled with WPILib. Sees the robot. Real-time graphs and 2D/3D field view. |
 | **Starter project** | Code base | Complete working robot. Build with Ctrl+Shift+P. `BUILD SUCCESSFUL` = good. |
-| **Simulator** | Test bench | Runs code on laptop. No hardware today. Drive with WASD. |
+| **Simulator** | Test bench | Runs code on laptop. No hardware today. Drive with WASD or arrow keys. |
 | **Reference card** | Cheat sheet | Two pages of patterns. Methods + conversions. Look up, then ask. |
 
 ---
@@ -27,11 +27,12 @@
 ## The Setup Workflow
 
 1. Run WPILib installer → launch WPILib VS Code
-2. Run AdvantageScope installer
+2. Open AdvantageScope (bundled — no separate install)
 3. Extract `FRC-XRP-Starter.zip`
 4. Open folder in WPILib VS Code → Build
 5. `Ctrl+Shift+P` → Simulate Robot Code
-6. Connect AdvantageScope → drag to graph
+6. Connect AdvantageScope → drag velocity fields to graph
+7. Add pose field to 2D/3D view → watch robot move on screen
 
 ---
 
@@ -53,14 +54,16 @@ You'll run this loop hundreds of times.
 - [ ] Open AdvantageScope
 - [ ] Build a project to `BUILD SUCCESSFUL`
 - [ ] Drive a simulated robot with the keyboard
-- [ ] Connect AdvantageScope and graph values
+- [ ] Connect AdvantageScope and graph velocity values
+- [ ] View the robot moving in AdvantageScope's 2D/3D field view
+- [ ] Find the reference card and locate its main sections
 
 ---
 
 ## Key Vocabulary
 
-- **WPILib** — The official FRC software suite — VS Code + Java + libraries + tools in one installer
-- **AdvantageScope** — Log viewer for robot data — real-time graphs, field views, replay from saved logs
+- **WPILib** — The official FRC software suite — VS Code + Java + libraries + tools + AdvantageScope in one installer
+- **AdvantageScope** — Log viewer for robot data — real-time graphs, 2D/3D field views, replay from saved logs
 - **Simulator** — Runs robot code on your laptop with no hardware — same Java logic as a real robot
 - **Build** — Compiles your Java source files into runnable bytecode — must succeed before you simulate
 - **Reference card** — Two-page printable cheat sheet — XRP methods, unit conversions, the patterns you'll forget

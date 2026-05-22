@@ -1,4 +1,4 @@
-# Module 2 — Lesson 02: What Did VSCode Just Create?
+# Module 1 — Lesson 02: What Did VSCode Just Create?
 
 **Stack:** Java | AdvantageKit | XRP
 **Card #:** 02 — *Keep this. Add it to your binder.*
@@ -24,6 +24,17 @@
 
 ---
 
+## Simulation GUI Panels
+
+| Panel | Purpose |
+|---|---|
+| **Robot State** | Enable/disable. Switch modes. Enable before driving — nothing works disabled. |
+| **Joysticks** | Map keyboard or controller to robot inputs. Drag `Keyboard 0` to `Joystick[0]`. |
+| **System Console** | Print statements, errors, stack traces. Check here first when something is wrong. |
+| **NetworkTables** | Live values published by the robot. AdvantageKit data appears as `AdvantageKit/...` |
+
+---
+
 ## The Simulator Workflow
 
 1. `Ctrl+Shift+P` → Simulate Robot Code
@@ -32,6 +43,7 @@
 4. Open AdvantageScope → Connect to Simulator
 5. Robot State → Teleoperated → Enable
 6. Click Sim GUI → drive with W/A/S/D
+7. In AdvantageScope: drag `LeftPositionMeters` and `GyroYawDegrees` to graphs
 
 ---
 
@@ -46,6 +58,7 @@
 
 > Sim GUI must be focused for keys to work.
 > Enable robot before driving — nothing moves disabled.
+> These match the default arcade drive command in RobotContainer.
 
 ---
 
@@ -53,9 +66,11 @@
 
 - [ ] Name every template file and its job
 - [ ] Use `Ctrl+Shift+P` to build and simulate
-- [ ] Launch sim and drive with keyboard
-- [ ] Connect AdvantageScope to simulator
+- [ ] Launch sim and identify all four Simulation GUI panels
+- [ ] Drive with keyboard and verify inputs in the Joysticks panel
+- [ ] Connect AdvantageScope to simulator and graph `LeftPositionMeters`
 - [ ] Explain why `LoggedRobot` extends `TimedRobot`
+- [ ] Find and fix the three common Robot.java bugs
 
 ---
 
@@ -64,7 +79,8 @@
 - **LoggedRobot** — AdvantageKit base class extending `TimedRobot` — adds logging to each cycle
 - **CommandScheduler** — The engine that runs commands — must be called in `robotPeriodic()`
 - **Simulator** — Runs robot code on your laptop — same logic, no hardware needed
-- **AdvantageScope** — Visualization tool that shows logged data from sim or real robot
+- **AdvantageScope** — Visualization tool that shows logged data from sim or real robot — bundled with WPILib
+- **System Console** — The simulator panel that shows errors and print output — check here first when debugging
 - **vendordeps** — JSON files specifying which third-party libraries (like AdvantageKit) to include
 
 ---

@@ -187,7 +187,7 @@ public interface ElevatorIO {
 ### Step 3 — Implement it for the XRP (15 min)
 
 ```java
-public class ElevatorIOXRP implements DriveIO {
+public class ElevatorIOXRP implements ElevatorIO {
     private final XRPMotor motor = new XRPMotor(3);
     private final Encoder encoder = new Encoder(/* channels — TBD */);
 
@@ -448,7 +448,7 @@ Don't give Gold students the answer. Ask:
 
 ### Setup
 
-Distribute (or point students to) the broken `ElevatorSubsystem` starter file. Three bugs, each from a different lesson:
+Distribute (or point students to) the broken `ElevatorSubsystem` starter file. Three bugs, each from a different category:
 
 ### Bug 1 — Missing `@AutoLog` on the inputs class
 
@@ -536,7 +536,7 @@ Walk the room. Every student should see at least:
 - Values returning to near-zero when stationary
 
 > **Common physical verification issues**
->
+
 | Issue | Response |
 |---|---|
 | AdvantageScope shows no Elevator folder | Check `RobotContainer` — subsystem must be instantiated |
@@ -583,6 +583,15 @@ A: *"Either you get zeros — the encoder isn't connected to that channel — or
 
 **Q: Why does the elevator need `appliedVolts` in the inputs struct if we're the ones setting it?**
 A: *"Logging what you commanded is how you debug the difference between 'I told it to do X' and 'it did Y.' If you log the commanded voltage and the actual position, you can tell in replay whether the motor did what you asked. Without it, you're guessing."*
+
+**Q: What happens in simulation if I don't have a DriveIOSim?**
+A: *"You use an empty default implementation — a DriveIO that does nothing. The robot runs, nothing moves, and AdvantageKit still logs everything. Great for testing command logic without hardware."*
+
+**Q: Do I write a new DriveIO interface for every robot?**
+A: *"No. One interface, multiple implementations. The interface is the contract — it doesn't change just because the hardware does. This is the whole point."*
+
+**Q: What if I forget to implement a method from the interface?**
+A: *"Java will refuse to compile. Loudly. This is actually a feature — the compiler is your mean but honest friend who catches mistakes before the robot does."*
 
 **Q: The scoop angle and elevator position need to be coordinated. Why don't we put that in `periodic()`?**
 A: *"`periodic()` runs every 20ms regardless of what's happening. If you put coordination logic there, it always runs — even during autonomous when you want explicit control. Commands are the right place for coordination because they can be scheduled, interrupted, and ended cleanly. We'll build that in Lesson 06."*

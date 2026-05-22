@@ -69,6 +69,28 @@ public class DriveSubsystem extends SubsystemBase {
 > **1. updateInputs → 2. processInputs → 3. use**
 > Swap 1 and 2 → data is one tick stale.
 
+### DriveIOInputs — Typical Fields
+
+```java
+@AutoLog
+public class DriveIOInputs {
+    public double leftPositionMeters        = 0.0;
+    public double rightPositionMeters       = 0.0;
+    public double leftVelocityMetersPerSec  = 0.0;  // L07
+    public double rightVelocityMetersPerSec = 0.0;  // L07
+    public double headingDegrees            = 0.0;  // L07
+}
+```
+
+Fill them in `DriveIOXRP.updateInputs()`:
+```java
+inputs.leftPositionMeters        = dt.getLeftDistanceInch()  * 0.0254;
+inputs.leftVelocityMetersPerSec  = dt.getLeftEncoderRate()   * 0.0254;
+inputs.headingDegrees            = gyro.getAngle();
+```
+
+> Log both position AND velocity. Jumpy velocity + clean position = sensor noise. Clean velocity + wrong position = units bug.
+
 ---
 
 ## The Three Modes
@@ -109,6 +131,16 @@ var drive = switch (Constants.currentMode) {
 
 ---
 
+## Sensors — Roles at a Glance
+
+| Sensor | What it measures | Unit | Use for |
+|---|---|---|---|
+| **Encoder** | Wheel rotation → distance | inches → convert to meters | Distance commands, P-control |
+| **Gyro** | Robot heading | degrees (resets on start) | Turns, drift correction |
+| **Reflectance** | Surface brightness | 0.0–1.0 (high on dark) | Line following |
+
+---
+
 ## Unit Conversions — Get These Right
 
 ```java
@@ -138,6 +170,9 @@ double rad = rotations * 2 * Math.PI;
 | Drive folder empty in log | Missing `@AutoLog` on inputs class |
 | Data is one tick behind | `processInputs` before `updateInputs` |
 | Output isn't in folder | Key needs prefix: `"Drive/Pos"` |
+| Robot creeps but never arrives | kP too small — double it |
+| Robot overshoots, oscillates | kP too big — halve it |
+| `atSetpoint()` never true | Tolerance not set — call `setTolerance()` in constructor |
 
 ---
 
@@ -317,7 +352,8 @@ subsystem.setVoltage(output);
 private final PIDController pid = new PIDController(kP, 0.0, 0.0);
 
 // In constructor — set tolerance:
-pid.setTolerance(0.02); // meters
+pid.setTolerance(0.02);        // position only (meters)
+pid.setTolerance(2.0, 5.0);   // position + velocity tolerance
 
 // In execute():
 double out = pid.calculate(drive.getPos(), targetMeters);
@@ -337,7 +373,9 @@ return pid.atSetpoint();
 - [ ] Every `recordOutput()` key starts with subsystem name
 - [ ] Constants live in `Constants.java`, not scattered in code
 - [ ] `addRequirements()` is called in every command's constructor
+- [ ] `setTolerance()` called before using `atSetpoint()`
+- [ ] Velocity fields in `DriveIOInputs` use `* 0.0254` (inches/sec → m/s)
 
 ---
 
-*FRC Programming Curriculum — Lessons 1–6 reference*
+*FRC Programming Curriculum — Lessons 1–7 reference*

@@ -40,10 +40,40 @@
 ## The Two Rules You Can't Break
 
 **Rule 1 — `updateInputs()` BEFORE `processInputs()`. Always.**
-Swap them, your data is one tick stale. Replay reproduces wrong reality.
+Swap them and your data is one tick stale. Replay reproduces wrong reality.
 
 **Rule 2 — Every `recordOutput` key starts with subsystem name.**
-`"Drive/AvgPos"`, not `"avgPos"`. No prefix = lost.
+`"Drive/AvgPos"` not `"avgPos"`. No prefix = lost in the sidebar.
+
+---
+
+## AdvantageScope Sidebar Structure
+
+| Folder | Contains |
+|---|---|
+| `RealOutputs/` | Values your code decided — `Logger.recordOutput()` calls |
+| `ReplayOutputs/` | Same outputs, recomputed during replay — compare to find what changed |
+| `AdvantageKit/RealOutputs/` + subsystem folders | Inputs from `@AutoLog` structs — folder name = first arg of `processInputs()` |
+| `NT/` and `DS/` | NetworkTables and driver station state |
+
+---
+
+## Visualization Tabs
+
+| Tab | Use it for |
+|---|---|
+| **Line Graph** | Numbers over time. Drag any field. The 90% case. |
+| **Odometry / 2D Field** | Drop a `Pose2d` — see where the robot went. Best for autonomous debugging. |
+| **Table** | Every value at every timestamp. Find "what was X at t=42.0?" |
+| **Console** | All `System.out.println()` from the robot. |
+
+---
+
+## Finding Your Log Files
+
+- **Sim logs:** `logs/` folder next to your project, named by date/time
+- **Real robot logs:** USB stick in the roboRIO. Pull it after the match.
+- **Nothing in `logs/`?** Check `Logger.addDataReceiver(new WPILOGWriter())` is in Robot constructor.
 
 ---
 
@@ -52,18 +82,21 @@ Swap them, your data is one tick stale. Replay reproduces wrong reality.
 - [ ] Explain what `@AutoLog` generates at compile time
 - [ ] Add a new field to an Inputs class and see it logged
 - [ ] Open a saved log and scrub through it in AdvantageScope
+- [ ] Find values in `RealOutputs/` and `AdvantageKit/` sidebar folders
 - [ ] Switch a project into REPLAY mode and re-run a log
-- [ ] Tell why `updateInputs` must come before `processInputs`
+- [ ] Explain why `updateInputs` must come before `processInputs`
 
 ---
 
 ## Key Vocabulary
 
-- **`@AutoLog`** — AdvantageKit annotation — goes on an inputs class to auto-generate logging code
+- **`@AutoLog`** — AdvantageKit annotation — goes on an inputs class to auto-generate `toLog`/`fromLog` serialization code
 - **`@AutoLogOutput`** — AdvantageKit annotation — goes on a field to auto-log its value every cycle
 - **Inputs struct** — A bag of public fields read from hardware each cycle — wraps everything you log via the IO
 - **Replay mode** — Running robot code against a saved log instead of hardware — same inputs, same code, no robot
 - **WPILOG** — The binary log format AdvantageKit writes — opened by AdvantageScope, replayable, sharable
+- **`RealOutputs/`** — AdvantageScope sidebar folder containing values logged during a live or sim run
+- **`ReplayOutputs/`** — AdvantageScope sidebar folder containing values recomputed during a replay run
 
 ---
 
