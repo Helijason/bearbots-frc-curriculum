@@ -1,88 +1,59 @@
-# \# FRC Programming Curriculum
+# BearBots 6964 — FRC Programming Curriculum
 
-# 
+A structured, seven-lesson curriculum for teaching FRC robot programming to high school students using Java, WPILib, AdvantageKit, and XRP robots.
 
-# A six-lesson curriculum on FRC programming using Java, AdvantageKit, and the XRP robot. Module 1 covers setup; Module 2 covers the core programming concepts.
+**Live site:** [helijason.github.io/bearbots-frc-curriculum](https://helijason.github.io/bearbots-frc-curriculum/)
 
-# 
+---
 
-# \---
+## Overview
 
-# 
+This curriculum takes students with little or no prior experience and progressively builds them toward reading and writing competition-ready robot code. The central concept is the **IO pattern** — a three-file abstraction separating hardware from subsystem logic — introduced in Lesson 4 and reinforced through every lesson that follows.
 
-# \## Files
+Lessons are organized in two phases:
 
-# 
+- **Phase 1 (Lessons 1–3):** No hardware required. Students work in VSCode with the WPILib simulator and AdvantageScope.
+- **Phase 2 (Lessons 4–7):** XRP robot hardware introduced. Students apply the IO pattern to real mechanisms.
 
-# \### Module 1 — Setup
+Each lesson includes a hook question, a student summary card, and an instructor guide with timing, scripts, common bugs, and tiered challenge notes.
 
-# 
+---
 
-# | Lesson | Summary Card | Instructor Guide |
+## Lessons
 
-# |---|---|---|
+| # | Title | Phase |
+|---|-------|-------|
+| 01 | Setup + First Drive | Simulator |
+| 02 | WPILib Template Structure and File Roles | Simulator |
+| 03 | What Is a Subsystem? | Simulator |
+| 04 | The IO Pattern and AdvantageKit Architecture | XRP |
+| 05 | How Do I Debug a Robot That Isn't Here? | XRP |
+| 06 | How Does the Robot Know When It's Done? | XRP |
+| 07 | Why Doesn't It Stop Where I Told It To? | XRP |
 
-# | \*\*01\*\* — Setup + First Drive | \[Lesson01\_SummaryCard.md](Lesson01\_SummaryCard.md) | \[Lesson01\_InstructorGuide.md](Lesson01\_InstructorGuide.md) |
+---
 
-# 
+## Tech Stack
 
-# \### Module 2 — Programming
+- **Java + WPILib** — primary programming environment
+- **AdvantageKit + AdvantageScope** — logging and telemetry
+- **XRP robot** — accessible hardware platform for Phase 2
+- **VSCode** — WPILib-integrated development environment
 
-# 
+---
 
-# | Lesson | Summary Card | Instructor Guide |
+## Repo Structure
 
-# |---|---|---|
+```
+/curriculum          Student summary cards and reference sheet
+/curriculum/instructor-guides    Instructor guides for each lesson
+/docs                Live website source
+/setup               Setup scripts and resources
+/vscode              VS Code snippets for AdvantageKit patterns
+```
 
-# | \*\*02\*\* — WPILib Template Structure and File Roles | \[Lesson02\_SummaryCard.md](Lesson02\_SummaryCard.md) | \[Lesson02\_InstructorGuide.md](Lesson02\_InstructorGuide.md) |
+---
 
-# | \*\*03\*\* — What Is a Subsystem? | \[Lesson03\_SummaryCard.md](Lesson03\_SummaryCard.md) | \[Lesson03\_InstructorGuide.md](Lesson03\_InstructorGuide.md) |
+## For Other Teams
 
-# | \*\*04\*\* — The IO Pattern and AdvantageKit Architecture | \[Lesson04\_SummaryCard.md](Lesson04\_SummaryCard.md) | \[Lesson04\_InstructorGuide.md](Lesson04\_InstructorGuide.md) |
-
-# | \*\*05\*\* — How Do I Debug a Robot That Isn't Here? | \[Lesson05\_SummaryCard.md](Lesson05\_SummaryCard.md) | \[Lesson05\_InstructorGuide.md](Lesson05\_InstructorGuide.md) |
-
-# | \*\*06\*\* — How Does the Robot Know When It's Done? | \[Lesson06\_SummaryCard.md](Lesson06\_SummaryCard.md) | \[Lesson06\_InstructorGuide.md](Lesson06\_InstructorGuide.md) |
-
-# | \*\*07\*\* — Why Doesn't It Stop Where I Told It To? | \[Lesson07\_SummaryCard.md](Lesson07\_SummaryCard.md) | \[Lesson07\_InstructorGuide.md](Lesson07\_InstructorGuide.md) |
-
-# 
-
-# \### Reference
-
-# 
-
-# \- \[StudentReferenceCard.md](StudentReferenceCard.md) — Two-page cheat sheet covering the IO pattern, logging, XRP hardware methods, unit conversions, command lifecycle, composition, AutoChooser, and P-control.
-
-# 
-
-# \---
-
-# 
-
-# \## Curriculum Arc
-
-# 
-
-# The curriculum is built around a single mental model that gets layered up over seven lessons:
-
-# 
-
-# 1\. \*\*Lesson 01\*\* — Get tools installed and drive a simulated robot. Foundation for everything.
-
-# 2\. \*\*Lesson 02\*\* — Walk through every generated file and understand why it exists before touching anything.
-
-# 3\. \*\*Lesson 03\*\* — One mechanism = one subsystem. Motor control belongs in commands.
-
-# 4\. \*\*Lesson 04\*\* — The IO pattern: subsystems shouldn't know what hardware they run on.
-
-# 5\. \*\*Lesson 05\*\* — Logging discipline. If it's not logged, it didn't happen.
-
-# 6\. \*\*Lesson 06\*\* — Commands have a beginning, middle, and end. Compose them into autos.
-
-# 7\. \*\*Lesson 07\*\* — Close the loop with sensors and P-control.
-
-# 
-
-# Each lesson includes a one-page summary card (for students) and an instructor guide (with timing, scripts, common bugs, and tier-by-tier notes for the practice phase).
-
+Feel free to use or adapt this curriculum for your own team. If you have improvements or corrections, open an issue or pull request.
