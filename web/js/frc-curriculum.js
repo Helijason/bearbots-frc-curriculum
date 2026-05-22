@@ -2,7 +2,13 @@
    FRC Programming Curriculum — Shared JavaScript
    ============================================================ */
  
-/* ── Page Population ──────────────────────────────────────── */
+/* ── Preview Mode ─────────────────────────────────────────── */
+const PREVIEW_MODE = new URLSearchParams(location.search).has('preview');
+function appendPreview(url) {
+  return PREVIEW_MODE && !url.includes('preview=true') ? url + '?preview=true' : url;
+}
+
+   /* ── Page Population ──────────────────────────────────────── */
 function initPage() {
   const lessonId = document.body.dataset.lesson;
   const lesson   = lessonId && SITE_CONFIG.lessons ? SITE_CONFIG.lessons[lessonId] : null;
@@ -18,7 +24,7 @@ function initPage() {
   function buildNavBar(el) {
     const logo = document.createElement('a');
     logo.className = 'logo';
-    logo.href = 'index.html';
+    logo.href = appendPreview('index.html');
     logo.textContent = SITE_CONFIG.siteName;
     if (SITE_CONFIG.workInProgress) {
       const badge = document.createElement('span');
@@ -53,7 +59,7 @@ function initPage() {
     const l = SITE_CONFIG.lessons[card.dataset.lesson];
     if (!l) return;
 
-    card.href = l.filename;
+    card.href = appendPreview(l.filename);
 
     const badgeMap = {
       ready:   { label: "Ready",   cls: "badge-ready" },
@@ -68,6 +74,12 @@ function initPage() {
       badge.className = `card-badge ${b.cls}`;
     }
 
+    // Lock soon cards unless preview mode
+    if (l.status === 'soon' && !PREVIEW_MODE) {
+      card.href = '#';
+      card.classList.add('coming-soon');
+    }
+    
     const h3 = document.createElement('h3');
     h3.textContent = `Lesson ${l.lesson} - ${l.title}`;
     card.appendChild(h3);
@@ -134,12 +146,18 @@ function initPage() {
 
   // prev/next nav links — all .site-nav elements (header + footer)
   document.querySelectorAll('.site-nav').forEach(nav => {
-    nav.innerHTML = '<a href="index.html">All lessons</a>';
+    nav.innerHTML = `<a href="${appendPreview('index.html')}">All lessons</a>`;
  
     if (lesson.prev) {
       const p = SITE_CONFIG.lessons[lesson.prev];
       const a = document.createElement('a');
-      a.href = p.filename;
+      if (p.status === 'soon' && !PREVIEW_MODE) {
+        a.href = '#';
+        a.classList.add('nav-locked');
+        a.title = 'Not yet available';
+      } else {
+        a.href = appendPreview(p.filename);
+      }
       a.innerHTML = `&larr; Lesson ${p.lesson}`;
       nav.insertBefore(a, nav.firstChild);
     }
@@ -147,7 +165,14 @@ function initPage() {
     if (lesson.next) {
       const n = SITE_CONFIG.lessons[lesson.next];
       const a = document.createElement('a');
-      a.href = n.filename;
+
+      if (n.status === 'soon' && !PREVIEW_MODE) {
+        a.href = '#';
+        a.classList.add('nav-locked');
+        a.title = 'Not yet available';
+      } else {
+        a.href = appendPreview(n.filename);
+      }
       a.innerHTML = `Lesson ${n.lesson} &rarr;`;
       nav.appendChild(a);
     }
