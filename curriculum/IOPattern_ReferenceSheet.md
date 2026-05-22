@@ -7,7 +7,7 @@
 
 ## The core idea
 
-> The subsystem code never changes. Only what's behind the IO does.
+> The subsystem never imports hardware. Only what's behind the IO does.
 
 In AdvantageKit, every subsystem talks to a hardware interface — never to hardware directly. That interface can be backed by three different things depending on mode:
 
@@ -112,12 +112,63 @@ REPLAY's `DriveIO {}` has no-op methods that write nothing to the inputs struct.
 
 ---
 
+## Programming concept 3 — Logging: inputs vs. outputs
+
+AdvantageKit logs two kinds of data differently. Knowing which is which matters.
+
+| Kind | What it is | How it's logged |
+|---|---|---|
+| **Inputs** | Data read *from* hardware (encoder positions, voltages, sensor readings) | `@AutoLogInput` annotation on fields in the inputs struct — AdvantageKit handles the rest |
+| **Outputs** | Data sent *to* hardware (voltage commands, setpoints, calculated values) | `Logger.recordOutput("Drive/leftVoltage", value)` — you call it manually |
+
+**The inputs struct — `DriveIOInputs`**
+
+```java
+// DriveIO.java
+public static class DriveIOInputs {
+    @AutoLogInput public double leftPositionMeters = 0.0;
+    @AutoLogInput public double rightPositionMeters = 0.0;
+    @AutoLogInput public double leftVelocityMetersPerSec = 0.0;
+}
+```
+
+`@AutoLogInput` tells AdvantageKit to log this field automatically inside `processInputs()`. No annotation → field is invisible to the logger and invisible to REPLAY.
+
+**`DriveIOInputsAutoLogged` — why the name is different**
+
+AdvantageKit generates a subclass called `DriveIOInputsAutoLogged` at compile time. That's the class you actually instantiate. It handles the logging boilerplate so your struct stays clean.
+
+```java
+// DriveSubsystem.java
+private final DriveIOInputsAutoLogged inputs = new DriveIOInputsAutoLogged();
+```
+
+**Recording outputs manually**
+
+```java
+// DriveSubsystem.java — inside periodic() after processInputs()
+Logger.recordOutput("Drive/leftVoltageCommand", leftVoltage);
+Logger.recordOutput("Drive/speedMetersPerSec", inputs.leftVelocityMetersPerSec);
+```
+
+Key: the string key must start with the subsystem name. `"Drive/..."` not `"leftVoltage"`. AdvantageScope uses this to organize the signal tree.
+
+**Data flow summary**
+
+```
+Hardware → updateInputs() → @AutoLogInput fields → processInputs() → REPLAY / AdvantageScope
+                                                                              ↑
+Commands → subsystem logic → Logger.recordOutput() ───────────────────────────┘
+```
+
+---
+
 ## Quick sanity check
 
 - [ ] `DriveSubsystem` has zero hardware imports
 - [ ] `DriveIOXRP` is the only file that imports `XRPDrivetrain`
 - [ ] `updateInputs()` is before `processInputs()`. Always.
-- [ ] `stop()` sets motors to `0.0`, not `1.0`
+- [ ] Every input field in `DriveIOInputs` has `@AutoLogInput` — plain fields are invisible to REPLAY
 - [ ] Every `recordOutput()` key starts with the subsystem name (`"Drive/..."`)
 - [ ] Mode switch lives in `RobotContainer`, driven by `Constants.currentMode`
 

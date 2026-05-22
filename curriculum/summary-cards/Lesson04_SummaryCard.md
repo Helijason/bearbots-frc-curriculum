@@ -20,12 +20,12 @@ Defines what a drivetrain can do.
 Think: job description.
 
 ### `DriveIOXRP.java` — The implementation
-Talks to XRP hardware.
-The only file allowed to know what hardware this is.
+Talks to XRP hardware. The only file allowed to know what hardware this is.
+Think: the person doing the job.
 
 ### `DriveSubsystem.java` — The subsystem
-Calls interface methods.
-Has no idea what's on the other end. Doesn't care.
+Calls interface methods. Has no idea what's on the other end. Doesn't care.
+Think: the manager.
 
 ---
 
@@ -34,7 +34,8 @@ Has no idea what's on the other end. Doesn't care.
 **Rule 1 — `DriveSubsystem` must NEVER `import XRPDrivetrain`.**
 Break it: changing hardware breaks every file.
 
-**Rule 2 — `stop()` sets motors to `0.0`. Not `1.0`. Not ever.**
+**Rule 2 — `stop()` puts the mechanism in a safe state.**
+For motors: `motor.set(0.0)`. For the drivetrain: `drivetrain.stopMotor()`.
 Break it: `stop()` launches game pieces. Awkward.
 
 ---
@@ -48,6 +49,19 @@ Break it: `stop()` launches game pieces. Awkward.
 
 > This loop runs every 20ms. Every loop cycle.
 > If `processInputs()` isn't in `periodic()`, nothing logs.
+> Order matters: `updateInputs` MUST come before `processInputs`.
+
+---
+
+## Unit Conversions You Will Need
+
+| Conversion | Formula |
+|---|---|
+| Encoder inches → meters | `inches * 0.0254` |
+| Volts → motor percent | `volts / 12.0` |
+
+> `motor.set()` and `tankDrive()` want -1.0 to 1.0, not volts.
+> XRP encoders return inches by default. WPILib uses meters. Always convert.
 
 ---
 
@@ -57,7 +71,8 @@ Break it: `stop()` launches game pieces. Awkward.
 - [ ] Name each file and describe its job in one sentence
 - [ ] Implement `DriveIOXRP` from a given interface
 - [ ] Find and fix a units bug in an IO implementation
-- [ ] Describe what `Logger.processInputs()` does and when
+- [ ] Describe what `Logger.processInputs()` does and when it must be called
+- [ ] Verify a subsystem's logged values in AdvantageScope
 
 ---
 
@@ -68,6 +83,7 @@ Break it: `stop()` launches game pieces. Awkward.
 - **IO layer** — The AdvantageKit abstraction separating hardware from subsystem logic
 - **Logged inputs** — Sensor readings captured by AdvantageKit every loop cycle for replay
 - **Replay mode** — Running robot logic against a saved log file without needing hardware
+- **`@AutoLog`** — Annotation that generates `IOInputsAutoLogged` — required for `Logger.processInputs()` to work
 
 ---
 

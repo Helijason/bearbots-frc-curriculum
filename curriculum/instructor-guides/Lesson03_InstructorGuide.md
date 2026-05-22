@@ -1,4 +1,4 @@
-# FRC Programming Curriculum — Module 2, Lesson 03
+# FRC Programming Curriculum — Module 1, Lesson 03
 
 # What Is a Subsystem?
 
@@ -112,7 +112,7 @@ Students from Lesson 02 will ask about this. Address it directly:
 > ```
 > Remove that line = no commands ever execute.
 >
-> **AdvantageKit and command-based are two separate systems** that work together through that one method call.
+> **AdvantageKit and command-based are two separate systems** that work together through that one method call. You could have a `TimedRobot` with no commands at all — command-based is a pattern we choose to use by running the scheduler.
 
 ### `periodic()` vs commands
 
@@ -126,43 +126,13 @@ This distinction trips up students all season. Make it explicit:
 | Update alerts / state | Run autonomous actions |
 | Cannot be stopped | Can be interrupted |
 
----
+### Common student questions
 
-## Phase 2 — Concept (10–25 min)
+**Q: Can a subsystem control two mechanisms?**
+Technically yes. It's almost always a bad idea. If two mechanisms are so tightly coupled that they must always be controlled together, they might belong in one subsystem. Otherwise separate them.
 
-### The cafeteria analogy
-
-Use this before showing any code. Students need the mental model first.
-
-> **Script**
->
-> *"Imagine your school cafeteria. Pizza station, salad bar, dessert section. Each one does its job. If the pizza oven breaks, the ice cream is fine. Your robot works the same way — each subsystem owns one mechanism. If the shooter breaks, the drivetrain keeps driving."*
-
-### The `LoggedRobot` and command framework question
-
-Students from Lesson 02 will ask about this. Address it directly:
-
-> **Inheritance chain:** `Robot` extends `LoggedRobot` extends `TimedRobot`
->
-> **Command framework is NOT a base class.** It runs because of this one line in `robotPeriodic()`:
-> ```java
-> CommandScheduler.getInstance().run()
-> ```
-> Remove that line = no commands ever execute.
->
-> **AdvantageKit and command-based are two separate systems** that work together through that one method call.
-
-### `periodic()` vs commands
-
-This distinction trips up students all season. Make it explicit:
-
-| `periodic()` | Commands |
-|---|---|
-| Runs every 20ms regardless | Runs when scheduled |
-| Read sensors | Control motors |
-| Log data to AdvantageKit | Respond to button presses |
-| Update alerts / state | Run autonomous actions |
-| Cannot be stopped | Can be interrupted |
+**Q: How does a subsystem communicate with another subsystem?**
+Through commands in RobotContainer. Subsystems don't talk to each other directly — that would create dependencies that make debugging much harder. Commands coordinate between subsystems.
 
 ---
 
@@ -207,15 +177,23 @@ Facilitate, don't settle. The productive debates:
 Be honest about this upfront. The tool creates a correct but minimal shell:
 
 ```java
-package frc.robot.subsystems;
+package frc.robot.subsystems;  // matches your folder structure
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Indexer extends SubsystemBase {
-    public Indexer() {}
+
+    public Indexer() {
+        // Constructor — runs once when subsystem is created
+        // Good place to configure hardware (motors, sensors)
+    }
 
     @Override
-    public void periodic() {}
+    public void periodic() {
+        // Runs every 20ms (50Hz)
+        // Read sensors, log data, update state
+        // DO NOT put motor control here — use commands
+    }
 }
 ```
 
@@ -233,7 +211,8 @@ It does NOT give you: IO interface, inputs struct, `@AutoLog`, `Logger.processIn
 
 ### Live demo steps
 
-- Right-click `subsystems` folder in Explorer → Create a new class/command → `SubsystemBase`
+- Right-click `subsystems/` folder in Explorer → Create a new class/command → `SubsystemBase`
+- Alternatively: `Ctrl+Shift+P` → `WPILib: Create a new class` → `SubsystemBase`
 - Name it `Indexer`. Show the generated file. Point out what's there and what's missing.
 - Add `@AutoLogOutput` to a field. Add `Logger.processInputs()` to `periodic()`. Show the imports needed.
 - Open `RobotContainer`. Add: `private final Indexer indexer = new Indexer();`
@@ -245,14 +224,14 @@ It does NOT give you: IO interface, inputs struct, `@AutoLog`, `Logger.processIn
 
 Teach this as a standard habit: after every structural change, verify in sim before adding logic.
 
-- Build succeeds → no compile errors
-- Sim launches → no runtime errors in System Console
-- AdvantageScope connects → subsystem folder appears in log tree
-- Enable and drive → `Drive/` values update in AdvantageScope graphs
+1. Build succeeds → no compile errors
+2. Sim launches → no runtime errors in System Console
+3. AdvantageScope connects → subsystem folder appears in log tree
+4. Enable and drive → `Drive/LeftPositionMeters` updates in AdvantageScope graphs
 
 > **AdvantageScope verification for subsystems**
 >
-> If the subsystem folder doesn't appear in AdvantageScope after enabling: check that `Logger.processInputs()` is called in `periodic()`, and that the subsystem is instantiated in `RobotContainer` (not just declared).
+> If the subsystem folder doesn't appear in AdvantageScope after enabling: check that `Logger.processInputs()` is called in `periodic()`, AND that the subsystem is instantiated in `RobotContainer` (not just declared).
 
 ---
 
@@ -262,15 +241,19 @@ Teach this as a standard habit: after every structural change, verify in sim bef
 
 #### Bronze — identify and create
 
-Students identify subsystems from a robot description, then create one using the WPILib tool and add it to `RobotContainer`. Watch for: students trying to create files by hand, putting too many mechanisms in one subsystem, or confusing sensors with subsystems.
+Students identify subsystems from a robot description (drivetrain, flywheel shooter + angle servo, ball sensor, LED strip), then create one using the WPILib tool and add it to `RobotContainer`. Watch for: students trying to create files by hand, putting too many mechanisms in one subsystem, or treating sensors as their own subsystem.
+
+> **Key teaching point for Bronze:** a sensor belongs inside whichever subsystem reads it — it doesn't get its own subsystem.
 
 #### Silver — add AdvantageKit structure
 
 Students take their Bronze subsystem and add `@AutoLogOutput` to at least two fields, verify they appear in AdvantageScope, and confirm `Logger.processInputs()` is in `periodic()`. If students get stuck: *"Add `@AutoLogOutput` directly above the field declaration. Rebuild. Then look for it in AdvantageScope."*
 
+Silver also adds: an `IndexerGoal` enum (`IDLE`, `ACTIVE`), a `setGoalCommand()` method, and a controller button binding. Goal should appear in AdvantageScope as `IndexerSubsystem/Goal`.
+
 #### Gold — full architecture design
 
-Students design a complete subsystem architecture for a given robot description — not just one subsystem but all of them, with justified boundary decisions. Don't rush Gold students to implementation. The design document is the deliverable.
+Students design a complete subsystem architecture for a given robot description — not just one subsystem but all of them, with justified boundary decisions. Key Gold insight: subsystems coordinate through commands, not direct method calls. Don't rush Gold students to implementation. The design document is the deliverable.
 
 ---
 

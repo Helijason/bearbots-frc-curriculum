@@ -1,4 +1,4 @@
-# FRC Programming Curriculum — Module 2, Lesson 02
+# FRC Programming Curriculum — Module 1, Lesson 02
 
 # WPILib Template Structure and File Roles
 
@@ -36,8 +36,8 @@
 ### Room setup
 
 - VSCode open on projector with a freshly generated WPILib project
-- AdvantageScope installed on instructor laptop and all student laptops
-- Student laptops have WPILib 2024 installed
+- AdvantageScope available on instructor laptop and all student laptops (bundled with WPILib)
+- Student laptops have WPILib 2026 installed
 - Digital handout open in browser: `lesson-02-vscode-template.html`
 
 > **The most important instructor mindset for this lesson**
@@ -52,7 +52,7 @@
 |---|---|---|---|
 | 0–5 min | **Hook** | Open fresh project. Count the files. Ask: what is all this? | Explore the file tree. Guess what each file does. |
 | 5–30 min | **File tour** | Walk through each file. Click to expand on projector. Think out loud. | Follow along. Ask questions. Note anything surprising. |
-| 30–60 min | **Simulator** | Live demo: launch sim, connect AdvantageScope, drive with keyboard. | Watch the demo, then replicate it on their own laptop. |
+| 30–60 min | **Simulator** | Live demo: launch sim, walk through GUI panels, connect AdvantageScope, drive with keyboard. | Watch the demo, then replicate it on their own laptop. |
 | 60–90 min | **Constants scavenger hunt** | Seed the starter project with misplaced magic numbers. Circulate. | Find hardcoded values in wrong files. Move them to `Constants.java`. Rebuild and verify. |
 | 90–110 min | **"Add your name to the robot"** | Demo: add a string constant, log it with `Logger.recordOutput`, find it in AdvantageScope. | Add their own name constant. Verify it appears live in AdvantageScope. |
 | 110–140 min | **Graph racing** | Facilitate. Call out interesting moments. Ask "what do you expect?" before each run. | Take turns driving. Add logged values to a shared graph. Experiment with patterns. |
@@ -83,7 +83,7 @@ Open a fresh WPILib project on the projector. Don't say anything. Just scroll th
 
 ---
 
-## Phase 2 — File Tour (5–15 min)
+## Phase 2 — File Tour (5–30 min)
 
 ### Walking through each file
 
@@ -91,7 +91,7 @@ For each file: open it on the projector, explain its job in one sentence, explai
 
 ### `Main.java`
 
-- **Job:** entry point. Calls `startRobot(Robot::new)`. That's all it does.
+- **Job:** entry point. Calls `RobotBase.startRobot(Robot::new)`. That's all it does.
 - **Missing:** robot doesn't start. Not even a compile error — just silence.
 - **Most likely mistake:** adding code here. The comment says not to. People do it anyway.
 
@@ -114,13 +114,23 @@ For each file: open it on the projector, explain its job in one sentence, explai
 - **Missing:** constants are hardcoded in five different files. One wiring change breaks everything.
 - **Most likely mistake:** not using it at all, then spending 2 hours finding hardcoded motor ID 4 when it should be 5.
 
+### `build.gradle`
+
+- **Job:** build recipe. Specifies WPILib version, vendor libraries, compile and deploy config.
+- **Edited by:** the WPILib tools (`Manage Vendor Libraries`), not by hand.
+- **Most likely mistake:** editing it manually and breaking version alignment.
+
 > **The `LoggedRobot` vs `TimedRobot` question**
 >
 > Students will ask about this. The answer: `LoggedRobot` extends `TimedRobot`. Same lifecycle methods, same timing. AdvantageKit adds a logging wrapper around each cycle. The command framework isn't a base class — it's opt-in through `CommandScheduler.run()` in `robotPeriodic()`.
 
+> **How the files connect**
+>
+> Robot.java creates one RobotContainer in its constructor. RobotContainer creates all the subsystems. Then every 20ms, Robot.java calls `robotPeriodic()`, which runs the CommandScheduler, which calls `periodic()` on every subsystem. That's the whole loop.
+
 ---
 
-## Phase 3 — Simulator Demo (15–30 min)
+## Phase 3 — Simulator Demo (30–60 min)
 
 ### Live simulator walkthrough
 
@@ -132,25 +142,39 @@ Do this live on the projector. Students follow along on their own laptops. Go sl
 - When prompted: check `halsim_gui`, click OK
 - Wait for build. Simulation GUI opens automatically.
 
-#### Step 2 — Set up keyboard driving
+#### Step 2 — Understand the Simulation GUI panels
+
+Walk through each panel before driving. Students should know what they're looking at.
+
+| Panel | Purpose |
+|---|---|
+| **Robot State** | Enable/disable the robot. Switch between Teleop, Auto, and Test modes. If you forget to enable — nothing moves. |
+| **Joysticks** | Map keyboard or real controller inputs to robot joystick slots. Drag `Keyboard 0` to `Joystick[0]`. |
+| **System Console** | Shows print statements, errors, and stack traces from robot code. Always check here first when something goes wrong. |
+| **NetworkTables** | Shows all values published to NetworkTables in real time. AdvantageKit data appears as `AdvantageKit/...` |
+
+> **"Nothing is happening" almost always means one of two things:** robot not enabled, or there's an error in System Console. Check both before assuming the code is wrong.
+
+#### Step 3 — Set up keyboard driving
 
 - In Simulation GUI → Joysticks panel
-- Drag 'Keyboard 0' to `Joystick[0]` slot
+- Drag `Keyboard 0` to `Joystick[0]` slot
 - Robot State panel → Teleoperated → Enable
 - Click back on Simulation GUI (keyboard only works when this window is focused)
 
-#### Step 3 — Connect AdvantageScope
+#### Step 4 — Connect AdvantageScope
 
-- Open AdvantageScope
+- Open AdvantageScope (bundled with WPILib)
 - File → Connect to Simulator (or `Ctrl+K`)
-- Left panel shows log key tree
+- Left panel shows log key tree — `AdvantageKit/` should appear
 - Connect BEFORE enabling the robot — otherwise first seconds of data are lost
 
-#### Step 4 — Drive and observe
+#### Step 5 — Drive and observe
 
 - Press `W` to drive forward, `S` backward, `A`/`D` to turn
 - In AdvantageScope: find `Drive/` folder, drag `LeftPositionMeters` to graph
-- Watch the graph update as the robot moves
+- Drag `GyroYawDegrees` to a second graph tab
+- Watch the graphs update as the robot moves
 - Ask: *'What happens to the graph when you spin in place?'*
 
 > **Keyboard default mappings**
@@ -159,16 +183,20 @@ Do this live on the projector. Students follow along on their own laptops. Go sl
 > - `S` — Backward (Left stick Y positive)
 > - `A` — Turn left (Left stick X negative)
 > - `D` — Turn right (Left stick X positive)
+>
+> These match the default arcade drive command in RobotContainer.
 
 > **If a student has a real controller**
 >
-> Plug it in before launching sim. It appears automatically in the Joysticks panel. Drag to `Joystick[0]`. Left stick Y = forward/back, Left stick X = turn. Confirm by watching axis values move in the panel.
+> Plug it in BEFORE launching sim. It appears automatically in the Joysticks panel. Drag to `Joystick[0]`. Move the sticks and watch axis values change in the panel to confirm it's working. Left stick Y = forward/back, Left stick X = turn.
 
 > **Common simulator mistakes to watch for**
 >
 > - Robot not enabled — nothing moves, students think code is broken. Check Robot State panel.
 > - AdvantageScope not connected — graphs show nothing. Connect before enabling.
 > - Keyboard not working — Simulation GUI window must be focused. Click it.
+> - Graphs flat while driving — `updateInputs()` has a bug.
+> - Graphs jump to big numbers immediately — check unit conversion (inches vs meters).
 
 ---
 
@@ -278,7 +306,7 @@ Instructor drives a secret pattern (figure-8, square, stop-and-go) while student
 
 ## Phase 9 — Connect + Wrap (175–180 min)
 
-### Connect Show students the same files they just learned about — now with AdvantageKit wired in. Ask: which parts look familiar?
+Show students the same files they just learned about — now with AdvantageKit wired in. Ask: which parts look familiar?
 
 - `Main.java` — identical to template
 - `Robot.java` — same structure, plus Logger setup block
