@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lesson 03 — What Is a Subsystem? | FRC Programming Curriculum</title>
+  <title></title>
   <link rel="stylesheet" href="frc-curriculum.css">
 </head>
 <body data-lesson="03">
@@ -18,11 +18,7 @@
     <div class="lesson-meta"></div>
     <h1 class="lesson-title"></h1>
     <div class="lesson-subtitle"></div>
-    <div class="lesson-info-bar">
-      <div class="info-item"><div class="info-dot"></div> ~45 minutes</div>
-      <div class="info-item"><div class="info-dot"></div> Hardware: none — VSCode + simulator</div>
-      <div class="info-item"><div class="info-dot"></div> Tools: VSCode WPILib tools, Simulator, AdvantageScope</div>
-    </div>
+    <div class="lesson-info-bar"></div>
   </div>
 
   <nav class="section-nav">
@@ -37,39 +33,39 @@
        ═══════════════════════════════════════════════════════ -->
   <div class="lesson-section active" id="section-concept">
 
-    <p>It's week 5. Your robot has a drivetrain, an indexer, a shooter, and a climber. Every mechanism is controlled by code. If you put all that code in one file, that file is about 1,200 lines long. Two programmers are trying to edit it at the same time. Nobody is sure which lines control what. The robot match starts in 10 minutes.</p>
+    <p>It's week 5 of build season. Your robot has a drivetrain, an elevator, a scoop, and an arm. Every mechanism is controlled by code. If you put all that code in one file, that file is about 1,200 lines long. Two programmers are trying to edit it at the same time. Nobody is sure which lines control what. The robot match starts in 10 minutes.</p>
     <p>This is the situation that subsystems exist to prevent.</p>
 
     <div class="hf-box hf-brain">
       <span class="hf-label">Your brain is probably thinking this right now</span>
       <p>"That sounds like a people problem, not a code problem. Can't everyone just be careful?"</p>
-      <p>They can try. They will fail. Code structure isn't about discipline — it's about making the right thing easy and the wrong thing hard. Subsystems make it structurally impossible to accidentally edit the shooter while you're debugging the climber.</p>
+      <p>They can try. They will fail. Code structure isn't about discipline — it's about making the right thing easy and the wrong thing hard. Subsystems make it structurally impossible to accidentally edit the elevator while you're debugging the scoop.</p>
     </div>
 
     <h2>The cafeteria analogy</h2>
     <p>Imagine your school cafeteria. There's a pizza station, a salad bar, and a dessert section. Each one does its own job. The pizza station doesn't also handle dessert. If the pizza oven breaks, the ice cream is fine.</p>
-    <p>Your robot works the same way. Each <strong>subsystem</strong> owns exactly one mechanism and controls it completely. If the shooter breaks, the drivetrain keeps driving.</p>
+    <p>Your robot works the same way. Each <strong>subsystem</strong> owns exactly one mechanism and controls it completely. If the elevator breaks, the drivetrain keeps driving.</p>
 
     <div class="info-grid">
       <div class="info-card">
-        <h4>Drivetrain</h4>
-        <p>Moves the robot around the field</p>
+        <h4>DriveSubsystem</h4>
+        <p>Moves the robot around the field. Owns the drive motors, encoders, and gyro.</p>
         <p class="aside">Gets blamed for everything</p>
       </div>
       <div class="info-card">
-        <h4>Indexer</h4>
-        <p>Moves game pieces through the robot</p>
-        <p class="aside">Jams exactly when you need it not to</p>
+        <h4>ElevatorSubsystem</h4>
+        <p>Lifts the scoop mechanism up and down. Owns the elevator motor and encoder.</p>
+        <p class="aside">Always needs one more centimeter of travel</p>
       </div>
       <div class="info-card">
-        <h4>Shooter</h4>
-        <p>Launches game pieces at a target</p>
-        <p class="aside">Always "almost working" during comp</p>
+        <h4>ScoopSubsystem</h4>
+        <p>Tilts to retain or dump game pieces. Owns the scoop servo.</p>
+        <p class="aside">Deceptively simple. Servo angles are everything.</p>
       </div>
       <div class="info-card">
-        <h4>Climber</h4>
-        <p>Lifts the robot at end of match</p>
-        <p class="aside">Never tested until week 6</p>
+        <h4>ArmSubsystem</h4>
+        <p>Rear arm for game piece control. Owns the arm servo or motor.</p>
+        <p class="aside">The one mechanism everyone forgets to test first</p>
       </div>
     </div>
 
@@ -77,12 +73,12 @@
 
     <div class="hf-box hf-info">
       <span class="hf-label">Reason 1 — One job, one place</span>
-      <p>If the indexer is broken, you look in one file. Not everywhere. When you're debugging at 2am before competition, "one file" feels like a gift from the universe.</p>
+      <p>If the scoop is broken, you look in one file. Not everywhere. When you're debugging at 2am before competition, "one file" feels like a gift from the universe.</p>
     </div>
 
     <div class="hf-box hf-info">
       <span class="hf-label">Reason 2 — Teammates can work in parallel</span>
-      <p>Two people editing the same file is a merge conflict waiting to ruin someone's day. With subsystems, one programmer works on the shooter while another works on the drivetrain — different files, no conflict.</p>
+      <p>Two people editing the same file is a merge conflict waiting to ruin someone's day. With subsystems, one programmer works on the elevator while another works on the drivetrain — different files, no conflict.</p>
     </div>
 
     <div class="hf-box hf-info">
@@ -94,10 +90,10 @@
 
     <div class="code-block">
       <pre>
-<span class="kw">public class</span> Indexer <span class="kw">extends</span> SubsystemBase {
+<span class="kw">public class</span> ScoopSubsystem <span class="kw">extends</span> SubsystemBase {
 
-    <span class="cm">// All indexer code lives here.</span>
-    <span class="cm">// Nothing else touches the indexer motor.</span>
+    <span class="cm">// All scoop code lives here.</span>
+    <span class="cm">// Nothing else touches the scoop servo.</span>
     <span class="cm">// If someone adds drivetrain code here,</span>
     <span class="cm">// that person buys the team snacks.</span>
 
@@ -144,7 +140,7 @@
 
     <div class="hf-box hf-brain">
       <span class="hf-label">Brain power — before you move on</span>
-      <p>Your robot has a turret that rotates horizontally and an arm that raises vertically. They're on the same mechanism. Are they one subsystem or two? Write your answer and your reasoning before reading Part 2. There's no single right answer — but there is a better answer.</p>
+      <p>The Bear Bots robot has an elevator that moves vertically, and a scoop mounted on top of the elevator that tilts to retain or dump game pieces. Are the elevator and scoop one subsystem or two? Write your answer and your reasoning before reading Part 2. There's no single right answer — but there is a better answer.</p>
     </div>
 
   </div><!-- /section-concept -->
@@ -165,7 +161,7 @@
       <p>&nbsp;&nbsp;&nbsp;&nbsp;(e.g., <code>src/main/java/frc/robot/subsystems/</code>)</p>
       <p><strong>2.</strong> Select <strong>Create a new class/command</strong></p>
       <p><strong>3.</strong> Select <strong>SubsystemBase</strong> from the list</p>
-      <p><strong>4.</strong> Type the name of your subsystem (e.g., <code>Indexer</code>)</p>
+      <p><strong>4.</strong> Type the name of your subsystem (e.g., <code>ScoopSubsystem</code>)</p>
       <p><strong>5.</strong> Press Enter — the file is created with the correct structure</p>
       <p>Alternatively: <code>Ctrl+Shift+P</code> &rarr; <code>WPILib: Create a new class</code></p>
     </div>
@@ -179,9 +175,9 @@
 
 <span class="kw">import</span> edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-<span class="kw">public class</span> Indexer <span class="kw">extends</span> SubsystemBase {
+<span class="kw">public class</span> ScoopSubsystem <span class="kw">extends</span> SubsystemBase {
 
-    <span class="kw">public</span> Indexer() {
+    <span class="kw">public</span> ScoopSubsystem() {
         <span class="cm">// Constructor — runs once when subsystem is created</span>
         <span class="cm">// Good place to configure hardware (motors, sensors)</span>
     }
@@ -209,7 +205,7 @@
 <span class="kw">public class</span> RobotContainer {
 
     <span class="cm">// Declare subsystems here</span>
-    <span class="kw">private final</span> Indexer indexer = <span class="kw">new</span> Indexer();
+    <span class="kw">private final</span> ScoopSubsystem scoop = <span class="kw">new</span> ScoopSubsystem();
 
     <span class="kw">public</span> RobotContainer() {
         configureBindings();
@@ -217,7 +213,7 @@
 
     <span class="kw">private void</span> configureBindings() {
         <span class="cm">// Wire buttons to commands here</span>
-        <span class="cm">// controller.a().onTrue(indexer.someCommand());</span>
+        <span class="cm">// controller.a().onTrue(scoop.someCommand());</span>
     }
 }
       </pre>
@@ -252,7 +248,7 @@
 
     <div class="hf-box hf-brain">
       <span class="hf-label">Do this right now</span>
-      <p>Create a new subsystem called <code>Indexer</code> using the WPILib tool. Register it in RobotContainer. Build, simulate, connect AdvantageScope, and verify the build succeeds without errors. Don't add any logic — just confirm the subsystem exists and loads.</p>
+      <p>Create a new subsystem called <code>ScoopSubsystem</code> using the WPILib tool. Register it in RobotContainer. Build, simulate, connect AdvantageScope, and verify the build succeeds without errors. Don't add any logic — just confirm the subsystem exists and loads.</p>
     </div>
 
   </div><!-- /section-tools -->
@@ -279,12 +275,12 @@
 
         <div class="hf-box hf-script" style="margin:0.75rem 0;">
           <span class="hf-label">Robot description</span>
-          <p>Your robot has: two drive motors, a motor that spins a flywheel to shoot balls, a servo that adjusts the shooter angle, a sensor that detects when a ball is loaded, and an LED strip that shows robot status.</p>
+          <p>The Bear Bots robot has: two drive motors, a motor that drives the elevator up and down, a servo that tilts the scoop to retain or dump game pieces, a rear arm servo, and encoders on each drive wheel.</p>
         </div>
 
         <ul class="task-list">
-          <li>List every mechanism. Which ones should be separate subsystems? Which ones might share a subsystem?</li>
-          <li>Create the <code>Shooter</code> subsystem file using <code>WPILib: Create a new class</code> &rarr; SubsystemBase</li>
+          <li>List every mechanism. Which ones should be separate subsystems? Which sensors belong to which subsystem?</li>
+          <li>Create the <code>ScoopSubsystem</code> file using <code>WPILib: Create a new class</code> &rarr; SubsystemBase</li>
           <li>Register it in RobotContainer. Build and verify no errors.</li>
           <li>Add one <code>System.out.println()</code> inside <code>periodic()</code>. Run the sim. Does it print?</li>
         </ul>
@@ -293,10 +289,10 @@
           <button class="toggle-btn" data-target="b2-ans" data-open="Show suggested answer" data-closed="Hide answer">Show suggested answer</button>
         </div>
         <div class="toggle-content hint" id="b2-hint">
-          Think about which mechanisms need to be controlled independently. The servo adjusts the shooter angle — does it make sense to control it separately from the flywheel, or are they always used together?
+          Think about which mechanisms need to be controlled independently. The elevator moves up and down — does it make sense to put the scoop in the same subsystem? What if the elevator breaks but the scoop still needs to tilt?
         </div>
         <div class="toggle-content answer" id="b2-ans">
-          Suggested: DriveSubsystem (two drive motors), ShooterSubsystem (flywheel + angle servo — they're tightly coupled), LEDSubsystem (optional — LEDs often get their own subsystem for state management). The ball sensor belongs inside whichever subsystem needs to read it, not its own subsystem.
+          Suggested: DriveSubsystem (two drive motors + encoders + gyro), ElevatorSubsystem (elevator motor + encoder), ScoopSubsystem (scoop servo), ArmSubsystem (arm servo). Each mechanism has one job and can fail independently — that's the right boundary. Encoders belong inside the subsystem that reads them, not their own subsystem.
         </div>
       </div>
 
@@ -304,19 +300,19 @@
         <span class="tier-label">Silver - build a minimal working subsystem</span>
         <p>Create a complete minimal subsystem that: stores a goal state, changes state via a command, and logs the current state to AdvantageScope.</p>
         <ul class="task-list">
-          <li>Create <code>IndexerSubsystem</code> using the WPILib tool</li>
-          <li>Add an enum <code>IndexerGoal</code> with values <code>IDLE</code> and <code>ACTIVE</code></li>
-          <li>Add a private <code>IndexerGoal goal</code> field defaulting to <code>IDLE</code></li>
+          <li>Create <code>ScoopSubsystem</code> using the WPILib tool</li>
+          <li>Add an enum <code>ScoopGoal</code> with values <code>FLAT</code>, <code>CARRY</code>, and <code>DUMP</code></li>
+          <li>Add a private <code>ScoopGoal goal</code> field defaulting to <code>FLAT</code></li>
           <li>Add <code>@AutoLogOutput</code> annotation to the goal field so it appears in AdvantageScope</li>
-          <li>Add a <code>setGoalCommand(IndexerGoal goal)</code> method returning a <code>runOnce()</code> command</li>
-          <li>Wire a controller button to <code>setGoalCommand(IndexerGoal.ACTIVE)</code> in RobotContainer</li>
+          <li>Add a <code>setGoalCommand(ScoopGoal goal)</code> method returning a <code>runOnce()</code> command</li>
+          <li>Wire a controller button to <code>setGoalCommand(ScoopGoal.CARRY)</code> in RobotContainer</li>
           <li>Run sim, drive, press the button — watch the goal change in AdvantageScope</li>
         </ul>
         <div class="toggle-row">
           <button class="toggle-btn" data-target="s2-hint" data-open="Show hint" data-closed="Hide hint">Show hint</button>
         </div>
         <div class="toggle-content hint" id="s2-hint">
-          <code>@AutoLogOutput</code> is an AdvantageKit annotation — add it directly above the field declaration. For the controller binding in RobotContainer: <code>driverController.a().onTrue(indexer.setGoalCommand(IndexerGoal.ACTIVE));</code>. The goal should appear in AdvantageScope as <code>IndexerSubsystem/Goal</code>.
+          <code>@AutoLogOutput</code> is an AdvantageKit annotation — add it directly above the field declaration. For the controller binding in RobotContainer: <code>driverController.a().onTrue(scoop.setGoalCommand(ScoopGoal.CARRY));</code>. The goal should appear in AdvantageScope as <code>ScoopSubsystem/Goal</code>.
         </div>
       </div>
 
@@ -335,7 +331,7 @@
           <button class="toggle-btn" data-target="g2-hint" data-open="Show hint" data-closed="Hide hint">Show hint</button>
         </div>
         <div class="toggle-content hint" id="g2-hint">
-          Subsystems coordinate through commands, not direct method calls. If the shooter needs to wait for the indexer to be ready, that's a command that requires both subsystems — not a method call from one subsystem to another. That distinction matters for scheduling.
+          Subsystems coordinate through commands, not direct method calls. As the elevator rises, the scoop needs to angle up to retain game pieces — that coordination belongs in a command that requires both subsystems, not a method call from one subsystem to the other. That distinction matters for scheduling.
         </div>
       </div>
 
@@ -367,27 +363,27 @@
         <div class="code-lab-line"><span class="line-num">1</span><span class="line-code"><span class="kw">public class</span> DriveSubsystem <span class="kw">extends</span> SubsystemBase {</span></div>
         <div class="code-lab-line"><span class="line-num">2</span><span class="line-code">&nbsp;&nbsp;<span class="kw">private final</span> XRPMotor leftMotor = <span class="kw">new</span> XRPMotor(<span class="num">0</span>);</span></div>
         <div class="code-lab-line"><span class="line-num">3</span><span class="line-code">&nbsp;&nbsp;<span class="kw">private final</span> XRPMotor rightMotor = <span class="kw">new</span> XRPMotor(<span class="num">1</span>);</span></div>
-        <div class="code-lab-line"><span class="line-num">4</span><span class="line-code">&nbsp;&nbsp;<span class="kw">private final</span> XRPMotor indexerMotor = <span class="kw">new</span> XRPMotor(<span class="num">2</span>);</span></div>
-        <div class="code-lab-line bug-line" data-bug="1"><span class="line-num">5</span><span class="line-code">&nbsp;&nbsp;<span class="cm">// indexer motor lives here because it was convenient</span></span></div>
+        <div class="code-lab-line"><span class="line-num">4</span><span class="line-code">&nbsp;&nbsp;<span class="kw">private final</span> XRPServo scoopServo = <span class="kw">new</span> XRPServo(<span class="num">4</span>);</span></div>
+        <div class="code-lab-line bug-line" data-bug="1"><span class="line-num">5</span><span class="line-code">&nbsp;&nbsp;<span class="cm">// scoop servo lives here because it was convenient</span></span></div>
         <div class="code-lab-line"><span class="line-num">6</span><span class="line-code">&nbsp;</span></div>
         <div class="code-lab-line"><span class="line-num">7</span><span class="line-code">&nbsp;&nbsp;<span class="kw">@Override</span></span></div>
         <div class="code-lab-line"><span class="line-num">8</span><span class="line-code">&nbsp;&nbsp;<span class="kw">public void</span> periodic() {</span></div>
         <div class="code-lab-line bug-line" data-bug="2"><span class="line-num">9</span><span class="line-code">&nbsp;&nbsp;&nbsp;&nbsp;leftMotor.set(<span class="num">0.5</span>); rightMotor.set(<span class="num">0.5</span>); <span class="cm">// always drive forward</span></span></div>
         <div class="code-lab-line"><span class="line-num">10</span><span class="line-code">&nbsp;&nbsp;}</span></div>
         <div class="code-lab-line"><span class="line-num">11</span><span class="line-code">&nbsp;</span></div>
-        <div class="code-lab-line"><span class="line-num">12</span><span class="line-code">&nbsp;&nbsp;<span class="kw">public</span> Command runIndexer() {</span></div>
-        <div class="code-lab-line"><span class="line-num">13</span><span class="line-code">&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span> runOnce(() -> indexerMotor.set(<span class="num">0.5</span>));</span></div>
+        <div class="code-lab-line"><span class="line-num">12</span><span class="line-code">&nbsp;&nbsp;<span class="kw">public</span> Command tiltScoop() {</span></div>
+        <div class="code-lab-line"><span class="line-num">13</span><span class="line-code">&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span> runOnce(() -> scoopServo.setAngle(<span class="num">90.0</span>));</span></div>
         <div class="code-lab-line bug-line" data-bug="3"><span class="line-num">14</span><span class="line-code">&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm">// this command requires DriveSubsystem — correct!</span></span></div>
         <div class="code-lab-line"><span class="line-num">15</span><span class="line-code">&nbsp;&nbsp;}</span></div>
         <div class="code-lab-line"><span class="line-num">16</span><span class="line-code">}</span></div>
       </div>
 
       <div class="bug-reveal" data-bug="1">
-        <h4>Bug 1 - Indexer motor living inside DriveSubsystem</h4>
+        <h4>Bug 1 - Scoop servo living inside DriveSubsystem</h4>
         <div class="bug-joke">It was convenient. It is not correct. "Convenient" and "correct" are different things that feel the same until 11pm before competition.</div>
-        <p>The indexer motor belongs in an <code>IndexerSubsystem</code> — not in <code>DriveSubsystem</code>. When the indexer breaks, you'll search DriveSubsystem for the bug. When a command tries to run the indexer, it will accidentally require the drive subsystem, preventing the robot from driving at the same time. Move the indexer motor to its own subsystem.</p>
+        <p>The scoop servo belongs in <code>ScoopSubsystem</code> — not in <code>DriveSubsystem</code>. When the scoop misbehaves, you'll search DriveSubsystem for the bug. When a command tries to tilt the scoop, it will accidentally require the drive subsystem, preventing the robot from driving at the same time. Move the scoop servo to its own subsystem.</p>
         <div class="bug-fix-label">Fix</div>
-        <div class="bug-fix">Create IndexerSubsystem.java (WPILib tool → SubsystemBase) and move indexerMotor there.</div>
+        <div class="bug-fix">Create ScoopSubsystem.java (WPILib tool → SubsystemBase) and move scoopServo there.</div>
       </div>
 
       <div class="bug-reveal" data-bug="2">
@@ -399,11 +395,11 @@
       </div>
 
       <div class="bug-reveal" data-bug="3">
-        <h4>Bug 3 - runIndexer() requires DriveSubsystem, not IndexerSubsystem</h4>
+        <h4>Bug 3 - tiltScoop() requires DriveSubsystem, not ScoopSubsystem</h4>
         <div class="bug-joke">The comment says "requires DriveSubsystem — correct!" The comment is not correct.</div>
-        <p>Because <code>runIndexer()</code> is defined inside <code>DriveSubsystem</code>, WPILib treats it as requiring the drive subsystem. This means running the indexer will lock out any drive commands — the robot can't drive while indexing. Commands should live in the subsystem that owns the hardware they control. Indexer commands belong in IndexerSubsystem.</p>
+        <p>Because <code>tiltScoop()</code> is defined inside <code>DriveSubsystem</code>, WPILib treats it as requiring the drive subsystem. This means tilting the scoop will lock out any drive commands — the robot can't drive while the scoop is tilting. Commands should live in the subsystem that owns the hardware they control. Scoop commands belong in ScoopSubsystem.</p>
         <div class="bug-fix-label">Fix</div>
-        <div class="bug-fix">Move runIndexer() to IndexerSubsystem. It will then correctly require only the indexer.</div>
+        <div class="bug-fix">Move tiltScoop() to ScoopSubsystem. It will then correctly require only the scoop.</div>
       </div>
 
       <div class="success-banner">

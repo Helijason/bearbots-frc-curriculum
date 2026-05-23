@@ -1,5 +1,5 @@
 /* ============================================================
-   FRC Programming Curriculum — Site Configuration
+   FRC Programming Curriculum - Site Configuration
    ============================================================ */
  
 const SITE_CONFIG = {
@@ -7,7 +7,7 @@ const SITE_CONFIG = {
   wipBadgeText: "WIP",
   siteName: "BearBots 6964 - FRC Programming Curriculum",
   siteSubtitle: "Project-based learning for FRC student programmers. Java, AdvantageKit, XRP hardware.",
-  banner: "🚧 Work in Progress — content may change",
+  banner: "🚧 Work in Progress - content may change",
  
   lessons: {
     "01": {
@@ -18,8 +18,8 @@ const SITE_CONFIG = {
       description: "Install everything, build a project, and drive a virtual robot with your keyboard. The foundation everything else builds on.",
       hardware: "Laptop",
       prereq: null,
-      tools: "USB drive: WPILib + AdvantageScope + Project",
-      duration: "~2-3 hours",
+      tools: "USB drive: VS Code WPILib, AdvantageKit",
+      duration: "3 hours",
       filename: "lesson-01-setup.html",
       status: "review",  // "ready", "current", "review", "soon"
       prev: null,
@@ -33,8 +33,8 @@ const SITE_CONFIG = {
       description: "Walk through every generated file and understand why it exists before touching anything.",
       hardware: "Laptop",
       prereq: "Lesson 01",
-      tools: "VS Code, WPILib, Simulator, AdvantageScope",
-      duration: "~2-3 hours",
+      tools: "VS Code WPILib, AdvantageKit",
+      duration: "3 hours",
       filename: "lesson-02-vscode-template.html",
       status: "soon",  // "ready", "current", "review", "soon"
       prev: "01",
@@ -48,8 +48,8 @@ const SITE_CONFIG = {
       description: "Why robots have separate files for separate mechanisms, and what happens when they don't.",
       hardware: "Laptop",
       prereq: "Lesson 02",
-      tools: "VSCode WPILib, Simulator, AdvantageScope",
-      duration: "~2-3 hours",
+      tools: "VS Code WPILib, AdvantageKit",
+      duration: "3 hours",
       filename: "lesson-03-subsystems.html",
       status: "soon",  // "ready", "current", "review", "soon"
       prev: "02",
@@ -63,8 +63,8 @@ const SITE_CONFIG = {
       description: "The IO pattern and AdvantageKit architecture. The most important concept in the curriculum.",
       hardware: "Laptop/XRP robot",
       prereq: "Lesson 03",
-      tools: "VS Code, WPILib, AdvantageKit",
-      duration: "~2-3 hours",
+      tools: "VS Code WPILib, AdvantageKit",
+      duration: "3 hours",
       filename: "lesson-04-io-pattern.html",
       status: "soon",  // "ready", "current", "review", "soon"
       prev: "03",
@@ -78,8 +78,8 @@ const SITE_CONFIG = {
       description: "@AutoLog, AdvantageScope navigation, and replay mode. Turn \"it broke at competition\" into \"I can see exactly what happened.\"",
       hardware: "Laptop/XRP robot",
       prereq: "Lesson 04",
-      tools: "VS Code, WPILib, AdvantageKit",
-      duration: "~2-3 hours",
+      tools: "VS Code WPILib, AdvantageKit",
+      duration: "3 hours",
       filename: "lesson-05-logging.html",
       status: "soon",  // "ready", "current", "review", "soon"
       prev: "04",
@@ -89,12 +89,12 @@ const SITE_CONFIG = {
       module: 2,
       lesson: "06",
       title: "How does the robot know when it's done?",
-      subtitle: "Commands, the four lifecycle methods, composition with SequentialCommandGroup, and the AutoChooser pattern.",
-      description: "Commands, the four lifecycle methods, composition with SequentialCommandGroup, and the AutoChooser pattern.",
+      subtitle: "Commands, the four lifecycle methods, and the AutoChooser pattern. Build your first competition autonomous routine - park, score rubble, or go for the high zone.",
+      description: "Commands, the four lifecycle methods, and the AutoChooser pattern. Build your first competition autonomous routine - park, score rubble, or go for the high zone.",
       hardware: "Laptop/XRP robot",
       prereq: "Lesson 05",
-      tools: "VS Code, WPILib, AdvantageKit",
-      duration: "~2-3 hours",
+      tools: "VS Code WPILib, AdvantageKit",
+      duration: "3 hours",
       filename: "lesson-06-autonomous.html",
       status: "soon",  // "ready", "current", "review", "soon"
       prev: "05",
@@ -103,16 +103,31 @@ const SITE_CONFIG = {
     "07": {
       module: 2,
       lesson: "07",
-      title: "Why doesn't it stop where I told it to?",
-      subtitle: "Encoders, gyro, P-control tuning. Continued work on competition program.",
-      description: "Encoders, gyro, P-control tuning. Continued work on competition program.",
+      title: "Make it reliable - closed-loop auto and competition prep",
+      subtitle: "Close the loop with P-control. Tune kP on the real field. Lock your strategy. Commit your code. Competition is next session.",
+      description: "Close the loop with P-control. Tune kP on the real field. Lock your strategy. Commit your code. Competition is next session.",
       hardware: "Laptop/XRP robot",
       prereq: "Lesson 06",
-      tools: "VS Code, WPILib, AdvantageKit",
-      duration: "~2-3 hours",
+      tools: "VS Code WPILib, AdvantageKit",
+      duration: "3 hours",
       filename: "lesson-07-sensors.html",
       status: "soon",  // "ready", "current", "review", "soon"
       prev: "06",
+      next: "08"
+    },
+    "08": {
+      module: 2,
+      lesson: "08",
+      title: "Competition Day - Orbit Odyssey",
+      subtitle: "Everything you built. One field. Real matches. 1v1 round-robin - every student competes individually.",
+      description: "Final tweaks, practice runs, competitive matches, awards, and curriculum close.",
+      hardware: "XRP robot",
+      prereq: "Lesson 07",
+      tools: "XRP robot, Game Field",
+      duration: "3 hours",
+      filename: "lesson-08-competition.html",
+      status: "soon",  // "ready", "current", "review", "soon"
+      prev: "07",
       next: null
     }
   }

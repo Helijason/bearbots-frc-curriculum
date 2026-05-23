@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lesson 07 — Sensors and feedback | FRC Programming Curriculum</title>
+  <title></title>
   <link rel="stylesheet" href="frc-curriculum.css">
 </head>
 <body data-lesson="07">
@@ -18,19 +18,14 @@
     <div class="lesson-meta"></div>
     <h1 class="lesson-title"></h1>
     <div class="lesson-subtitle"></div>
-    <div class="lesson-info-bar">
-      <div class="info-item"><div class="info-dot"></div> ~45 minutes</div>
-      <div class="info-item"><div class="info-dot"></div> Hardware: XRP robot</div>
-      <div class="info-item"><div class="info-dot"></div> Prereq: Lesson 06 - Autonomous routines</div>
-      <div class="info-item"><div class="info-dot"></div> Java &middot; Encoders &middot; Gyro &middot; PID</div>
-    </div>
+    <div class="lesson-info-bar"></div>
   </div>
 
   <nav class="section-nav">
     <button class="section-nav-btn active" data-section="concept">Part 1 - The concept</button>
     <button class="section-nav-btn" data-section="pid">Part 2 - Closing the loop</button>
     <button class="section-nav-btn" data-section="challenge">Part 3 - Try it yourself</button>
-    <button class="section-nav-btn" data-section="lab">Part 4 - Code review</button>
+    <button class="section-nav-btn" data-section="lab">Part 4 - Verify and lock</button>
   </nav>
 
   <!-- ═══════════════════════════════════════════════════════
@@ -385,107 +380,71 @@ private static final double kHeading = 0.05;
        ═══════════════════════════════════════════════════════ -->
   <div class="lesson-section" id="section-lab">
 
-    <p class="bug-lab-intro">
-      For Lessons 02-06 we ran a "Broken Robot Lab" - planted bugs, find them. For the closer, we do something different: a <strong>code review</strong>. Below is a <code>ShooterSubsystem</code> that compiles, runs, and ships. Nothing is broken. But there are <strong>3 things</strong> that a real team's code reviewer would flag and ask to fix. Click each highlighted line to see what an experienced eye notices.
-    </p>
+    <p>Before you touch the field, prove it works in sim. Before you commit your code, record what you tuned and why. These two tools are your gate and your memory.</p>
 
-    <div class="bug-lab" data-lab="lesson-07">
+    <h2>Sim verification checklist — complete before every field run</h2>
 
-      <div class="bug-progress">
-        <span>Review notes:</span>
-        <div class="bug-dot"></div>
-        <div class="bug-dot"></div>
-        <div class="bug-dot"></div>
-        <span class="bug-progress-count">0 / 3</span>
-      </div>
-
-      <div class="code-lab">
-        <div class="code-lab-line"><span class="line-num">1</span><span class="line-code"><span class="cm">// ShooterSubsystem.java — pulled from a real team's repo</span></span></div>
-        <div class="code-lab-line"><span class="line-num">2</span><span class="line-code"><span class="kw">public class</span> ShooterSubsystem <span class="kw">extends</span> SubsystemBase {</span></div>
-        <div class="code-lab-line bug-line" data-bug="1"><span class="line-num">3</span><span class="line-code">&nbsp;&nbsp;<span class="kw">private final</span> TalonFX motor = <span class="kw">new</span> TalonFX(13);</span></div>
-        <div class="code-lab-line"><span class="line-num">4</span><span class="line-code">&nbsp;&nbsp;<span class="kw">private final</span> PIDController pid = <span class="kw">new</span> PIDController(0.0001, 0.0, 0.0);</span></div>
-        <div class="code-lab-line"><span class="line-num">5</span><span class="line-code">&nbsp;&nbsp;<span class="kw">private double</span> targetRpm = 0.0;</span></div>
-        <div class="code-lab-line"><span class="line-num">6</span><span class="line-code">&nbsp;</span></div>
-        <div class="code-lab-line"><span class="line-num">7</span><span class="line-code">&nbsp;&nbsp;<span class="kw">public void</span> setTargetRpm(<span class="kw">double</span> rpm) { targetRpm = rpm; }</span></div>
-        <div class="code-lab-line"><span class="line-num">8</span><span class="line-code">&nbsp;&nbsp;<span class="kw">public boolean</span> atTarget() { <span class="kw">return</span> Math.abs(targetRpm - getRpm()) &lt; 50.0; }</span></div>
-        <div class="code-lab-line"><span class="line-num">9</span><span class="line-code">&nbsp;</span></div>
-        <div class="code-lab-line bug-line" data-bug="2"><span class="line-num">10</span><span class="line-code">&nbsp;&nbsp;<span class="kw">private double</span> getRpm() { <span class="kw">return</span> motor.getVelocity().getValue() * 60.0; }</span></div>
-        <div class="code-lab-line"><span class="line-num">11</span><span class="line-code">&nbsp;</span></div>
-        <div class="code-lab-line"><span class="line-num">12</span><span class="line-code">&nbsp;&nbsp;<span class="kw">@Override</span> <span class="kw">public void</span> periodic() {</span></div>
-        <div class="code-lab-line bug-line" data-bug="3"><span class="line-num">13</span><span class="line-code">&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">double</span> volts = pid.calculate(getRpm(), targetRpm);</span></div>
-        <div class="code-lab-line"><span class="line-num">14</span><span class="line-code">&nbsp;&nbsp;&nbsp;&nbsp;motor.setVoltage(volts);</span></div>
-        <div class="code-lab-line"><span class="line-num">15</span><span class="line-code">&nbsp;&nbsp;}</span></div>
-        <div class="code-lab-line"><span class="line-num">16</span><span class="line-code">}</span></div>
-      </div>
-
-      <div class="bug-reveal" data-bug="1">
-        <h4>Review note 1 - hardware imported directly into the subsystem</h4>
-        <div class="bug-joke">"This code works on a TalonFX. What about the simulator? What about replay? What about when the robot ships with a SparkMax instead?"</div>
-        <p>Direct <code>new TalonFX(13)</code> in the subsystem is exactly the bug Lesson 04 warned about. The subsystem should depend on a <code>ShooterIO</code> interface, with <code>ShooterIOTalonFX</code> as one implementation and <code>ShooterIOSim</code> as another. <code>RobotContainer</code> picks which one based on <code>Constants.currentMode</code>. As-is, this code can't run in simulation, can't be replayed, and can't be reused if the team switches motor controllers next year.</p>
-        <div class="bug-fix-label">Refactor</div>
-        <div class="bug-fix">private final ShooterIO io;<br>public ShooterSubsystem(ShooterIO io) { this.io = io; }</div>
-      </div>
-
-      <div class="bug-reveal" data-bug="2">
-        <h4>Review note 2 - magic number with no source-of-truth</h4>
-        <div class="bug-joke">"What's the 60? Why is it there? Where else does it appear? When it's wrong, where do I look?"</div>
-        <p>The <code>* 60.0</code> converts rotations-per-second (TalonFX native unit) to rotations-per-minute. That's fine, but the literal floats around with no name and no context. If the gear ratio between the motor and the flywheel is anything other than 1:1, this number is wrong - and you'd never know from looking at the call site. Move it to <code>Constants.Shooter.GEAR_RATIO</code> and give it a comment explaining the unit conversion. Same goes for the kP value (0.0001) and the tolerance (50.0). Constants belong in <code>Constants.java</code>, not scattered across subsystems.</p>
-        <div class="bug-fix-label">Refactor</div>
-        <div class="bug-fix">return motor.getVelocity().getValue() * Constants.Shooter.RPM_PER_RPS;</div>
-      </div>
-
-      <div class="bug-reveal" data-bug="3">
-        <h4>Review note 3 - motor control inside periodic()</h4>
-        <div class="bug-joke">"Lesson 03 said motor control goes in commands, not periodic. This is motor control in periodic. The student got an A, then ignored the A on their next project."</div>
-        <p>Calling <code>motor.setVoltage()</code> inside <code>periodic()</code> means the shooter is <em>always</em> being driven, even when no command is requesting it. There's no way for a default command to take over, no way for the scheduler to interrupt cleanly, no way for an emergency stop to cut the motor. The fix is to put the PID calculation in a <code>run</code> method exposed by the subsystem, and have a <code>RunShooter</code> command that calls it from its own <code>execute()</code>. <code>periodic()</code> should only do <code>io.updateInputs()</code> and <code>Logger.processInputs()</code>.</p>
-        <div class="bug-fix-label">Refactor</div>
-        <div class="bug-fix">// In ShooterSubsystem:<br>public void runAtRpm(double rpm) { io.setVoltage(pid.calculate(...)); }<br><br>// New command, RunShooter, calls runAtRpm() in execute()</div>
-      </div>
-
-      <div class="success-banner">
-        All 3 review notes spotted. These are exactly the comments a senior team programmer would leave on a junior teammate's pull request - not because the code is "wrong," but because the patterns we've spent six lessons building exist for reasons that won't show up until the second time something breaks. You've finished the curriculum. Read team code with this eye now.
-      </div>
-
+    <div class="hf-box hf-warning">
+      <span class="hf-label">The rule</span>
+      <p>If it doesn't pass in sim, it doesn't run on the field. No exceptions. Catching a bug in sim costs 30 seconds. Catching it on the field costs your next match slot.</p>
     </div>
 
-    <h2>What you've actually learned</h2>
-
-    <p>Seven lessons, one curriculum, one consistent pattern.</p>
-
-    <ul class="task-list">
-      <li><strong>Lesson 01:</strong> setting up a working environment and running your first robot code in simulation</li>
-      <li><strong>Lesson 02:</strong> recognizing every file in a generated WPILib project and what it does</li>
-      <li><strong>Lesson 03:</strong> separating mechanisms into subsystems, putting motor control in commands</li>
-      <li><strong>Lesson 04:</strong> the IO pattern - subsystem, interface, implementation - and why it makes sim and replay possible</li>
-      <li><strong>Lesson 05:</strong> @AutoLog, AdvantageScope, replay mode, and the discipline that makes debugging actually work</li>
-      <li><strong>Lesson 06:</strong> commands as the four lifecycle methods, composition with SequentialCommandGroup, AutoChooser</li>
-      <li><strong>Lesson 07:</strong> closing the loop with sensors, P-control, and reading real team code with a critical eye</li>
-    </ul>
-
-    <p>Everything from here is a longer version of the same patterns. New mechanisms, more sensors, harder routines - same subsystems, same IO pattern, same logging, same commands, same feedback loops. You're ready to read your team's competition code now.</p>
-
-    <div class="chat-thread">
-      <div class="bubble bubble-q">
-        <div class="bubble-who">Student</div>
-        That's it? Just Seven lessons?
-      </div>
-      <div class="bubble bubble-a">
-        <div class="bubble-who">Yes</div>
-        That's the foundation. The next year of your programming life is applying these six concepts to your team's actual robot - new subsystems, new mechanisms, new auto routines. None of it is harder than what you just did. It's just more of it.
-      </div>
-      <div class="bubble bubble-q">
-        <div class="bubble-who">Student</div>
-        What should I read next?
-      </div>
-      <div class="bubble bubble-a">
-        <div class="bubble-who">In order</div>
-        Your team's competition codebase. Open the most recent year's code, find a subsystem, read it, ask "is this the IO pattern?" Then "are commands separated from periodic?" Then "what's logged?" Then propose one change that brings the code closer to the patterns you learned. That's how you become useful to a team.
-      </div>
+    <div class="hf-box hf-info">
+      <span class="hf-label">Sim verification checklist</span>
+      <p><strong>1. Build succeeds</strong> — <code>Ctrl+Shift+P</code> → WPILib: Build Robot Code → <code>BUILD SUCCESSFUL</code></p>
+      <p><strong>2. Simulator launches</strong> — no errors in System Console on startup</p>
+      <p><strong>3. Auto command initializes</strong> — in AdvantageScope, Commands folder shows your auto command starting</p>
+      <p><strong>4. Auto command ends</strong> — Commands folder shows the command finishing cleanly, not timing out</p>
+      <p><strong>5. Position curve looks right</strong> — graph <code>Drive/LeftPositionMeters</code> — smooth approach, settles near target, no oscillation</p>
+      <p><strong>6. Motors stop</strong> — after command ends, velocity drops to zero in AdvantageScope</p>
+      <p>All six pass? You're cleared for the field.</p>
     </div>
 
     <div class="hf-box hf-brain">
-      <span class="hf-label">Last brain power - one task before you close this tab</span>
-      <p>Save your six summary cards somewhere you'll find them. Print them if you can. Tape the reference card to your laptop. The next time you're at competition at 11pm trying to figure out why the auto isn't working, you'll want all of this within reach.</p>
+      <span class="hf-label">What the curve tells you</span>
+      <p>Before you run anything on the field, predict what the AdvantageScope position curve will look like. Sketch it in your head: rises smoothly, approaches the target, slows near it, settles. Then run it. If the curve matches your prediction — your mental model is right. If it doesn't — that mismatch is exactly where the bug is. Prediction → run → compare. That's the tuning loop.</p>
+    </div>
+
+    <h2>Field tuning log — one row per run</h2>
+
+    <p>Every field run gets a row. If you don't write it down, you won't remember whether kP = 3.0 or 4.0 was the one that worked — and you'll retune the same thing twice.</p>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <h4>What to record each run</h4>
+        <p><strong>kP:</strong> what value did you use?</p>
+        <p><strong>PARK_DISTANCE_METERS:</strong> what was the constant?</p>
+        <p><strong>Result:</strong> where did it stop? (in zone / short / long / crashed)</p>
+        <p><strong>Curve shape:</strong> smooth / oscillating / creeping / slammed past</p>
+        <p><strong>Next change:</strong> what one thing are you changing and why?</p>
+      </div>
+      <div class="info-card">
+        <h4>The one-change rule</h4>
+        <p>Change exactly one constant per run. If you change kP and distance at the same time and the result improves, you don't know which one fixed it. You don't know which one to keep.</p>
+        <p class="aside">Science: change one variable, observe the result, conclude. Same process.</p>
+      </div>
+    </div>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">What "3 consecutive successful runs" means</span>
+      <p>Don't declare victory after one good run. Run it three times from the same starting position. If it lands in the zone all three times — you're done tuning, write down the values, commit the code. If it misses on run 2 or 3 — you're not done. One lucky run isn't reliability.</p>
+    </div>
+
+    <h2>Strategy lock — before you leave today</h2>
+
+    <ul class="task-list">
+      <li>Auto runs cleanly in sim — all 6 checklist items pass</li>
+      <li>Auto parks reliably on real field — 3 consecutive runs in zone</li>
+      <li>AutoChooser default set to your chosen strategy</li>
+      <li>kP and distance values recorded in your tuning log</li>
+      <li>Constants committed: <code>git commit -m "Competition auto: [strategy] — kP=[value], dist=[value]m"</code></li>
+      <li>Comment added in RobotContainer: <code>// Competition strategy: [Park / Score + Park] — tuned [date]</code></li>
+    </ul>
+
+    <div class="hf-box hf-brain">
+      <span class="hf-label">Last brain power before competition day</span>
+      <p>Competition day is tomorrow. Your auto is committed. Your constants are tuned. The only thing left is execution — autonomous runs itself, and then you drive.</p>
+      <p>Save your eight summary cards somewhere you'll find them. The field tuning log you filled in today is what you reference between matches if something drifts. Keep it with you.</p>
     </div>
 
   </div><!-- /section-lab -->
@@ -494,7 +453,7 @@ private static final double kHeading = 0.05;
     <button class="section-nav-btn active" data-section="concept">Part 1 - The concept</button>
     <button class="section-nav-btn" data-section="pid">Part 2 - Closing the loop</button>
     <button class="section-nav-btn" data-section="challenge">Part 3 - Try it yourself</button>
-    <button class="section-nav-btn" data-section="lab">Part 4 - Code review</button>
+    <button class="section-nav-btn" data-section="lab">Part 4 - Verify and lock</button>
   </nav>
 
 </div><!-- /page-container -->

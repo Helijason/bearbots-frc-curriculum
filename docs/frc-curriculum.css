@@ -484,6 +484,17 @@ code {
   flex-shrink: 0;
   padding-top: 0.15rem;
 }
+
+.bullet-list {
+  list-style: disc;
+  margin: 0.75rem 0;
+  padding-left: 1.75rem !important;
+}
+
+.bullet-list li {
+  padding: 0.35rem 0;
+  font-size: 0.9rem;
+}
  
 /* ── Hint / Answer Toggles ────────────────────────────────── */
 .toggle-row { display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap; }

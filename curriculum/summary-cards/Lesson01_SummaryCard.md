@@ -80,6 +80,16 @@ You'll run this loop hundreds of times.
 
 ---
 
+---
+
+## Competition Connection
+
+> **Orbit Odyssey** is the game you're building toward. Every tool you set up today — VS Code, the simulator, AdvantageScope — is what you'll use to write and debug the code that competes on that field.
+>
+> The loop you ran today (**Code → Build → Simulate → Drive → Watch values**) is the same loop you'll run in every lesson from here to competition day.
+
+---
+
 *FRC Programming Curriculum — Lesson 01*
-*Next: Lesson 02 — Understanding the WPILib project template, file responsibilities, and the simulator.*
-*Keep this. Collect all 7.*
+*Next: Lesson 02 — WPILib template structure and file roles.*
+*Keep this. Collect all 8.*

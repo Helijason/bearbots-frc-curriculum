@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lesson 05 — Logging and AdvantageScope | FRC Programming Curriculum</title>
+  <title></title>
   <link rel="stylesheet" href="frc-curriculum.css">
 </head>
 <body data-lesson="05">
@@ -18,12 +18,7 @@
     <div class="lesson-meta"></div>
     <h1 class="lesson-title"></h1>
     <div class="lesson-subtitle"></div>
-    <div class="lesson-info-bar">
-      <div class="info-item"><div class="info-dot"></div> ~45 minutes</div>
-      <div class="info-item"><div class="info-dot"></div> Hardware: XRP robot</div>
-      <div class="info-item"><div class="info-dot"></div> Prereq: Lesson 04 - The IO pattern</div>
-      <div class="info-item"><div class="info-dot"></div> Java &middot; AdvantageKit &middot; AdvantageScope</div>
-    </div>
+    <div class="lesson-info-bar"></div>
   </div>
 
   <nav class="section-nav">
@@ -88,7 +83,7 @@
       </div>
       <div class="info-card">
         <h4>Outputs - @AutoLogOutput on a field</h4>
-        <p>Things you <em>decide</em>: target velocity, calculated pose, autonomous mode name, "is the shooter ready?" booleans.</p>
+        <p>Things you <em>decide</em>: target velocity, calculated pose, autonomous mode name, "is the elevator at position?" booleans.</p>
         <p>Put <code>@AutoLogOutput</code> on a field directly - AdvantageKit logs the value every time it changes.</p>
         <p class="aside">These are the values that change because your code decided.</p>
       </div>
@@ -226,7 +221,7 @@ Logger.processInputs(<span class="st">"Drive"</span>, inputs);     <span class="
 
       <div class="info-card">
         <h4><code>AdvantageKit/RealOutputs/</code> + per-subsystem folders</h4>
-        <p>Inputs from your <code>@AutoLog</code> structs - e.g., <code>Drive/LeftPositionMeters</code>, <code>Shooter/CurrentAmps</code>. The folder name comes from the first arg of <code>Logger.processInputs("Drive", inputs)</code>.</p>
+        <p>Inputs from your <code>@AutoLog</code> structs - e.g., <code>Drive/LeftPositionMeters</code>, <code>Elevator/PositionMeters</code>. The folder name comes from the first arg of <code>Logger.processInputs("Drive", inputs)</code>.</p>
       </div>
 
       <div class="info-card">

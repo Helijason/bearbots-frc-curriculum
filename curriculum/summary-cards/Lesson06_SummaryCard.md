@@ -129,6 +129,16 @@ public Command getAutonomousCommand() { return autoChooser.getSelected(); }
 
 ---
 
+---
+
+## Competition Connection
+
+> **Your autonomous routine is a command.** Park = `DriveDistance`. Score + park = `SequentialCommandGroup(DriveDistance, WaitCommand, DriveDistance)`. The AutoChooser lets you pick your strategy before each match from the dashboard.
+>
+> **The break-even question:** a park auto is 5 guaranteed points. A scoring attempt adds risk. If your rubble routine works 80% of the time and scores 3 rubble, that's 8 pts when it works and 0 when it fails. Is that better than 5 every time? That's strategy — and it's yours to decide.
+
+---
+
 *FRC Programming Curriculum — Lesson 06*
-*Next: Lesson 07 — Sensors and feedback*
-*Keep this. Collect all 7.*
+*Next: Lesson 07 — Make it reliable: closed-loop auto and competition prep.*
+*Keep this. Collect all 8.*
