@@ -53,7 +53,7 @@
 |---|---|---|---|
 | 0–10 min | **Hook** | Side-by-side comparison: monolithic vs structured. Count the lines. Ask which they'd rather debug at 11pm. | Look at both. Form opinions. Argue. |
 | 10–25 min | **Concept** | Cafeteria analogy. `periodic()` vs commands table. `CommandScheduler` relationship. | Follow along. Ask questions. |
-| 25–55 min | **"Design the Robot" whiteboard** | Present Reefscape 2025 game description. Facilitate the boundary debate — don't settle it too fast. | Whiteboard which subsystems they'd create. Justify every boundary decision. Argue about edge cases. |
+| 25–55 min | **"Design the Robot" whiteboard** | Present Orbit Odyssey game. Facilitate the boundary debate — don't settle it too fast. Reveal Bear Bots robot design at end. | Whiteboard which subsystems they'd create. Justify every boundary decision. Argue about edge cases. |
 | 55–80 min | **Tools demo** | Live demo: create subsystem with WPILib tool. Show what it generates and what it doesn't. Add AdvantageKit structure on top. Register in `RobotContainer`. Run sim. Verify in AdvantageScope. | Replicate on their own laptop. Verify subsystem folder appears. |
 | 80–120 min | **Bronze/Silver/Gold practice** | Circulate. Ask "what do you expect?" before every run. Redirect with questions, not answers. | Bronze: identify + create. Silver: add `@AutoLogOutput` and verify in AdvantageScope. Gold: full architecture design from scratch. |
 | 120–150 min | **Broken robot lab** | Circulate. Don't give answers — give direction. Require sim confirmation for every fix. | Find and fix the three bugs. Must run the sim to confirm each fix, not just read the code. |
@@ -138,25 +138,38 @@ Through commands in RobotContainer. Subsystems don't talk to each other directly
 
 ## Phase 3 — "Design the Robot" Whiteboard (25–55 min)
 
-*Students decide what deserves to be a subsystem before they write any code. The debate is the lesson.*
+*Students decide what deserves to be a subsystem before they write any code. The debate is the lesson. This session uses Orbit Odyssey — the game they will compete in — as the design target.*
 
 ### Setup
 
-Present the Reefscape 2025 game description — or any recent FRC game students recognize. Give them the mechanism list: drivetrain, coral intake, coral elevator, algae remover, climber, vision cameras.
+- Orbit Odyssey game manual on projector (field diagram visible)
+- Remind students of the pair brainstorm from Lesson 02: *"Last session you listed what the robot needs to do. Let's use that."*
+- Whiteboard cleared and ready
 
-### What students do
+### Round 1 — Pairs brainstorm (10 min)
 
-- Whiteboard their proposed subsystem list
-- For each proposed subsystem, justify: *"What does it own? What does it control? What happens if it breaks?"*
-- Debate edge cases: Is vision a subsystem? Does the elevator get one file or two if it has two stages? Does the climber share a subsystem with the hook?
+Each pair works independently first. Prompt:
 
-### What you do
+> *"Based on the Orbit Odyssey game, what mechanisms does this robot need? Write down every physical system — not code, not files — just the things that move or sense."*
 
-Facilitate, don't settle. The productive debates:
+**Circulate with these prompts if pairs stall:**
+- *"What does the robot need to do in autonomous to score?"* (navigate, park, score rubble)
+- *"How does it pick up or carry the amplifier?"* (some kind of intake or holder)
+- *"How does it deliver rubble to the High Rubble Zone?"* (needs to lift — elevator)
+- *"What's on the back of the robot?"* (arm — for game piece control or endgame)
 
-- **Vision:** most teams make it a subsystem even though it has no motors — it owns the camera and publishes poses. Valid.
-- **Two-stage elevator:** one subsystem is usually right — it's one mechanism with one goal even if it has two motors.
-- **Climber + hook:** separate subsystems if they can fail independently; one if they always move together.
+**Expected outputs from pairs:** drivetrain, some kind of intake/scoop, something that lifts, maybe an arm. Let them arrive at these — don't name them yet.
+
+### Round 2 — Group share-out and subsystem mapping (15 min)
+
+Pairs share. Write every mechanism on the whiteboard without editing. Then facilitate:
+
+> *"We have a list of mechanisms. Now let's group them. Which of these are separate enough to get their own file?"*
+
+**The productive debates to let run:**
+- *"Does the scoop that carries the amplifier need its own subsystem, or is it part of the drivetrain?"* — It's separate. It can fail without affecting driving.
+- *"Does the thing that lifts need its own file separate from the thing that scoops?"* — Yes. One job each.
+- *"Does the drivetrain own the encoders and gyro?"* — Yes. Sensors belong to the subsystem that reads them.
 
 > **The question that cuts through every edge case**
 >
@@ -165,8 +178,21 @@ Facilitate, don't settle. The productive debates:
 
 > **What to watch for**
 >
-> Students who want one subsystem for everything ("it's all connected anyway") — push back: *"So if your shooter breaks, you can't drive?"*
-> Students who want a subsystem for every motor — push back: *"The elevator has two motors. Does it have two jobs?"*
+> Students who want one subsystem for everything — push back: *"So if your scoop breaks, you can't drive?"*
+> Students who want a subsystem for every motor — push back: *"The elevator moves one thing. Does it matter how many motors do it?"*
+
+### What the whiteboard should converge toward
+
+Don't force it — but guide the debate until the board shows something close to:
+
+```
+DriveSubsystem      — moves the robot, owns encoders and gyro
+ElevatorSubsystem   — lifts the scoop mechanism up and down
+ScoopSubsystem      — tilts to retain or dump game pieces
+ArmSubsystem        — rear arm for game piece control
+```
+
+If students arrive at this naturally: perfect. If they're close but not quite: *"Look at what you have. Does each of these have exactly one job?"*
 
 ---
 
@@ -312,21 +338,40 @@ Students design a complete subsystem architecture for a given robot description 
 
 ---
 
-## Phase 9 — Connect + Wrap (175–180 min)
+## Phase 9 — Bear Bots Robot Reveal + Wrap (175–180 min)
 
-### Connect
+*The payoff for the whiteboard. Students designed a robot. Now they find out what the team actually decided — and why it matches.*
 
-Pull up `Indexer.java` from the team code review. Ask students to identify:
+### The reveal
 
-- Where is the goal enum? (`IndexerGoal: ACTIVE, IDLE, REVERSE`)
-- Where is `Logger.processInputs()` called? (in `periodic()`)
-- What happens in `periodic()` when disabled? (goal resets to `IDLE`)
+After the peer code review or `@AutoLogOutput` race wraps up, call the group together.
 
-Then segue to Lesson 04:
+> **Script — the reveal**
+>
+> *"You spent the last 30 minutes arguing about what this robot needs. Drivetrain, something that lifts, something that scoops, something on the back. Here's what the Bear Bots team decided."*
+
+Draw or show the Bear Bots robot diagram:
+
+```
+FRONT:  Scoop (servo-controlled tilt) mounted on Elevator (vertical lift)
+REAR:   Arm (for game piece control)
+BASE:   Drivetrain (tank drive, encoders, gyro)
+```
+
+> *"Notice anything? Your whiteboard and our design aren't that different. That's not a coincidence — the game tells you what the robot needs. You worked it out from first principles. We worked it out the same way, then built it and prototyped different intake concepts before landing on the scoop-on-elevator approach."*
+
+**Ask the class:**
+- *"What's different from what your pair had?"*
+- *"Does anything about this design surprise you?"*
+- *"Which subsystem do you think is the hardest to code?"*
+
+Let the discussion run for 3–4 minutes. Don't resolve everything — leave questions open.
+
+### Connect to Lesson 04
 
 > **Teaser for Lesson 04**
 >
-> *"Notice this Indexer has an `IndexerIO` and `IndexerIOTalonFX`. Next lesson we find out what those are for — and why the subsystem itself has no idea what hardware it's running on. That turns out to be a very good thing."*
+> *"Next lesson you'll meet these subsystems in code. The elevator, the scoop, the arm — they'll all be files. And here's the twist: the subsystem file itself won't know what hardware it's running on. You'll find out why that's actually a great idea, and build the whole pattern from scratch. Bring your XRP."*
 
 ---
 

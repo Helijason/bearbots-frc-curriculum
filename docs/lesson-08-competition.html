@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 08 — Competition Day | FRC Programming Curriculum</title>
+  <link rel="stylesheet" href="frc-curriculum.css">
+</head>
+<body data-lesson="08">
+
+<div class="wip-banner"></div>
+
+<header class="site-header"></header>
+
+<div class="page-container">
+
+  <div class="lesson-header">
+    <div class="lesson-meta"></div>
+    <h1 class="lesson-title"></h1>
+    <div class="lesson-subtitle"></div>
+    <div class="lesson-info-bar">
+      <div class="info-item"><div class="info-dot"></div> ~3 hours</div>
+      <div class="info-item"><div class="info-dot"></div> Hardware: XRP robot + Orbit Odyssey field</div>
+      <div class="info-item"><div class="info-dot"></div> Prereq: Lesson 07 — Competition prep</div>
+      <div class="info-item"><div class="info-dot"></div> 1v1 Round-Robin &middot; Real Matches &middot; Real Points</div>
+    </div>
+  </div>
+
+  <nav class="section-nav">
+    <button class="section-nav-btn active" data-section="today">Part 1 - Today's format</button>
+    <button class="section-nav-btn" data-section="tweaks">Part 2 - Final tweaks</button>
+    <button class="section-nav-btn" data-section="compete">Part 3 - Match play</button>
+    <button class="section-nav-btn" data-section="close">Part 4 - Awards &amp; close</button>
+  </nav>
+
+  <!-- ═══════════════════════════════════════════════════════
+       PART 1 — TODAY'S FORMAT
+       ═══════════════════════════════════════════════════════ -->
+  <div class="lesson-section active" id="section-today">
+
+    <p>Seven lessons. Eight sessions. Today it all runs.</p>
+
+    <p>Your autonomous code runs itself for 30 seconds. You drive the rest. The code you committed at the end of Lesson 07 is what competes — with one exception: you have a 30-minute tweak window at the start to make final constant adjustments.</p>
+
+    <div class="hf-box hf-brain">
+      <span class="hf-label">Your brain is probably thinking this right now</span>
+      <p>"What if my auto doesn't work?"</p>
+      <p>Then you park manually in teleop. That's still 5 points per match if you do it at the end. The robot that parks reliably every match beats the robot that scores big once and crashes twice. Reliability is a strategy.</p>
+    </div>
+
+    <h2>Match structure — Orbit Odyssey 1v1</h2>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <h4>Autonomous — 30 seconds</h4>
+        <p>Hands off the controller. Your code runs. Robot scores rubble, drives to zones, parks — whatever you programmed.</p>
+        <p class="aside">AutoChooser selects your strategy. Set it before you put the robot on the field.</p>
+      </div>
+      <div class="info-card">
+        <h4>Transition — ~30 seconds</h4>
+        <p>Pick up your controller. Get ready. Check that your robot is where you expect it to be.</p>
+        <p class="aside">Don't touch the robot. Don't touch the controller until teleop is called.</p>
+      </div>
+      <div class="info-card">
+        <h4>Teleop — 90 seconds</h4>
+        <p>You drive. Complete laps around the field. Carry the amplifier for bonus points. Deposit rubble in zones.</p>
+        <p class="aside">Laps are clockwise. 5 points each. +3 points per lap while carrying the amplifier.</p>
+      </div>
+      <div class="info-card">
+        <h4>Endgame — last 30 seconds</h4>
+        <p>Return the amplifier to the Earth Pedestal for 10 points. Park in the Low Rubble Zone for 5 more.</p>
+        <p class="aside">Endgame is called at 30 seconds remaining. Plan your return route before the match starts.</p>
+      </div>
+    </div>
+
+    <h2>Scoring quick reference</h2>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <h4>Autonomous</h4>
+        <p>Rubble in Low Zone: <strong>1 pt each</strong></p>
+        <p>Rubble in High Zone: <strong>3 pts each</strong></p>
+        <p>Park in Low Zone: <strong>5 pts</strong></p>
+      </div>
+      <div class="info-card">
+        <h4>Teleop</h4>
+        <p>Lap completion: <strong>5 pts</strong></p>
+        <p>Lap with Amplifier: <strong>+3 pts</strong></p>
+      </div>
+      <div class="info-card">
+        <h4>Endgame</h4>
+        <p>Amplifier returned to Earth: <strong>10 pts</strong></p>
+        <p>Park in Low Zone: <strong>5 pts</strong></p>
+      </div>
+    </div>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">Strategy note — guaranteed points</span>
+      <p>Park auto (5 pts) + endgame park (5 pts) + amplifier return (10 pts) = <strong>20 points minimum</strong> if you execute all three reliably. That's before any laps or rubble. Know your floor before you go for the ceiling.</p>
+    </div>
+
+    <h2>Pre-match checklist</h2>
+
+    <p>Run through this before every single match — not just the first one.</p>
+
+    <ul class="bullet-list">
+      <li>Robot fits in starting position, all mechanisms within frame perimeter</li>
+      <li>Elevator at bottom, scoop flat</li>
+      <li>AutoChooser set to your chosen strategy</li>
+      <li>Alliance color marker visible and secure</li>
+      <li>Controller connected — test it before the match starts</li>
+      <li>Rubble preloaded if using a scoring auto</li>
+    </ul>
+
+    <div class="hf-box hf-warning">
+      <span class="hf-label">The one rule that never changes</span>
+      <p>Between matches: <strong>constants only</strong>. No rewriting commands. No new files. No structural changes. If your auto is 10cm short, you change <code>PARK_DISTANCE_METERS</code> in <code>Constants.java</code> — you do not rewrite <code>DriveDistance</code>. This is how real competition works.</p>
+    </div>
+
+  </div><!-- /section-today -->
+
+  <!-- ═══════════════════════════════════════════════════════
+       PART 2 — FINAL TWEAKS
+       ═══════════════════════════════════════════════════════ -->
+  <div class="lesson-section" id="section-tweaks">
+
+    <p>You have 30 minutes. Hard stop. Use it well.</p>
+
+    <div class="hf-box hf-brain">
+      <span class="hf-label">Your brain is probably thinking this right now</span>
+      <p>"I just need to rewrite this one command and it'll work perfectly."</p>
+      <p>No. If you rewrite a command in 30 minutes without testing it, you will break something that was working. The 30-minute window exists for constants — not rewrites. If something fundamental is broken, adjust your strategy instead. A robot that drives manually and parks every match beats a robot that has a beautiful autonomous that crashes every match.</p>
+    </div>
+
+    <h2>What you can change</h2>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <h4>✅ Allowed</h4>
+        <p><code>PARK_DISTANCE_METERS</code></p>
+        <p><code>kP</code></p>
+        <p><code>AUTO_TIMEOUT_SECONDS</code></p>
+        <p>AutoChooser default selection</p>
+        <p class="aside">All of these live in <code>Constants.java</code>.</p>
+      </div>
+      <div class="info-card">
+        <h4>❌ Not allowed</h4>
+        <p>Rewriting command classes</p>
+        <p>Adding new subsystem methods</p>
+        <p>New files of any kind</p>
+        <p>Changing <code>periodic()</code> logic</p>
+        <p class="aside">If you need these, your strategy needs to change — not your code.</p>
+      </div>
+    </div>
+
+    <h2>The tweak workflow</h2>
+
+    <ol>
+      <li>Identify the specific problem from your Lesson 07 field runs</li>
+      <li>Change <strong>one constant</strong> in <code>Constants.java</code></li>
+      <li>Run in simulator — verify the behavior in AdvantageScope</li>
+      <li>If sim looks good, confirm with instructor</li>
+      <li>That's it — don't keep tweaking if it looks right</li>
+    </ol>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">If your auto is already solid</span>
+      <p>Close your laptop. Walk the field. Think about your teleop route — where will you pick up the amplifier? What's your path for completing laps efficiently? Which endgame maneuver gets you to the pedestal fastest? Mental prep is real prep.</p>
+    </div>
+
+    <h2>If something is truly broken</h2>
+
+    <p>Talk to your instructor. Be specific: "My auto always overshoots by 15cm" is fixable with a constant. "My command never ends" is a structural bug — change your strategy to manual park and compete anyway. One broken session doesn't erase seven lessons of work.</p>
+
+  </div><!-- /section-tweaks -->
+
+  <!-- ═══════════════════════════════════════════════════════
+       PART 3 — MATCH PLAY
+       ═══════════════════════════════════════════════════════ -->
+  <div class="lesson-section" id="section-compete">
+
+    <p>Matches run on a posted schedule. Find your match number, find your first opponent, and be ready at the field before your match is called.</p>
+
+    <div class="hf-box hf-brain">
+      <span class="hf-label">Your brain is probably thinking this right now</span>
+      <p>"My auto failed in practice. Now what?"</p>
+      <p>Switch your AutoChooser to your fallback option — or to no auto at all. A match with no autonomous and good teleop still scores points. Stay calm. Drive well. The competition isn't just autonomous — it's three periods and every period is a chance to score.</p>
+    </div>
+
+    <h2>Between matches</h2>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <h4>Watch the match in progress</h4>
+        <p>What routes are other drivers taking? How are they handling the amplifier? What's scoring most efficiently?</p>
+      </div>
+      <div class="info-card">
+        <h4>Note what to adjust</h4>
+        <p>Write it down — don't rely on memory. One constant to change. One driving adjustment. Keep it specific.</p>
+      </div>
+      <div class="info-card">
+        <h4>One change maximum</h4>
+        <p>If you're going to adjust a constant, change exactly one thing. Run it in sim if time allows. Confirm with instructor.</p>
+      </div>
+    </div>
+
+    <h2>Scoring — what counts as what</h2>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <h4>Laps</h4>
+        <p>Robot moves clockwise around the field 360 degrees = one lap = 5 points. Must be complete. Partial laps don't score.</p>
+        <p class="aside">Carrying the amplifier during the lap adds 3 more points.</p>
+      </div>
+      <div class="info-card">
+        <h4>Parking</h4>
+        <p>Robot partially in the Low Rubble Zone at the end of a period counts as parked. Even partially in counts.</p>
+        <p class="aside">Endgame park: 5 pts. Auto park: 5 pts. Both can score in the same match.</p>
+      </div>
+      <div class="info-card">
+        <h4>Amplifier return</h4>
+        <p>Amplifier must be on the Earth Pedestal at the end of the match. Dropped next to it does not count.</p>
+        <p class="aside">10 points. Highest single action in the game. Worth going out of your way for.</p>
+      </div>
+    </div>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">Teleop strategy — the amplifier math</span>
+      <p>Each lap is 5 pts. Each lap with the amplifier is 8 pts. If you can complete 3 laps in teleop while carrying the amplifier that's 24 points vs 15 without it — a 9-point swing. But picking up and returning the amplifier costs time. Is the 9-point swing worth the time? That's your call to make.</p>
+    </div>
+
+    <h2>Penalties</h2>
+
+    <p>Keep it clean. Penalties give your opponent points — not what you want.</p>
+
+    <ul class="bullet-list">
+      <li><strong>Pinning for 5+ seconds</strong> — 2 pts to opponent</li>
+      <li><strong>Crossing centerline during auto</strong> — 2 pts to opponent</li>
+      <li><strong>Entering opponent's Rubble Zone</strong> — 2 pts to opponent</li>
+      <li><strong>Possessing more than 1 rubble</strong> — 1 pt per extra rubble</li>
+      <li><strong>Launching or throwing game pieces</strong> — red card</li>
+    </ul>
+
+  </div><!-- /section-compete -->
+
+  <!-- ═══════════════════════════════════════════════════════
+       PART 4 — AWARDS & CLOSE
+       ═══════════════════════════════════════════════════════ -->
+  <div class="lesson-section" id="section-close">
+
+    <p>Matches done. Scores tallied. Here's what happens next.</p>
+
+    <h2>Awards</h2>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <h4>🏆 Tournament Winner</h4>
+        <p>Highest average score across all matches.</p>
+      </div>
+      <div class="info-card">
+        <h4>🤖 Most Reliable Auto</h4>
+        <p>Highest average autonomous score across all matches.</p>
+      </div>
+      <div class="info-card">
+        <h4>🎮 Best Driver</h4>
+        <p>Highest average teleop score across all matches.</p>
+      </div>
+      <div class="info-card">
+        <h4>📈 Most Improved</h4>
+        <p>Biggest score increase from first match to last match.</p>
+      </div>
+      <div class="info-card">
+        <h4>💡 Innovation Award</h4>
+        <p>Most creative or unexpected autonomous strategy.</p>
+      </div>
+      <div class="info-card">
+        <h4>🤝 Gracious Professionalism</h4>
+        <p>Best attitude, fairest play, most supportive of other competitors. In FRC, this one matters.</p>
+      </div>
+    </div>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">On Gracious Professionalism</span>
+      <p>In FIRST Robotics, Gracious Professionalism is not a consolation prize. Teams win this award at Worlds. It describes the kind of competitor who helps a struggling opponent fix their robot before a match — because the goal is great robots competing, not just winning. If you earned this today, you're already thinking like an FRC student.</p>
+    </div>
+
+    <h2>What you built</h2>
+
+    <p>Seven lessons ago you installed a software environment and drove a simulated robot with your keyboard.</p>
+
+    <p>Today you competed with code you wrote — autonomous routines that scored real points on a real field without you touching the controller.</p>
+
+    <p>Everything in between:</p>
+
+    <ul class="bullet-list">
+      <li><strong>Lesson 01:</strong> Working environment. First robot code in simulation.</li>
+      <li><strong>Lesson 02:</strong> Every file in a WPILib project and what it does.</li>
+      <li><strong>Lesson 03:</strong> Separating mechanisms into subsystems. Motor control in commands.</li>
+      <li><strong>Lesson 04:</strong> IO pattern — subsystem, interface, implementation — making sim and replay possible.</li>
+      <li><strong>Lesson 05:</strong> <code>@AutoLog</code>, AdvantageScope, replay mode, logging discipline.</li>
+      <li><strong>Lesson 06:</strong> Commands as four lifecycle methods. Composition. AutoChooser.</li>
+      <li><strong>Lesson 07:</strong> Closing the loop with P-control. Tuning from data. Strategy lock.</li>
+      <li><strong>Lesson 08:</strong> Competition. Real matches. Real points.</li>
+    </ul>
+
+    <div class="hf-box hf-brain">
+      <span class="hf-label">Last brain power — what's next</span>
+      <p>These patterns don't stop here. New mechanisms, more sensors, harder routines — same subsystems, same IO pattern, same logging, same commands, same feedback loops.</p>
+      <p>When you open your team's competition code this fall, you'll recognize it. When something breaks at 11pm before a match, you'll know where to look. You're not starting from zero anymore.</p>
+      <p>Save your eight summary cards. Keep the reference card with your laptop. The next time you're at competition you'll want them within reach.</p>
+    </div>
+
+    <div class="bubble-chat">
+      <div class="bubble bubble-q">
+        <div class="bubble-who">Student</div>
+        What should I do next?
+      </div>
+      <div class="bubble bubble-a">
+        <div class="bubble-who">In order</div>
+        Open your team's most recent competition codebase. Find a subsystem. Ask: "Is this the IO pattern?" Then "are commands separated from periodic?" Then "what's logged?" Then propose one improvement. That's how you become useful to a team — and that's what all of this was building toward.
+      </div>
+    </div>
+
+  </div><!-- /section-close -->
+
+  <nav class="section-nav section-nav--bottom">
+    <button class="section-nav-btn active" data-section="today">Part 1 - Today's format</button>
+    <button class="section-nav-btn" data-section="tweaks">Part 2 - Final tweaks</button>
+    <button class="section-nav-btn" data-section="compete">Part 3 - Match play</button>
+    <button class="section-nav-btn" data-section="close">Part 4 - Awards &amp; close</button>
+  </nav>
+
+</div><!-- /page-container -->
+<footer class="site-footer"></footer>
+
+<script src="js/site-config.js"></script>
+<script src="js/frc-curriculum.js"></script>
+</body>
+</html>

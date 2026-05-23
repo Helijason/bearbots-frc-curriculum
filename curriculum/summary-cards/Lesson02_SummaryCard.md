@@ -95,6 +95,16 @@
 
 ---
 
+---
+
+## Competition Connection
+
+> **First look at Orbit Odyssey.** This lesson ends with a pair brainstorm — what does this robot need to DO to score points? Keep your answers. Next lesson you'll map them directly to subsystem files.
+>
+> Every file you learned today has a job on the competition robot. `Constants.java` holds your park distance and kP. `RobotContainer` wires your auto command to the AutoChooser. Understanding the template now means you won't be guessing later.
+
+---
+
 *FRC Programming Curriculum — Lesson 02*
 *Next: Lesson 03 — What is a subsystem?*
-*Keep this. Collect all 7.*
+*Keep this. Collect all 8.*

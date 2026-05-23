@@ -110,6 +110,16 @@ Swap them and your data is one tick stale. Replay reproduces wrong reality.
 
 ---
 
+---
+
+## Competition Connection
+
+> **Logging is what turns "something went wrong" into "here's exactly what happened."** Your competition autonomous runs for 30 seconds with no human input. If it fails, the log is your only witness.
+>
+> After every practice run in Lessons 06 and 07, you'll pull the log and open it in AdvantageScope. The position curve tells you whether to increase kP or adjust your distance constant. Without this lesson, you'd be guessing.
+
+---
+
 *FRC Programming Curriculum — Lesson 05*
-*Next: Lesson 06 — Autonomous routines*
-*Keep this. Collect all 7.*
+*Next: Lesson 06 — How does the robot know when it's done?*
+*Keep this. Collect all 8.*

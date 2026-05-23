@@ -59,10 +59,10 @@
 | **0–5 min** | **Hook** | Run a working auto routine on the projector. Then run one with a missing `isFinished`. Ask which is which. | Watch. Predict. Realize the difference is one method. |
 | **5–30 min** | **Concept** | Walk through the four methods of Command. Read `DriveDistance.java` line-by-line. Cover `addRequirements`. CommandScheduler lifecycle. | Follow on digital handout. Match each method to its purpose. |
 | **30–60 min** | **Composition** | `SequentialCommandGroup`, parallel variants, decorators. AutoChooser wiring on projector. | Replicate AutoChooser setup. Add an option. |
-| **60–120 min** | **Practice** | Circulate during tiered challenge. Push Bronze finishers to Silver. Catch the four common bugs early. | Bronze: run existing auto + read AdvantageScope. Silver: write `TurnToAngle`. Gold: compose L-shape. |
+| **60–120 min** | **Practice** | Circulate during tiered challenge. Push Bronze finishers to Silver. Catch the four common bugs early. | Bronze: park auto (5 pts). Silver: rubble scoring auto. Gold: high zone auto + strategy math. |
 | **120–150 min** | **Broken robot lab** | Circulate. Redirect with questions, not answers. | Find and fix 3 bugs. Predict what each would look like in AdvantageScope. |
-| **150–170 min** | **Physical XRP auto** | Students run autonomous on real hardware. Compare sim vs physical behavior. | Run DriveDistance on XRP. Measure actual vs expected distance. |
-| **170–180 min** | **Connect + wrap** | Tease Lesson 07. Exit check. | Exit check: name the four methods. Tease closed-loop control. |
+| **150–170 min** | **Physical XRP auto on field** | Enforce sim-first gate. Circulate during field runs. Watch for open-loop overshoot. | Run auto on Orbit Odyssey field. Log it. Compare sim vs hardware. Note the gap. |
+| **170–180 min** | **Strategy discussion + wrap** | Facilitate break-even discussion. Exit check. Tease Lesson 07. | Debate risky vs safe auto. Exit check. |
 
 > **45-minute compressed version**
 > Drop the composition deep dive. Cover only the four lifecycle methods and the broken robot lab. Assign Silver/Gold tiers as homework. Students will know commands but not how to compose them — the composition concepts are still in the digital handout for self-study.
@@ -213,11 +213,54 @@ In `Robot.java`'s `autonomousInit()`: schedule whatever `getAutonomousCommand()`
 
 ## Phase 4 — Practice (60–120 min)
 
-*Tiered challenge. Push students upward — Bronze finishers go straight to Silver. Never sit down during this phase.*
+*Tiered challenge — but every tier is building real competition auto code, not toy exercises. Push students upward as they finish each tier. Never sit down during this phase.*
+
+> **The framing to give students before they start**
+>
+> *"Every command you write in this phase is a candidate for your Orbit Odyssey autonomous routine. Bronze gets you a robot that parks. Silver gets you a robot that scores rubble. Gold gets you a robot that does both. Real points, real strategy."*
+
+### Bronze tier — Park auto (30–40 min for most students)
+
+**Target:** robot drives from start position and parks in the Low Rubble Zone by end of autonomous. Worth 5 points guaranteed.
+
+Students build `DriveDistance` and wire it into the AutoChooser as the default option.
+
+```java
+// In RobotContainer — default auto: drive to parking zone and stop
+autoChooser.setDefaultOption("Park (5 pts)", new DriveDistance(drive, PARK_DISTANCE_METERS));
+```
+
+`PARK_DISTANCE_METERS` goes in `Constants.java` — students will tune this in Lesson 07.
+
+**Success criteria:** robot drives and stops. AutoChooser shows "Park (5 pts)". Run in sim first, verify in AdvantageScope that the command initializes, runs, and ends cleanly.
+
+**Common Bronze struggles:**
+
+| Struggle | Response |
+|---|---|
+| AutoChooser not visible in SmartDashboard | Look for `SmartDashboard/Auto Choice` in AdvantageScope sidebar |
+| Robot doesn't stop | Bug #3 from the lab — `end()` is empty. *"What should happen to motors when the command ends?"* |
+| Commands folder empty in AdvantageScope | `CommandScheduler.onCommandInitialize` not wired in `Robot.java` |
+
+### Silver tier — Rubble scoring auto (30–40 min for students who finish Bronze)
+
+**Target:** robot drives to the Low Rubble Zone, pauses to score preloaded rubble, then parks. Worth up to 6 points (1 per rubble + 5 park).
+
+Students add a `TurnToAngle` command and compose a sequence:
+
+```java
+autoChooser.addOption("Score + Park (6 pts)",
+    new SequentialCommandGroup(
+        new DriveDistance(drive, SCORE_DISTANCE_METERS),
+        new WaitCommand(0.5),   // pause to let rubble settle
+        new DriveDistance(drive, PARK_DISTANCE_METERS - SCORE_DISTANCE_METERS)
+    )
+);
+```
 
 ### Reference implementation — `TurnToAngle`
 
-Have this ready but don't show it until a student has been stuck for 10+ minutes on Silver:
+Have this ready but don't show it until a student has been stuck for 10+ minutes:
 
 ```java
 public class TurnToAngle extends Command {
@@ -251,19 +294,28 @@ public class TurnToAngle extends Command {
 }
 ```
 
-> **Gyro gotchas to know before students hit them:**
-> - `Math.signum(targetDegrees)` handles both positive and negative target angles correctly
-> - `Math.abs()` on both sides of the comparison handles sign issues
-> - Gyro might wrap around 180° or 360° for large angles — for the 90° XRP case this is not a problem, but flag it
+> **Gyro gotchas:**
+> - `Math.signum(targetDegrees)` handles positive and negative angles correctly
+> - Gyro might wrap around 360° for large angles — for the XRP's 90° turns this is not a problem, but flag it
 
-### What to circulate for
+### Gold tier — High Rubble Zone auto (remaining time)
 
-- **Bronze:** students who can't find the AutoChooser in SmartDashboard — show them where it appears (Shuffleboard or SmartDashboard tab; look for `SmartDashboard/Auto Choice` in AdvantageScope)
-- **Bronze:** students who can't find the Commands folder in AdvantageScope — check `CommandScheduler.getInstance().onCommandInitialize(...)` is in `Robot.java`
-- **Silver:** students whose `TurnToAngle` never ends — probably wrong sign or wrong direction in `isFinished`. Ask: *"What's your start angle? What's your current angle? When should you stop?"*
-- **Silver:** students whose `TurnToAngle` ends instantly — forgot to record `startDegrees` in `initialize`, so `current - 0` already exceeds the target
-- **Gold:** students who used `ParallelCommandGroup` by accident — exactly bug #1 in the lab. Let them discover it, then point at line 3 of the lab code
-- **Gold:** add `WaitCommand(0.5)` between moves as a bonus challenge; `withTimeout(15.0)` wrapping the whole routine as a double bonus
+**Target:** robot drives to High Rubble Zone (elevated platform, 2 pts per rubble vs 1 pt in Low Zone). Worth more points but harder to execute reliably.
+
+Students add a second AutoChooser option that attempts the High Zone approach:
+
+```java
+autoChooser.addOption("High Zone (2 pts/rubble)",
+    new SequentialCommandGroup(
+        new DriveDistance(drive, HIGH_ZONE_APPROACH_METERS),
+        new TurnToAngle(drive, HIGH_ZONE_ANGLE_DEGREES),
+        new DriveDistance(drive, HIGH_ZONE_PUSH_METERS),
+        new WaitCommand(0.3)
+    ).withTimeout(28.0)  // must finish before 30-second auto ends
+);
+```
+
+**Gold discussion question:** *"Your high zone auto is riskier than park. When is it worth the risk? What's the break-even point?"* Let students work out: if park is 5 pts guaranteed and high zone is 0 pts if it fails, you need to score at least 3 rubble to come out ahead. That's strategy, not just code.
 
 ### The high-leverage question
 
@@ -307,38 +359,63 @@ Line 26: `end()` is empty. When the command finishes or gets interrupted, the mo
 
 ---
 
-## Phase 6 — Physical XRP Auto (150–170 min)
+## Phase 6 — Physical XRP Auto on the Field (150–170 min)
 
-*Students run autonomous on real hardware and compare to sim.*
+*First time students run their autonomous on the actual Orbit Odyssey field. Sim verified — now prove it on hardware.*
+
+### Before running — sim verification gate
+
+Every student must run their auto in sim and confirm it ends cleanly in AdvantageScope before getting field time. Not negotiable. This is the real workflow: sim first, hardware second.
 
 ### What students do
 
 - Deploy code to XRP
-- Run `DriveDistance(drive, 1.0)` in autonomous mode
-- Measure actual stopping distance with tape measure
-- Compare to the 1m target
-- Ask: *"If it overshot, why? How would you fix it without changing the target distance?"*
+- Place robot at starting position on the field
+- Run their chosen auto (park or scoring routine)
+- Watch where it stops — does it land in the zone?
+- Pull the log, open in AdvantageScope, find the command sequence in the Commands folder
+- Ask: *"Did the sim and hardware behave the same? If not, why not?"*
 
 ### What to watch for
 
-- Students who get different distances on hardware vs sim — unit conversion issue or encoder calibration
-- Students who run the auto and the robot doesn't stop — bug #3 still in their code
-- Students who want to reduce the power to improve accuracy — let them try, then tease Lesson 07 (closed-loop control fixes this properly)
+- Students whose robot overshoots the parking zone — open loop issue, tease Lesson 07 fix
+- Students whose robot stops short — kP or power too low, or encoder units bug from Lesson 04
+- Students whose robot doesn't stop at all — bug #3 still in their code. Stop them immediately.
+- Students who want to immediately change distances — remind them: *"Note it down, put the value in Constants.java, tune in Lesson 07. Don't restructure code on the field."*
+
+> **The key discipline to introduce here**
+>
+> *"Write down your target distance and your actual stopping point. That gap is what Lesson 07 closes. Today we're proving the command structure works — not that the numbers are perfect yet."*
 
 ---
 
-## Phase 7 — Connect + Wrap (170–180 min)
+## Phase 7 — Strategy Discussion + Wrap (170–180 min)
 
-### Exit check — 60 seconds, no grades
+*Commands are working. Students have a park auto running. Now connect code choices to strategy choices.*
 
-Two questions:
+### Strategy discussion (8 min)
+
+Ask the whole group:
+
+> *"You now have a working park auto worth 5 guaranteed points. Your AutoChooser has options. Here's the question: when would you choose the risky high zone auto over the safe park auto?"*
+
+Let students debate. Seed it if needed:
+- *"What if your alliance partner can definitely park? Do you still park?"*
+- *"What if your rubble-scoring routine only works 60% of the time? Is that better than guaranteed park?"*
+- *"What does 'reliable' mean for an autonomous routine?"*
+
+Don't resolve it — this is the question they'll be answering with data in Lesson 07.
+
+### Exit check (2 min)
+
+Two questions before packing up:
 
 1. *"Name the four methods of a command."*
-2. *"Why does `end()` need to stop the motors even if `isFinished()` already returned true?"*
+2. *"Your park auto overshoots by 10cm. Which file do you change, and what do you change in it?"* (Answer: `Constants.java`, update `PARK_DISTANCE_METERS`. Not the command class.)
 
 ### Teaser for Lesson 07
 
-> *"Today's commands work because we time things by encoder distance — we drive at 0.5 power and wait for the encoder to hit 1 meter. The robot overshoots because it has momentum. Next time, we close the loop: instead of 'drive at 0.5 power until 1 meter', we say 'drive at exactly 1 m/s, with PID feedback, until exactly 1 meter.' Same four-method structure. Same composition. Just smarter `execute()`."*
+> *"Your park auto stops in roughly the right place. Sometimes. The problem is it's open loop — you set a power and hope. Battery voltage changes, floor friction changes, the robot doesn't care. Next session we close the loop: the robot measures where it is and adjusts every 20ms until it's exactly where you told it to be. Same four-method command structure. Same AutoChooser. Just smarter math in `execute()`."*
 
 ---
 

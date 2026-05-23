@@ -315,7 +315,69 @@ Show students the same files they just learned about — now with AdvantageKit w
 
 > **Teaser for Lesson 03**
 >
-> *"Next lesson we figure out what goes in those subsystem files — and why putting everything in `Robot.java` is a terrible idea that always sounds fine until it isn't."*
+> *"Next lesson we figure out what goes in those subsystem files — and why putting everything in `Robot.java` is a terrible idea that always sounds fine until it isn't. We'll also start talking about what robot we're actually building — and why it matters."*
+
+---
+
+## Phase 10 — Orbit Odyssey Game Intro (use remaining time or open of next session)
+
+*First time students see the competition they're building toward. Keep it energizing — don't turn it into a lecture. Pairs talk first, group shares second.*
+
+> **Instructor mindset**
+>
+> The goal is curiosity, not comprehension. Students don't need to understand every rule today. They need to leave asking *"how would I score points?"* That question drives the next five lessons.
+
+### Setup
+
+- Orbit Odyssey game manual PDF open on projector
+- Gameplay video queued if available
+- Whiteboard available for pair share-out
+
+### Step 1 — Watch or read (5 min)
+
+Play a gameplay video if you have one. If not, show the field diagram and read the game overview aloud — slowly, with the diagram visible the whole time.
+
+> **Script**
+>
+> *"This is what we're building toward. By the end of this program, your robot will compete in this game. Don't worry about every rule yet — just watch and ask yourself: what does the robot need to DO?"*
+
+### Step 2 — Pair brainstorm Round 1: Game tasks (5 min)
+
+One person drives discussion, one writes. Prompt:
+
+> *"List everything the robot needs to do to score points. Be specific — 'drive' isn't enough. 'Drive to the Low Rubble Zone and stop' is better."*
+
+Prompts to circulate with if pairs stall:
+- *"What happens in autonomous? What scores points there?"*
+- *"What's the highest-value thing a robot can do in driver-controlled?"*
+- *"What does 'endgame' mean for this game?"*
+
+### Step 3 — Pair brainstorm Round 2: Robot requirements (5 min)
+
+Same pairs. New prompt:
+
+> *"Now think about the robot itself. What does it physically need to be able to do? What does it need to pick up? Where does it need to deliver things?"*
+
+Prompts if pairs stall:
+- *"The amplifier is a wiffle ball. How would you carry it?"*
+- *"Rubble goes into a zone. How do you push or carry it there?"*
+- *"The robot fits in a 10-inch cube. Does that change anything?"*
+
+### Step 4 — Share out (5 min)
+
+Each pair shares their top 2–3 robot requirements. Write them on the whiteboard without editing. Let duplicates stack — that tells you what the class agrees on. Don't resolve debates. Surface the questions, not the answers.
+
+> **What to listen for**
+>
+> Students who think mechanically ("we need something to push the rubble") — acknowledge it. Students who stay abstract ("it needs to be fast") — redirect: *"Fast at what specifically?"*
+
+### Step 5 — Plant the seed (2 min)
+
+> **Script**
+>
+> *"Keep that list in your head. Next lesson we talk about subsystems — how robots break their jobs into separate files. When we do that whiteboard, you're going to recognize these exact tasks. The code structure we build over the next five lessons is a direct answer to what you just wrote down."*
+
+> **Do NOT reveal the Bear Bots robot design here.** That reveal happens at the end of Lesson 03 after students have worked through the design themselves.
 
 ---
 

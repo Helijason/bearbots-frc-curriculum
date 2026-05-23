@@ -97,6 +97,16 @@ Break it: `stop()` launches game pieces. Awkward.
 
 ---
 
+---
+
+## Competition Connection
+
+> **Every subsystem on your competition robot uses this pattern.** `ElevatorIO`, `ScoopIO`, `ArmIO` — three files each, same structure. The subsystem never knows whether it's running in sim or on the real XRP.
+>
+> This matters at competition: you debug in sim on the bus, then deploy to hardware in the pit. Same code path. If the IO pattern is missing, replay mode doesn't work — and replay mode is how you figure out what went wrong in the match you just lost.
+
+---
+
 *FRC Programming Curriculum — Lesson 04*
-*Next: Lesson 05 — Logging and AdvantageScope*
-*Keep this. Collect all 7.*
+*Next: Lesson 05 — How do I debug a robot that isn't here?*
+*Keep this. Collect all 8.*

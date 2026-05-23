@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lesson 06 — Autonomous routines | FRC Programming Curriculum</title>
+  <title></title>
   <link rel="stylesheet" href="frc-curriculum.css">
 </head>
 <body data-lesson="06">
@@ -18,12 +18,7 @@
     <div class="lesson-meta"></div>
     <h1 class="lesson-title"></h1>
     <div class="lesson-subtitle"></div>
-    <div class="lesson-info-bar">
-      <div class="info-item"><div class="info-dot"></div> ~45 minutes</div>
-      <div class="info-item"><div class="info-dot"></div> Hardware: XRP robot</div>
-      <div class="info-item"><div class="info-dot"></div> Prereq: Lesson 05 - Logging</div>
-      <div class="info-item"><div class="info-dot"></div> Java &middot; WPILib commands</div>
-    </div>
+    <div class="lesson-info-bar"></div>
   </div>
 
   <nav class="section-nav">
@@ -214,12 +209,12 @@
 
     <h2>ParallelCommandGroup - all at once</h2>
 
-    <p>Sometimes you want two commands running at the same time - drive forward <em>while</em> spinning up the shooter. <code>ParallelCommandGroup</code> runs them concurrently and finishes when <strong>all</strong> children finish.</p>
+    <p>Sometimes you want two commands running at the same time - drive forward <em>while</em> tilting the scoop to collect. <code>ParallelCommandGroup</code> runs them concurrently and finishes when <strong>all</strong> children finish.</p>
 
     <div class="code-block"><pre>
 <span class="kw">return new</span> ParallelCommandGroup(
     <span class="kw">new</span> DriveDistance(drive, 2.0),
-    <span class="kw">new</span> SpinUpShooter(shooter, 4000)
+    <span class="kw">new</span> TiltScoop(scoop, ScoopGoal.CARRY)
 );</pre></div>
 
     <div class="hf-box hf-warning">
@@ -233,7 +228,7 @@
       <div class="info-card">
         <h4>ParallelDeadlineGroup</h4>
         <p>"Run all of these together, but the first command (the deadline) decides when we're done. When it finishes, kill the rest."</p>
-        <p>Use case: drive for 3 seconds while running the intake. When the drive finishes, stop the intake too.</p>
+        <p>Use case: drive for 3 seconds while tilting the scoop to collect. When the drive finishes, stop the scoop too.</p>
       </div>
       <div class="info-card">
         <h4>ParallelRaceGroup</h4>
@@ -273,7 +268,7 @@ driveDist.andThen(turn).andThen(driveDist).withTimeout(15.0);</pre></div>
 <span class="kw">public</span> RobotContainer() {
     autoChooser.setDefaultOption(<span class="st">"Drive 1m"</span>, <span class="kw">new</span> DriveDistance(drive, 1.0));
     autoChooser.addOption(<span class="st">"L-shape"</span>, driveLShape(drive));
-    autoChooser.addOption(<span class="st">"Score and back up"</span>, scoreAndBackUp(drive, shooter));
+    autoChooser.addOption(<span class="st">"Score + Park"</span>, scoreAndPark(drive));
     SmartDashboard.putData(<span class="st">"Auto Choice"</span>, autoChooser);
 }
 
