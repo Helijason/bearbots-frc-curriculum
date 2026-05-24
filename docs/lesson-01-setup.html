@@ -250,72 +250,125 @@
       <p><strong>1.</strong> Find the <strong>System Joysticks</strong> panel in the Simulation GUI</p>
       <p><strong>2.</strong> Drag <strong>Keyboard 0</strong> from System Joysticks into the <strong>Joysticks</strong> panel (slot 0)</p>
       <img src="images/lesson01/simulator-keyboard-setup.webp" alt="Setup keyboard for the joystick in the simulator.">
-      <p><strong>3.</strong> Find the <strong>Robot State</strong> panel &rarr; click <strong>Teleoperated</strong> &rarr; click <strong>Enable</strong></p>
+      <p><strong>3.</strong> Find the <strong>Robot State</strong> panel &rarr; click <strong>Teleoperated</strong></p>
       <img src="images/lesson01/simulator-robot-state.webp" alt="Simulator robot state.">
     </div>
 
     <div class="info-grid">
       <div class="info-card">
-        <h4>W or &uarr;</h4>
+        <h4>W</h4>
         <p>Drive forward</p>
       </div>
       <div class="info-card">
-        <h4>S or &darr;</h4>
+        <h4>S</h4>
         <p>Drive backward</p>
       </div>
       <div class="info-card">
-        <h4>A or &larr;</h4>
+        <h4>A</h4>
         <p>Turn left</p>
       </div>
       <div class="info-card">
-        <h4>D or &rarr;</h4>
+        <h4>D</h4>
         <p>Turn right</p>
       </div>
     </div>
 
     <div class="hf-box hf-warning">
       <span class="hf-label">You won't see the robot move on screen</span>
-      <p>The Simulation GUI by itself doesn't show the robot moving - that's what AdvantageScope is for. The robot <em>is</em> receiving your commands. You'll see the proof in a moment.</p>
+      <p>The Simulation GUI by itself doesn't show the robot moving - that's what AdvantageScope is for. The robot <em>is</em> receiving your commands. You'll see the proof in a moment. What you will see is data updating in the <strong>Network Tables.</strong></p>
+      <img src="images/lesson01/Simulator-network-tables.webp" alt="Simulator network tables.">
     </div>
 
-    <h2>Step 3 - Connect AdvantageScope</h2>
+    <h2>Step 3 - Open and connect AdvantageScope</h2>
 
-    <p>Keep the simulator running. Open AdvantageScope (don't close VS Code).</p>
+    <p>Keep the simulator running. Launch AdvantageScope from inside WPILib VS Code — don't close VS Code.</p>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">Launch AdvantageScope</span>
+      <p><strong>1.</strong> In WPILib VS Code, press <code>Ctrl+Shift+P</code></p>
+      <p><strong>2.</strong> Type <code>WPILib: Start Tool</code> and press <strong>Enter</strong></p>
+      <p><strong>3.</strong> Select <strong>AdvantageScope</strong> from the list</p>
+    </div>
 
     <div class="hf-box hf-info">
       <span class="hf-label">Connect to the simulator</span>
-      <p><strong>1.</strong> In AdvantageScope: <strong>File &rarr; Connect to Simulator</strong> (or <code>Ctrl+K</code>)</p>
-      <p><strong>2.</strong> Look at the bottom-left corner - it should say <strong>Connected</strong></p>
-      <p><strong>3.</strong> The left sidebar should populate with log keys (you'll see <code>Drive/</code>, <code>AdvantageKit/</code>, etc.)</p>
-      <p>Connect AdvantageScope BEFORE driving so you don't miss any data.</p>
-      <p><strong>4.</strong> Click on the Simulation GUI window so it has keyboard focus</p>
+      <p><strong>1.</strong> In AdvantageScope: <strong>File &rarr; Connect to Simulator</strong> and </strong> select <strong>Default: NetworkTables 4 </strong>(or <code>Ctrl+Shift+K</code>)</p>
+      <img src="images/lesson01/AdvantageScope-connect-to-simulator.webp" alt="AdvantageScope connect to simulator.">
+      <p><strong>2.</strong> Look at the top and you'll see a time bar start timing.</p>
+      <p><strong>3.</strong> The left sidebar will populate with log keys (you'll see <code>AdvantageKit/Drive/</code>, <code>AdvantageKit/DriverStation</code>, etc.)</p>
+      <p>Connect AdvantageScope <strong>BEFORE</strong> driving so you don't miss any data.</p>
     </div>
 
     <h2>Step 4 - Drag values onto the graph</h2>
 
     <p>The left sidebar in AdvantageScope is now populated with every value your robot is logging. We'll graph two of them.</p>
 
-    <ul class="task-list">
-      <li>In the left sidebar, expand <strong>Drive</strong></li>
-      <li>You'll see fields like <code>LeftVelocityRadPerSec</code>, <code>RightVelocityRadPerSec</code></li>
-      <li>Drag <code>LeftVelocityRadPerSec</code> onto the main graph area</li>
-      <li>Drag <code>RightVelocityRadPerSec</code> onto the same graph</li>
-    </ul>
-
+    <div class="hf-box hf-info">
+      <span class="hf-label">Add Data to Graph</span>
+      <p><strong>1.</strong> In the top tabs select the <strong>Line Graph</strong></p>
+      <p><strong>2.</strong> In the left sidebar, expand <strong>AdvantageKit &rarr; Drive</strong></p>
+      <p><strong>3.</strong> You'll see fields like <code>LeftVelocityMetersPerSec</code>, <code>RightVelocityMetersPerSec</code></p>
+      <p><strong>4.</strong> Drag <code>LeftVelocityMetersPerSec</code> onto the <strong>Left Axis</strong> below the main graph area</p>
+      <img src="images/lesson01/AdvantageScope-add-data-linegraph.webp" alt="AdvantageScope add data to graph.">
+      <p><strong>5.</strong> Drag <code>RightVelocityMetersPerSec</code> onto the same <strong>Left Axis</strong> area</p>
+    </div>
+    
     <h2>Step 5 - Drive and watch</h2>
 
-    <ul class="task-list">
-      <li>Click back to the Simulation GUI window (so it has focus)</li>
-      <li>Make sure <strong>Teleoperated</strong> is still enabled</li>
-      <li>Press and hold <strong>W</strong> for a couple seconds, then release</li>
-      <li>Switch to AdvantageScope</li>
-      <li>The graph should show both velocity lines spike up while you held W, then fall back to zero</li>
-    </ul>
+    <div class="hf-box hf-info">
+      <span class="hf-label">Create Data to View</span>
+      <p><strong>1.</strong> Click the Simulation GUI window (so it has keyboard focus)</p>
+      <p><strong>2.</strong> Make sure <strong>Teleoperated</strong> is still enabled</p>
+      <p><strong>3.</strong> Press and hold <strong>W</strong> for a couple seconds, then release</p>
+      <p><strong>4.</strong> Switch to AdvantageScope</p>
+      <p><strong>5.</strong> Both velocity lines should spike up while you held W, then fall back to zero</p>
+      <img src="images/lesson01/AdvantageScope-graph-velocities.webp" alt="AdvantageScope graphing velocities.">
+    </div>
 
     <div class="hf-box hf-brain">
       <span class="hf-label">What you just did</span>
       <p>You ran robot code without a robot. You drove a virtual machine with your keyboard. You logged sensor values to disk and graphed them in real time.</p>
       <p>If you understand nothing else from today, understand this: <strong>code &rarr; build &rarr; simulate &rarr; drive &rarr; watch values</strong> is the loop. You'll run it hundreds of times.</p>
+    </div>
+
+    <h2>Step 6 - View the robot in 2D</h2>
+
+    <p>Now let's see the robot move on the field.</p>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">Add the robot pose to the 2D field</span>
+      <p><strong>1.</strong> In AdvantageScope, select <strong>2D Field</strong> from the <strong>Top Tabs</strong>.</p>
+      <p><strong>2.</strong> In the left sidebar, expand <strong>AdvantageKit &rarr; RealOutputs &rarr; Odometry</strong></p>
+      <p><strong>3.</strong> Find <strong>Robot</strong> &mdash; it will show as <code>Robot - Pose2d</code></p>
+      <p><strong>4.</strong> Drag <strong>Robot</strong> onto the 2D Field view, under <strong>Poses</strong></p>
+      <p><strong>5.</strong> A blue box with an arrow will appear in the top-right corner of the field &mdash; this is called the <strong>Blue Origin</strong></p>
+      <p><strong>6.</strong> Click the Simulation GUI window to give it keyboard focus</p>
+      <p><strong>7.</strong> Drive with <strong>W, S, A, D</strong> and watch the robot icon move on the field</p>
+      <img src="images/lesson01/AdvantageScope-2D-drive.webp" alt="AdvantageScope 2D drive.">
+    </div>
+
+    <h2>Step 7 - View the robot in 3D</h2>
+
+    <p>Switch to <strong>3D Field</strong> in AdvantageScope's top Tabs. The robot pose doesn't carry over automatically &mdash; you'll need to add it again.</p>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">Add the robot pose to the 3D field</span>
+      <p><strong>1.</strong> In the left sidebar, expand <strong>AdvantageKit &rarr; RealOutputs &rarr; Odometry</strong></p>
+      <p><strong>2.</strong> Drag <strong>Robot</strong> onto the 3D Field view, under <strong>Poses</strong></p>
+      <p><strong>3.</strong> Click the Simulation GUI and drive with <strong>W, S, A, D</strong></p>
+      <img src="images/lesson01/AdvantageScope-3D-drive.webp" alt="AdvantageScope 3D drive.">
+    </div>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">Navigating the 3D view</span>
+      <p><strong>Left mouse button</strong> &mdash; rotate around the field</p>
+      <p><strong>Scroll wheel</strong> &mdash; zoom in and out</p>
+      <p><strong>Right mouse button</strong> &mdash; drag the field view</p>
+    </div>
+
+    <div class="hf-box hf-brain">
+      <span class="hf-label">AdvantageScope remembers your setup</span>
+      <p>Once you've added the robot pose to the 2D and 3D views, AdvantageScope saves that configuration. Next time you connect, it will already be there. You can always change it later.</p>
     </div>
 
     <h2>Quick check</h2>
@@ -343,7 +396,7 @@
       <span class="hf-label">Stuck? Common issues</span>
       <p><strong>Robot doesn't respond to keys:</strong> Click on the Simulation GUI window to give it focus. Make sure Teleoperated is still enabled (it disables when the simulator restarts).</p>
       <p><strong>AdvantageScope won't connect:</strong> The simulator must be running first. Check the bottom-left of AdvantageScope.</p>
-      <p><strong>Values aren't changing:</strong> Did you drag the right fields? You want <code>Drive/LeftVelocityRadPerSec</code> and <code>Drive/RightVelocityRadPerSec</code> - not <code>Setpoints</code>.</p>
+      <p><strong>Values aren't changing:</strong> Did you drag the right fields? You want <code>Drive/LeftVelocityMetersPerSec</code> and <code>Drive/RightVelocityMetersPerSec</code> - not <code>Setpoints</code>.</p>
       <p><strong>Still stuck:</strong> Ask a mentor. This is a moment to get help, not to grind.</p>
     </div>
 
@@ -391,6 +444,7 @@
       <li>Starter project builds successfully (<code>BUILD SUCCESSFUL</code>)</li>
       <li>Simulator runs and the robot responds to keyboard</li>
       <li>AdvantageScope says <strong>Connected</strong> and shows velocity values changing when you drive</li>
+      <li>AdvantageScope 2D and 3D field views show the robot moving when you drive</li>
       <li>Reference card is saved somewhere you'll find it</li>
     </ul>
 
