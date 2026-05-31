@@ -69,7 +69,7 @@
 | **0–10 min** | **Hook + setup** | Frame the day. Hand out USB drives. Verify everyone has one. | Plug in laptop. Copy USB contents to Documents folder. |
 | **10–60 min** | **Install WPILib** | Live-demo on projector. Circulate. Triage stuck students into backup laptops after 15 min. | Run installer. Choose options. Wait. Launch WPILib VS Code 2026. Verify AdvantageScope opens (bundled). |
 | **60–100 min** | **Build the starter** | Demo: open folder, build, see `BUILD SUCCESSFUL`. Watch for VS-Code-vs-WPILib-VS-Code mistakes. | Extract ZIP. Open in WPILib VS Code. Build. See `BUILD SUCCESSFUL`. |
-| **100–150 min** | **First drive** | Demo simulator + AdvantageScope flow on projector first. This is the payoff — everyone must reach it. | Launch sim. Enable teleop. Drive with WASD/arrows. Connect AdvantageScope. Watch values move. |
+| **100–150 min** | **First drive** | Demo simulator + AdvantageScope flow on projector first. This is the payoff — everyone must reach it. | Launch sim. Enable teleop. Drive with W/S/A/D. Launch AdvantageScope via Start Tool. Connect. Graph velocity values. |
 | **150–170 min** | **2D/3D pose view** | Demo adding robot pose to AdvantageScope's 2D/3D tab. | Add pose field. Watch robot move on screen as they drive. |
 | **170–180 min** | **Reference card + wrap** | Walk through reference card sections. Run end-of-session checklist student by student. | Save reference card. Run through checklist. Pack up laptop. |
 
@@ -192,19 +192,22 @@ Run this top-to-bottom on the projector. Don't skip steps. Students follow along
 - In Simulation GUI → System Joysticks panel → drag `Keyboard 0` to `Joystick[0]` slot
 - Robot State panel → Teleoperated → Enable
 - Click Simulation GUI window — keyboard only works when this window has focus
-- Keys: W/↑ forward, S/↓ backward, A/← turn left, D/→ turn right
+- Keys: W forward, S backward, A turn left, D turn right
 
-#### Step 3 — Connect AdvantageScope
+#### Step 3 — Open and connect AdvantageScope
 
-- Open AdvantageScope (don't close VS Code)
-- File → Connect to Simulator (or `Ctrl+K`)
-- Confirm "Connected" appears in bottom-left
+- In WPILib VS Code: `Ctrl+Shift+P` → type `WPILib: Start Tool` → select **AdvantageScope**
+- In AdvantageScope: **File → Connect to Simulator** → select **Default: NetworkTables 4** (or `Ctrl+Shift+K`)
+- Confirm connection: the time bar at the top of AdvantageScope starts running
+- The left sidebar populates with `AdvantageKit/Drive/`, `AdvantageKit/DriverStation/`, etc.
 - Connect BEFORE driving — otherwise the first seconds of data are lost
 
-#### Step 4 — Drive and watch
+#### Step 4 — Graph velocity values
 
-- In AdvantageScope: expand Drive folder, drag `LeftVelocityRadPerSec` onto graph
-- Drag `RightVelocityRadPerSec` onto the same graph
+- In AdvantageScope: select the **Line Graph** tab at the top
+- In the left sidebar, expand **AdvantageKit → Drive**
+- Drag `LeftVelocityMetersPerSec` onto the **Left Axis** below the graph area
+- Drag `RightVelocityMetersPerSec` onto the same **Left Axis**
 - Switch to Simulation GUI, hold `W` for 2–3 seconds, release
 - Switch back to AdvantageScope — both lines spike up, then drop to zero
 - Ask: *'What happens if you press A or D?'* Let them try.
@@ -217,7 +220,7 @@ Run this top-to-bottom on the projector. Don't skip steps. Students follow along
 | **Robot doesn't respond to keys** | Two causes: (1) Teleop not enabled, (2) Simulation GUI doesn't have focus. Click it. |
 | **AdvantageScope won't connect** | Simulator must be running first. Restart sim, then connect. |
 | **Connected, but no values appear** | Robot must be enabled in teleop. Disabled robots don't publish data. |
-| **Values exist but graph stays flat** | Wrong fields dragged. Use `Drive/LeftVelocityRadPerSec`, not Setpoints. |
+| **Values exist but graph stays flat** | Wrong fields dragged. Use `AdvantageKit/Drive/LeftVelocityMetersPerSec`, not Setpoints. Also confirm Line Graph tab is selected. |
 
 > **Pacing check — by 150 minutes**
 >
@@ -229,20 +232,30 @@ Run this top-to-bottom on the projector. Don't skip steps. Students follow along
 
 *The bonus wow. AdvantageScope can render the robot's position on a field view. This is where simulation stops feeling abstract.*
 
-### What students do
+### What students do — 2D Field
 
-- In AdvantageScope, open a new tab → select **2D Field** (or **3D Field**)
-- In the left sidebar, find the `Drive/Pose` field (or similar pose field logged by the starter project)
-- Drag it onto the 2D/3D view
-- Switch to the Simulation GUI and drive — the robot icon on the field should move
+- In AdvantageScope: select **2D Field** from the top tabs
+- In the left sidebar, expand **AdvantageKit → RealOutputs → Odometry**
+- Find **Robot** (shows as `Robot - Pose2d`) → drag it onto the 2D Field view under **Poses**
+- A blue box with an arrow appears in the top-right corner of the field — this is the **Blue Origin**
+- Click the Simulation GUI and drive with W/S/A/D — the robot icon moves on the field
+
+### What students do — 3D Field
+
+- In AdvantageScope: select **3D Field** from the top tabs
+- The pose does not carry over automatically — repeat: expand **AdvantageKit → RealOutputs → Odometry** → drag **Robot** under **Poses**
+- Click the Simulation GUI and drive with W/S/A/D
+- **3D mouse controls:** left-click drag = rotate, scroll wheel = zoom, right-click drag = pan
+- AdvantageScope saves the pose configuration — next session it will already be set up
 
 ### Common issues — 2D/3D pose
 
 | Issue | Solution |
 |---|---|
-| **No Pose field visible** | Robot must be enabled and running. Check the sidebar for any field with "Pose" in the name. |
-| **Robot doesn't move on field** | Verify the correct field is dragged — not a velocity or encoder field. |
+| **No Pose field visible** | Expand AdvantageKit → RealOutputs → Odometry. Robot must be enabled. |
+| **Robot doesn't move on field** | Verify Robot (Pose2d) is dragged — not a velocity or encoder field. |
 | **2D view shows robot but it's off the field** | Field image may need to be selected. Check AdvantageScope's field dropdown. |
+| **3D view not responding to mouse** | Click inside the 3D view first to give it focus. |
 
 > **Pacing check — by 170 minutes**
 >
@@ -271,8 +284,9 @@ Walk through each student. Verify each item before they pack up:
 - [ ] AdvantageScope opens
 - [ ] Starter project builds successfully
 - [ ] Simulator runs and responds to keyboard
-- [ ] AdvantageScope shows values when driving
-- [ ] AdvantageScope 2D/3D view shows robot moving
+- [ ] AdvantageScope connects (time bar starts) and shows velocity values when driving
+- [ ] AdvantageScope 2D field view shows robot moving
+- [ ] AdvantageScope 3D field view shows robot moving
 - [ ] Reference card saved
 
 > **Script — what to say at the end**
@@ -323,8 +337,9 @@ By the end of this session:
 - 80%+ of students have installations working on their own laptops
 - 100% of students have a working setup — own laptop or backup
 - 100% of students have seen the simulator run successfully
-- 100% of students have seen values change in AdvantageScope
-- 100% of students have seen the robot move in AdvantageScope's 2D/3D view
+- 100% of students have seen velocity values graph in AdvantageScope
+- 100% of students have seen the robot move in AdvantageScope's 2D field view
+- 100% of students have seen the robot move in AdvantageScope's 3D field view
 
 > If these metrics aren't met, do not proceed to Lesson 02 yet. Schedule a follow-up session and finish the setup. Lesson 02 assumes a working environment.
 
