@@ -19,7 +19,7 @@
 | **WPILib + VS Code** | Editor | The FRC editor. Java + libraries. Purple = correct. |
 | **AdvantageScope** | Dashboard | Bundled with WPILib. Sees the robot. Real-time graphs and 2D/3D field view. |
 | **Starter project** | Code base | Complete working robot. Build with Ctrl+Shift+P. `BUILD SUCCESSFUL` = good. |
-| **Simulator** | Test bench | Runs code on laptop. No hardware today. Drive with WASD or arrow keys. |
+| **Simulator** | Test bench | Runs code on laptop. No hardware today. Drive with W, S, A, D keys. |
 | **Reference card** | Cheat sheet | Two pages of patterns. Methods + conversions. Look up, then ask. |
 
 ---
@@ -27,12 +27,15 @@
 ## The Setup Workflow
 
 1. Run WPILib installer → launch WPILib VS Code
-2. Open AdvantageScope (bundled — no separate install)
-3. Extract `FRC-XRP-Starter.zip`
-4. Open folder in WPILib VS Code → Build
-5. `Ctrl+Shift+P` → Simulate Robot Code
-6. Connect AdvantageScope → drag velocity fields to graph
-7. Add pose field to 2D/3D view → watch robot move on screen
+2. Extract `FRC-XRP-Starter.zip`
+3. Open folder in WPILib VS Code → Build
+4. `Ctrl+Shift+P` → Simulate Robot Code → check `halsim_gui`
+5. Set up keyboard: drag Keyboard 0 to Joystick[0] → enable Teleoperated
+6. `Ctrl+Shift+P` → WPILib: Start Tool → select AdvantageScope
+7. File → Connect to Simulator → select Default: NetworkTables 4 (`Ctrl+Shift+K`) → time bar starts at top
+8. Line Graph tab → expand AdvantageKit → Drive → drag `LeftVelocityMetersPerSec` and `RightVelocityMetersPerSec` to Left Axis → drive with W/S/A/D
+9. 2D Field tab → expand AdvantageKit → RealOutputs → Odometry → drag Robot (Pose2d) to Poses → drive → watch robot move
+10. 3D Field tab → add Robot pose again → drive → use mouse to rotate/zoom/pan
 
 ---
 
@@ -51,11 +54,12 @@ You'll run this loop hundreds of times.
 ## After This Lesson I Can…
 
 - [ ] Open WPILib VS Code (purple theme)
-- [ ] Open AdvantageScope
+- [ ] Launch AdvantageScope via WPILib: Start Tool
 - [ ] Build a project to `BUILD SUCCESSFUL`
-- [ ] Drive a simulated robot with the keyboard
-- [ ] Connect AdvantageScope and graph velocity values
-- [ ] View the robot moving in AdvantageScope's 2D/3D field view
+- [ ] Drive a simulated robot with W, S, A, D
+- [ ] Connect AdvantageScope (time bar starts) and graph `LeftVelocityMetersPerSec` / `RightVelocityMetersPerSec`
+- [ ] View the robot moving in AdvantageScope's 2D field view
+- [ ] View the robot moving in AdvantageScope's 3D field view
 - [ ] Find the reference card and locate its main sections
 
 ---
