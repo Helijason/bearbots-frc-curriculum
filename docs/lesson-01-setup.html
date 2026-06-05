@@ -24,7 +24,7 @@
   <nav class="section-nav">
     <button class="section-nav-btn active" data-section="install">Part 1A - Install the tools (USB)</button>
     <button class="section-nav-btn" data-section="install-web">Part 1B - Install the tools (Web)</button>
-    <button class="section-nav-btn" data-section="project">Part 2 - The starter project</button>
+    <button class="section-nav-btn" data-section="project">Part 2 - The Lesson01 project</button>
     <button class="section-nav-btn" data-section="drive">Part 3 - Your first drive</button>
     <button class="section-nav-btn" data-section="verify">Part 4 - Verify and reference</button>
   </nav>
@@ -56,8 +56,8 @@
         <p class="aside">Includes Java, libraries, build tools - one big install.</p>
       </div>
       <div class="info-card">
-        <h4>2. Starter project builds</h4>
-        <p>Open the project, hit build, see <code>BUILD SUCCESSFUL</code>.</p>
+        <h4>2. <strong>First Drive</strong> project builds</h4>
+        <p>Open the <strong>First Drive</strong> project and compile it successfully.</p>
         <p class="aside">If this works, your code is ready to run in simulation.</p>
       </div>
       <div class="info-card">
@@ -81,7 +81,7 @@
         <p class="aside">If the robot moves on the screen when you drive, your pose data is making it all the way through.</p>
       </div>
       <div class="info-card">
-        <h4>7. You can find the reference card</h4>
+        <h4>Bonus: Reference card in hand</h4>
         <p>Two-page PDF cheat sheet. Saved somewhere you'll actually find it again.</p>
         <p class="aside">You'll use this every session from now on.</p>
       </div>
@@ -102,9 +102,9 @@
     <p>Everything you need is on the USB drive your mentor gave you. <strong>Copy all four files to your laptop before you start.</strong></p>
 
     <ul class="task-list">
-      <li><strong>WPILib installer</strong> - Windows <code>.exe</code></li>
+      <li><strong>WPILib installer</strong> - Windows <code>.iso</code></li>
       <li><strong>VS Code zip file</strong> - Windows <code>.zip</code></li>
-      <li><strong>Lesson01 project ZIP</strong> - <code>Lesson01-Project.zip</code></li>
+      <li><strong>Lesson01 project ZIP</strong> - <code>Lesson01-Project.zip</code>, contains the First Drive project.</li>
       <li><strong>Reference card</strong> - <code>XRP-Reference-Card.pdf</code></li>
     </ul>
 
@@ -152,7 +152,7 @@
 
     <div class="hf-box hf-brain">
       <span class="hf-label">Brain power - before you move on</span>
-      <p>WPILib is installed and AdvantageScope is ready to launch. Next we'll open the Lesson01 project and verify your environment can actually compile robot code.</p>
+      <p>WPILib is installed and AdvantageScope is ready to launch. Next we'll open the <strong>First Drive</strong> project and verify your environment can actually compile robot code.</p>
     </div>
 
   </div><!-- /section-install -->
@@ -169,21 +169,56 @@
 
     <p>You're about to install WPILib VS Code and WPILib start tools, build a project, and drive a robot that doesn't physically exist.</p>
 
-    <!-- ... "What done looks like" info-grid (identical to Part 1A) ... -->
+  <div class="info-grid">
+    <div class="info-card">
+      <h4>1. WPILib + VS Code installed</h4>
+      <p>The official FRC editor with all the robot tools built in.</p>
+      <p class="aside">Includes Java, libraries, build tools - one big install.</p>
+    </div>
+    <div class="info-card">
+      <h4>2. <strong>First Drive</strong> project builds</h4>
+      <p>Open the <strong>First Drive</strong> project and compile it successfully.</p>
+      <p class="aside">If this works, your code is ready to run in simulation.</p>
+    </div>
+    <div class="info-card">
+      <h4>3. Simulator runs</h4>
+      <p>Simulate the robot code that was just built, control robot modes, map joystick or keyboard to control the robot, and see robot data.</p>
+      <p class="aside">No XRP needed today.</p>
+    </div>
+    <div class="info-card">
+      <h4>4. AdvantageScope launches</h4>
+      <p>Included with WPILib. Lets you see what the robot is doing in real time.</p>
+      <p class="aside">If WPILib is the workshop, AdvantageScope is the dashboard.</p>
+    </div>
+    <div class="info-card">
+      <h4>5. AdvantageScope shows values</h4>
+      <p>Connect to the simulator, drag a value onto the graph, watch it move.</p>
+      <p class="aside">If the number moves when you drive, everything is wired up correctly.</p>
+    </div>
+    <div class="info-card">
+      <h4>6. AdvantageScope simulates in 2D/3D</h4>
+      <p>Add the robot pose to the 2D/3D view and control the robot!</p>
+      <p class="aside">If the robot moves on the screen when you drive, your pose data is making it all the way through.</p>
+    </div>
+    <div class="info-card">
+      <h4>Bonus: Reference card in hand</h4>
+      <p>Two-page PDF cheat sheet. Saved somewhere you'll actually find it again.</p>
+      <p class="aside">You'll use this every session from now on.</p>
+    </div>
+  </div>
+
 
     <h2>What to download</h2>
-    <p>You need two things. Download both before you start the install.</p>
+    <p>You need two things. Download all before you start the install.</p>
 
     <ul class="task-list">
       <li><strong>WPILib installer</strong> &mdash; includes VS Code, no separate download needed.<br>
         <a href="https://docs.wpilib.org/en/stable/docs/zero-to-robot/step-2/wpilib-setup.html" target="_blank">docs.wpilib.org &rarr; WPILib Installation Guide</a></li>
-      <li><strong>Lesson01 project</strong> &mdash; the Bear Bots XRP project to verify your environment is setup.<br>
+      <li><strong>First Drive</strong> Project &mdash; the Bear Bots XRP project to verify your environment is set up.<br>
         <a href="https://github.com/Helijason/bearbots-xrp-code/tree/main/Lesson01/First%20Drive" target="_blank">github.com/Helijason/bearbots-xrp-code</a> &rarr; navigate to <strong>Lesson01 &rarr; First Drive</strong>, then click <strong>Code &rarr; Download ZIP</strong></li>
     </ul>
 
     <h2>Install WPILib + VS Code</h2>
-    <!-- ... same install steps, with step 6 changed to: -->
-    <p><strong>1.</strong> When asked about VS Code: select <strong>Download for this computer only</strong> to download VS Code automatically.</p>
 
     <div class="hf-box hf-info">
       <span class="hf-label">On Windows</span>
@@ -208,19 +243,19 @@
   </div><!-- /section-install-web -->
 
   <!-- ═══════════════════════════════════════════════════════
-       PART 2 — THE STARTER PROJECT
+       PART 2 — THE FIRST DRIVE PROJECT
        ═══════════════════════════════════════════════════════ -->
   <div class="lesson-section" id="section-project">
 
-    <p>The starter project is a complete, working robot program. Today you're opening it and verifying your environment can compile it and run in the simulator. You'll explore what's actually inside in Lesson 02.</p>
+    <p>The First Drive project is a complete, working robot program. Today you're opening it and verifying your environment can compile it and run in the simulator. You'll explore what's actually inside in <span class="next-lesson-ref"></span>.</p>
 
     <h2>Step 1 - Extract the ZIP</h2>
 
     <ul class="task-list">
-      <li>Find <code>FRC-XRP-Starter.zip</code> on your USB drive</li>
+      <li>Find <code>Lesson01-Project.zip</code> on your USB drive</li>
       <li>Copy it to your <strong>Documents</strong> folder (or wherever you keep code)</li>
       <li>Right-click &rarr; <strong>Extract All</strong> on Windows</li>
-      <li>You should now have a folder named <code>FRC-XRP-Starter</code></li>
+      <li>You should now have a folder named <code>Lesson01-Project</code></li>
     </ul>
 
     <div class="hf-box hf-warning">
@@ -233,7 +268,7 @@
     <ul class="task-list">
       <li>Launch <strong>WPILib VS Code 2026</strong> (the WPILib one - not regular VS Code if previously installed.)</li>
       <li>Click <strong>File &rarr; Open Folder</strong></li>
-      <li>Navigate to your extracted <code>FRC-XRP-Starter</code> folder</li>
+      <li>Navigate to your extracted <code>Lesson01-Project\Lesson01\First Drive</code> folder</li>
       <li>Click <strong>Select Folder</strong></li>
     </ul>
 
@@ -267,7 +302,8 @@
       <p><strong>2.</strong> Did you open the <strong>folder</strong>, not just a single file?</p>
       <p><strong>3.</strong> Did the extract actually create a real folder?</p>
       <p><strong>4.</strong> Is your internet working? Gradle needs to download dependencies on first build.</p>
-      <p>If all of those are fine and it's still failing, ask a mentor.</p>    </div>
+      <p>If all of those are fine and it's still failing, ask a mentor.</p>
+    </div>
 
   </div><!-- /section-project -->
 
@@ -347,7 +383,7 @@
 
     <div class="hf-box hf-info">
       <span class="hf-label">Connect to the simulator</span>
-      <p><strong>1.</strong> In AdvantageScope: <strong>File &rarr; Connect to Simulator</strong> and </strong> select <strong>Default: NetworkTables 4 </strong>(or <code>Ctrl+Shift+K</code>)</p>
+      <p><strong>1.</strong> In AdvantageScope: <strong>File &rarr; Connect to Simulator</strong> and select <strong>Default: NetworkTables 4 </strong>(or <code>Ctrl+Shift+K</code>)</p>
       <img src="images/lesson01/AdvantageScope-connect-to-simulator.webp" alt="AdvantageScope connect to simulator.">
       <p><strong>2.</strong> Look at the top and you'll see a time bar start timing.</p>
       <p><strong>3.</strong> The left sidebar will populate with log keys (you'll see <code>AdvantageKit/Drive/</code>, <code>AdvantageKit/DriverStation</code>, etc.)</p>
@@ -478,8 +514,8 @@
 
     <ul class="task-list">
       <li>Find <code>XRP-Reference-Card.pdf</code> on the USB drive</li>
-      <li>Copy it to <strong>the same folder where you extracted the starter project</strong> - that way it's right next to your code</li>
-      <li>Open it in your PDF reader to verify it works</li>
+      <li>Copy it to <strong>the same folder where you extracted the First Drive project</strong> - that way it's right next to your code</li>
+      <li>Open it in your PDF reader to verify it opens</li>
     </ul>
 
     <h2>Find these sections in the reference card</h2>
@@ -487,7 +523,7 @@
     <p>Spend two minutes locating each of the following. You don't have to read them today - just know they exist.</p>
 
     <ul class="task-list">
-      <li><strong>XRP Drivetrain methods</strong> - <code>arcadeDrive()</code>, <code>getLeftEncoderDistance()</code>, etc.</li>
+      <li><strong>XRP Drivetrain methods</strong> - <code>arcadeDrive()</code>, <code>getDistance()</code>, etc.</li>
       <li><strong>Common unit conversions</strong> - inches to meters, radians to degrees</li>
       <li><strong>AdvantageKit logging pattern</strong> - the three-line pattern in every subsystem</li>
       <li><strong>CommandScheduler call</strong> - the line that <em>must</em> be in <code>robotPeriodic()</code></li>
@@ -505,7 +541,7 @@
     <ul class="task-list">
       <li>WPILib VS Code opens</li>
       <li>AdvantageScope opens</li>
-      <li>Starter project builds successfully (<code>BUILD SUCCESSFUL</code>)</li>
+      <li><strong>First Drive</strong> project builds successfully (<code>BUILD SUCCESSFUL</code>)</li>
       <li>Simulator runs and the robot responds to keyboard</li>
       <li>AdvantageScope says <strong>Connected</strong> and shows velocity values changing when you drive</li>
       <li>AdvantageScope 2D and 3D field views show the robot moving when you drive</li>
@@ -514,7 +550,7 @@
 
     <div class="hf-box hf-warning">
       <span class="hf-label">If any of those don't work</span>
-      <p>Don't try to power through it. The whole rest of the curriculum assumes these six things work. Use a backup laptop today and troubleshoot your own machine before Lesson 02. A working setup on a borrowed laptop is better than a broken setup on your own.</p>
+      <p>The whole rest of the curriculum assumes the first six things work. Use a backup laptop today and troubleshoot your own machine before <span class="next-lesson-ref"></span>. A working setup on a borrowed laptop is better than a broken setup on your own.</p>
     </div>
 
     <div class="chat-thread">
@@ -522,17 +558,17 @@
         <div class="bubble-who">Student</div>
         I got everything working. Now what?
       </div>
-      <div class="bubble bubble-a">
-        <div class="bubble-who">Teacher</div>
-        Next session Lesson 02 is "WPILib Template Structure and File Roles" - you'll open the starter project and learn what every file actually does. The goal is to understand the structure before we change anything.
+    <div class="bubble bubble-a">
+      <div class="bubble-who">Teacher</div>
+      Next <span class="next-lesson-ref"></span> — you'll open the First Drive project and learn what every file actually does. The goal is to understand the structure before we change anything.
       </div>
-      <div class="bubble bubble-q">
+    <div class="bubble bubble-q">
         <div class="bubble-who">Student</div>
         Do I need to bring anything?
       </div>
       <div class="bubble bubble-a">
         <div class="bubble-who">Teacher</div>
-        Yes, your laptop with everything we installed today, your power cord, and the reference card. Don't uninstall anything between now and Lesson 02.
+        Yes, your laptop with everything we installed today, your power cord, and the reference card. Don't uninstall anything between now and <span class="next-lesson-ref"></span>.
       </div>
     </div>
 
@@ -546,7 +582,7 @@
   <nav class="section-nav section-nav--bottom">
         <button class="section-nav-btn active" data-section="install">Part 1A - Install the tools (USB)</button>
     <button class="section-nav-btn" data-section="install-web">Part 1B - Install the tools (Web)</button>
-    <button class="section-nav-btn" data-section="project">Part 2 - The starter project</button>
+    <button class="section-nav-btn" data-section="project">Part 2 - The Lesson01 project</button>
     <button class="section-nav-btn" data-section="drive">Part 3 - Your first drive</button>
     <button class="section-nav-btn" data-section="verify">Part 4 - Verify and reference</button>
   </nav>
