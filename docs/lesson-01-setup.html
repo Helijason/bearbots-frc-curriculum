@@ -104,7 +104,7 @@
     <ul class="task-list">
       <li><strong>WPILib installer</strong> - Windows <code>.exe</code></li>
       <li><strong>VS Code zip file</strong> - Windows <code>.zip</code></li>
-      <li><strong>Starter project ZIP</strong> - <code>FRC-XRP-Starter.zip</code></li>
+      <li><strong>Lesson01 project ZIP</strong> - <code>Lesson01-Project.zip</code></li>
       <li><strong>Reference card</strong> - <code>XRP-Reference-Card.pdf</code></li>
     </ul>
 
@@ -152,7 +152,7 @@
 
     <div class="hf-box hf-brain">
       <span class="hf-label">Brain power - before you move on</span>
-      <p>WPILib is installed and AdvantageScope is ready to launch. Next we'll open the starter project and verify your environment can actually compile robot code.</p>
+      <p>WPILib is installed and AdvantageScope is ready to launch. Next we'll open the Lesson01 project and verify your environment can actually compile robot code.</p>
     </div>
 
   </div><!-- /section-install -->
@@ -177,8 +177,8 @@
     <ul class="task-list">
       <li><strong>WPILib installer</strong> &mdash; includes VS Code, no separate download needed.<br>
         <a href="https://docs.wpilib.org/en/stable/docs/zero-to-robot/step-2/wpilib-setup.html" target="_blank">docs.wpilib.org &rarr; WPILib Installation Guide</a></li>
-      <li><strong>Starter project</strong> &mdash; the Bear Bots XRP project you'll use all curriculum.<br>
-        <a href="https://github.com/Helijason/XRP-Advantagekit-Test" target="_blank">github.com/Helijason/XRP-Advantagekit-Test</a> &rarr; click <strong>Code &rarr; Download ZIP</strong></li>
+      <li><strong>Lesson01 project</strong> &mdash; the Bear Bots XRP project to verify your environment is setup.<br>
+        <a href="https://github.com/Helijason/bearbots-xrp-code/tree/main/Lesson01/First%20Drive" target="_blank">github.com/Helijason/bearbots-xrp-code</a> &rarr; navigate to <strong>Lesson01 &rarr; First Drive</strong>, then click <strong>Code &rarr; Download ZIP</strong></li>
     </ul>
 
     <h2>Install WPILib + VS Code</h2>
@@ -393,25 +393,34 @@
     <div class="hf-box hf-info">
       <span class="hf-label">Add the robot pose to the 2D field</span>
       <p><strong>1.</strong> In AdvantageScope, select <strong>2D Field</strong> from the <strong>Top Tabs</strong>.</p>
-      <p><strong>2.</strong> In the left sidebar, expand <strong>AdvantageKit &rarr; RealOutputs &rarr; Odometry</strong></p>
-      <p><strong>3.</strong> Find <strong>Robot</strong> &mdash; it will show as <code>Robot - Pose2d</code></p>
+      <p><strong>2.</strong> In the left sidebar, expand <strong>AdvantageKit &rarr; RealOutputs &rarr; Drive</strong></p>
+      <p><strong>3.</strong> Find <strong>Robot</strong> &mdash; it will show as <code>Pose - Pose2d</code></p>
+      <img src="images/lesson01/AdvantageScope-2d-Setup.webp" alt="AdvantageScope 2D drive setup.">
       <p><strong>4.</strong> Drag <strong>Robot</strong> onto the 2D Field view, under <strong>Poses</strong></p>
       <p><strong>5.</strong> A blue box with an arrow will appear in the top-right corner of the field &mdash; this is called the <strong>Blue Origin</strong></p>
       <p><strong>6.</strong> Click the Simulation GUI window to give it keyboard focus</p>
       <p><strong>7.</strong> Drive with <strong>W, S, A, D</strong> and watch the robot icon move on the field</p>
-      <img src="images/lesson01/AdvantageScope-2D-drive.webp" alt="AdvantageScope 2D drive.">
     </div>
 
     <h2>Step 7 - View the robot in 3D</h2>
 
-    <p>Switch to <strong>3D Field</strong> in AdvantageScope's top Tabs. The robot pose doesn't carry over automatically &mdash; you'll need to add it again.</p>
+    <p>Switch to <strong>3D Field</strong> in AdvantageScope's top Tabs. The robot pose doesn't carry over automatically - you'll need to add it again. We will add the 2026 kitbot and change it to a custom XRP robot with a working arm.</p>
 
     <div class="hf-box hf-info">
       <span class="hf-label">Add the robot pose to the 3D field</span>
-      <p><strong>1.</strong> In the left sidebar, expand <strong>AdvantageKit &rarr; RealOutputs &rarr; Odometry</strong></p>
-      <p><strong>2.</strong> Drag <strong>Robot</strong> onto the 3D Field view, under <strong>Poses</strong></p>
-      <p><strong>3.</strong> Click the Simulation GUI and drive with <strong>W, S, A, D</strong></p>
-      <img src="images/lesson01/AdvantageScope-3D-drive.webp" alt="AdvantageScope 3D drive.">
+      <p><strong>1.</strong> In the left sidebar, expand <strong>AdvantageKit &rarr; RealOutputs &rarr; Drive</strong></p>
+      <p><strong>2.</strong> Drag <strong>Robot</strong> onto the 3D Field view, under <strong>Poses</strong>, (Same as 2D instructions)</p>
+      <img src="images/lesson01/AdvantageScope_3D-Setup1.webp" alt="AdvantageScope 3D drive setup.">
+      <p><strong>3.</strong> Add the arm component. Drag <strong>FinalComponentPoses - Pose3d</strong> into the same box as the drive pose.</p>
+      <img src="images/lesson01/AdvantageScope_3D-Setup2.webp" alt="AdvantageScope 3D arm setup.">
+      <p><strong>4.</strong> Select a custom assets folder from <strong>App &rarr; Use Custom Assets Folder</strong>.</p>
+      <img src="images/lesson01/AdvantageScope_3D-Custom-Assets.webp" alt="AdvantageScope custom asset folder.">
+      <p><strong>5.</strong> Close AdvantageScope and restart to load the custom assets.</p>
+      <p><strong>6.</strong> Reconnect to the simulator.</p>
+      <p><strong>7.</strong> Goto the 3D Field. Right click on the robot pose (top selection) and select the XRP Robot.</p>
+      <img src="images/lesson01/AdvantageScope_3D-Setup3.webp" alt="AdvantageScope select Robot XRP.">
+      <p><strong>8.</strong> Click the Simulation GUI and drive with <strong>W, S, A, D</strong>, and control the arm with <strong>Z, X</strong></p>
+      <img src="images/lesson01/AdvantageScope_3D-Drive.webp" alt="AdvantageScope 3D drive.">
     </div>
 
     <div class="hf-box hf-info">

@@ -167,6 +167,11 @@
        ═══════════════════════════════════════════════════════ -->
   <div class="lesson-section" id="section-simulator">
 
+    <div class="hf-box hf-brain">
+      <span class="hf-label">Brain Power answer — from the end of Part 1</span>
+      <p>If a command doesn't run when you press a button, check <strong>RobotContainer first</strong> — that's where button bindings live. If the binding is there and it still doesn't work, check that <code>CommandScheduler.getInstance().run()</code> is actually in <code>robotPeriodic()</code>. No scheduler call = no commands ever run, no matter how good your bindings are.</p>
+    </div>
+    
     <p>Before you ever touch the XRP, you need to be comfortable in the simulator. This is where you'll spend most of your development time. Real hardware is for verifying — simulation is for building.</p>
 
     <div class="hf-box hf-brain">
