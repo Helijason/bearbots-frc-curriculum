@@ -104,6 +104,14 @@ function initPage() {
  
   if (!lesson) return;
 
+  // Inject next lesson title into any .next-lesson-ref spans
+  if (lesson.next) {
+    const n = SITE_CONFIG.lessons[lesson.next];
+    document.querySelectorAll('.next-lesson-ref').forEach(el => {
+      el.textContent = `Lesson ${n.lesson} — "${n.title}"`;
+    });
+  }
+
   const labelText = `Module ${lesson.module} - Lesson ${lesson.lesson}`;
  
   // lesson-label (header + footer)

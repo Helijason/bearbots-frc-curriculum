@@ -27,15 +27,14 @@
 ## The Setup Workflow
 
 1. Run WPILib installer → launch WPILib VS Code
-2. Extract `FRC-XRP-Starter.zip`
-3. Open folder in WPILib VS Code → Build
-4. `Ctrl+Shift+P` → Simulate Robot Code → check `halsim_gui`
-5. Set up keyboard: drag Keyboard 0 to Joystick[0] → enable Teleoperated
-6. `Ctrl+Shift+P` → WPILib: Start Tool → select AdvantageScope
-7. File → Connect to Simulator → select Default: NetworkTables 4 (`Ctrl+Shift+K`) → time bar starts at top
-8. Line Graph tab → expand AdvantageKit → Drive → drag `LeftVelocityMetersPerSec` and `RightVelocityMetersPerSec` to Left Axis → drive with W/S/A/D
-9. 2D Field tab → expand AdvantageKit → RealOutputs → Odometry → drag Robot (Pose2d) to Poses → drive → watch robot move
-10. 3D Field tab → add Robot pose again → drive → use mouse to rotate/zoom/pan
+2. Extract `Lesson01-Project.zip` → open `Lesson01\First Drive` folder in WPILib VS Code → Build
+3. `Ctrl+Shift+P` → Simulate Robot Code → check `halsim_gui`
+4. Set up keyboard: drag Keyboard 0 to Joystick[0] → enable Teleoperated
+5. `Ctrl+Shift+P` → WPILib: Start Tool → select AdvantageScope
+6. File → Connect to Simulator → select Default: NetworkTables 4 (`Ctrl+Shift+K`) → time bar starts at top
+7. Line Graph tab → expand AdvantageKit → Drive → drag `LeftVelocityMetersPerSec` and `RightVelocityMetersPerSec` to Left Axis → drive with W/S/A/D
+8. 2D Field tab → expand AdvantageKit → RealOutputs → Drive → drag Robot (Pose2d) to Poses → drive → watch robot move
+9. 3D Field tab → add Robot pose again + FinalComponentPoses (arm) → App → Use Custom Assets Folder → restart AdvantageScope → right-click robot pose → select XRP Robot → drive with W/S/A/D, arm with Z/X
 
 ---
 
@@ -55,11 +54,11 @@ You'll run this loop hundreds of times.
 
 - [ ] Open WPILib VS Code (purple theme)
 - [ ] Launch AdvantageScope via WPILib: Start Tool
-- [ ] Build a project to `BUILD SUCCESSFUL`
+- [ ] Build the **First Drive** project to `BUILD SUCCESSFUL`
 - [ ] Drive a simulated robot with W, S, A, D
 - [ ] Connect AdvantageScope (time bar starts) and graph `LeftVelocityMetersPerSec` / `RightVelocityMetersPerSec`
 - [ ] View the robot moving in AdvantageScope's 2D field view
-- [ ] View the robot moving in AdvantageScope's 3D field view
+- [ ] View the robot and arm moving in AdvantageScope's 3D field view with the XRP robot model
 - [ ] Find the reference card and locate its main sections
 
 ---
