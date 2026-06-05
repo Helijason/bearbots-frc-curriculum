@@ -18,7 +18,7 @@ const SITE_CONFIG = {
       description: "Install everything, build a project, and drive a virtual robot with your keyboard. The foundation everything else builds on.",
       hardware: "Laptop",
       prereq: null,
-      tools: "USB drive: VS Code WPILib, AdvantageKit",
+      tools: "USB drive/Internet: VS Code WPILib, AdvantageKit",
       duration: "3 hours",
       filename: "lesson-01-setup.html",
       status: "review",  // "ready", "current", "review", "soon"
