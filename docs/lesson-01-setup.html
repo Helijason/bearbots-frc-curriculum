@@ -81,7 +81,7 @@
         <p class="aside">If the robot moves on the screen when you drive, your pose data is making it all the way through.</p>
       </div>
       <div class="info-card">
-        <h4>Bonus: Reference card in hand</h4>
+        <h4>Bonus: Lesson Summary card in hand</h4>
         <p>Two-page PDF cheat sheet. Saved somewhere you'll actually find it again.</p>
         <p class="aside">You'll use this every session from now on.</p>
       </div>
@@ -99,13 +99,17 @@
     </div>
 
     <h2>What's on the USB drive</h2>
-    <p>Everything you need is on the USB drive your mentor gave you. <strong>Copy all four files to your laptop before you start.</strong></p>
+    <p>Everything you need is on the USB drive your mentor gave you. <strong>Copy all files to your laptop before you start.</strong></p>
 
     <ul class="task-list">
-      <li><strong>WPILib installer</strong> - Windows <code>.iso</code></li>
-      <li><strong>VS Code zip file</strong> - Windows <code>.zip</code></li>
-      <li><strong>Lesson01 project ZIP</strong> - <code>Lesson01-Project.zip</code>, contains the First Drive project.</li>
-      <li><strong>Reference card</strong> - <code>XRP-Reference-Card.pdf</code></li>
+      <li><strong>Web Instructions</strong> - 01 Web\Index <code>.html</code></li>
+      <li><strong>7-Zip</strong> - 02 Installation\7-zip\7z*-WindowsVersion <code>.exe</code></li>
+      <li><strong>WPILib installer</strong> - 02 Installation\WPILib_Windows-year.* <code>.iso</code></li>
+      <li><strong>VS Code zip file</strong> - 02 Installation\VSCode-win* <code>.zip</code></li>
+      <li><strong>Gradle Cache</strong> - 03 Lesson01\Gradle Cache\caches</li>
+      <li><strong>Lesson01-project</strong> - 03 Lesson01\Lesson01-Project <code>.zip</code>, contains the First Drive project.</li>
+      <li><strong>FRC Lesson 01 Summary</strong> - 03 Lesson01\FRC_Lesson01_Summary_Card <code>.pdf</code></li>
+      <li><strong>XRP Firmware</strong> - XRP Firmware\xrp-wpilib-firmware-2.1.0-aa439f0 <code>.uf2</code></li>
     </ul>
 
     <p>Pick the right OS version. If you grab the wrong one, the installer won't run.</p>
@@ -121,18 +125,23 @@
 
     <div class="hf-box hf-info">
       <span class="hf-label">On Windows</span>
-      <p><strong>1.</strong> Double-click <code>WPILib_Windows-2026.x.x.exe</code> on your USB drive (the version number may differ)</p>
-      <p><strong>2.</strong> If Windows asks "Do you want to allow this app to make changes?" &rarr; click <strong>Yes</strong></p>
-      <p><strong>3.</strong> If Windows SmartScreen blocks it &rarr; click <strong>More info</strong>, then <strong>Run anyway</strong></p>
-      <p><strong>4.</strong> Keep the default install path. Don't change it.</p>
-      <p><strong>5.</strong> When asked: <strong>Select the install mode you would like.</strong>. Select Everything.</p>
+      <p><strong>1.</strong> Right click <code>WPILib_Windows-2026.x.x.iso</code> in the files copied from the USB drive and select <strong>mount</strong></p>
+      <p><strong>2.</strong> Double-click <code>WPILibInstaller.exe</code> to start the installation</p>
+      <p><strong>3.</strong> If Windows asks "Do you want to allow this app to make changes?" &rarr; click <strong>Yes</strong></p>
+      <p><strong>4.</strong> If Windows SmartScreen blocks it &rarr; click <strong>More info</strong>, then <strong>Run anyway</strong></p>
+      <p><strong>5.</strong> Keep the default install path. Don't change it.</p>
+      <p><strong>6.</strong> When asked: <strong>Select the install mode you would like.</strong>. Select Everything.</p>
       <img src="images/lesson01/installer-options.webp" alt="WPILib installer, install mode.">
-      <p><strong>6.</strong> When asked: <strong>Download VS Code</strong>. Select existing VS Code archive for offline install on this computer.</p>
+      <p><strong>7.</strong> When asked: <strong>Download VS Code</strong>. Select existing VS Code archive for offline install on this computer. <strong>02 Installation\VSCode-win*.zip</strong></p>
       <img src="images/lesson01/installer-vscode-download.webp" alt="WPILib installer VS Code download option">
-      <p><strong>7.</strong> Click <strong>Execute Install</strong> and wait. The progress bar moves slowly.</p>
+      <p><strong>Note:</strong> You will likely get an invalid Hash VSCode. It is okay install the version provided. Click on Next to continue.</p>
+      <p><strong>8.</strong> Open File Explorer and navigate to <code>03 Lesson01\Gradle Cache\</code> on the USB drive.</p>
+      <p><strong>9.</strong> Copy the <code>caches</code> folder.</p>
+      <p><strong>10.</strong> Paste it into <code>C:\Users\<em>YourUsername</em>\.gradle\</code> — if prompted to merge folders or replace files, choose <strong>Merge</strong> / <strong>Yes</strong>.</p>
     </div>
 
-    <p>When the installer finishes, launch <strong>WPILib VS Code 2026</strong> from your Start menu (Windows). VS Code opens with a WPILib theme - that's how you know it's the right one.</p>
+    <p>When the installer finishes, launch <strong>WPILib VS Code 2026</strong> from your desktop icon (Windows). VS Code opens with a WPILib theme - that's how you know it's the right one.</p>
+    <p>After WPILib VS Code opens, press <kbd>Ctrl+Shift+P</kbd> and type <strong>Java: Clean Java Language Server Workspace</strong>, then select <strong>Reload and delete</strong>. This forces VS Code to index the AdvantageKit libraries from the Gradle cache.</p>
 
     <div class="hf-box hf-warning">
       <span class="hf-label">Important: WPILib VS Code is its own installation</span>
@@ -201,7 +210,7 @@
       <p class="aside">If the robot moves on the screen when you drive, your pose data is making it all the way through.</p>
     </div>
     <div class="info-card">
-      <h4>Bonus: Reference card in hand</h4>
+      <h4>Bonus: Lesson Summary card in hand</h4>
       <p>Two-page PDF cheat sheet. Saved somewhere you'll actually find it again.</p>
       <p class="aside">You'll use this every session from now on.</p>
     </div>
@@ -233,6 +242,18 @@
     </div>
 
     <p>When the installer finishes, launch <strong>WPILib VS Code 2026</strong> from your Start menu (Windows). VS Code opens with a WPILib theme - that's how you know it's the right one.</p>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">Verify extensions are installed</span>
+      <p>Press <kbd>Ctrl+Shift+X</kbd> to open the Extensions panel. Under <strong>Installed</strong> you should see:</p>
+      <ul>
+        <li>WPILib</li>
+        <li>Language Support for Java</li>
+        <li>Debugger for Java</li>
+        <li>Project Manager for Java</li>
+      </ul>
+      <p>If any are missing, the WPILib installer may not have completed correctly. Re-run it before continuing.</p>
+    </div>
 
     <div class="hf-box hf-warning">
       <span class="hf-label">Important: WPILib VS Code is its own installation</span>
@@ -288,7 +309,7 @@
       <p><strong>4.</strong> Watch the terminal at the bottom of VS Code</p>
     </div>
 
-    <p>The first build is slow - Gradle is downloading every library the project uses. Subsequent builds will be fast. When it finishes successfully, you'll see <code>BUILD SUCCESSFUL</code> in the terminal output.</p>
+    <p>The first build is slow - Gradle is downloading every library the project uses (Web users only). Subsequent builds will be faster. When it finishes successfully, you'll see <code>BUILD SUCCESSFUL</code> in the terminal output.</p>
 
     <div class="hf-box hf-brain">
       <span class="hf-label">What just happened</span>
@@ -301,7 +322,7 @@
       <p><strong>1.</strong> Are you in WPILib VS Code, not regular VS Code?</p>
       <p><strong>2.</strong> Did you open the <strong>folder</strong>, not just a single file?</p>
       <p><strong>3.</strong> Did the extract actually create a real folder?</p>
-      <p><strong>4.</strong> Is your internet working? Gradle needs to download dependencies on first build.</p>
+      <p><strong>4.</strong> Is your internet working (Web Users only)? Gradle needs to download dependencies on first build.</p>
       <p>If all of those are fine and it's still failing, ask a mentor.</p>
     </div>
 
@@ -328,8 +349,9 @@
       <p><strong>2.</strong> Type <code>WPILib: Simulate Robot Code</code></p>
       <p><strong>3.</strong> Press <strong>Enter</strong></p>
       <p><strong>4.</strong> When prompted, check <strong>halsim_gui</strong> and click OK</p>
-      <p><strong>5.</strong> Wait for the build (it's quick this time - already compiled)</p>
-      <p><strong>6.</strong> A new window will appear: the <strong>Simulation GUI</strong></p>
+      <p><strong>5.</strong> When prompted to <strong>allow public and private networks to access this app?</strong> (OpenJDK Platform binary), click Allow</p>
+      <p><strong>6.</strong> Wait for the build (it's quick this time - already compiled)</p>
+      <p><strong>7.</strong> A new window will appear: the <strong>Simulation GUI</strong></p>
       <img src="images/lesson01/robot-simulator.webp" alt="Robot simulator">
       
     </div>
@@ -387,7 +409,6 @@
       <img src="images/lesson01/AdvantageScope-connect-to-simulator.webp" alt="AdvantageScope connect to simulator.">
       <p><strong>2.</strong> Look at the top and you'll see a time bar start timing.</p>
       <p><strong>3.</strong> The left sidebar will populate with log keys (you'll see <code>AdvantageKit/Drive/</code>, <code>AdvantageKit/DriverStation</code>, etc.)</p>
-      <p>Connect AdvantageScope <strong>BEFORE</strong> driving so you don't miss any data.</p>
     </div>
 
     <h2>Step 4 - Drag values onto the graph</h2>
@@ -449,13 +470,11 @@
       <img src="images/lesson01/AdvantageScope_3D-Setup1.webp" alt="AdvantageScope 3D drive setup.">
       <p><strong>3.</strong> Add the arm component. Drag <strong>FinalComponentPoses - Pose3d</strong> into the same box as the drive pose.</p>
       <img src="images/lesson01/AdvantageScope_3D-Setup2.webp" alt="AdvantageScope 3D arm setup.">
-      <p><strong>4.</strong> Select a custom assets folder from <strong>App &rarr; Use Custom Assets Folder</strong>.</p>
+      <p><strong>4.</strong> Select a custom assets folder from <strong>App &rarr; Use Custom Assets Folder</strong>. <code>Lesson01-Project\assets\advantagescope</code></p>
       <img src="images/lesson01/AdvantageScope_3D-Custom-Assets.webp" alt="AdvantageScope custom asset folder.">
-      <p><strong>5.</strong> Close AdvantageScope and restart to load the custom assets.</p>
-      <p><strong>6.</strong> Reconnect to the simulator.</p>
-      <p><strong>7.</strong> Goto the 3D Field. Right click on the robot pose (top selection) and select the XRP Robot.</p>
+      <p><strong>5.</strong> Goto the 3D Field. Right click on the robot pose (top selection) and select the XRP Robot.</p>
       <img src="images/lesson01/AdvantageScope_3D-Setup3.webp" alt="AdvantageScope select Robot XRP.">
-      <p><strong>8.</strong> Click the Simulation GUI and drive with <strong>W, S, A, D</strong>, and control the arm with <strong>Z, X</strong></p>
+      <p><strong>6.</strong> Click the Simulation GUI and drive with <strong>W, S, A, D</strong>, and control the arm with <strong>Z, X</strong></p>
       <img src="images/lesson01/AdvantageScope_3D-Drive.webp" alt="AdvantageScope 3D drive.">
     </div>
 
@@ -508,30 +527,19 @@
        ═══════════════════════════════════════════════════════ -->
   <div class="lesson-section" id="section-verify">
 
-    <h2>Save the reference card</h2>
+    <h2>Save the FRC_Lesson01_Summary_Card.pdf</h2>
 
-    <p>The reference card is a two-page cheat sheet for the XRP curriculum. It has the most-used methods, the unit conversions you'll forget, and the core patterns for writing subsystems. You'll use it constantly. Memorizing it is not the goal - knowing where to look things up is.</p>
+    <p>The Lesson 01 Summary Card is a two-page reference sheet covering today's key concepts, vocabulary, and what you learned. Add it to your binder — you'll collect one for each lesson.</p>
 
     <ul class="task-list">
-      <li>Find <code>XRP-Reference-Card.pdf</code> on the USB drive</li>
-      <li>Copy it to <strong>the same folder where you extracted the First Drive project</strong> - that way it's right next to your code</li>
+      <li>Find <code>FRC_Lesson01_Summary_Card.pdf</code> in <code>03 Lesson01\</code> on the USB drive</li>
+      <li>Copy it to your binder folder on this computer</li>
       <li>Open it in your PDF reader to verify it opens</li>
-    </ul>
-
-    <h2>Find these sections in the reference card</h2>
-
-    <p>Spend two minutes locating each of the following. You don't have to read them today - just know they exist.</p>
-
-    <ul class="task-list">
-      <li><strong>XRP Drivetrain methods</strong> - <code>arcadeDrive()</code>, <code>getDistance()</code>, etc.</li>
-      <li><strong>Common unit conversions</strong> - inches to meters, radians to degrees</li>
-      <li><strong>AdvantageKit logging pattern</strong> - the three-line pattern in every subsystem</li>
-      <li><strong>CommandScheduler call</strong> - the line that <em>must</em> be in <code>robotPeriodic()</code></li>
     </ul>
 
     <div class="hf-box hf-info">
       <span class="hf-label">A habit to build</span>
-      <p>Before you ask a mentor "how do I do X?", check the reference card first. The best programmers look things up first. Build that habit now.</p>
+      <p>Before you ask a mentor "how do I do X?", check the summary card first. The best programmers look things up first. Build that habit now.</p>
     </div>
 
     <h2>Setup checklist - before you leave today</h2>
@@ -545,7 +553,7 @@
       <li>Simulator runs and the robot responds to keyboard</li>
       <li>AdvantageScope says <strong>Connected</strong> and shows velocity values changing when you drive</li>
       <li>AdvantageScope 2D and 3D field views show the robot moving when you drive</li>
-      <li>Reference card is saved somewhere you'll find it</li>
+      <li>Lesson 01 Summary Card is saved and added to your binder</li>
     </ul>
 
     <div class="hf-box hf-warning">
@@ -568,7 +576,7 @@
       </div>
       <div class="bubble bubble-a">
         <div class="bubble-who">Teacher</div>
-        Yes, your laptop with everything we installed today, your power cord, and the reference card. Don't uninstall anything between now and <span class="next-lesson-ref"></span>.
+        Yes, your laptop with everything we installed today, your power cord, and the summary card. Don't uninstall anything between now and <span class="next-lesson-ref"></span>.
       </div>
     </div>
 
