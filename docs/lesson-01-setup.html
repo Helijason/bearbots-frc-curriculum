@@ -89,7 +89,7 @@
 
     <div class="hf-box hf-warning">
       <span class="hf-label">Operating system support</span>
-      <p><strong>Windows, Mac, and Linux are supported.</strong> Instructions below cover windows.</p>
+      <p><strong>Windows, Mac, and Linux are supported.</strong> Instructions below cover windows. Use the Web install instructions if you don't have access to the team USB or if you are using a different operating system.</p>
     </div>
 
     <div class="hf-box hf-info">
@@ -99,14 +99,14 @@
     </div>
 
     <h2>What's on the USB drive</h2>
-    <p>Everything you need is on the USB drive your mentor gave you. <strong>Copy all files to your laptop before you start.</strong></p>
+    <p>Everything you need is on the USB drive your mentor gave you. <strong>Copy all files to your laptop before you start</strong>. NOTE: It is recommended to put the files <code>C:\Bearbots</code>. You may run into issues if you put the files in Onedrive.</p>
 
     <ul class="task-list">
       <li><strong>Web Instructions</strong> - 01 Web\Index <code>.html</code></li>
       <li><strong>7-Zip</strong> - 02 Installation\7-zip\7z*-WindowsVersion <code>.exe</code></li>
       <li><strong>WPILib installer</strong> - 02 Installation\WPILib_Windows-year.* <code>.iso</code></li>
-      <li><strong>VS Code zip file</strong> - 02 Installation\VSCode-win* <code>.zip</code></li>
-      <li><strong>Gradle Cache</strong> - 03 Lesson01\Gradle Cache\caches</li>
+      <li><strong>VS Code zip file</strong> - 02 Installation\VSCode-win* <code>.zip</code> <strong>(Provided for offline installation)</strong></li>
+      <li><strong>Gradle Cache</strong> - 03 Lesson01\Gradle Cache\caches  <strong>(Provided for offline installation)</strong></li>
       <li><strong>Lesson01-project</strong> - 03 Lesson01\Lesson01-Project <code>.zip</code>, contains the First Drive project.</li>
       <li><strong>FRC Lesson 01 Summary</strong> - 03 Lesson01\FRC_Lesson01_Summary_Card <code>.pdf</code></li>
       <li><strong>XRP Firmware</strong> - XRP Firmware\xrp-wpilib-firmware-2.1.0-aa439f0 <code>.uf2</code></li>
@@ -132,21 +132,64 @@
       <p><strong>5.</strong> Keep the default install path. Don't change it.</p>
       <p><strong>6.</strong> When asked: <strong>Select the install mode you would like.</strong>. Select Everything.</p>
       <img src="images/lesson01/installer-options.webp" alt="WPILib installer, install mode.">
-      <p><strong>7.</strong> When asked: <strong>Download VS Code</strong>. Select existing VS Code archive for offline install on this computer. <strong>02 Installation\VSCode-win*.zip</strong></p>
-      <img src="images/lesson01/installer-vscode-download.webp" alt="WPILib installer VS Code download option">
-      <p><strong>Note:</strong> You will likely get an invalid Hash VSCode. It is okay install the version provided. Click on Next to continue.</p>
-      <p><strong>8.</strong> Open File Explorer and navigate to <code>03 Lesson01\Gradle Cache\</code> on the USB drive.</p>
-      <p><strong>9.</strong> Copy the <code>caches</code> folder.</p>
-      <p><strong>10.</strong> Paste it into <code>C:\Users\<em>YourUsername</em>\.gradle\</code> — if prompted to merge folders or replace files, choose <strong>Merge</strong> / <strong>Yes</strong>.</p>
-    </div>
+      <p><strong>7.</strong> When asked: <strong>Download VS Code</strong>:</p>
 
-    <p>When the installer finishes, launch <strong>WPILib VS Code 2026</strong> from your desktop icon (Windows). VS Code opens with a WPILib theme - that's how you know it's the right one.</p>
-    <p>After WPILib VS Code opens, press <kbd>Ctrl+Shift+P</kbd> and type <strong>Java: Clean Java Language Server Workspace</strong>, then select <strong>Reload and delete</strong>. This forces VS Code to index the AdvantageKit libraries from the Gradle cache.</p>
+      <div class="toggle-row">
+        <button class="swap-btn"
+          data-show="vscode-offline"
+          data-hide="vscode-online"
+          data-label-swap="⚠ No internet — show offline steps"
+          data-label-back="✓ I have internet — show online steps"
+          data-swapped="false">
+          ⚠ No internet — show offline steps
+        </button>
+      </div>
+
+<!--       <div id="vscode-online">
+        <ul class="bullet-list">
+          <li>Select <strong>Download for this computer only (fastest)</strong>, then click <strong>Next</strong>.</li>
+        </ul>
+      </div> -->
+      <div class="toggle-content hint" id="vscode-online" style="display:none;">
+        <p><strong>ONLINE Steps:</strong></p>
+        <ul class="bullet-list">
+          <li>Select <strong>Download for this computer only (fastest)</strong>, then click <strong>Next</strong>.</li>
+          <img src="images/lesson01/installer-vscode-online.webp" alt="WPILib installer VS Code online option">
+        </ul>
+        <p>When the installer finishes, launch <strong>WPILib VS Code 2026</strong> from your desktop icon (Windows). VS Code opens with a WPILib theme - that's how you know it's the right one.</p>
+      </div>
+
+      <div class="toggle-content hint" id="vscode-offline" style="display:none;">
+        <p><strong>OFFLINE Steps:</strong></p>
+        <ul class="bullet-list">
+          <li>Select <strong>Select existing VS Code archive for offline install on this computer</strong>, then navigate to <strong>02 Installation\VSCode-win*.zip</strong> on the USB drive.</li>
+          <img src="images/lesson01/installer-vscode-offline.webp" alt="WPILib installer VS Code offline option">
+        </ul>
+        <p><strong>Note:</strong> You will likely get an invalid Hash warning. It is okay — install the version provided. Click <strong>Next</strong> to continue.</p>
+        <p><strong>8.</strong> Open File Explorer and navigate to <code>03 Lesson01\Gradle Cache\</code> on the USB drive.</p>
+        <p><strong>9.</strong> Copy the <code>caches</code> folder.</p>
+        <p><strong>10.</strong> Paste it into <code>C:\Users\<em>YourUsername</em>\.gradle\</code> — if prompted to merge folders or replace files, choose <strong>Merge</strong> / <strong>Yes</strong>.</p>
+        <p>When the installer finishes, launch <strong>WPILib VS Code 2026</strong> from your desktop icon (Windows). VS Code opens with a WPILib theme - that's how you know it's the right one.</p>
+        <p>After WPILib VS Code opens, press <kbd>Ctrl+Shift+P</kbd> and type <strong>Java: Clean Java Language Server Workspace</strong>, then select <strong>Reload and delete</strong>. This forces VS Code to index the AdvantageKit libraries from the Gradle cache.</p>
+      </div>
+    </div>
 
     <div class="hf-box hf-warning">
       <span class="hf-label">Important: WPILib VS Code is its own installation</span>
       <p>If you already had VS Code installed, you now have <strong>two of them</strong>. Regular VS Code and WPILib VS Code. They look almost identical, but only the WPILib one has the robot tools.</p>
       <p><strong>Always use WPILib VS Code 2026 for this curriculum.</strong> Pin it to your taskbar or dock so you don't accidentally open the wrong one.</p>
+    </div>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">Verify extensions are installed.</span>
+      <p>Press <kbd>Ctrl+Shift+X</kbd> to open the Extensions panel. Under <strong>Installed</strong> you should see:</p>
+      <ul>
+        <li>WPILib</li>
+        <li>Language Support for Java</li>
+        <li>Debugger for Java</li>
+        <li>Project Manager for Java</li>
+      </ul>
+      <p>If any are missing, the WPILib installer may not have completed correctly. Re-run it before continuing.</p>
     </div>
 
     <div class="hf-box hf-sidebar">
@@ -238,6 +281,7 @@
       <p><strong>5.</strong> When asked: <strong>Select the install mode you would like.</strong>. Select Everything.</p>
       <img src="images/lesson01/installer-options.webp" alt="WPILib installer, install mode.">
       <p><strong>6.</strong> When asked: <strong>Download VS Code</strong>. Select Download for this computer only (fastest).</p>
+      <img src="images/lesson01/installer-vscode-online.webp" alt="WPILib installer VS Code online option">
       <p><strong>7.</strong> Click <strong>Execute Install</strong> and wait. The progress bar moves slowly.</p>
     </div>
 
@@ -303,7 +347,8 @@
 
     <div class="hf-box hf-info">
       <span class="hf-label">How to build</span>
-      <p><strong>1.</strong> Press <code>Ctrl+Shift+P</code> (Windows)</p>
+      <p><strong>1.</strong> Click the WPILib hexagon logo in the top-right corner of VS Code
+      </p>
       <p><strong>2.</strong> Type <code>WPILib: Build Robot Code</code></p>
       <p><strong>3.</strong> Press <strong>Enter</strong></p>
       <p><strong>4.</strong> Watch the terminal at the bottom of VS Code</p>
@@ -345,7 +390,7 @@
 
     <div class="hf-box hf-info">
       <span class="hf-label">How to launch</span>
-      <p><strong>1.</strong> In VS Code, press <code>Ctrl+Shift+P</code> (Windows)</p>
+      <p><strong>1.</strong> In WPILib VS Code, click the <strong>WPILib hexagon logo</strong> in the top right corner of VS Code.</p>
       <p><strong>2.</strong> Type <code>WPILib: Simulate Robot Code</code></p>
       <p><strong>3.</strong> Press <strong>Enter</strong></p>
       <p><strong>4.</strong> When prompted, check <strong>halsim_gui</strong> and click OK</p>
@@ -398,7 +443,7 @@
 
     <div class="hf-box hf-info">
       <span class="hf-label">Launch AdvantageScope</span>
-      <p><strong>1.</strong> In WPILib VS Code, press <code>Ctrl+Shift+P</code></p>
+      <p><strong>1.</strong> In WPILib VS Code, click the <strong>WPILib hexagon logo</strong> in the top right corner of VS Code.</p>
       <p><strong>2.</strong> Type <code>WPILib: Start Tool</code> and press <strong>Enter</strong></p>
       <p><strong>3.</strong> Select <strong>AdvantageScope</strong> from the list</p>
     </div>
@@ -549,7 +594,7 @@
     <ul class="task-list">
       <li>WPILib VS Code opens</li>
       <li>AdvantageScope opens</li>
-      <li><strong>First Drive</strong> project builds successfully (<code>BUILD SUCCESSFUL</code>)</li>
+      <li><strong>First Drive</strong> project builds successfully <code>BUILD SUCCESSFUL</code></li>
       <li>Simulator runs and the robot responds to keyboard</li>
       <li>AdvantageScope says <strong>Connected</strong> and shows velocity values changing when you drive</li>
       <li>AdvantageScope 2D and 3D field views show the robot moving when you drive</li>

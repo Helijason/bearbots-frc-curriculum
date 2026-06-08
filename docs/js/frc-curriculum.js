@@ -240,7 +240,32 @@ function initToggles() {
     });
   });
 }
- 
+
+/* ── Swap Toggles ─────────────────────────────────────────── */
+function initSwapToggles() {
+  document.querySelectorAll('.swap-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const showId = btn.dataset.show;
+      const hideId = btn.dataset.hide;
+      const showEl = document.getElementById(showId);
+      const hideEl = document.getElementById(hideId);
+      const isSwapped = btn.dataset.swapped === 'true';
+
+      if (!isSwapped) {
+        if (hideEl) hideEl.style.display = 'none';
+        if (showEl) showEl.style.display = 'block';
+        btn.textContent = btn.dataset.labelBack;
+        btn.dataset.swapped = 'true';
+      } else {
+        if (showEl) showEl.style.display = 'none';
+        if (hideEl) hideEl.style.display = 'block';
+        btn.textContent = btn.dataset.labelSwap;
+        btn.dataset.swapped = 'false';
+      }
+    });
+  });
+}
+
 /* ── Quiz Buttons ─────────────────────────────────────────── */
 function initQuiz() {
   document.querySelectorAll('.quiz-btn').forEach(btn => {
@@ -308,6 +333,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initSectionNav();
   initTierTabs();
   initToggles();
+  initSwapToggles();
   initQuiz();
   initBugLab();
 });
