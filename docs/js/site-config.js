@@ -21,7 +21,7 @@ const SITE_CONFIG = {
       tools: "USB drive/Internet: VS Code WPILib, AdvantageKit",
       duration: "3 hours",
       filename: "lesson-01-setup.html",
-      status: "review",  // "ready", "current", "review", "soon"
+      status: "ready",  // "ready", "current", "review", "soon"
       prev: null,
       next: "02"
     },
