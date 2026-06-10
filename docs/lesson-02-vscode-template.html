@@ -5,11 +5,227 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title></title>
   <link rel="stylesheet" href="frc-curriculum.css">
+  <style>
+    /* ── File Prediction tap-to-select ─────────────────────── */
+    .fp-widget { margin: 1.2rem 0; }
+    .fp-round-label {
+      font-size: 0.78rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--teal); margin-bottom: 0.6rem;
+    }
+    .fp-instruction {
+      font-size: 0.82rem; color: var(--muted); margin-bottom: 0.75rem;
+      font-style: italic;
+    }
+    .fp-tiles {
+      display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1rem;
+    }
+    .fp-tile {
+      padding: 0.35rem 0.7rem;
+      background: var(--white); border: 1.5px solid var(--teal-border);
+      border-radius: 6px; font-size: 0.82rem; font-weight: 600;
+      color: var(--teal); cursor: pointer; user-select: none;
+      transition: background 0.12s, border-color 0.12s, opacity 0.12s;
+    }
+    .fp-tile:hover { background: var(--teal-light); }
+    .fp-tile.selected {
+      background: var(--teal); color: var(--white);
+      border-color: var(--teal); box-shadow: 0 0 0 3px rgba(29,106,114,0.25);
+    }
+    .fp-tile.placed { opacity: 0.35; pointer-events: none; }
+    .fp-targets { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem; }
+    .fp-target {
+      display: flex; align-items: center; gap: 0.6rem;
+      padding: 0.55rem 0.75rem;
+      background: var(--gray-bg); border: 2px dashed var(--gray-border);
+      border-radius: var(--radius); min-height: 2.4rem; cursor: pointer;
+      transition: background 0.12s, border-color 0.12s;
+    }
+    .fp-target:hover { background: var(--teal-light); border-color: var(--teal); }
+    .fp-target.correct { background: #E1F5EE; border-color: var(--teal-mid); border-style: solid; cursor: default; }
+    .fp-target.wrong   { background: var(--red-light); border-color: var(--red); border-style: solid; }
+    .fp-target-label {
+      font-size: 0.82rem; font-weight: 600; color: var(--dark);
+      min-width: 160px; flex-shrink: 0;
+    }
+    .fp-drop-zone { flex: 1; min-height: 1.6rem; display: flex; align-items: center; }
+    .fp-placed-tile {
+      padding: 0.25rem 0.6rem;
+      background: var(--teal); color: var(--white);
+      border-radius: 6px; font-size: 0.82rem; font-weight: 600;
+      cursor: pointer; user-select: none;
+    }
+    .fp-placed-tile:hover { background: #145860; }
+    .fp-controls { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+    .fp-check-btn, .fp-reset-btn {
+      padding: 0.4rem 1rem; border-radius: 6px; font-size: 0.82rem;
+      font-weight: 600; border: none; cursor: pointer; transition: background 0.15s;
+    }
+    .fp-check-btn { background: var(--teal); color: var(--white); }
+    .fp-check-btn:hover { background: #145860; }
+    .fp-reset-btn { background: var(--gray-bg); color: var(--mid); border: 1px solid var(--gray-border); }
+    .fp-reset-btn:hover { background: #e8e8e8; }
+    .fp-score { font-size: 0.82rem; color: var(--muted); margin-left: auto; }
+    .fp-feedback {
+      font-size: 0.82rem; margin-top: 0.5rem; padding: 0.5rem 0.75rem;
+      border-radius: 6px; display: none;
+    }
+    .fp-feedback.show { display: block; }
+    .fp-feedback.perfect { background: var(--teal-light); color: var(--teal); font-weight: 600; }
+    .fp-feedback.partial { background: var(--amber-light); color: var(--amber); }
+    .fp-round-tabs { display: flex; gap: 0.4rem; margin-bottom: 0.75rem; }
+    .fp-round-tab {
+      padding: 0.3rem 0.9rem; border-radius: 6px; font-size: 0.8rem;
+      font-weight: 600; border: 1.5px solid var(--gray-border);
+      background: var(--white); color: var(--muted); cursor: pointer; transition: all 0.15s;
+    }
+    .fp-round-tab.active { background: var(--teal); border-color: var(--teal); color: var(--white); }
+    .fp-round { display: none; }
+    .fp-round.active { display: block; }
+
+    /* ── Symptom Match tap-to-select (unlock gate) ──────────── */
+    .sm-widget { margin: 1.2rem 0; }
+    .sm-instruction { font-size: 0.82rem; color: var(--muted); margin-bottom: 0.75rem; font-style: italic; }
+    .sm-symptoms { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem; }
+    .sm-symptom {
+      padding: 0.55rem 0.75rem;
+      background: var(--amber-light); border: 1.5px solid var(--amber-border);
+      border-radius: var(--radius); font-size: 0.85rem; color: var(--amber);
+      cursor: pointer; user-select: none; transition: background 0.12s, border-color 0.12s, opacity 0.12s;
+    }
+    .sm-symptom:hover { background: #fde8b8; }
+    .sm-symptom.selected {
+      background: var(--amber); color: var(--white);
+      border-color: var(--amber); box-shadow: 0 0 0 3px rgba(146,96,10,0.25);
+    }
+    .sm-symptom.placed { opacity: 0.3; pointer-events: none; }
+    .sm-files { display: flex; flex-direction: column; gap: 0.5rem; }
+    .sm-file {
+      display: flex; align-items: flex-start; gap: 0.6rem;
+      padding: 0.55rem 0.75rem;
+      background: var(--gray-bg); border: 2px dashed var(--gray-border);
+      border-radius: var(--radius); min-height: 2.8rem; cursor: pointer;
+      transition: background 0.12s, border-color 0.12s;
+    }
+    .sm-file:hover { background: var(--amber-light); border-color: var(--amber-border); }
+    .sm-file.correct { background: #E1F5EE; border-color: var(--teal-mid); border-style: solid; cursor: default; }
+    .sm-file.wrong   { background: var(--red-light); border-color: var(--red); border-style: solid; }
+    .sm-file-name {
+      font-size: 0.82rem; font-weight: 700; color: var(--dark);
+      min-width: 170px; flex-shrink: 0; padding-top: 0.1rem;
+      font-family: var(--font-mono);
+    }
+    .sm-drop-zone { flex: 1; display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center; min-height: 1.6rem; }
+    .sm-placed {
+      padding: 0.25rem 0.55rem;
+      background: var(--amber); color: var(--white);
+      border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer;
+    }
+    .sm-placed:hover { background: #6e4800; }
+    .sm-controls { display: flex; gap: 0.5rem; align-items: center; margin-top: 0.75rem; }
+    .sm-check-btn, .sm-reset-btn {
+      padding: 0.4rem 1rem; border-radius: 6px; font-size: 0.82rem;
+      font-weight: 600; border: none; cursor: pointer;
+    }
+    .sm-check-btn { background: var(--teal); color: var(--white); }
+    .sm-check-btn:hover { background: #145860; }
+    .sm-reset-btn { background: var(--gray-bg); color: var(--mid); border: 1px solid var(--gray-border); }
+    .sm-feedback {
+      font-size: 0.85rem; margin-top: 0.6rem; padding: 0.55rem 0.75rem;
+      border-radius: 6px; display: none;
+    }
+    .sm-feedback.show { display: block; }
+    .sm-feedback.perfect { background: var(--teal-light); color: var(--teal); font-weight: 600; }
+    .sm-feedback.partial { background: var(--amber-light); color: var(--amber); }
+
+    /* ── Orbit Odyssey locked/unlocked section ──────────────── */
+    #orbit-locked {
+      text-align: center; padding: 2rem 1rem;
+      background: var(--gray-bg); border: 2px dashed var(--gray-border);
+      border-radius: var(--radius-lg); color: var(--muted);
+    }
+    #orbit-locked .lock-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+    #orbit-locked p { font-size: 0.9rem; margin-bottom: 0.75rem; }
+    #orbit-bypass { display: flex; gap: 0.5rem; justify-content: center; margin-top: 1rem; flex-wrap: wrap; }
+    #orbit-bypass input {
+      padding: 0.4rem 0.75rem; border: 1.5px solid var(--gray-border);
+      border-radius: 6px; font-size: 0.85rem; width: 140px;
+    }
+    #orbit-bypass button {
+      padding: 0.4rem 0.9rem; background: var(--purple); color: var(--white);
+      border: none; border-radius: 6px; font-size: 0.85rem; font-weight: 600;
+      cursor: pointer;
+    }
+    #orbit-bypass button:hover { background: #362a6a; }
+    #orbit-bypass .bypass-err {
+      font-size: 0.8rem; color: var(--red); width: 100%; text-align: center;
+    }
+    #orbit-content { display: none; }
+
+    /* ── Scoring table ──────────────────────────────────────── */
+    .scoring-table {
+      width: 100%; border-collapse: collapse; margin: 0.75rem 0;
+      font-size: 0.88rem;
+    }
+    .scoring-table th {
+      background: var(--purple); color: var(--white);
+      padding: 0.45rem 0.75rem; text-align: left; font-weight: 600;
+    }
+    .scoring-table td {
+      padding: 0.4rem 0.75rem; border-bottom: 1px solid var(--gray-border);
+      color: var(--mid);
+    }
+    .scoring-table tr:last-child td { border-bottom: none; }
+    .scoring-table tr:nth-child(even) td { background: var(--purple-light); }
+    .scoring-table .pts { font-weight: 700; color: var(--purple); }
+
+    /* ── Going Further collapsible ──────────────────────────── */
+    .going-further-toggle {
+      display: flex; align-items: center; gap: 0.5rem;
+      padding: 0.6rem 1rem; background: var(--gray-bg);
+      border: 1.5px solid var(--gray-border); border-radius: var(--radius);
+      cursor: pointer; font-size: 0.88rem; font-weight: 600; color: var(--mid);
+      margin-top: 1rem; user-select: none;
+    }
+    .going-further-toggle:hover { border-color: var(--purple); color: var(--purple); }
+    .going-further-toggle .gf-arrow { transition: transform 0.2s; }
+    .going-further-toggle.open .gf-arrow { transform: rotate(90deg); }
+    #going-further-content {
+      display: none; padding: 1rem;
+      background: var(--purple-light); border: 1.5px solid var(--purple-border);
+      border-radius: var(--radius); margin-top: 0.4rem;
+    }
+
+    /* ── Hardware table ─────────────────────────────────────── */
+    .hw-table {
+      width: 100%; border-collapse: collapse; font-size: 0.85rem; margin: 0.75rem 0;
+    }
+    .hw-table th {
+      background: var(--teal); color: var(--white);
+      padding: 0.4rem 0.65rem; text-align: left; font-weight: 600; font-size: 0.8rem;
+    }
+    .hw-table td {
+      padding: 0.38rem 0.65rem; border-bottom: 1px solid var(--gray-border);
+      color: var(--mid); font-family: var(--font-mono); font-size: 0.8rem;
+    }
+    .hw-table tr:last-child td { border-bottom: none; }
+    .hw-table tr:nth-child(even) td { background: var(--teal-light); }
+    .hw-table .hw-plain { font-family: var(--font-sans); }
+
+    /* ── Scavenger Hunt checklist ───────────────────────────── */
+    .scav-list { list-style: none; padding: 0; margin: 0.75rem 0; }
+    .scav-list li {
+      display: flex; align-items: flex-start; gap: 0.6rem;
+      padding: 0.45rem 0; border-bottom: 1px solid var(--gray-border);
+      font-size: 0.88rem; color: var(--mid);
+    }
+    .scav-list li:last-child { border-bottom: none; }
+    .scav-list input[type=checkbox] { margin-top: 0.15rem; accent-color: var(--teal); }
+    .scav-list code { font-size: 0.82rem; }
+  </style>
 </head>
 <body data-lesson="02">
 
 <div class="wip-banner"></div>
-
 <header class="site-header"></header>
 
 <div class="page-container">
@@ -22,40 +238,29 @@
   </div>
 
   <nav class="section-nav">
-    <button class="section-nav-btn active" data-section="concept">Part 1 - The files</button>
-    <button class="section-nav-btn" data-section="simulator">Part 2 - The simulator</button>
-    <button class="section-nav-btn" data-section="challenge">Part 3 - Try it yourself</button>
-    <button class="section-nav-btn" data-section="lab">Part 4 - Fix the broken robot</button>
+    <button class="section-nav-btn active" data-section="files">Part 1 — The Files</button>
+    <button class="section-nav-btn" data-section="simulator">Part 2 — The Simulator</button>
+    <button class="section-nav-btn" data-section="data">Part 3 — Read the Data</button>
+    <button class="section-nav-btn" data-section="challenges">Part 4 — Hands-On</button>
+    <button class="section-nav-btn" data-section="lab">Part 5 — Broken Robot Lab</button>
+    <button class="section-nav-btn" data-section="match">Part 6 — Symptom Match</button>
+    <button class="section-nav-btn" data-section="orbit">Part 7 — Orbit Odyssey</button>
   </nav>
+
 
   <!-- ═══════════════════════════════════════════════════════
        PART 1 — THE FILES
        ═══════════════════════════════════════════════════════ -->
-  <div class="lesson-section active" id="section-concept">
-
-    <p>You just ran <code>WPILib: Create a new project</code> and VS Code generated a bunch of files. Your instinct is probably to start editing them immediately. Resist that instinct for about 20 minutes. Let's understand what we have first.</p>
+  <div class="lesson-section active" id="section-files">
 
     <div class="hf-box hf-brain">
-      <span class="hf-label">Your brain is probably thinking this right now</span>
+      <span class="hf-label">Your brain right now</span>
       <p>"I just want to make the robot drive. Why are we reading files?"</p>
-      <p>Fair. But if you don't know what these files do, you'll spend the rest of the season randomly editing things hoping something works. Understanding the structure takes 20 minutes. Debugging blind takes hours. Your call.</p>
+      <p>Fair. But if you don't know what these files do, you'll spend the rest of the season randomly editing things hoping something works. This takes 20 minutes. Debugging blind takes hours.</p>
     </div>
 
-    <h2>Creating a new project the right way</h2>
-    <p>Always use the WPILib tools — never create robot files by hand. The tools set up the package declarations, imports, and class structure correctly every time.</p>
-
-    <div class="hf-box hf-info">
-      <span class="hf-label">How to create a new WPILib project</span>
-      <p><strong>1.</strong> Press <code>Ctrl+Shift+P</code> to open the command palette</p>
-      <p><strong>2.</strong> Type <code>WPILib: Create a new project</code> and press Enter</p>
-      <p><strong>3.</strong> Select: Template &rarr; Java &rarr; Command Robot Skeleton (Advanced)</p>
-      <p><strong>4.</strong> Enter your team number, project name, and save location</p>
-      <p><strong>5.</strong> Click Generate Project</p>
-      <p>VS Code will open the new project automatically. Wait for the build to finish before touching anything.</p>
-    </div>
-
-    <h2>The files — what each one does</h2>
-    <p>A freshly generated WPILib project has exactly these files. Click each one to learn its job.</p>
+    <h2>What the project generates</h2>
+    <p>Run <code>WPILib: Create a new project</code> → Command Robot Skeleton (Advanced) and you get exactly these files. Every one has a specific job. None are optional.</p>
 
     <div style="display:flex; flex-direction:column; gap:0.5rem; margin: 1rem 0;">
 
@@ -64,8 +269,8 @@
         <p>The entry point. Starts the robot.</p>
       </div>
       <div id="file-main" style="display:none; background:var(--code-bg); border:1px solid var(--code-border); border-radius:var(--radius); padding:1rem; margin-top:-0.25rem;">
-        <p style="font-size:0.875rem; color:var(--mid); margin-bottom:0.75rem;"><strong>Job:</strong> The very first thing that runs when the robot boots. It calls <code>RobotBase.startRobot(Robot::new)</code> which hands control to your Robot class.</p>
-        <p style="font-size:0.875rem; color:var(--mid); margin-bottom:0.75rem;"><strong>Should you modify it?</strong> Almost never. The only reason to touch this file is if you rename your main Robot class.</p>
+        <p style="font-size:0.875rem; color:var(--mid); margin-bottom:0.75rem;"><strong>Job:</strong> The very first thing that runs when the robot boots. Calls <code>RobotBase.startRobot(Robot::new)</code> which hands control to your Robot class.</p>
+        <p style="font-size:0.875rem; color:var(--mid); margin-bottom:0.75rem;"><strong>Should you modify it?</strong> Almost never. Only touch this if you rename your Robot class.</p>
         <div class="hf-box hf-warning" style="margin:0.5rem 0 0;">
           <span class="hf-label">The rule</span>
           <p>Do not add static variables or initialization code to Main.java. The comment at the top says this. It means it.</p>
@@ -77,9 +282,9 @@
         <p>The lifecycle manager. Controls what happens in each robot mode.</p>
       </div>
       <div id="file-robot" style="display:none; background:var(--code-bg); border:1px solid var(--code-border); border-radius:var(--radius); padding:1rem; margin-top:-0.25rem;">
-        <p style="font-size:0.875rem; color:var(--mid); margin-bottom:0.75rem;"><strong>Job:</strong> Contains the lifecycle methods — <code>robotPeriodic()</code>, <code>autonomousInit()</code>, <code>teleopInit()</code>, etc. These are called automatically by WPILib at the right times.</p>
-        <p style="font-size:0.875rem; color:var(--mid); margin-bottom:0.75rem;"><strong>Extends:</strong> In a standard project, Robot extends <code>TimedRobot</code>. In our AdvantageKit project, it extends <code>LoggedRobot</code> instead. LoggedRobot extends TimedRobot — so all the same lifecycle methods work.</p>
-        <p style="font-size:0.875rem; color:var(--mid); margin-bottom:0.75rem;"><strong>The most important line:</strong> <code>CommandScheduler.getInstance().run()</code> in <code>robotPeriodic()</code>. This is what makes the entire command-based framework work. Without it, no commands ever execute.</p>
+        <p style="font-size:0.875rem; color:var(--mid); margin-bottom:0.75rem;"><strong>Job:</strong> Contains lifecycle methods — <code>robotPeriodic()</code>, <code>autonomousInit()</code>, <code>teleopInit()</code>, etc. Called automatically by WPILib at the right times.</p>
+        <p style="font-size:0.875rem; color:var(--mid); margin-bottom:0.75rem;"><strong>AdvantageKit note:</strong> Our project extends <code>LoggedRobot</code> instead of <code>TimedRobot</code>. LoggedRobot extends TimedRobot — all the same lifecycle methods work, you just get logging for free.</p>
+        <p style="font-size:0.875rem; color:var(--mid); margin-bottom:0.75rem;"><strong>Most important line:</strong> <code>CommandScheduler.getInstance().run()</code> in <code>robotPeriodic()</code>. Without it, no commands ever execute. Ever.</p>
         <div class="code-block"><pre>
 <span class="kw">@Override</span>
 <span class="kw">public void</span> robotPeriodic() {
@@ -92,9 +297,9 @@
         <p>The switchboard. Creates subsystems and wires up buttons.</p>
       </div>
       <div id="file-container" style="display:none; background:var(--code-bg); border:1px solid var(--code-border); border-radius:var(--radius); padding:1rem; margin-top:-0.25rem;">
-        <p style="font-size:0.875rem; color:var(--mid); margin-bottom:0.75rem;"><strong>Job:</strong> This is where you instantiate subsystems, set up controller bindings, and provide the autonomous command. It's the "main switchboard" of the robot.</p>
-        <p style="font-size:0.875rem; color:var(--mid); margin-bottom:0.75rem;"><strong>Why not put this in Robot.java?</strong> Separation of concerns. Robot.java handles timing and lifecycle. RobotContainer handles what the robot actually does. Keeping them separate makes both easier to read and debug.</p>
-        <p style="font-size:0.875rem; color:var(--mid);"><strong>This is the file you'll edit most.</strong> Every new subsystem and every button binding lives here.</p>
+        <p style="font-size:0.875rem; color:var(--mid); margin-bottom:0.75rem;"><strong>Job:</strong> Instantiates subsystems, sets up controller bindings, provides the autonomous command. The main switchboard of the robot.</p>
+        <p style="font-size:0.875rem; color:var(--mid); margin-bottom:0.75rem;"><strong>Why not put this in Robot.java?</strong> Separation of concerns. Robot.java handles timing. RobotContainer handles what the robot actually does. Both files stay readable.</p>
+        <p style="font-size:0.875rem; color:var(--mid);"><strong>This is the file you'll edit most.</strong> Every new subsystem and button binding lives here.</p>
       </div>
 
       <div class="info-card" style="cursor:pointer;" onclick="toggleFile('constants')">
@@ -102,11 +307,11 @@
         <p>The number vault. Motor IDs, speeds, PID values — all in one place.</p>
       </div>
       <div id="file-constants" style="display:none; background:var(--code-bg); border:1px solid var(--code-border); border-radius:var(--radius); padding:1rem; margin-top:-0.25rem;">
-        <p style="font-size:0.875rem; color:var(--mid); margin-bottom:0.75rem;"><strong>Job:</strong> Stores constants that are used throughout the robot code. Motor IDs, gear ratios, PID gains, field dimensions. Anything that's a fixed number that might need to change should be here — not hardcoded in a subsystem.</p>
-        <p style="font-size:0.875rem; color:var(--mid); margin-bottom:0.75rem;"><strong>In AdvantageKit projects,</strong> Constants.java also holds the <code>Mode</code> enum that controls REAL/SIM/REPLAY behavior.</p>
+        <p style="font-size:0.875rem; color:var(--mid); margin-bottom:0.75rem;"><strong>Job:</strong> Stores constants used throughout the codebase. Motor IDs, gear ratios, PID gains, field dimensions. Anything that's a fixed number that might change should be here — not hardcoded in a subsystem.</p>
+        <p style="font-size:0.875rem; color:var(--mid); margin-bottom:0.75rem;"><strong>In AdvantageKit projects,</strong> Constants.java also holds the <code>Mode</code> enum controlling REAL/SIM/REPLAY behavior.</p>
         <div class="hf-box hf-brain" style="margin:0.5rem 0 0;">
-          <span class="hf-label">Why does this matter?</span>
-          <p>Imagine your motor ID is hardcoded as <code>4</code> in five different files. Someone changes the wiring. Now you have to find and change it in five places without missing any. With Constants.java you change it once. Sleep well.</p>
+          <span class="hf-label">Why this matters</span>
+          <p>Motor ID hardcoded as <code>4</code> in five files. Wiring changes. Now you hunt through five files without missing any. With Constants.java you change it once.</p>
         </div>
       </div>
 
@@ -115,15 +320,59 @@
         <p>The build recipe. Tells Java what libraries to include.</p>
       </div>
       <div id="file-gradle" style="display:none; background:var(--code-bg); border:1px solid var(--code-border); border-radius:var(--radius); padding:1rem; margin-top:-0.25rem;">
-        <p style="font-size:0.875rem; color:var(--mid); margin-bottom:0.75rem;"><strong>Job:</strong> Configures the build system. Specifies which WPILib version to use, which vendor libraries to include, and how to compile and deploy the code.</p>
-        <p style="font-size:0.875rem; color:var(--mid); margin-bottom:0.75rem;"><strong>When you add AdvantageKit</strong> using <code>WPILib: Manage Vendor Libraries</code>, it adds entries to this file automatically. You rarely edit it by hand.</p>
-        <p style="font-size:0.875rem; color:var(--mid);"><strong>If your build fails mysteriously,</strong> build.gradle is often the culprit — mismatched versions or missing vendor deps.</p>
+        <p style="font-size:0.875rem; color:var(--mid); margin-bottom:0.75rem;"><strong>Job:</strong> Configures the build system. Specifies WPILib version, vendor libraries, compile and deploy settings.</p>
+        <p style="font-size:0.875rem; color:var(--mid); margin-bottom:0.75rem;"><strong>When you add AdvantageKit</strong> via <code>WPILib: Manage Vendor Libraries</code>, it edits this file automatically. Rarely touched by hand.</p>
+        <p style="font-size:0.875rem; color:var(--mid);"><strong>If your build fails mysteriously</strong> — check here first. Mismatched versions or missing vendor deps are usually the culprit.</p>
       </div>
 
     </div>
 
-    <h2>How the files connect</h2>
-    <p>The files aren't independent — they call each other in a specific order every loop cycle.</p>
+    <h2>How the boot sequence works</h2>
+    <p>The files don't run independently — they start each other in a fixed order every time the robot powers on.</p>
+
+    <div style="background:var(--code-bg); border:1px solid var(--code-border); border-radius:var(--radius); padding:1.25rem; margin:0.75rem 0; overflow-x:auto;">
+      <svg viewBox="0 0 560 220" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:560px;display:block;margin:0 auto;">
+        <defs>
+          <marker id="arr" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+            <polygon points="0 0, 8 3, 0 6" fill="#1D6A72"/>
+          </marker>
+        </defs>
+        <!-- Boxes -->
+        <rect x="10"  y="85" width="100" height="38" rx="7" fill="#E1F5EE" stroke="#1D6A72" stroke-width="1.5"/>
+        <text x="60"  y="100" text-anchor="middle" font-family="'Segoe UI',sans-serif" font-size="11" font-weight="700" fill="#1D6A72">Main.java</text>
+        <text x="60"  y="115" text-anchor="middle" font-family="'Cascadia Code','Consolas',monospace" font-size="9" fill="#444">startRobot()</text>
+
+        <rect x="145" y="85" width="110" height="38" rx="7" fill="#E1F5EE" stroke="#1D6A72" stroke-width="1.5"/>
+        <text x="200" y="100" text-anchor="middle" font-family="'Segoe UI',sans-serif" font-size="11" font-weight="700" fill="#1D6A72">Robot.java</text>
+        <text x="200" y="115" text-anchor="middle" font-family="'Cascadia Code','Consolas',monospace" font-size="9" fill="#444">constructor</text>
+
+        <rect x="290" y="85" width="125" height="38" rx="7" fill="#EEEDFE" stroke="#4A3B8C" stroke-width="1.5"/>
+        <text x="352" y="100" text-anchor="middle" font-family="'Segoe UI',sans-serif" font-size="11" font-weight="700" fill="#4A3B8C">RobotContainer</text>
+        <text x="352" y="115" text-anchor="middle" font-family="'Cascadia Code','Consolas',monospace" font-size="9" fill="#444">subsystems + bindings</text>
+
+        <rect x="450" y="85" width="100" height="38" rx="7" fill="#FEF3E2" stroke="#92600A" stroke-width="1.5"/>
+        <text x="500" y="100" text-anchor="middle" font-family="'Segoe UI',sans-serif" font-size="11" font-weight="700" fill="#92600A">Constants.java</text>
+        <text x="500" y="115" text-anchor="middle" font-family="'Cascadia Code','Consolas',monospace" font-size="9" fill="#444">values read</text>
+
+        <!-- Loop box -->
+        <rect x="100" y="160" width="220" height="38" rx="7" fill="#1D6A72" stroke="none"/>
+        <text x="210" y="177" text-anchor="middle" font-family="'Segoe UI',sans-serif" font-size="10" font-weight="700" fill="white">Every 20ms: robotPeriodic()</text>
+        <text x="210" y="191" text-anchor="middle" font-family="'Cascadia Code','Consolas',monospace" font-size="9" fill="#9FE1CB">CommandScheduler.getInstance().run()</text>
+
+        <!-- Arrows startup -->
+        <line x1="110" y1="104" x2="143" y2="104" stroke="#1D6A72" stroke-width="1.5" marker-end="url(#arr)"/>
+        <line x1="255" y1="104" x2="288" y2="104" stroke="#1D6A72" stroke-width="1.5" marker-end="url(#arr)"/>
+        <line x1="415" y1="104" x2="448" y2="104" stroke="#1D6A72" stroke-width="1.5" marker-end="url(#arr)"/>
+
+        <!-- Arrow to loop -->
+        <line x1="200" y1="123" x2="200" y2="158" stroke="#1D6A72" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+
+        <!-- Labels -->
+        <text x="280" y="20" text-anchor="middle" font-family="'Segoe UI',sans-serif" font-size="10" fill="#666">Boot sequence (runs once)</text>
+        <line x1="10" y1="25" x2="550" y2="25" stroke="#CCCCCC" stroke-width="0.75"/>
+        <text x="280" y="148" text-anchor="middle" font-family="'Segoe UI',sans-serif" font-size="10" fill="#666">Then loops forever ↓</text>
+      </svg>
+    </div>
 
     <div class="chat-thread">
       <div class="bubble bubble-q">
@@ -140,26 +389,23 @@
       </div>
       <div class="bubble bubble-a">
         <div class="bubble-who">Good catch</div>
-        LoggedRobot extends TimedRobot — it adds AdvantageKit's logging wrapper around each loop cycle. When we add AdvantageKit to our project, we change <code>extends TimedRobot</code> to <code>extends LoggedRobot</code>. All the lifecycle methods work the same way. We just get logging for free.
+        LoggedRobot extends TimedRobot — it wraps each loop cycle with AdvantageKit logging. When we add AdvantageKit we change <code>extends TimedRobot</code> to <code>extends LoggedRobot</code>. All lifecycle methods work the same. You just get logging for free.
       </div>
     </div>
 
     <div class="hf-box hf-sidebar">
-      <span class="hf-label">There are no dumb questions</span>
-      <p><strong>Q: Can I put everything in Robot.java and skip the other files?</strong></p>
-      <p>Technically yes. It will work for about two weeks. Then you'll have 800 lines of Robot.java, two programmers editing the same file, and merge conflicts that make everyone cry. The structure exists for a reason.</p>
-      <p><strong>Q: What's the vendordeps folder?</strong></p>
-      <p>JSON files that tell the build system where to download vendor libraries like AdvantageKit, CTRE Phoenix, or REV hardware. When you run <code>WPILib: Manage Vendor Libraries</code>, it creates these files automatically.</p>
-      <p><strong>Q: Do I need to understand build.gradle?</strong></p>
-      <p>Not deeply. Know that it exists, know that vendor libraries affect it, and know that if the build breaks mysteriously — check here first.</p>
+      <span class="hf-label">Common questions</span>
+      <p><strong>Can I put everything in Robot.java?</strong> Technically yes. It works for about two weeks. Then you have 800 lines, two programmers editing the same file, and merge conflicts that make everyone cry.</p>
+      <p><strong>What's the vendordeps folder?</strong> JSON files telling the build system where to download vendor libraries. Created automatically by <code>WPILib: Manage Vendor Libraries</code>.</p>
+      <p><strong>Do I need to understand build.gradle?</strong> Know it exists, know vendor libraries affect it, know to check it when the build breaks mysteriously.</p>
     </div>
 
     <div class="hf-box hf-brain">
-      <span class="hf-label">Brain power — before you move on</span>
-      <p>Without looking at anything: if a command doesn't run when you press a button, which file is the first place you'd check? Write down your answer before moving to Part 2.</p>
+      <span class="hf-label">Before you move on</span>
+      <p>Without looking: if a command doesn't run when you press a button, which file do you check first? Write it down before moving to Part 2.</p>
     </div>
 
-  </div><!-- /section-concept -->
+  </div><!-- /section-files -->
 
 
   <!-- ═══════════════════════════════════════════════════════
@@ -168,45 +414,39 @@
   <div class="lesson-section" id="section-simulator">
 
     <div class="hf-box hf-brain">
-      <span class="hf-label">Brain Power answer — from the end of Part 1</span>
-      <p>If a command doesn't run when you press a button, check <strong>RobotContainer first</strong> — that's where button bindings live. If the binding is there and it still doesn't work, check that <code>CommandScheduler.getInstance().run()</code> is actually in <code>robotPeriodic()</code>. No scheduler call = no commands ever run, no matter how good your bindings are.</p>
+      <span class="hf-label">Answer from Part 1</span>
+      <p>Check <strong>RobotContainer first</strong> — button bindings live there. If the binding exists and still nothing happens, check that <code>CommandScheduler.getInstance().run()</code> is in <code>robotPeriodic()</code>. No scheduler call = no commands, ever, no matter how perfect your bindings are.</p>
     </div>
-    
+
     <p>Before you ever touch the XRP, you need to be comfortable in the simulator. This is where you'll spend most of your development time. Real hardware is for verifying — simulation is for building.</p>
 
-    <div class="hf-box hf-brain">
-      <span class="hf-label">Your brain is probably thinking this right now</span>
-      <p>"The simulator isn't a real robot. Why would I care about simulated data?"</p>
-      <p>Because 90% of bugs are logic bugs, not hardware bugs. The simulator catches them faster, cheaper, and without risk of the robot driving into the scoring table in front of the head referee.</p>
-    </div>
-
-    <h2>Step 1 — Launch the simulator</h2>
+    <h2>Launch the simulator</h2>
 
     <div class="hf-box hf-info">
-      <span class="hf-label">How to launch</span>
+      <span class="hf-label">Step by step</span>
       <p><strong>1.</strong> Press <code>Ctrl+Shift+P</code></p>
-      <p><strong>2.</strong> Type <code>WPILib: Simulate Robot Code</code> and press Enter</p>
-      <p><strong>3.</strong> A dialog appears asking which extensions to load. Check <strong>halsim_gui</strong> and click OK</p>
-      <p><strong>4.</strong> Wait for the build. The Robot Simulation window opens automatically.</p>
+      <p><strong>2.</strong> Type <code>WPILib: Simulate Robot Code</code> → Enter</p>
+      <p><strong>3.</strong> Dialog asks which extensions to load — check <strong>halsim_gui</strong> → OK</p>
+      <p><strong>4.</strong> Wait for build. The Robot Simulation window opens automatically.</p>
     </div>
 
     <div class="hf-box hf-warning">
-      <span class="hf-label">Common mistake</span>
-      <p>If the simulation window opens but nothing seems to work — check the <strong>System Console</strong> panel first. Errors print there. "Nothing is happening" and "there is an error" look identical from the outside.</p>
+      <span class="hf-label">If nothing seems to work</span>
+      <p>Check the <strong>System Console</strong> panel first. Errors print there. "Nothing is happening" and "there is an error" look identical from the outside.</p>
     </div>
 
-    <h2>Step 2 — Understand the simulation GUI panels</h2>
+    <h2>The simulation GUI panels</h2>
 
     <div class="info-grid">
       <div class="info-card">
         <h4>Robot State</h4>
         <p>Enable/disable the robot. Switch between Teleop, Auto, and Test modes.</p>
-        <p class="aside">If you forget to enable — nothing moves. This is the #1 sim confusion.</p>
+        <p class="aside">Forgetting to enable is the #1 sim confusion.</p>
       </div>
       <div class="info-card">
         <h4>Joysticks</h4>
         <p>Map keyboard or real controller inputs to robot joystick slots.</p>
-        <p class="aside">Keyboard 0 is always available. Drag it to Joystick[0].</p>
+        <p class="aside">Drag Keyboard 0 to Joystick[0].</p>
       </div>
       <div class="info-card">
         <h4>System Console</h4>
@@ -215,157 +455,293 @@
       </div>
       <div class="info-card">
         <h4>NetworkTables</h4>
-        <p>Shows all values being published to NetworkTables in real time.</p>
-        <p class="aside">AdvantageKit data appears here as "AdvantageKit/..."</p>
+        <p>Shows all values published to NetworkTables in real time.</p>
+        <p class="aside">AdvantageKit data appears as "AdvantageKit/…"</p>
       </div>
     </div>
 
-    <h2>Step 3 — Connect AdvantageScope</h2>
+    <h2>Connect AdvantageScope</h2>
 
     <div class="hf-box hf-info">
-      <span class="hf-label">Connect AdvantageScope to the simulator</span>
-      <p><strong>1.</strong> Open AdvantageScope (install from GitHub if not already installed)</p>
-      <p><strong>2.</strong> File &rarr; <strong>Connect to Simulator</strong> (or press <code>Ctrl+K</code>)</p>
-      <p><strong>3.</strong> The left panel populates with log keys — you should see <code>AdvantageKit/</code> appear</p>
-      <p><strong>4.</strong> Connect AdvantageScope BEFORE enabling the robot — otherwise you miss the first seconds of data</p>
+      <span class="hf-label">Connect to the simulator</span>
+      <p><strong>1.</strong> Open AdvantageScope (bundled with WPILib Game Tools — no separate install)</p>
+      <p><strong>2.</strong> File → <strong>Connect to Simulator</strong> (or <code>Ctrl+K</code>)</p>
+      <p><strong>3.</strong> Left panel populates — look for the <code>AdvantageKit/</code> folder</p>
+      <p><strong>4.</strong> Connect <em>before</em> enabling the robot so you don't miss the first seconds of data</p>
     </div>
 
-    <h2>Step 4 — Set up keyboard driving</h2>
-
-    <p>You can drive the simulated robot using your keyboard. Here's the exact setup:</p>
+    <h2>Set up keyboard driving</h2>
 
     <div class="hf-box hf-info">
       <span class="hf-label">Keyboard joystick setup</span>
-      <p><strong>1.</strong> In the Simulation GUI, find the <strong>Joysticks</strong> panel</p>
-      <p><strong>2.</strong> Find <strong>Keyboard 0</strong> in the available inputs list</p>
-      <p><strong>3.</strong> Drag it to the <strong>Joystick[0]</strong> slot</p>
-      <p><strong>4.</strong> Go to <strong>Robot State</strong> panel &rarr; select <strong>Teleoperated</strong> &rarr; click <strong>Enable</strong></p>
-      <p><strong>5.</strong> Click back on the Simulation GUI window (keyboard input only works when this window is focused)</p>
+      <p><strong>1.</strong> In the Simulation GUI find the <strong>Joysticks</strong> panel</p>
+      <p><strong>2.</strong> Drag <strong>Keyboard 0</strong> to the <strong>Joystick[0]</strong> slot</p>
+      <p><strong>3.</strong> Robot State panel → select <strong>Teleoperated</strong> → click <strong>Enable</strong></p>
+      <p><strong>4.</strong> Click back on the Simulation GUI window — keyboard input only works when it's focused</p>
     </div>
 
     <div class="hf-box hf-sidebar">
-      <span class="hf-label">Keyboard default mappings</span>
-      <p><strong>W</strong> - Forward (Left stick Y negative)</p>
-      <p><strong>S</strong> - Backward (Left stick Y positive)</p>
-      <p><strong>A</strong> - Turn left (Left stick X negative)</p>
-      <p><strong>D</strong> - Turn right (Left stick X positive)</p>
+      <span class="hf-label">Default keyboard mappings</span>
+      <p><strong>W</strong> — Forward &nbsp; <strong>S</strong> — Backward &nbsp; <strong>A</strong> — Turn left &nbsp; <strong>D</strong> — Turn right</p>
       <p>These match the default arcade drive command in RobotContainer.</p>
     </div>
 
     <div class="hf-box hf-sidebar">
-      <span class="hf-label">Using a real controller instead</span>
-      <p><strong>1.</strong> Plug in your USB controller BEFORE launching the simulator</p>
+      <span class="hf-label">Using a real controller</span>
+      <p><strong>1.</strong> Plug in USB controller <em>before</em> launching the simulator</p>
       <p><strong>2.</strong> It appears automatically in the Joysticks panel</p>
       <p><strong>3.</strong> Drag it to Joystick[0]</p>
-      <p><strong>4.</strong> Left stick Y = forward/backward, Left stick X = turn</p>
-      <p>Move the sticks and watch the axis values change in the Joysticks panel to confirm it's working.</p>
+      <p><strong>4.</strong> Move the sticks — watch axis values update in the Joysticks panel to confirm it's working</p>
     </div>
 
-    <h2>Step 5 — Watch data in AdvantageScope</h2>
+    <h2>XRP hardware ports</h2>
+    <p>When we move to physical hardware, these are the port-to-subsystem mappings for the Bear Bots XRP.</p>
 
-    <div class="hf-box hf-info">
-      <span class="hf-label">Viewing live data while driving</span>
-      <p><strong>1.</strong> In AdvantageScope's left panel, find the <code>Drive/</code> folder and expand it</p>
-      <p><strong>2.</strong> Drag <code>LeftPositionMeters</code> to the graph area on the right</p>
-      <p><strong>3.</strong> Drag <code>GyroYawDegrees</code> to a second graph tab</p>
-      <p><strong>4.</strong> Drive with keyboard or controller</p>
-      <p><strong>5.</strong> Watch the graphs update in real time as the robot moves</p>
-      <p>If graphs are flat while driving - <code>updateInputs()</code> has a bug.</p>
-      <p>If graphs jump immediately to big numbers - check unit conversion (inches vs meters).</p>
+    <table class="hw-table">
+      <thead>
+        <tr>
+          <th>Device</th>
+          <th>Port</th>
+          <th>Subsystem</th>
+          <th>Direction</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Right drive motor</td><td>Motor 0</td><td class="hw-plain">DriveSubsystem</td><td class="hw-plain">Output</td></tr>
+        <tr><td>Left drive motor</td><td>Motor 1</td><td class="hw-plain">DriveSubsystem</td><td class="hw-plain">Output</td></tr>
+        <tr><td>Right encoder</td><td>Motor 0 built-in</td><td class="hw-plain">DriveSubsystem</td><td class="hw-plain">Input</td></tr>
+        <tr><td>Left encoder</td><td>Motor 1 built-in</td><td class="hw-plain">DriveSubsystem</td><td class="hw-plain">Input</td></tr>
+        <tr><td>Gyro</td><td>XRPGyro</td><td class="hw-plain">DriveSubsystem</td><td class="hw-plain">Input</td></tr>
+        <tr><td>Arm servo</td><td>Device 4 → Servo 1</td><td class="hw-plain">ArmSubsystem</td><td class="hw-plain">Output</td></tr>
+      </tbody>
+    </table>
+
+    <div class="hf-box hf-warning">
+      <span class="hf-label">Motor 0 is the RIGHT motor</span>
+      <p>This is counterintuitive. Motor 0 = right, Motor 1 = left. Flag this in your mental model now — it will bite you if you forget.</p>
     </div>
 
     <div class="hf-box hf-brain">
       <span class="hf-label">Do this right now</span>
-      <p>Launch the simulator. Connect AdvantageScope. Enable the robot in Teleop mode. Drive using the keyboard. Watch at least one value move in AdvantageScope.</p>
-      <p>Don't move on until you've done this. The rest of the curriculum assumes you're comfortable with this workflow.</p>
+      <p>Launch the simulator. Connect AdvantageScope. Enable in Teleop. Drive with the keyboard. Watch at least one value move in AdvantageScope. Don't move on until you've done this.</p>
     </div>
 
   </div><!-- /section-simulator -->
 
 
   <!-- ═══════════════════════════════════════════════════════
-       PART 3 — TIERED CHALLENGE
+       PART 3 — READ THE DATA
        ═══════════════════════════════════════════════════════ -->
-  <div class="lesson-section" id="section-challenge">
+  <div class="lesson-section" id="section-data">
 
-    <p>Time to use the WPILib tools. All three tiers use <code>Ctrl+Shift+P</code> as the starting point — get comfortable with the command palette. It's the fastest way to do almost everything in VS Code.</p>
+    <p>The simulator is running. Now learn to read what the robot is actually doing — without looking at the robot.</p>
 
-    <div class="tier-tabs">
-      <button class="tier-tab bronze active" data-tier="bronze">Bronze - I used the palette once</button>
-      <button class="tier-tab silver" data-tier="silver">Silver - I know what these files do</button>
-      <button class="tier-tab gold" data-tier="gold">Gold - I could teach this</button>
+    <h2>Graph Racing</h2>
+    <p>Everyone sets up the same two graphs, then we race to see whose data looks the most interesting.</p>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">Set up your graphs</span>
+      <p><strong>1.</strong> In AdvantageScope's left panel, expand the <code>Drive/</code> folder</p>
+      <p><strong>2.</strong> Drag <code>LeftPositionMeters</code> to the graph area</p>
+      <p><strong>3.</strong> Drag <code>RightPositionMeters</code> onto the same graph tab</p>
+      <p><strong>4.</strong> Enable in Teleop and start driving</p>
     </div>
 
-    <div>
-
-      <div class="tier-panel bronze active">
-        <span class="tier-label">Bronze - explore and observe</span>
-        <p>Open your new WPILib project and complete each task using only the command palette. Write down what happens after each one.</p>
-        <ul class="task-list">
-          <li>Press <code>Ctrl+Shift+P</code> and type <code>WPILib: Build Robot Code</code>. Does it succeed? What does the output say?</li>
-          <li>Press <code>Ctrl+Shift+P</code> and type <code>WPILib: Simulate Robot Code</code>. Select halsim_gui. What windows open?</li>
-          <li>In the Simulation GUI, drag Keyboard 0 to Joystick[0]. Enable in Teleop. Press W. What happens in the Joysticks panel?</li>
-          <li>Connect AdvantageScope to the simulator. What folders appear in the left panel?</li>
-        </ul>
-        <div class="toggle-row">
-          <button class="toggle-btn" data-target="b1-hint" data-open="Show hint" data-closed="Hide hint">Show hint</button>
-        </div>
-        <div class="toggle-content hint" id="b1-hint">
-          If the build fails, check the System Console for errors. If AdvantageScope shows nothing, make sure the robot is enabled in the Simulation GUI — disabled robots don't publish data.
-        </div>
-      </div>
-
-      <div class="tier-panel silver">
-        <span class="tier-label">Silver - add AdvantageKit to a fresh project</span>
-        <p>Start with a brand new WPILib project and add AdvantageKit using the vendor library tool. Then verify the setup works.</p>
-        <ul class="task-list">
-          <li>Create a new project: <code>Ctrl+Shift+P</code> &rarr; <code>WPILib: Create a new project</code> &rarr; Command Robot Skeleton (Advanced)</li>
-          <li>Add AdvantageKit: <code>Ctrl+Shift+P</code> &rarr; <code>WPILib: Manage Vendor Libraries</code> &rarr; Install new library (online) &rarr; paste the AdvantageKit URL</li>
-          <li>In Robot.java, change <code>extends TimedRobot</code> to <code>extends LoggedRobot</code> and add the required imports</li>
-          <li>Add the Mode enum to Constants.java following the pattern in your reference card</li>
-          <li>Build and simulate. Does it start without errors?</li>
-        </ul>
-        <div class="toggle-row">
-          <button class="toggle-btn" data-target="s1-hint" data-open="Show hint" data-closed="Hide hint">Show hint</button>
-          <button class="toggle-btn" data-target="s1-ans" data-open="Show AdvantageKit URL" data-closed="Hide URL">Show AdvantageKit URL</button>
-        </div>
-        <div class="toggle-content hint" id="s1-hint">
-          After changing to LoggedRobot, you'll need to add the Logger setup block in the Robot constructor. Check your reference card for the three-mode switch pattern. If you get import errors, let VS Code's quick fix (Ctrl+.) resolve them automatically.
-        </div>
-        <div class="toggle-content answer" id="s1-ans">
-          https://raw.githubusercontent.com/Mechanical-Advantage/AdvantageKit/main/vendordep/AdvantageKit.json
-        </div>
-      </div>
-
-      <div class="tier-panel gold">
-        <span class="tier-label">Gold - explain it to someone else</span>
-        <p>You understand the files. Now explain them. Write a one-paragraph description of each file — what it does, what breaks if it's missing, and one thing a new student would most likely get wrong about it. Use only plain English — no code.</p>
-        <ul class="task-list">
-          <li>Write your explanations for: Main.java, Robot.java, RobotContainer.java, Constants.java</li>
-          <li>Compare your explanations with a teammate. Where do you disagree? Who is right?</li>
-          <li>Bonus: Draw a diagram showing how data flows from a button press to a motor output, naming every file it passes through</li>
-        </ul>
-        <div class="toggle-row">
-          <button class="toggle-btn" data-target="g1-hint" data-open="Show hint" data-closed="Hide hint">Show hint</button>
-        </div>
-        <div class="toggle-content hint" id="g1-hint">
-          For the diagram bonus: button press &rarr; RobotContainer (binding) &rarr; Command scheduled &rarr; CommandScheduler (in Robot.java) &rarr; Subsystem periodic() &rarr; IO method &rarr; hardware. Every file is in that chain somewhere.
-        </div>
-      </div>
-
+    <div class="hf-box hf-brain">
+      <span class="hf-label">Prediction round</span>
+      <p>Before each maneuver, the class predicts what the graph will look like. Closest prediction wins candy.</p>
+      <p>Maneuver 1: drive straight forward for 2 seconds.<br>
+         Maneuver 2: spin in place for 2 seconds.<br>
+         Maneuver 3: instructor's mystery pattern — describe it only after everyone draws their prediction.</p>
     </div>
 
-  </div><!-- /section-challenge -->
+    <h2>What is the robot doing?</h2>
+    <p>Instructor drives. You watch <em>only</em> the encoder graphs — no watching the 3D model.</p>
+
+    <div class="chat-thread">
+      <div class="bubble bubble-q">
+        <div class="bubble-who">Student</div>
+        Both encoder values went up at the same rate. What did the robot do?
+      </div>
+      <div class="bubble bubble-a">
+        <div class="bubble-who">Think about it</div>
+        Both wheels turned the same direction at the same speed. That's a straight line forward. If the robot were turning, one encoder would go up faster than the other — or one would go negative.
+      </div>
+      <div class="bubble bubble-q">
+        <div class="bubble-who">Student</div>
+        So I can tell the robot is turning just by comparing left and right?
+      </div>
+      <div class="bubble bubble-a">
+        <div class="bubble-who">That's odometry</div>
+        The difference between left and right encoder values tells you rotation rate. That's literally how real FRC robots estimate their position on the field without GPS. You just discovered odometry.
+      </div>
+    </div>
+
+    <div class="hf-box hf-sidebar">
+      <span class="hf-label">Three rounds</span>
+      <p><strong>Round 1:</strong> Straight line — both encoders increase equally</p>
+      <p><strong>Round 2:</strong> Spin in place — encoders go opposite directions</p>
+      <p><strong>Round 3:</strong> Mystery — describe what you see, then reveal the maneuver</p>
+    </div>
+
+    <div class="hf-box hf-brain">
+      <span class="hf-label">Before Part 4</span>
+      <p>In your own words: how would you tell from encoder data alone whether the robot drove straight or turned? No code — just the concept.</p>
+    </div>
+
+  </div><!-- /section-data -->
 
 
   <!-- ═══════════════════════════════════════════════════════
-       PART 4 — BROKEN ROBOT LAB
+       PART 4 — HANDS-ON CHALLENGES
+       ═══════════════════════════════════════════════════════ -->
+  <div class="lesson-section" id="section-challenges">
+
+    <p>Three hands-on activities. Work at your own pace — all three have extensions if you finish early.</p>
+
+    <h2>Activity 1 — File Prediction Game</h2>
+    <p>Pairs. Each round: drag the tiles to the correct targets. No peeking at code.</p>
+
+    <div class="fp-widget" id="fp-widget">
+      <div class="fp-round-tabs">
+        <button class="fp-round-tab active" onclick="fpSwitchRound('r1', this)">Round 1 — File → Role</button>
+        <button class="fp-round-tab" onclick="fpSwitchRound('r2', this)">Round 2 — Snippet → File</button>
+      </div>
+
+      <!-- Round 1: file name → role description -->
+      <div class="fp-round active" id="fp-r1">
+        <div class="fp-round-label">Tap a file name, then tap its role</div>
+        <div class="fp-instruction">Tap a tile to select it (it turns teal), then tap a target to place it. Tap a placed tile to remove it.</div>
+        <div class="fp-tiles" id="fp-r1-tiles">
+          <div class="fp-tile" data-value="Main.java">Main.java</div>
+          <div class="fp-tile" data-value="Robot.java">Robot.java</div>
+          <div class="fp-tile" data-value="RobotContainer.java">RobotContainer.java</div>
+          <div class="fp-tile" data-value="Constants.java">Constants.java</div>
+          <div class="fp-tile" data-value="build.gradle">build.gradle</div>
+        </div>
+        <div class="fp-targets" id="fp-r1-targets">
+          <div class="fp-target" data-answer="Robot.java">
+            <span class="fp-target-label">Lifecycle manager</span>
+            <div class="fp-drop-zone"></div>
+          </div>
+          <div class="fp-target" data-answer="RobotContainer.java">
+            <span class="fp-target-label">Subsystems + button bindings</span>
+            <div class="fp-drop-zone"></div>
+          </div>
+          <div class="fp-target" data-answer="Constants.java">
+            <span class="fp-target-label">All the magic numbers</span>
+            <div class="fp-drop-zone"></div>
+          </div>
+          <div class="fp-target" data-answer="Main.java">
+            <span class="fp-target-label">First thing that runs on boot</span>
+            <div class="fp-drop-zone"></div>
+          </div>
+          <div class="fp-target" data-answer="build.gradle">
+            <span class="fp-target-label">Vendor library config</span>
+            <div class="fp-drop-zone"></div>
+          </div>
+        </div>
+        <div class="fp-controls">
+          <button class="fp-check-btn" onclick="fpCheck('r1')">Check answers</button>
+          <button class="fp-reset-btn" onclick="fpReset('r1')">Reset</button>
+          <span class="fp-score" id="fp-r1-score"></span>
+        </div>
+        <div class="fp-feedback" id="fp-r1-feedback"></div>
+      </div>
+
+      <!-- Round 2: code snippet → file -->
+      <div class="fp-round" id="fp-r2">
+        <div class="fp-round-label">Tap a snippet, then tap the file it belongs in</div>
+        <div class="fp-instruction">Tap a tile to select it (it turns teal), then tap a target to place it. Tap a placed tile to remove it.</div>
+        <div class="fp-tiles" id="fp-r2-tiles">
+          <div class="fp-tile" data-value="snip-a" style="font-family:var(--font-mono);font-size:0.78rem;">CommandScheduler.getInstance().run()</div>
+          <div class="fp-tile" data-value="snip-b" style="font-family:var(--font-mono);font-size:0.78rem;">new RobotContainer()</div>
+          <div class="fp-tile" data-value="snip-c" style="font-family:var(--font-mono);font-size:0.78rem;">controller.leftBumper().onTrue(...)</div>
+          <div class="fp-tile" data-value="snip-d" style="font-family:var(--font-mono);font-size:0.78rem;">static final double kMaxOutput = 1.0</div>
+          <div class="fp-tile" data-value="snip-e" style="font-family:var(--font-mono);font-size:0.78rem;">RobotBase.startRobot(Robot::new)</div>
+        </div>
+        <div class="fp-targets" id="fp-r2-targets">
+          <div class="fp-target" data-answer="snip-e">
+            <span class="fp-target-label">Main.java</span>
+            <div class="fp-drop-zone"></div>
+          </div>
+          <div class="fp-target" data-answer="snip-a">
+            <span class="fp-target-label">Robot.java</span>
+            <div class="fp-drop-zone"></div>
+          </div>
+          <div class="fp-target" data-answer="snip-b">
+            <span class="fp-target-label">Robot.java constructor</span>
+            <div class="fp-drop-zone"></div>
+          </div>
+          <div class="fp-target" data-answer="snip-c">
+            <span class="fp-target-label">RobotContainer.java</span>
+            <div class="fp-drop-zone"></div>
+          </div>
+          <div class="fp-target" data-answer="snip-d">
+            <span class="fp-target-label">Constants.java</span>
+            <div class="fp-drop-zone"></div>
+          </div>
+        </div>
+        <div class="fp-controls">
+          <button class="fp-check-btn" onclick="fpCheck('r2')">Check answers</button>
+          <button class="fp-reset-btn" onclick="fpReset('r2')">Reset</button>
+          <span class="fp-score" id="fp-r2-score"></span>
+        </div>
+        <div class="fp-feedback" id="fp-r2-feedback"></div>
+      </div>
+    </div><!-- /fp-widget -->
+
+    <h2>Activity 2 — Constants Scavenger Hunt</h2>
+    <p>Six magic numbers are hiding in the project — hardcoded directly in subsystem files instead of Constants.java where they belong. Find each one, move it to Constants.java, and check it off.</p>
+
+    <ul class="scav-list">
+      <li><input type="checkbox"> <span>A motor speed limit hardcoded as <code>0.8</code> in <code>DriveSubsystem.java</code></span></li>
+      <li><input type="checkbox"> <span>A joystick deadband value <code>0.1</code> hardcoded in <code>RobotContainer.java</code></span></li>
+      <li><input type="checkbox"> <span>A max arm angle <code>120</code> (degrees) hardcoded in <code>ArmSubsystem.java</code></span></li>
+      <li><input type="checkbox"> <span>A conversion factor <code>0.1524</code> (wheel circumference in meters) hardcoded in <code>DriveSubsystem.java</code></span></li>
+      <li><input type="checkbox"> <span>A delay time <code>0.5</code> (seconds) hardcoded in an auto command</span></li>
+      <li><input type="checkbox"> <span>A string <code>"Robot"</code> used as a Logger key, hardcoded in <code>Robot.java</code></span></li>
+    </ul>
+
+    <div class="hf-box hf-brain">
+      <span class="hf-label">When you're done</span>
+      <p>Build the project. It should still compile. If it doesn't, you moved something but didn't update the reference. Find the broken reference and fix it.</p>
+    </div>
+
+    <h2>Activity 3 — Add Your Name to the Robot</h2>
+    <p>Make the robot log who's driving it. One line of code.</p>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">The task</span>
+      <p><strong>1.</strong> In <code>Constants.java</code>, add: <code>public static final String PILOT_NAME = "Your Name";</code></p>
+      <p><strong>2.</strong> In <code>Robot.java</code> inside <code>robotPeriodic()</code>, add: <code>Logger.recordOutput("Pilot", Constants.PILOT_NAME);</code></p>
+      <p><strong>3.</strong> Run the simulator. Open AdvantageScope. Find <code>Pilot</code> in the log tree.</p>
+    </div>
+
+    <div class="hf-box hf-sidebar">
+      <span class="hf-label">Extensions — if you finish early</span>
+      <p><strong>Loop count:</strong> Add a counter that increments each loop and logs as <code>"LoopCount"</code></p>
+      <p><strong>Timer:</strong> Log <code>Timer.getFPGATimestamp()</code> as <code>"UptimeSeconds"</code></p>
+      <p><strong>Boolean:</strong> Log <code>true</code> as <code>"RobotAlive"</code> — what does it look like in AdvantageScope?</p>
+      <p><strong>Favorite number:</strong> Log any integer as <code>"FavoriteNumber"</code></p>
+    </div>
+
+  </div><!-- /section-challenges -->
+
+
+  <!-- ═══════════════════════════════════════════════════════
+       PART 5 — BROKEN ROBOT LAB
        ═══════════════════════════════════════════════════════ -->
   <div class="lesson-section" id="section-lab">
 
     <p class="bug-lab-intro">
-      This Robot.java compiles. The simulator launches. And yet the robot does absolutely nothing when you try to drive it. There are <strong>3 bugs</strong> hiding in the highlighted lines. Click each one to find out what went wrong.
+      Four robots. Four different files. Each one compiles and launches — and then something goes wrong. Your job: read the symptom, find the bug, fix it. Each bug lives in a <strong>different file</strong>.
     </p>
+
+    <div class="hf-box hf-warning">
+      <span class="hf-label">Rules</span>
+      <p>Hints cost one candy each. You have to ask — they won't be offered. Work in pairs for Bugs 1–2, solo for Bugs 3–4.</p>
+    </div>
 
     <div class="bug-lab" data-lab="lesson-02">
 
@@ -374,80 +750,514 @@
         <div class="bug-dot"></div>
         <div class="bug-dot"></div>
         <div class="bug-dot"></div>
-        <span class="bug-progress-count">0 / 3</span>
+        <div class="bug-dot"></div>
+        <span class="bug-progress-count">0 / 4</span>
       </div>
 
-      <div class="code-lab">
-        <div class="code-lab-line"><span class="line-num">1</span><span class="line-code"><span class="kw">public class</span> Robot <span class="kw">extends</span> TimedRobot {</span></div>
-        <div class="code-lab-line bug-line" data-bug="1"><span class="line-num">2</span><span class="line-code">&nbsp;&nbsp;<span class="cm">// extends TimedRobot — logging will work fine here</span></span></div>
-        <div class="code-lab-line"><span class="line-num">3</span><span class="line-code">&nbsp;&nbsp;<span class="kw">private</span> RobotContainer robotContainer;</span></div>
-        <div class="code-lab-line"><span class="line-num">4</span><span class="line-code">&nbsp;</span></div>
-        <div class="code-lab-line"><span class="line-num">5</span><span class="line-code">&nbsp;&nbsp;<span class="kw">public</span> Robot() {</span></div>
-        <div class="code-lab-line"><span class="line-num">6</span><span class="line-code">&nbsp;&nbsp;&nbsp;&nbsp;Logger.start();</span></div>
-        <div class="code-lab-line"><span class="line-num">7</span><span class="line-code">&nbsp;&nbsp;&nbsp;&nbsp;robotContainer = <span class="kw">new</span> RobotContainer();</span></div>
-        <div class="code-lab-line"><span class="line-num">8</span><span class="line-code">&nbsp;&nbsp;}</span></div>
-        <div class="code-lab-line"><span class="line-num">9</span><span class="line-code">&nbsp;</span></div>
-        <div class="code-lab-line"><span class="line-num">10</span><span class="line-code">&nbsp;&nbsp;<span class="kw">@Override</span></span></div>
-        <div class="code-lab-line"><span class="line-num">11</span><span class="line-code">&nbsp;&nbsp;<span class="kw">public void</span> robotPeriodic() {</span></div>
-        <div class="code-lab-line bug-line" data-bug="2"><span class="line-num">12</span><span class="line-code">&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm">// TODO: run the command scheduler here sometime</span></span></div>
-        <div class="code-lab-line"><span class="line-num">13</span><span class="line-code">&nbsp;&nbsp;}</span></div>
-        <div class="code-lab-line"><span class="line-num">14</span><span class="line-code">&nbsp;</span></div>
-        <div class="code-lab-line"><span class="line-num">15</span><span class="line-code">&nbsp;&nbsp;<span class="kw">@Override</span></span></div>
-        <div class="code-lab-line"><span class="line-num">16</span><span class="line-code">&nbsp;&nbsp;<span class="kw">public void</span> teleopInit() {</span></div>
-        <div class="code-lab-line bug-line" data-bug="3"><span class="line-num">17</span><span class="line-code">&nbsp;&nbsp;&nbsp;&nbsp;robotContainer = <span class="kw">new</span> RobotContainer(); <span class="cm">// fresh start!</span></span></div>
-        <div class="code-lab-line"><span class="line-num">18</span><span class="line-code">&nbsp;&nbsp;}</span></div>
-        <div class="code-lab-line"><span class="line-num">19</span><span class="line-code">}</span></div>
+      <!-- Bug 1 — Robot.java: extends TimedRobot -->
+      <div style="margin-bottom:1rem;">
+        <div class="hf-box hf-warning" style="margin-bottom:0.5rem;">
+          <span class="hf-label">Bug 1 symptom — Robot.java</span>
+          <p>The simulator starts. You enable in Teleop. You drive. The robot moves — but AdvantageScope shows no log data at all. The <code>AdvantageKit/</code> folder never appears.</p>
+        </div>
+        <div class="code-lab">
+          <div class="code-lab-line bug-line" data-bug="1"><span class="line-num">1</span><span class="line-code"><span class="kw">public class</span> Robot <span class="kw">extends</span> TimedRobot {</span></div>
+          <div class="code-lab-line"><span class="line-num">2</span><span class="line-code">&nbsp;&nbsp;<span class="kw">private</span> RobotContainer robotContainer;</span></div>
+          <div class="code-lab-line"><span class="line-num">3</span><span class="line-code">&nbsp;&nbsp;<span class="kw">public</span> Robot() {</span></div>
+          <div class="code-lab-line"><span class="line-num">4</span><span class="line-code">&nbsp;&nbsp;&nbsp;&nbsp;Logger.start();</span></div>
+          <div class="code-lab-line"><span class="line-num">5</span><span class="line-code">&nbsp;&nbsp;&nbsp;&nbsp;robotContainer = <span class="kw">new</span> RobotContainer();</span></div>
+          <div class="code-lab-line"><span class="line-num">6</span><span class="line-code">&nbsp;&nbsp;}</span></div>
+          <div class="code-lab-line"><span class="line-num">7</span><span class="line-code">}</span></div>
+        </div>
+        <div class="bug-reveal" data-bug="1">
+          <h4>Bug 1 — extends TimedRobot instead of LoggedRobot</h4>
+          <div class="bug-joke">Logger.start() on a TimedRobot is like installing a dashcam with no memory card. It runs. It records nothing.</div>
+          <p><code>TimedRobot</code> doesn't know about AdvantageKit. The logger attaches its hooks to <code>LoggedRobot</code>'s loop cycle. Without that, no inputs are captured — you get a driving robot with zero observability.</p>
+          <div class="bug-fix-label">Fix</div>
+          <div class="bug-fix">public class Robot extends LoggedRobot {</div>
+        </div>
       </div>
 
-      <div class="bug-reveal" data-bug="1">
-        <h4>Bug 1 - extends TimedRobot instead of LoggedRobot</h4>
-        <div class="bug-joke">The comment says "logging will work fine here." The comment is lying.</div>
-        <p>TimedRobot doesn't know anything about AdvantageKit. Extending it means Logger.start() will fail silently or throw an error, and none of your inputs will ever be logged. The fix is one word: change <code>TimedRobot</code> to <code>LoggedRobot</code>. LoggedRobot extends TimedRobot — everything else works the same.</p>
-        <div class="bug-fix-label">Fix</div>
-        <div class="bug-fix">public class Robot extends LoggedRobot {</div>
+      <!-- Bug 2 — RobotContainer.java: axes swapped -->
+      <div style="margin-bottom:1rem;">
+        <div class="hf-box hf-warning" style="margin-bottom:0.5rem;">
+          <span class="hf-label">Bug 2 symptom — RobotContainer.java</span>
+          <p>Robot drives forward when you push the joystick <em>left</em>. Pushing forward makes the robot spin. Controls feel 90 degrees rotated.</p>
+        </div>
+        <div class="code-lab">
+          <div class="code-lab-line"><span class="line-num">1</span><span class="line-code"><span class="kw">new</span> ArcadeDriveCommand(</span></div>
+          <div class="code-lab-line bug-line" data-bug="2"><span class="line-num">2</span><span class="line-code">&nbsp;&nbsp;() -> -controller.getLeftX(), <span class="cm">// forward</span></span></div>
+          <div class="code-lab-line bug-line" data-bug="2"><span class="line-num">3</span><span class="line-code">&nbsp;&nbsp;() -> -controller.getLeftY()  <span class="cm">// turn</span></span></div>
+          <div class="code-lab-line"><span class="line-num">4</span><span class="line-code">);</span></div>
+        </div>
+        <div class="bug-reveal" data-bug="2">
+          <h4>Bug 2 — Joystick axes swapped</h4>
+          <div class="bug-joke">The comments even label them correctly. The code disagrees with the comments. The comments are right.</div>
+          <p>On a standard joystick: Y axis = forward/backward, X axis = left/right. Forward input should come from <code>getLeftY()</code>, turn from <code>getLeftX()</code>. They're swapped here.</p>
+          <div class="bug-fix-label">Fix</div>
+          <div class="bug-fix">() -> -controller.getLeftY(), // forward<br>() -> -controller.getLeftX()  // turn</div>
+        </div>
       </div>
 
-      <div class="bug-reveal" data-bug="2">
-        <h4>Bug 2 - CommandScheduler never runs</h4>
-        <div class="bug-joke">The TODO has been there since the project was created. It will be there forever if no one fixes it.</div>
-        <p><code>robotPeriodic()</code> runs every 20ms but does nothing. Without <code>CommandScheduler.getInstance().run()</code>, no commands ever execute — not autonomous, not teleop driving, not button bindings. The robot boots, logs nothing, and sits there judging you.</p>
-        <div class="bug-fix-label">Fix</div>
-        <div class="bug-fix">CommandScheduler.getInstance().run();</div>
+      <!-- Bug 3 — Constants.java: kMaxOutput = 100 -->
+      <div style="margin-bottom:1rem;">
+        <div class="hf-box hf-warning" style="margin-bottom:0.5rem;">
+          <span class="hf-label">Bug 3 symptom — Constants.java</span>
+          <p>The slightest joystick movement sends the robot to full speed instantly. There's no proportional control — it's either stopped or full throttle.</p>
+        </div>
+        <div class="code-lab">
+          <div class="code-lab-line"><span class="line-num">1</span><span class="line-code"><span class="kw">public static final class</span> Drive {</span></div>
+          <div class="code-lab-line bug-line" data-bug="3"><span class="line-num">2</span><span class="line-code">&nbsp;&nbsp;<span class="kw">public static final double</span> kMaxOutput = <span class="num">100.0</span>;</span></div>
+          <div class="code-lab-line"><span class="line-num">3</span><span class="line-code">}</span></div>
+        </div>
+        <div class="bug-reveal" data-bug="3">
+          <h4>Bug 3 — kMaxOutput set to 100.0 instead of 1.0</h4>
+          <div class="bug-joke">100% sounds more powerful. It is not. Motor output is clamped to [-1, 1]. Everything above 1.0 is just 1.0 with extra steps.</div>
+          <p>Motor output values range from -1.0 (full reverse) to 1.0 (full forward). Any value multiplied by <code>100.0</code> immediately saturates the clamp. The motor sees 1.0 the instant the joystick moves at all.</p>
+          <div class="bug-fix-label">Fix</div>
+          <div class="bug-fix">public static final double kMaxOutput = 1.0;</div>
+        </div>
       </div>
 
-      <div class="bug-reveal" data-bug="3">
-        <h4>Bug 3 - RobotContainer recreated on every teleop start</h4>
-        <div class="bug-joke">"Fresh start!" it says cheerfully, destroying all your subsystems and button bindings every time teleop begins.</div>
-        <p>Creating <code>new RobotContainer()</code> in <code>teleopInit()</code> throws away the subsystems and bindings created in the constructor and builds new ones. Any state carried from autonomous is lost. Any commands running are orphaned. RobotContainer should be created exactly once — in the Robot constructor. Remove this line entirely.</p>
-        <div class="bug-fix-label">Fix</div>
-        <div class="bug-fix">// Remove line 17 entirely. RobotContainer is created once in the constructor.</div>
+      <!-- Bug 4 — DriveSubsystem.java: left motor not inverted -->
+      <div style="margin-bottom:1rem;">
+        <div class="hf-box hf-warning" style="margin-bottom:0.5rem;">
+          <span class="hf-label">Bug 4 symptom — DriveSubsystem.java</span>
+          <p>Driving "forward" makes the robot spin in place. The left encoder value goes <em>negative</em> while the right goes positive. Both motors are running but fighting each other.</p>
+        </div>
+        <div class="code-lab">
+          <div class="code-lab-line"><span class="line-num">1</span><span class="line-code"><span class="kw">private final</span> XRPMotor leftMotor  = <span class="kw">new</span> XRPMotor(<span class="num">1</span>);</span></div>
+          <div class="code-lab-line"><span class="line-num">2</span><span class="line-code"><span class="kw">private final</span> XRPMotor rightMotor = <span class="kw">new</span> XRPMotor(<span class="num">0</span>);</span></div>
+          <div class="code-lab-line"><span class="line-num">3</span><span class="line-code">&nbsp;</span></div>
+          <div class="code-lab-line"><span class="line-num">4</span><span class="line-code"><span class="kw">public</span> DriveSubsystem() {</span></div>
+          <div class="code-lab-line bug-line" data-bug="4"><span class="line-num">5</span><span class="line-code">&nbsp;&nbsp;<span class="cm">// left motor runs same direction as right</span></span></div>
+          <div class="code-lab-line"><span class="line-num">6</span><span class="line-code">&nbsp;&nbsp;rightMotor.setInverted(<span class="kw">true</span>);</span></div>
+          <div class="code-lab-line"><span class="line-num">7</span><span class="line-code">}</span></div>
+        </div>
+        <div class="bug-reveal" data-bug="4">
+          <h4>Bug 4 — Left motor not inverted</h4>
+          <div class="bug-joke">The motors face opposite directions on the chassis. Running them the same way is not cooperation. It's a disagreement with wheels.</div>
+          <p>On a differential drive, the left and right motors are mechanically mirrored. To make both wheels push forward, one motor must be inverted. Here only <code>rightMotor</code> is inverted — left runs backwards relative to right, producing a spin instead of straight motion.</p>
+          <div class="bug-fix-label">Fix</div>
+          <div class="bug-fix">leftMotor.setInverted(true);<br>rightMotor.setInverted(true);</div>
+        </div>
       </div>
 
       <div class="success-banner">
-        All 3 bugs found. Wrong base class, missing scheduler call, and accidental subsystem recreation — these are real mistakes that real teams make when setting up a new project. You'll recognize all three on sight from now on.
+        All 4 bugs found. Swapped axes, blown output constant, missing inversion, wrong base class — all real mistakes from real FRC codebases. Head to Part 6.
       </div>
 
-    </div>
+    </div><!-- /bug-lab -->
 
   </div><!-- /section-lab -->
 
+
+  <!-- ═══════════════════════════════════════════════════════
+       PART 6 — SYMPTOM MATCH
+       ═══════════════════════════════════════════════════════ -->
+  <div class="lesson-section" id="section-match">
+
+    <p>Match each bug symptom from the lab to the file where it lives. Get all four right to unlock Part 7.</p>
+
+    <div class="sm-widget" id="sm-widget">
+      <div class="sm-instruction">Tap a symptom to select it (turns orange), then tap the file it came from. Tap a placed symptom to remove it.</div>
+      <div class="sm-symptoms" id="sm-symptoms">
+        <div class="sm-symptom" data-value="sym-a">
+          "AdvantageKit/ folder never appears in AdvantageScope"
+        </div>
+        <div class="sm-symptom" data-value="sym-b">
+          "Push joystick forward → robot spins. Push left → drives forward."
+        </div>
+        <div class="sm-symptom" data-value="sym-c">
+          "Slightest joystick input = instant full speed"
+        </div>
+        <div class="sm-symptom" data-value="sym-d">
+          "Encoders go opposite directions when driving straight"
+        </div>
+      </div>
+
+      <div class="sm-files" id="sm-files">
+        <div class="sm-file" data-answer="sym-a">
+          <span class="sm-file-name">Robot.java</span>
+          <div class="sm-drop-zone"></div>
+        </div>
+        <div class="sm-file" data-answer="sym-b">
+          <span class="sm-file-name">RobotContainer.java</span>
+          <div class="sm-drop-zone"></div>
+        </div>
+        <div class="sm-file" data-answer="sym-c">
+          <span class="sm-file-name">Constants.java</span>
+          <div class="sm-drop-zone"></div>
+        </div>
+        <div class="sm-file" data-answer="sym-d">
+          <span class="sm-file-name">DriveSubsystem.java</span>
+          <div class="sm-drop-zone"></div>
+        </div>
+      </div>
+
+      <div class="sm-controls">
+        <button class="sm-check-btn" onclick="smCheck()">Check answers</button>
+        <button class="sm-reset-btn" onclick="smReset()">Reset</button>
+      </div>
+      <div class="sm-feedback" id="sm-feedback"></div>
+    </div>
+
+    <!-- Instructor bypass -->
+    <div style="margin-top:1.5rem; padding-top:1rem; border-top:1px solid var(--gray-border);">
+      <div id="orbit-bypass">
+        <input type="text" id="bypass-input" placeholder="Instructor code">
+        <button onclick="orbitBypass()">Unlock</button>
+        <span class="bypass-err" id="bypass-err"></span>
+      </div>
+    </div>
+
+  </div><!-- /section-match -->
+
+
+  <!-- ═══════════════════════════════════════════════════════
+       PART 7 — ORBIT ODYSSEY
+       ═══════════════════════════════════════════════════════ -->
+  <div class="lesson-section" id="section-orbit">
+
+    <!-- Locked state -->
+    <div id="orbit-locked">
+      <div class="lock-icon">🔒</div>
+      <p>Complete the Symptom Match in Part 6 to unlock this section.</p>
+      <p style="font-size:0.8rem; color:var(--muted);">Or ask your instructor for the unlock code.</p>
+    </div>
+
+    <!-- Unlocked content -->
+    <div id="orbit-content">
+
+      <div class="hf-box hf-brain">
+        <span class="hf-label">You earned this</span>
+        <p>You built a project, read the files, ran the simulator, logged data, and fixed four bugs. Now meet the game you'll be programming your robot to play.</p>
+      </div>
+
+      <h2>Orbit Odyssey — the game</h2>
+      <p>Two robots, one field, three types of game elements. Your robot has 2.5 minutes to score as many points as possible.</p>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin:0.75rem 0;">
+        <div class="hf-box hf-info" style="margin:0;">
+          <span class="hf-label">Match format</span>
+          <p><strong>Autonomous:</strong> 30 seconds — robot acts on its own</p>
+          <p><strong>Teleoperated:</strong> 2 minutes — you drive</p>
+          <p><strong>Format:</strong> 1v1 round-robin — every student competes against every other student</p>
+        </div>
+        <div class="hf-box hf-sidebar" style="margin:0;">
+          <span class="hf-label">Endgame options</span>
+          <p>Score the large ball on the High Pedestal — <strong>10 points</strong></p>
+          <p>Park your robot in the Low Zone — <strong>3 points</strong></p>
+          <p>Both in the same match? Allowed.</p>
+        </div>
+      </div>
+
+      <h2>Scoring</h2>
+      <table class="scoring-table">
+        <thead>
+          <tr><th>Action</th><th class="pts">Points</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Rubble in Low Zone</td><td class="pts">1</td></tr>
+          <tr><td>Rubble in High Goal</td><td class="pts">3</td></tr>
+          <tr><td>Ping pong ball in Low Zone</td><td class="pts">2</td></tr>
+          <tr><td>Ping pong ball in High Goal</td><td class="pts">5</td></tr>
+          <tr><td>Large ball on High Pedestal</td><td class="pts">10</td></tr>
+          <tr><td>Robot parked in Low Zone</td><td class="pts">3</td></tr>
+        </tbody>
+      </table>
+
+      <div class="hf-box hf-warning">
+        <span class="hf-label">No penalties</span>
+        <p>No element holding limits. No robot inspection. No penalties for any robot contact. Focus on scoring, not avoiding fouls.</p>
+      </div>
+
+      <!-- Going Further collapsible -->
+      <div class="going-further-toggle" onclick="toggleGoingFurther(this)">
+        <span class="gf-arrow">▶</span>
+        <span>Going Further — robot action brainstorm (instructor-led)</span>
+      </div>
+      <div id="going-further-content">
+        <p style="font-size:0.88rem; color:var(--purple); font-weight:600; margin-bottom:0.75rem;">Instructor: run this activity if time permits. It sets up Lesson 3's subsystem introduction.</p>
+
+        <p style="font-size:0.88rem; color:var(--mid); margin-bottom:0.75rem;">With a partner, discuss each question for 2 minutes. Be specific — describe exactly what the robot physically does.</p>
+
+        <div class="hf-box hf-sidebar" style="margin-bottom:0.75rem;">
+          <span class="hf-label">Round 1</span>
+          <p>List every physical action the robot needs to do to score rubble in the High Goal. Don't say "pick it up" — describe the specific movements.</p>
+        </div>
+        <div class="hf-box hf-sidebar" style="margin-bottom:0.75rem;">
+          <span class="hf-label">Round 2</span>
+          <p>Which actions could the robot do on its own during autonomous? Which ones require a human driver? Why?</p>
+        </div>
+        <div class="hf-box hf-sidebar">
+          <span class="hf-label">Round 3</span>
+          <p>If you had to organize all those robot actions into groups — mechanisms that work independently — how many groups would there be? What would you call them?</p>
+        </div>
+
+        <div class="hf-box hf-brain" style="margin-top:0.75rem;">
+          <span class="hf-label">Don't reveal this yet</span>
+          <p>The groups students name in Round 3 are the subsystems from Lesson 3. Let them discover the names themselves. Same concept, different vocabulary — they've already figured it out.</p>
+        </div>
+      </div>
+
+    </div><!-- /orbit-content -->
+
+  </div><!-- /section-orbit -->
+
   <nav class="section-nav section-nav--bottom">
-    <button class="section-nav-btn active" data-section="concept">Part 1 - The files</button>
-    <button class="section-nav-btn" data-section="simulator">Part 2 - The simulator</button>
-    <button class="section-nav-btn" data-section="challenge">Part 3 - Try it yourself</button>
-    <button class="section-nav-btn" data-section="lab">Part 4 - Fix the broken robot</button>
+    <button class="section-nav-btn active" data-section="files">Part 1 — The Files</button>
+    <button class="section-nav-btn" data-section="simulator">Part 2 — The Simulator</button>
+    <button class="section-nav-btn" data-section="data">Part 3 — Read the Data</button>
+    <button class="section-nav-btn" data-section="challenges">Part 4 — Hands-On</button>
+    <button class="section-nav-btn" data-section="lab">Part 5 — Broken Robot Lab</button>
+    <button class="section-nav-btn" data-section="match">Part 6 — Symptom Match</button>
+    <button class="section-nav-btn" data-section="orbit">Part 7 — Orbit Odyssey</button>
   </nav>
 
 </div><!-- /page-container -->
+
 <footer class="site-footer"></footer>
 
 <script src="js/site-config.js"></script>
 <script src="js/frc-curriculum.js"></script>
 <script>
+
+/* ── File expand toggles ───────────────────────────────────── */
 function toggleFile(id) {
   const el = document.getElementById('file-' + id);
   el.style.display = el.style.display === 'block' ? 'none' : 'block';
 }
+
+/* ── Going Further toggle ──────────────────────────────────── */
+function toggleGoingFurther(btn) {
+  const content = document.getElementById('going-further-content');
+  const isOpen = content.style.display === 'block';
+  content.style.display = isOpen ? 'none' : 'block';
+  btn.classList.toggle('open', !isOpen);
+}
+
+/* ── File Prediction tap-to-select ─────────────────────────── */
+let fpSelected = null; // currently selected tile element
+
+function fpInit() {
+  document.querySelectorAll('.fp-tile').forEach(tile => {
+    tile.addEventListener('click', () => {
+      if (tile.classList.contains('placed')) return;
+      // Deselect if already selected
+      if (fpSelected === tile) {
+        tile.classList.remove('selected');
+        fpSelected = null;
+        return;
+      }
+      // Deselect previous
+      if (fpSelected) fpSelected.classList.remove('selected');
+      fpSelected = tile;
+      tile.classList.add('selected');
+    });
+  });
+
+  document.querySelectorAll('.fp-target').forEach(target => {
+    target.addEventListener('click', () => {
+      if (!fpSelected) return;
+      const zone = target.querySelector('.fp-drop-zone');
+      // Return existing placed tile
+      const existing = zone.querySelector('.fp-placed-tile');
+      if (existing) {
+        const origTile = document.querySelector(`.fp-tile[data-value="${existing.dataset.value}"]`);
+        if (origTile) origTile.classList.remove('placed');
+        existing.remove();
+      }
+      // Place selected tile
+      const placed = document.createElement('span');
+      placed.className = 'fp-placed-tile';
+      placed.dataset.value = fpSelected.dataset.value;
+      placed.textContent = fpSelected.textContent;
+      placed.onclick = (e) => {
+        e.stopPropagation();
+        const origTile = document.querySelector(`.fp-tile[data-value="${placed.dataset.value}"]`);
+        if (origTile) origTile.classList.remove('placed');
+        placed.remove();
+        target.classList.remove('correct', 'wrong');
+      };
+      zone.appendChild(placed);
+      fpSelected.classList.add('placed');
+      fpSelected.classList.remove('selected');
+      fpSelected = null;
+      target.classList.remove('correct', 'wrong');
+    });
+  });
+}
+
+function fpSwitchRound(roundId, btn) {
+  document.querySelectorAll('.fp-round').forEach(r => r.classList.remove('active'));
+  document.querySelectorAll('.fp-round-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('fp-' + roundId).classList.add('active');
+  btn.classList.add('active');
+}
+
+function fpCheck(roundId) {
+  const round = document.getElementById('fp-' + roundId);
+  const targets = round.querySelectorAll('.fp-target');
+  let correct = 0;
+  targets.forEach(target => {
+    const zone = target.querySelector('.fp-drop-zone');
+    const placed = zone.querySelector('.fp-placed-tile');
+    if (!placed) return;
+    if (placed.dataset.value === target.dataset.answer) {
+      target.classList.add('correct');
+      target.classList.remove('wrong');
+      correct++;
+    } else {
+      target.classList.add('wrong');
+      target.classList.remove('correct');
+    }
+  });
+  const total = targets.length;
+  const scoreEl = document.getElementById('fp-' + roundId + '-score');
+  const feedbackEl = document.getElementById('fp-' + roundId + '-feedback');
+  scoreEl.textContent = correct + ' / ' + total;
+  feedbackEl.classList.add('show');
+  if (correct === total) {
+    feedbackEl.className = 'fp-feedback show perfect';
+    feedbackEl.textContent = '🎉 Perfect round! All ' + total + ' correct.';
+  } else {
+    feedbackEl.className = 'fp-feedback show partial';
+    feedbackEl.textContent = correct + ' of ' + total + ' correct. Red targets are wrong — try moving those tiles.';
+  }
+}
+
+function fpReset(roundId) {
+  const round = document.getElementById('fp-' + roundId);
+  round.querySelectorAll('.fp-target').forEach(t => {
+    t.classList.remove('correct', 'wrong');
+    const zone = t.querySelector('.fp-drop-zone');
+    zone.innerHTML = '';
+  });
+  round.querySelectorAll('.fp-tile').forEach(t => t.classList.remove('placed'));
+  const scoreEl = document.getElementById('fp-' + roundId + '-score');
+  if (scoreEl) scoreEl.textContent = '';
+  const feedbackEl = document.getElementById('fp-' + roundId + '-feedback');
+  if (feedbackEl) { feedbackEl.textContent = ''; feedbackEl.className = 'fp-feedback'; }
+}
+
+/* ── Symptom Match tap-to-select ───────────────────────────── */
+let smSelected = null;
+
+function smInit() {
+  document.querySelectorAll('.sm-symptom').forEach(sym => {
+    sym.addEventListener('click', () => {
+      if (sym.classList.contains('placed')) return;
+      if (smSelected === sym) {
+        sym.classList.remove('selected');
+        smSelected = null;
+        return;
+      }
+      if (smSelected) smSelected.classList.remove('selected');
+      smSelected = sym;
+      sym.classList.add('selected');
+    });
+  });
+
+  document.querySelectorAll('.sm-file').forEach(file => {
+    file.addEventListener('click', () => {
+      if (!smSelected) return;
+      const zone = file.querySelector('.sm-drop-zone');
+      // Return existing
+      const existing = zone.querySelector('.sm-placed');
+      if (existing) {
+        const origSym = document.querySelector(`.sm-symptom[data-value="${existing.dataset.value}"]`);
+        if (origSym) origSym.classList.remove('placed');
+        existing.remove();
+      }
+      const placed = document.createElement('span');
+      placed.className = 'sm-placed';
+      placed.dataset.value = smSelected.dataset.value;
+      placed.textContent = smSelected.textContent;
+      placed.onclick = (e) => {
+        e.stopPropagation();
+        const origSym = document.querySelector(`.sm-symptom[data-value="${placed.dataset.value}"]`);
+        if (origSym) origSym.classList.remove('placed');
+        placed.remove();
+        file.classList.remove('correct', 'wrong');
+      };
+      zone.appendChild(placed);
+      smSelected.classList.add('placed');
+      smSelected.classList.remove('selected');
+      smSelected = null;
+      file.classList.remove('correct', 'wrong');
+    });
+  });
+}
+
+function smCheck() {
+  const files = document.querySelectorAll('.sm-file');
+  let correct = 0;
+  files.forEach(file => {
+    const zone = file.querySelector('.sm-drop-zone');
+    const placed = zone.querySelector('.sm-placed');
+    if (!placed) return;
+    if (placed.dataset.value === file.dataset.answer) {
+      file.classList.add('correct'); file.classList.remove('wrong');
+      correct++;
+    } else {
+      file.classList.add('wrong'); file.classList.remove('correct');
+    }
+  });
+  const feedbackEl = document.getElementById('sm-feedback');
+  feedbackEl.classList.add('show');
+  if (correct === 4) {
+    feedbackEl.className = 'sm-feedback show perfect';
+    feedbackEl.textContent = '✅ All 4 correct — Part 7 unlocked!';
+    orbitUnlock();
+  } else {
+    feedbackEl.className = 'sm-feedback show partial';
+    feedbackEl.textContent = correct + ' of 4 correct. Red boxes are wrong — move those symptoms.';
+  }
+}
+
+function smReset() {
+  document.querySelectorAll('.sm-file').forEach(f => {
+    f.classList.remove('correct','wrong');
+    f.querySelector('.sm-drop-zone').innerHTML = '';
+  });
+  document.querySelectorAll('.sm-symptom').forEach(s => s.classList.remove('placed'));
+  const fb = document.getElementById('sm-feedback');
+  fb.textContent = ''; fb.className = 'sm-feedback';
+}
+
+/* ── Orbit Odyssey unlock ──────────────────────────────────── */
+const ORBIT_KEY = 'orbit_unlocked_02';
+const BYPASS_CODE = 'ORBIT';
+
+function orbitUnlock() {
+  localStorage.setItem(ORBIT_KEY, '1');
+  document.getElementById('orbit-locked').style.display = 'none';
+  document.getElementById('orbit-content').style.display = 'block';
+}
+
+function orbitBypass() {
+  const val = document.getElementById('bypass-input').value.trim().toUpperCase();
+  const err = document.getElementById('bypass-err');
+  if (val === BYPASS_CODE) {
+    err.textContent = '';
+    orbitUnlock();
+  } else {
+    err.textContent = 'Wrong code.';
+  }
+}
+
+/* ── Init ──────────────────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded', () => {
+  fpInit();
+  smInit();
+  // Check if already unlocked
+  if (localStorage.getItem(ORBIT_KEY)) {
+    document.getElementById('orbit-locked').style.display = 'none';
+    document.getElementById('orbit-content').style.display = 'block';
+  }
+});
+
 </script>
 </body>
 </html>
