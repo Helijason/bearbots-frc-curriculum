@@ -259,8 +259,165 @@
       <p>Fair. But if you don't know what these files do, you'll spend the rest of the season randomly editing things hoping something works. This takes 20 minutes. Debugging blind takes hours.</p>
     </div>
 
-    <h2>What the project generates</h2>
-    <p>Run <code>WPILib: Create a new project</code> → Command Robot Skeleton (Advanced) and you get exactly these files. Every one has a specific job. None are optional.</p>
+    <h2>Step 1 — Create a vanilla project</h2>
+    <p>Every BearBots project starts from the same WPILib template. Create one now so you can see exactly what the generator produces.</p>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">Create the project</span>
+      <p><strong>1.</strong> Press <code>Ctrl+Shift+P</code> → type <code>WPILib: Create a new project</code> → Enter</p>
+      <p><strong>2.</strong> Project type: <strong>Template</strong> → Language: <strong>Java</strong> → Template: <strong>Command Robot Skeleton (Advanced)</strong></p>
+      <p><strong>3.</strong> Folder: choose somewhere outside your BearBots project (e.g. <code>D:\FRC\vanilla-explore</code>)</p>
+      <p><strong>4.</strong> Project name: <code>VanillaExplore</code> &nbsp;·&nbsp; Team number: <code>6964</code></p>
+      <p><strong>5.</strong> Click <strong>Generate Project</strong>. Wait for <code>BUILD SUCCESSFUL</code> in the terminal.</p>
+      <p><strong>6.</strong> VS Code prompts to open the new project — open it in a <strong>new window</strong> so you can have both projects open side by side.</p>
+    </div>
+
+    <div class="hf-box hf-warning">
+      <span class="hf-label">This project is for exploring only</span>
+      <p>Don't deploy this to the XRP. Don't save work here. It's a read-only reference — the BearBots project is where you'll actually code.</p>
+    </div>
+
+    <h2>Step 2 — Install Git and clone the BearBots project</h2>
+    <p>Git is version control — it tracks every change you make to code, lets you undo mistakes, and lets a whole team work on the same project without overwriting each other. You'll use it every session.</p>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">Check if Git is already installed</span>
+      <p><strong>1.</strong> Open the VS Code terminal: <code>Ctrl+`</code> (backtick) or Terminal → New Terminal</p>
+      <p><strong>2.</strong> Type exactly:</p>
+      <div class="code-block"><pre>git --version</pre></div>
+      <p><strong>3.</strong> If you see something like <code>git version 2.48.1.windows.1</code> — Git is installed. Skip to the clone step below.</p>
+      <p>If you see <code>'git' is not recognized</code> — follow the install steps for your situation.</p>
+    </div>
+
+    <div class="swap-container" style="margin-bottom:1rem;">
+      <button class="swap-btn"
+        data-show="git-offline" data-hide="git-online"
+        data-label-swap="Switch to offline install"
+        data-label-back="Switch to online install"
+        data-swapped="false">Switch to offline install</button>
+
+      <div id="git-online">
+        <div class="hf-box hf-info" style="margin-top:0.75rem;">
+          <span class="hf-label">Online — install Git from the web</span>
+          <p><strong>1.</strong> Go to <a href="https://git-scm.com/download/win" target="_blank" rel="noopener">git-scm.com/download/win</a> — download starts automatically</p>
+          <p><strong>2.</strong> Run the installer. Accept all defaults — don't change any options.</p>
+          <p><strong>3.</strong> When finished, <strong>close and reopen VS Code</strong> — the terminal needs to restart to see Git</p>
+          <p><strong>4.</strong> Run <code>git --version</code> again to confirm it works</p>
+        </div>
+      </div>
+
+      <div id="git-offline" style="display:none;">
+        <div class="hf-box hf-info" style="margin-top:0.75rem;">
+          <span class="hf-label">Offline — install from USB</span>
+          <p><strong>1.</strong> Plug in the USB drive</p>
+          <p><strong>2.</strong> In the VS Code terminal, run:</p>
+          <div class="code-block"><pre>D:\install\git\Git-installer.exe</pre></div>
+          <p><strong>3.</strong> Accept all defaults in the installer — don't change any options.</p>
+          <p><strong>4.</strong> When finished, <strong>close and reopen VS Code</strong> — the terminal needs to restart to see Git</p>
+          <p><strong>5.</strong> Run <code>git --version</code> to confirm it worked</p>
+        </div>
+      </div>
+    </div>
+
+    <p>Now clone the BearBots project. This downloads the entire repository to your machine.</p>
+
+    <div class="swap-container">
+      <button class="swap-btn"
+        data-show="repo-offline" data-hide="repo-online"
+        data-label-swap="Switch to offline setup"
+        data-label-back="Switch to online setup"
+        data-swapped="false">Switch to offline setup</button>
+
+      <div id="repo-online">
+        <div class="hf-box hf-info" style="margin-top:0.75rem;">
+          <span class="hf-label">Online — clone from GitHub</span>
+          <p><strong>1.</strong> In the VS Code terminal, run:</p>
+          <div class="code-block"><pre>cd D:\FRC
+git clone https://github.com/Helijason/bearbots-xrp-code</pre></div>
+          <p><strong>2.</strong> Wait for the download to finish. You'll see <code>Cloning into 'bearbots-xrp-code'...</code> and then a done message.</p>
+          <p><strong>3.</strong> Open the cloned folder: File → Open Folder → <code>D:\FRC\bearbots-xrp-code</code></p>
+          <div class="hf-box hf-warning" style="margin-top:0.75rem; margin-bottom:0;">
+            <span class="hf-label">Keep it separate</span>
+            <p>This must be a fresh folder separate from Lesson 1. The <code>cd D:\FRC</code> command puts you in the right place — don't clone inside an existing project folder.</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="repo-offline" style="display:none;">
+        <div class="hf-box hf-info" style="margin-top:0.75rem;">
+          <span class="hf-label">Offline — copy from USB</span>
+          <p><strong>1.</strong> In the VS Code terminal, run:</p>
+          <div class="code-block"><pre>xcopy /E /I D:\bearbots-xrp-code D:\FRC\bearbots-xrp-code</pre></div>
+          <p><strong>2.</strong> Open the copied folder: File → Open Folder → <code>D:\FRC\bearbots-xrp-code</code></p>
+          <div class="hf-box hf-warning" style="margin-top:0.75rem; margin-bottom:0;">
+            <span class="hf-label">Keep it separate</span>
+            <p>This must be a fresh folder separate from Lesson 1. Don't copy into an existing project folder.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h2>Git basics — your three commands</h2>
+    <p>Git tracks changes in snapshots called <strong>commits</strong>. Think of each commit as a save point you can return to. Here are the three commands you'll use every session.</p>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">After you make changes to your code</span>
+      <p><strong>Stage your changes</strong> — tell Git which files to include in the snapshot:</p>
+      <div class="code-block"><pre>git add .</pre></div>
+      <p>The <code>.</code> means "everything changed in this folder." You can also stage a single file: <code>git add Robot.java</code></p>
+
+      <p style="margin-top:0.75rem;"><strong>Commit</strong> — save the snapshot with a message describing what you did:</p>
+      <div class="code-block"><pre>git commit -m "Add pilot name logging to Robot.java"</pre></div>
+      <p>The message is for you and your teammates. Be specific — "fixed stuff" is useless at 11pm the night before competition.</p>
+
+      <p style="margin-top:0.75rem;"><strong>Pull</strong> — get the latest updates from the shared repository:</p>
+      <div class="code-block"><pre>git pull</pre></div>
+      <p>Run this at the start of every session so you're working from the latest code.</p>
+    </div>
+
+    <div class="hf-box hf-sidebar">
+      <span class="hf-label">What about pushing?</span>
+      <p><code>git push</code> uploads your commits to GitHub so teammates can see them. You'll do this later once your changes are ready to share. For now, commit locally — your work is saved and tracked even without pushing.</p>
+    </div>
+
+    <!-- Git cheat sheet reference box -->
+    <div style="border:2px solid var(--teal); border-radius:var(--radius); overflow:hidden; margin:1rem 0;">
+      <div style="background:var(--teal); padding:0.5rem 0.75rem; display:flex; align-items:center; gap:0.5rem;">
+        <span style="color:white; font-weight:700; font-size:0.85rem;">📋 Git Quick Reference</span>
+        <span style="color:#A8D4D4; font-size:0.78rem; margin-left:auto;">keep this — you'll use it every lesson</span>
+      </div>
+      <div style="padding:0.75rem; background:var(--teal-light);">
+        <table style="width:100%; border-collapse:collapse; font-size:0.85rem;">
+          <tr>
+            <td style="padding:0.35rem 0.5rem; font-family:var(--font-mono); color:var(--teal); font-weight:700; white-space:nowrap; border-bottom:1px solid var(--gray-border);">git --version</td>
+            <td style="padding:0.35rem 0.5rem; color:var(--mid); border-bottom:1px solid var(--gray-border);">Confirm Git is installed</td>
+          </tr>
+          <tr>
+            <td style="padding:0.35rem 0.5rem; font-family:var(--font-mono); color:var(--teal); font-weight:700; white-space:nowrap; border-bottom:1px solid var(--gray-border);">git clone &lt;url&gt;</td>
+            <td style="padding:0.35rem 0.5rem; color:var(--mid); border-bottom:1px solid var(--gray-border);">Download a repository for the first time</td>
+          </tr>
+          <tr>
+            <td style="padding:0.35rem 0.5rem; font-family:var(--font-mono); color:var(--teal); font-weight:700; white-space:nowrap; border-bottom:1px solid var(--gray-border);">git pull</td>
+            <td style="padding:0.35rem 0.5rem; color:var(--mid); border-bottom:1px solid var(--gray-border);">Get latest updates — run at the start of every session</td>
+          </tr>
+          <tr>
+            <td style="padding:0.35rem 0.5rem; font-family:var(--font-mono); color:var(--teal); font-weight:700; white-space:nowrap; border-bottom:1px solid var(--gray-border);">git add .</td>
+            <td style="padding:0.35rem 0.5rem; color:var(--mid); border-bottom:1px solid var(--gray-border);">Stage all changed files</td>
+          </tr>
+          <tr>
+            <td style="padding:0.35rem 0.5rem; font-family:var(--font-mono); color:var(--teal); font-weight:700; white-space:nowrap; border-bottom:1px solid var(--gray-border);">git commit -m "msg"</td>
+            <td style="padding:0.35rem 0.5rem; color:var(--mid); border-bottom:1px solid var(--gray-border);">Save a snapshot with a description</td>
+          </tr>
+          <tr>
+            <td style="padding:0.35rem 0.5rem; font-family:var(--font-mono); color:var(--teal); font-weight:700; white-space:nowrap;">git push</td>
+            <td style="padding:0.35rem 0.5rem; color:var(--mid);">Upload commits to GitHub (covered later)</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <h2>Step 3 — What the vanilla project generates</h2>
+    <p>Look at the vanilla project first. Open the Explorer panel (<code>Ctrl+Shift+E</code>) and expand <code>src/main/java/frc/robot/</code>. You should see exactly these files:</p>
 
     <div style="display:flex; flex-direction:column; gap:0.5rem; margin: 1rem 0;">
 
@@ -273,7 +430,7 @@
         <p style="font-size:0.875rem; color:var(--mid); margin-bottom:0.75rem;"><strong>Should you modify it?</strong> Almost never. Only touch this if you rename your Robot class.</p>
         <div class="hf-box hf-warning" style="margin:0.5rem 0 0;">
           <span class="hf-label">The rule</span>
-          <p>Do not add static variables or initialization code to Main.java. The comment at the top says this. It means it.</p>
+          <p>The comment at the top of Main.java says "Do not add any static variables or initialization code here." It means it. WPILib needs to control startup order — anything added here runs before the hardware layer is ready.</p>
         </div>
       </div>
 
@@ -283,7 +440,7 @@
       </div>
       <div id="file-robot" style="display:none; background:var(--code-bg); border:1px solid var(--code-border); border-radius:var(--radius); padding:1rem; margin-top:-0.25rem;">
         <p style="font-size:0.875rem; color:var(--mid); margin-bottom:0.75rem;"><strong>Job:</strong> Contains lifecycle methods — <code>robotPeriodic()</code>, <code>autonomousInit()</code>, <code>teleopInit()</code>, etc. Called automatically by WPILib at the right times.</p>
-        <p style="font-size:0.875rem; color:var(--mid); margin-bottom:0.75rem;"><strong>AdvantageKit note:</strong> Our project extends <code>LoggedRobot</code> instead of <code>TimedRobot</code>. LoggedRobot extends TimedRobot — all the same lifecycle methods work, you just get logging for free.</p>
+        <p style="font-size:0.875rem; color:var(--mid); margin-bottom:0.75rem;"><strong>Vanilla gives you:</strong> <code>extends TimedRobot</code>. Notice that. You'll see why it changes in the comparison section below.</p>
         <p style="font-size:0.875rem; color:var(--mid); margin-bottom:0.75rem;"><strong>Most important line:</strong> <code>CommandScheduler.getInstance().run()</code> in <code>robotPeriodic()</code>. Without it, no commands ever execute. Ever.</p>
         <div class="code-block"><pre>
 <span class="kw">@Override</span>
@@ -304,14 +461,26 @@
 
       <div class="info-card" style="cursor:pointer;" onclick="toggleFile('constants')">
         <h4>Constants.java &nbsp;<span style="font-size:0.75rem;color:var(--muted);font-weight:400;">click to expand</span></h4>
-        <p>The number vault. Motor IDs, speeds, PID values — all in one place.</p>
+        <p>A place for numbers that don't change. Starts nearly empty.</p>
       </div>
       <div id="file-constants" style="display:none; background:var(--code-bg); border:1px solid var(--code-border); border-radius:var(--radius); padding:1rem; margin-top:-0.25rem;">
-        <p style="font-size:0.875rem; color:var(--mid); margin-bottom:0.75rem;"><strong>Job:</strong> Stores constants used throughout the codebase. Motor IDs, gear ratios, PID gains, field dimensions. Anything that's a fixed number that might change should be here — not hardcoded in a subsystem.</p>
-        <p style="font-size:0.875rem; color:var(--mid); margin-bottom:0.75rem;"><strong>In AdvantageKit projects,</strong> Constants.java also holds the <code>Mode</code> enum controlling REAL/SIM/REPLAY behavior.</p>
-        <div class="hf-box hf-brain" style="margin:0.5rem 0 0;">
-          <span class="hf-label">Why this matters</span>
-          <p>Motor ID hardcoded as <code>4</code> in five files. Wiring changes. Now you hunt through five files without missing any. With Constants.java you change it once.</p>
+        <p style="font-size:0.875rem; color:var(--mid); margin-bottom:0.75rem;"><strong>Vanilla gives you:</strong> an almost empty file with one comment: <em>"place constants here."</em> That's it.</p>
+        <p style="font-size:0.875rem; color:var(--mid); margin-bottom:0.75rem;"><strong>The intent:</strong> motor IDs, speed limits, PID gains — anything that's a fixed value that might need changing later. Hardcode a motor ID in a subsystem and you'll search 6 files when wiring changes. Put it in Constants.java and you change it once.</p>
+        <div class="hf-box hf-sidebar" style="margin:0.5rem 0 0;">
+          <span class="hf-label">Constants.java isn't the only constants file</span>
+          <p>On real competition robots, Constants.java gets crowded fast. Teams split it out:</p>
+          <table style="width:100%;font-size:0.8rem;border-collapse:collapse;margin-top:0.5rem;">
+            <tr style="background:var(--teal);color:white;">
+              <th style="padding:0.3rem 0.5rem;text-align:left;">What</th>
+              <th style="padding:0.3rem 0.5rem;text-align:left;">Where teams put it</th>
+            </tr>
+            <tr><td style="padding:0.3rem 0.5rem;border-bottom:1px solid var(--gray-border);">Swerve offsets, gear ratios, PID</td><td style="padding:0.3rem 0.5rem;border-bottom:1px solid var(--gray-border);"><code>TunerConstants.java</code> or <code>SwerveConstants.java</code></td></tr>
+            <tr><td style="padding:0.3rem 0.5rem;border-bottom:1px solid var(--gray-border);">Field layout, AprilTag positions</td><td style="padding:0.3rem 0.5rem;border-bottom:1px solid var(--gray-border);"><code>FieldConstants.java</code></td></tr>
+            <tr><td style="padding:0.3rem 0.5rem;border-bottom:1px solid var(--gray-border);">Arm limits, speeds, gains</td><td style="padding:0.3rem 0.5rem;border-bottom:1px solid var(--gray-border);"><code>ArmConstants.java</code> or inner class in subsystem</td></tr>
+            <tr><td style="padding:0.3rem 0.5rem;border-bottom:1px solid var(--gray-border);">CAN bus IDs</td><td style="padding:0.3rem 0.5rem;border-bottom:1px solid var(--gray-border);"><code>Constants.java</code> inner class, or <code>CANConstants.java</code></td></tr>
+            <tr><td style="padding:0.3rem 0.5rem;">Vision camera configs</td><td style="padding:0.3rem 0.5rem;"><code>VisionConstants.java</code></td></tr>
+          </table>
+          <p style="margin-top:0.6rem;">There's no single right answer — this is a <strong>team design decision</strong>. Start in Constants.java. Split into separate files when it gets crowded. The BearBots project uses inner classes (<code>Constants.DriveConstants</code>, etc.) as a middle ground.</p>
         </div>
       </div>
 
@@ -325,6 +494,265 @@
         <p style="font-size:0.875rem; color:var(--mid);"><strong>If your build fails mysteriously</strong> — check here first. Mismatched versions or missing vendor deps are usually the culprit.</p>
       </div>
 
+      <div class="info-card" style="cursor:pointer;" onclick="toggleFile('example')">
+        <h4>ExampleSubsystem.java + ExampleCommand.java &nbsp;<span style="font-size:0.75rem;color:var(--muted);font-weight:400;">click to expand</span></h4>
+        <p>Placeholder files. Gone in the BearBots project.</p>
+      </div>
+      <div id="file-example" style="display:none; background:var(--code-bg); border:1px solid var(--code-border); border-radius:var(--radius); padding:1rem; margin-top:-0.25rem;">
+        <p style="font-size:0.875rem; color:var(--mid); margin-bottom:0.75rem;">WPILib generates these as structural examples showing how a subsystem and command are shaped. They don't do anything real — no hardware, no logic worth keeping.</p>
+        <p style="font-size:0.875rem; color:var(--mid);">In the BearBots project these are deleted and replaced with <code>DriveSubsystem.java</code> and our actual robot files. You'll learn what goes inside subsystems in Lesson 3.</p>
+      </div>
+
+    </div>
+
+    <h2>Step 4 — Compare vanilla vs BearBots</h2>
+    <p>Now open both projects side by side. The BearBots project isn't vanilla — we made deliberate changes before you got here. Each card below shows one difference, why it was a problem, and why the change fixes it.</p>
+
+    <div class="hf-box hf-brain" style="margin-bottom:1rem;">
+      <span class="hf-label">Your job</span>
+      <p>Find each change in the BearBots project before reading the card. The file name is labelled on every card. Spot the difference first — then click to see the reasoning.</p>
+    </div>
+
+    <!-- Diff card component styles (inline so they're scoped to lesson 02) -->
+    <style>
+      .diff-card { border:1px solid var(--gray-border); border-radius:var(--radius); overflow:hidden; margin-bottom:1rem; }
+      .diff-card-file {
+        background:var(--gray-bg); padding:0.4rem 0.75rem;
+        font-size:0.75rem; font-weight:700; color:var(--muted);
+        font-family:var(--font-mono); border-bottom:1px solid var(--gray-border);
+        display:flex; align-items:center; gap:0.4rem;
+      }
+      .diff-card-file .diff-file-badge {
+        background:var(--teal); color:white; border-radius:4px;
+        padding:0.1rem 0.45rem; font-size:0.7rem; font-family:var(--font-sans);
+      }
+      .diff-panels {
+        display:grid; grid-template-columns:1fr 1fr; border-bottom:1px solid var(--gray-border);
+      }
+      .diff-panel {
+        padding:0.65rem 0.75rem;
+      }
+      .diff-panel:first-child { border-right:1px solid var(--gray-border); }
+      .diff-panel-label {
+        font-size:0.7rem; font-weight:700; text-transform:uppercase;
+        letter-spacing:0.05em; margin-bottom:0.35rem;
+      }
+      .diff-panel.vanilla .diff-panel-label { color:var(--muted); }
+      .diff-panel.bearbots .diff-panel-label { color:var(--teal); }
+      .diff-panel code {
+        font-size:0.82rem; display:block; padding:0.35rem 0.5rem;
+        border-radius:4px; line-height:1.5;
+      }
+      .diff-panel.vanilla code { background:#f0f0f0; color:#555; }
+      .diff-panel.bearbots code { background:var(--teal-light); color:var(--teal); }
+      .diff-problem {
+        padding:0.65rem 0.75rem; border-bottom:1px solid var(--gray-border);
+        background:var(--red-light);
+      }
+      .diff-problem-label {
+        font-size:0.7rem; font-weight:700; text-transform:uppercase;
+        letter-spacing:0.05em; color:var(--red); margin-bottom:0.25rem;
+      }
+      .diff-problem p { font-size:0.85rem; color:#5a1a1a; margin:0; }
+      .diff-why-toggle {
+        padding:0.55rem 0.75rem; cursor:pointer;
+        display:flex; align-items:center; gap:0.5rem;
+        font-size:0.82rem; font-weight:600; color:var(--purple);
+        background:var(--purple-light); border:none; width:100%;
+        text-align:left; transition:background 0.15s;
+      }
+      .diff-why-toggle:hover { background:#e0d9f5; }
+      .diff-why-toggle .dw-arrow { transition:transform 0.2s; font-style:normal; }
+      .diff-why-toggle.open .dw-arrow { transform:rotate(90deg); }
+      .diff-why-content {
+        display:none; padding:0.65rem 0.75rem;
+        background:var(--purple-light); border-top:1px solid var(--purple-border);
+        font-size:0.85rem; color:var(--mid);
+      }
+      .diff-why-content p { margin:0 0 0.4rem; }
+      .diff-why-content p:last-child { margin:0; }
+      .diff-good-to-know {
+        display:inline-block; font-size:0.7rem; font-weight:700;
+        background:var(--amber-light); color:var(--amber);
+        border:1px solid var(--amber-border); border-radius:4px;
+        padding:0.1rem 0.45rem; margin-left:0.4rem; vertical-align:middle;
+      }
+    </style>
+
+    <!-- Card 1: Robot.java — extends TimedRobot → LoggedRobot -->
+    <div class="diff-card">
+      <div class="diff-card-file">
+        <span class="diff-file-badge">Robot.java</span>
+        Class declaration
+      </div>
+      <div class="diff-panels">
+        <div class="diff-panel vanilla">
+          <div class="diff-panel-label">📄 Vanilla</div>
+          <code>public class Robot<br>  extends TimedRobot</code>
+        </div>
+        <div class="diff-panel bearbots">
+          <div class="diff-panel-label">🐻 BearBots</div>
+          <code>public class Robot<br>  extends LoggedRobot</code>
+        </div>
+      </div>
+      <div class="diff-problem">
+        <div class="diff-problem-label">⚠️ Problem this solves</div>
+        <p>TimedRobot has no logging hooks. Your robot breaks at competition on Saturday. You have zero recorded data to understand what happened. You go home guessing.</p>
+      </div>
+      <button class="diff-why-toggle" onclick="toggleWhy(this)">
+        <span class="dw-arrow">▶</span> Why we changed this
+      </button>
+      <div class="diff-why-content">
+        <p><code>LoggedRobot</code> extends <code>TimedRobot</code> — every lifecycle method works identically. The difference is that LoggedRobot wraps each 20ms loop cycle with AdvantageKit data capture. Every input the robot reads, every output it commands, timestamped and saved. You can replay the entire match in simulation later and see exactly what happened, when it happened.</p>
+        <p>All the same methods still exist: <code>robotPeriodic()</code>, <code>teleopInit()</code>, etc. Nothing breaks. You just gain observability.</p>
+      </div>
+    </div>
+
+    <!-- Card 2: Robot.java — Logger.start() -->
+    <div class="diff-card">
+      <div class="diff-card-file">
+        <span class="diff-file-badge">Robot.java</span>
+        Constructor
+      </div>
+      <div class="diff-panels">
+        <div class="diff-panel vanilla">
+          <div class="diff-panel-label">📄 Vanilla</div>
+          <code>public Robot() {<br>  robotContainer =<br>    new RobotContainer();<br>}</code>
+        </div>
+        <div class="diff-panel bearbots">
+          <div class="diff-panel-label">🐻 BearBots</div>
+          <code>public Robot() {<br>  Logger.start();<br>  robotContainer =<br>    new RobotContainer();<br>}</code>
+        </div>
+      </div>
+      <div class="diff-problem">
+        <div class="diff-problem-label">⚠️ Problem this solves</div>
+        <p>AdvantageKit is installed but never told to start. Every <code>@AutoLog</code> annotation silently does nothing. No error, no warning — just no data, ever.</p>
+      </div>
+      <button class="diff-why-toggle" onclick="toggleWhy(this)">
+        <span class="dw-arrow">▶</span> Why we changed this
+      </button>
+      <div class="diff-why-content">
+        <p><code>Logger.start()</code> initializes all data sinks and starts the capture loop. It must happen before <code>new RobotContainer()</code> — subsystems are created inside RobotContainer, and we need logging active before their first <code>periodic()</code> call so no data is missed from boot.</p>
+        <p>Note: this is <code>Logger.start()</code> — not <code>Logger.getInstance().start()</code>. AdvantageKit 3.x changed the API. The old pattern still appears in many tutorials online. Ours is correct for 2025+.</p>
+      </div>
+    </div>
+
+    <!-- Card 3: Robot.java — currentMode / data receivers -->
+    <div class="diff-card">
+      <div class="diff-card-file">
+        <span class="diff-file-badge">Robot.java</span>
+        Logger configuration
+      </div>
+      <div class="diff-panels">
+        <div class="diff-panel vanilla">
+          <div class="diff-panel-label">📄 Vanilla</div>
+          <code>// (nothing)<br>// no mode awareness</code>
+        </div>
+        <div class="diff-panel bearbots">
+          <div class="diff-panel-label">🐻 BearBots</div>
+          <code>if (Constants.currentMode<br>  == Mode.REAL) {<br>  // file logger<br>} else if ...<br>  // NT logger</code>
+        </div>
+      </div>
+      <div class="diff-problem">
+        <div class="diff-problem-label">⚠️ Problem this solves</div>
+        <p>Code runs the same whether it's on a real robot, in simulation, or replaying a log. The wrong hardware layer loads silently — motors that don't exist, sensors that return zero — and nobody knows why the sim behaves differently from the real robot.</p>
+      </div>
+      <button class="diff-why-toggle" onclick="toggleWhy(this)">
+        <span class="dw-arrow">▶</span> Why we changed this
+      </button>
+      <div class="diff-why-content">
+        <p><code>Constants.currentMode</code> tells Logger which data receivers to attach. On the real robot: log to a USB file for later replay. In simulation: log to NetworkTables so AdvantageScope sees it live. In replay mode: read from a saved log file instead of hardware.</p>
+        <p>One codebase, three behaviors, zero code changes between them. That's the whole AdvantageKit value proposition.</p>
+      </div>
+    </div>
+
+    <!-- Card 4: Constants.java — Mode enum -->
+    <div class="diff-card">
+      <div class="diff-card-file">
+        <span class="diff-file-badge">Constants.java</span>
+        Mode enum + currentMode field
+      </div>
+      <div class="diff-panels">
+        <div class="diff-panel vanilla">
+          <div class="diff-panel-label">📄 Vanilla</div>
+          <code>// place constants here<br>// (empty)</code>
+        </div>
+        <div class="diff-panel bearbots">
+          <div class="diff-panel-label">🐻 BearBots</div>
+          <code>public enum Mode {<br>  REAL, SIM, REPLAY<br>}<br>public static final Mode<br>  currentMode = Mode.SIM;</code>
+        </div>
+      </div>
+      <div class="diff-problem">
+        <div class="diff-problem-label">⚠️ Problem this solves</div>
+        <p>No way to tell the codebase which environment it's running in. Teams hardcode for real hardware and lose the ability to simulate, or hardcode for sim and can't deploy without changes.</p>
+      </div>
+      <button class="diff-why-toggle" onclick="toggleWhy(this)">
+        <span class="dw-arrow">▶</span> Why we changed this
+      </button>
+      <div class="diff-why-content">
+        <p>One field controls the entire IO layer. Set <code>currentMode = Mode.SIM</code> and the codebase loads simulated hardware. Set it to <code>Mode.REAL</code> and it talks to real motors. Set it to <code>Mode.REPLAY</code> and it reads from a saved log file.</p>
+        <p>On a roboRIO, the code auto-detects REAL using <code>RobotBase.isReal()</code> so you never accidentally deploy sim code. In VS Code, you set SIM manually. This is covered in Lesson 4 when we go deep on the IO pattern.</p>
+      </div>
+    </div>
+
+    <!-- Card 5: Constants.java — inner class structure -->
+    <div class="diff-card">
+      <div class="diff-card-file">
+        <span class="diff-file-badge">Constants.java</span>
+        Inner class structure
+      </div>
+      <div class="diff-panels">
+        <div class="diff-panel vanilla">
+          <div class="diff-panel-label">📄 Vanilla</div>
+          <code>// place constants here<br>// (empty)</code>
+        </div>
+        <div class="diff-panel bearbots">
+          <div class="diff-panel-label">🐻 BearBots</div>
+          <code>public static final<br>  class DriveConstants {<br>  public static final int<br>    kLeftMotorPort = 1;<br>  ...<br>}</code>
+        </div>
+      </div>
+      <div class="diff-problem">
+        <div class="diff-problem-label">⚠️ Problem this solves</div>
+        <p>Magic numbers scattered across subsystem files. Motor port hardcoded as <code>1</code> in three places. Wiring changes on build day. You hunt through files, miss one, and the robot drives in circles at your first match.</p>
+      </div>
+      <button class="diff-why-toggle" onclick="toggleWhy(this)">
+        <span class="dw-arrow">▶</span> Why we changed this
+      </button>
+      <div class="diff-why-content">
+        <p>Inner classes group related constants together without needing separate files. <code>Constants.DriveConstants.kLeftMotorPort</code> is unambiguous about what it is and where to find it. Change it once, everything that references it updates automatically.</p>
+        <p>This is a <strong>team design decision</strong> — there's no single right answer. BearBots uses inner classes as a middle ground. As the codebase grows, teams often split into separate files: <code>ArmConstants.java</code>, <code>FieldConstants.java</code>, <code>VisionConstants.java</code>. Start here, split when it gets crowded. The pattern is more important than the file count.</p>
+      </div>
+    </div>
+
+    <!-- Card 6: build.gradle — AdvantageKit vendor dep -->
+    <div class="diff-card">
+      <div class="diff-card-file">
+        <span class="diff-file-badge">build.gradle</span>
+        AdvantageKit vendor dependency
+        <span class="diff-good-to-know">good to know</span>
+      </div>
+      <div class="diff-panels">
+        <div class="diff-panel vanilla">
+          <div class="diff-panel-label">📄 Vanilla</div>
+          <code>// WPILib deps only<br>// no AdvantageKit</code>
+        </div>
+        <div class="diff-panel bearbots">
+          <div class="diff-panel-label">🐻 BearBots</div>
+          <code>// AdvantageKit vendor<br>// dep block added by<br>// Manage Vendor Libraries</code>
+        </div>
+      </div>
+      <div class="diff-problem">
+        <div class="diff-problem-label">⚠️ Problem this solves</div>
+        <p>AdvantageKit classes are referenced in code but unknown to the build system. First build fails with "cannot find symbol" on every Logger and @AutoLog reference. Nothing compiles.</p>
+      </div>
+      <button class="diff-why-toggle" onclick="toggleWhy(this)">
+        <span class="dw-arrow">▶</span> Why we changed this
+      </button>
+      <div class="diff-why-content">
+        <p>You never edit this block by hand. Running <code>WPILib: Manage Vendor Libraries → Install new libraries (online)</code> and pasting the AdvantageKit URL writes this automatically. The vendor dep tells Gradle where to download the AdvantageKit JAR and how to include it in the build.</p>
+        <p>If you ever add a new vendor library mid-season (PathPlanner, Phoenix 6, REVLib), this is the file that changes. Check it when builds break mysteriously.</p>
+        <p>📎 <a href="https://docs.advantagekit.org/getting-started/installation" target="_blank" rel="noopener">AdvantageKit installation docs →</a></p>
+      </div>
     </div>
 
     <h2>How the boot sequence works</h2>
@@ -495,7 +923,7 @@
     </div>
 
     <h2>XRP hardware ports</h2>
-    <p>When we move to physical hardware, these are the port-to-subsystem mappings for the Bear Bots XRP.</p>
+    <p>When we move to physical hardware, these are the port-to-subsystem mappings for the BearBots XRP.</p>
 
     <table class="hw-table">
       <thead>
@@ -1027,6 +1455,15 @@
 function toggleFile(id) {
   const el = document.getElementById('file-' + id);
   el.style.display = el.style.display === 'block' ? 'none' : 'block';
+}
+
+/* ── Diff card why toggle ──────────────────────────────────── */
+function toggleWhy(btn) {
+  const content = btn.nextElementSibling;
+  const isOpen = content.style.display === 'block';
+  content.style.display = isOpen ? 'none' : 'block';
+  btn.classList.toggle('open', !isOpen);
+  btn.querySelector('.dw-arrow').textContent = isOpen ? '▶' : '▼';
 }
 
 /* ── Going Further toggle ──────────────────────────────────── */
