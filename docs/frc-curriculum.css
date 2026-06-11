@@ -278,7 +278,17 @@ code {
  
 .hf-box p { margin-bottom: 0.6rem; font-size: 0.9rem; }
 .hf-box p:last-child { margin-bottom: 0; }
- 
+
+.hf-box ul, .hf-box ol {
+  padding-left: 2em;
+  margin: 0.25em 0 0.6em;
+}
+
+.hf-box ul li, .hf-box ol li {
+  font-size: 0.9rem;
+  padding: 0.1rem 0;
+}
+
 /* Brain box — amber */
 .hf-brain {
   background: var(--amber-light);
