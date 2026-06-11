@@ -259,22 +259,33 @@
       <p>Fair. But if you don't know what these files do, you'll spend the rest of the season randomly editing things hoping something works. This takes 20 minutes. Debugging blind takes hours.</p>
     </div>
 
-    <h2>Step 1 — Create a vanilla project</h2>
+    <h2>Step 1 — Create a XRP template project</h2>
     <p>Every BearBots project starts from the same WPILib template. Create one now so you can see exactly what the generator produces.</p>
 
     <div class="hf-box hf-info">
       <span class="hf-label">Create the project</span>
-      <p><strong>1.</strong> Press <code>Ctrl+Shift+P</code> → type <code>WPILib: Create a new project</code> → Enter</p>
-      <p><strong>2.</strong> Project type: <strong>Template</strong> → Language: <strong>Java</strong> → Template: <strong>Command Robot Skeleton (Advanced)</strong></p>
-      <p><strong>3.</strong> Folder: choose somewhere outside your BearBots project (e.g. <code>D:\FRC\vanilla-explore</code>)</p>
-      <p><strong>4.</strong> Project name: <code>VanillaExplore</code> &nbsp;·&nbsp; Team number: <code>6964</code></p>
-      <p><strong>5.</strong> Click <strong>Generate Project</strong>. Wait for <code>BUILD SUCCESSFUL</code> in the terminal.</p>
-      <p><strong>6.</strong> VS Code prompts to open the new project — open it in a <strong>new window</strong> so you can have both projects open side by side.</p>
+      <p><strong>1.</strong> Click the WPILib hexagon logo in the top-right corner of VS Code</p>
+      <p><strong>2.</strong> Type <code>WPILib: Create a new project</code> and press <strong>Enter</strong></p>
+      <p><strong>3.</strong> Project type: <strong>Template</strong> → Language: <strong>Java</strong> → Template: <strong>Command Robot Skeleton (Advanced)</strong></p>
+      <ul>
+        <li>Click on <code>A</code> box and select <strong>Template</strong></li>
+        <li>Click on <code>B</code> box and select <strong>java</strong></li>
+        <li>Click on <code>C</code> box and select <strong>XRP - Timed Robot</strong></li>
+      </ul>
+      <img src="images/lesson02/CreateProject_Project_Type.webp" alt="Create project, select project type.">
+      <p><strong>4.</strong> Folder: choose somewhere outside your BearBots project (e.g. <code>D:\FRC\XRP-Template</code>)</p>
+      <p><strong>5.</strong> Project name: <code>XRP-Template</code> &nbsp;·&nbsp; Team number: <code>6964</code></p>
+      <p><strong>6.</strong> Check the box next to <strong>Enable Desktop Support</strong></p>
+      <ul>
+        <li><strong>See Note:</strong> this is required for simulation.</strong></li>
+      </ul>
+      <p><strong>7.</strong> Click <strong>Generate Project</strong>.</p>
+      <p><strong>8.</strong> VS Code prompts to open the new project — open it in a <strong>new window</strong>.</p>
     </div>
 
     <div class="hf-box hf-warning">
       <span class="hf-label">This project is for exploring only</span>
-      <p>Don't deploy this to the XRP. Don't save work here. It's a read-only reference — the BearBots project is where you'll actually code.</p>
+      <p>Don't deploy this to the XRP. Don't save work here. It's a read-only reference.</p>
     </div>
 
     <h2>Step 2 — Install Git and clone the BearBots project</h2>
@@ -285,7 +296,7 @@
       <p><strong>1.</strong> Open the VS Code terminal: <code>Ctrl+`</code> (backtick) or Terminal → New Terminal</p>
       <p><strong>2.</strong> Type exactly:</p>
       <div class="code-block"><pre>git --version</pre></div>
-      <p><strong>3.</strong> If you see something like <code>git version 2.48.1.windows.1</code> — Git is installed. Skip to the clone step below.</p>
+      <p><strong>3.</strong> If you see something like <code>git version 2.54.0.windows.1</code> — Git is installed. Skip to the clone step below.</p>
       <p>If you see <code>'git' is not recognized</code> — follow the install steps for your situation.</p>
     </div>
 
@@ -303,6 +314,9 @@
           <p><strong>2.</strong> Run the installer. Accept all defaults — don't change any options.</p>
           <p><strong>3.</strong> When finished, <strong>close and reopen VS Code</strong> — the terminal needs to restart to see Git</p>
           <p><strong>4.</strong> Run <code>git --version</code> again to confirm it works</p>
+          <ul>
+            <li><strong>FILE CLEAN UP:</strong> The install file can be removed after git has been installed.</strong></li>
+          </ul>
         </div>
       </div>
 
@@ -310,11 +324,15 @@
         <div class="hf-box hf-info" style="margin-top:0.75rem;">
           <span class="hf-label">Offline — install from USB</span>
           <p><strong>1.</strong> Plug in the USB drive</p>
-          <p><strong>2.</strong> In the VS Code terminal, run:</p>
-          <div class="code-block"><pre>D:\install\git\Git-installer.exe</pre></div>
-          <p><strong>3.</strong> Accept all defaults in the installer — don't change any options.</p>
-          <p><strong>4.</strong> When finished, <strong>close and reopen VS Code</strong> — the terminal needs to restart to see Git</p>
-          <p><strong>5.</strong> Run <code>git --version</code> to confirm it worked</p>
+          <p><strong>2.</strong> Open File Explorer and navigate to <code>D:\02-Install\git</code></p>
+          <p><strong>3.</strong> Copy the <code>Git-#.##.#-64-bit.exe</code> file to your <strong>Downloads</strong> folder</p>
+          <p><strong>4.</strong> Navigate to your Downloads folder and double-click <code>Git-installer.exe</code></p>
+          <p><strong>5.</strong> Accept all defaults in the installer — don't change any options.</p>
+          <p><strong>6.</strong> When finished, <strong>close and reopen VS Code</strong> — the terminal needs to restart to see Git</p>
+          <p><strong>7.</strong> Run <code>git --version</code> to confirm it worked</p>
+          <ul>
+            <li><strong>FILE CLEAN UP:</strong> The install file can be removed after git has been installed.</strong></li>
+          </ul>
         </div>
       </div>
     </div>
@@ -328,17 +346,19 @@
         data-label-back="Switch to online setup"
         data-swapped="false">Switch to offline setup</button>
 
-      <div id="repo-online">
+<div id="repo-online">
         <div class="hf-box hf-info" style="margin-top:0.75rem;">
           <span class="hf-label">Online — clone from GitHub</span>
-          <p><strong>1.</strong> In the VS Code terminal, run:</p>
-          <div class="code-block"><pre>cd D:\FRC
+          <p><strong>1.</strong> In the VS Code terminal, create a new folder for FRC files. Run:</p>
+          <div class="code-block"><pre>mkdir C:\FRC</pre></div>
+          <p><strong>2.</strong> Clone the repo into that folder:</p>
+          <div class="code-block"><pre>cd C:\FRC
 git clone https://github.com/Helijason/bearbots-xrp-code</pre></div>
-          <p><strong>2.</strong> Wait for the download to finish. You'll see <code>Cloning into 'bearbots-xrp-code'...</code> and then a done message.</p>
-          <p><strong>3.</strong> Open the cloned folder: File → Open Folder → <code>D:\FRC\bearbots-xrp-code</code></p>
+          <p><strong>3.</strong> Wait for the download to finish. You'll see <code>Cloning into 'bearbots-xrp-code'...</code> and then a done message.</p>
+          <p><strong>4.</strong> Open the cloned folder: File → Open Folder → <code>C:\FRC\bearbots-xrp-code</code></p>
           <div class="hf-box hf-warning" style="margin-top:0.75rem; margin-bottom:0;">
             <span class="hf-label">Keep it separate</span>
-            <p>This must be a fresh folder separate from Lesson 1. The <code>cd D:\FRC</code> command puts you in the right place — don't clone inside an existing project folder.</p>
+            <p>This must be a fresh folder separate from Lesson 1. The <code>cd C:\FRC</code> command puts you in the right place — don't clone inside an existing project folder.</p>
           </div>
         </div>
       </div>
@@ -346,9 +366,10 @@ git clone https://github.com/Helijason/bearbots-xrp-code</pre></div>
       <div id="repo-offline" style="display:none;">
         <div class="hf-box hf-info" style="margin-top:0.75rem;">
           <span class="hf-label">Offline — copy from USB</span>
-          <p><strong>1.</strong> In the VS Code terminal, run:</p>
-          <div class="code-block"><pre>xcopy /E /I D:\bearbots-xrp-code D:\FRC\bearbots-xrp-code</pre></div>
-          <p><strong>2.</strong> Open the copied folder: File → Open Folder → <code>D:\FRC\bearbots-xrp-code</code></p>
+          <p><strong>1.</strong> Open File Explorer and navigate to the USB drive</p>
+          <p><strong>2.</strong> Copy the <code>FRC</code> folder from the root of the USB drive</p>
+          <p><strong>3.</strong> Paste it into <code>C:\</code></p>
+          <p><strong>4.</strong> Open the copied folder: File → Open Folder → <code>C:\FRC\bearbots-xrp-code</code></p>
           <div class="hf-box hf-warning" style="margin-top:0.75rem; margin-bottom:0;">
             <span class="hf-label">Keep it separate</span>
             <p>This must be a fresh folder separate from Lesson 1. Don't copy into an existing project folder.</p>

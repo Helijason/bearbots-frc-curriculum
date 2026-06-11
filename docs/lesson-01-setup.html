@@ -102,14 +102,14 @@
     <p>Everything you need is on the USB drive your mentor gave you. <strong>Copy all files to your laptop before you start</strong>. NOTE: It is recommended to put the files <code>C:\Bearbots</code>. You may run into issues if you put the files in Onedrive.</p>
 
     <ul class="task-list">
-      <li><strong>Web Instructions</strong> - 01 Web\Index <code>.html</code></li>
-      <li><strong>7-Zip</strong> - 02 Installation\7-zip\7z*-WindowsVersion <code>.exe</code></li>
-      <li><strong>WPILib installer</strong> - 02 Installation\WPILib_Windows-year.* <code>.iso</code></li>
-      <li><strong>VS Code zip file</strong> - 02 Installation\VSCode-win* <code>.zip</code> <strong>(Provided for offline installation)</strong></li>
-      <li><strong>Gradle Cache</strong> - 03 Lesson01\Gradle Cache\caches  <strong>(Provided for offline installation)</strong></li>
-      <li><strong>Lesson01-project</strong> - 03 Lesson01\Lesson01-Project <code>.zip</code>, contains the First Drive project.</li>
-      <li><strong>FRC Lesson 01 Summary</strong> - 03 Lesson01\FRC_Lesson01_Summary_Card <code>.pdf</code></li>
-      <li><strong>XRP Firmware</strong> - XRP Firmware\xrp-wpilib-firmware-2.1.0-aa439f0 <code>.uf2</code></li>
+      <li><strong>Web Instructions</strong> - FRC\bearbots-xrp-code\docs\Index <code>.html</code></li>
+      <li><strong>Lesson01-project</strong> - FRC\bearbots-xrp-code\Lesson01\Lesson01-Project <code>.zip</code>, contains the First Drive project.</li>
+      <li><strong>FRC Lesson 01 Summary</strong> - FRC\bearbots-xrp-code\handouts\FRC_Lesson01_Summary_Card <code>.pdf</code></li>
+      <li><strong>7-Zip</strong> - Install\7-zip\7z*-WindowsVersion <code>.exe</code></li>
+      <li><strong>WPILib installer</strong> - Install\WPILib-VSCode\WPILib_Windows-year.* <code>.iso</code></li>
+      <li><strong>VS Code zip file</strong> - Install\WPILib-VSCode\VSCode-win* <code>.zip</code> <strong>(Provided for offline installation)</strong></li>
+      <li><strong>Gradle Cache</strong> - Install\Lesson01\Gradle Cache\caches  <strong>(Provided for offline installation)</strong></li>
+      <li><strong>XRP Firmware</strong> - Install\XRP Firmware\xrp-wpilib-firmware-2.1.0-aa439f0 <code>.uf2</code></li>
     </ul>
 
     <p>Pick the right OS version. If you grab the wrong one, the installer won't run.</p>
@@ -157,11 +157,11 @@
       <div class="toggle-content hint" id="vscode-offline" style="display:none;">
         <p><strong>OFFLINE Steps:</strong></p>
         <ul class="bullet-list">
-          <li>Select <strong>Select existing VS Code archive for offline install on this computer</strong>, then navigate to <strong>02 Installation\VSCode-win*.zip</strong> on the USB drive.</li>
+          <li>Select <strong>Select existing VS Code archive for offline install on this computer</strong>, then navigate to <strong>Install\VSCode-win*.zip</strong> where this file was saved on your computer.</li>
           <img src="images/lesson01/installer-vscode-offline.webp" alt="WPILib installer VS Code offline option">
         </ul>
         <p><strong>Note:</strong> You will likely get an invalid Hash warning. It is okay — install the version provided. Click <strong>Next</strong> to continue.</p>
-        <p><strong>8.</strong> Open File Explorer and navigate to <code>03 Lesson01\Gradle Cache\</code> on the USB drive.</p>
+        <p><strong>8.</strong> Open File Explorer and navigate to <code>\Install\Lesson01-Gradle</code> where this file was saved on your computer.</p>
         <p><strong>9.</strong> Copy the <code>caches</code> folder.</p>
         <p><strong>10.</strong> Paste it into <code>C:\Users\<em>YourUsername</em>\.gradle\</code> — if prompted to merge folders or replace files, choose <strong>Merge</strong> / <strong>Yes</strong>.</p>
         <p>When the installer finishes, launch <strong>WPILib VS Code 2026</strong> from your desktop icon (Windows). VS Code opens with a WPILib theme - that's how you know it's the right one.</p>
@@ -305,33 +305,19 @@
 
   </div><!-- /section-install-web -->
 
-  <!-- ═══════════════════════════════════════════════════════
+<!-- ═══════════════════════════════════════════════════════
        PART 2 — THE FIRST DRIVE PROJECT
        ═══════════════════════════════════════════════════════ -->
   <div class="lesson-section" id="section-project">
 
     <p>The First Drive project is a complete, working robot program. Today you're opening it and verifying your environment can compile it and run in the simulator. You'll explore what's actually inside in <span class="next-lesson-ref"></span>.</p>
 
-    <h2>Step 1 - Extract the ZIP</h2>
-
-    <ul class="task-list">
-      <li>Find <code>Lesson01-Project.zip</code> on your USB drive</li>
-      <li>Copy it to your <strong>Documents</strong> folder (or wherever you keep code)</li>
-      <li>Right-click &rarr; <strong>Extract All</strong> on Windows</li>
-      <li>You should now have a folder named <code>Lesson01-Project</code></li>
-    </ul>
-
-    <div class="hf-box hf-warning">
-      <span class="hf-label">Don't work from inside the ZIP</span>
-      <p>Some operating systems will let you "browse" inside a ZIP file like it's a folder. <strong>That's not the same as extracting.</strong> If you skip the extract step, nothing else in this lesson will work. Make sure you actually have a real folder, not just a window into the ZIP.</p>
-    </div>
-
-    <h2>Step 2 - Open the folder in WPILib VS Code</h2>
+<h2>Step 1 - Open the folder in WPILib VS Code</h2>
 
     <ul class="task-list">
       <li>Launch <strong>WPILib VS Code 2026</strong> (the WPILib one - not regular VS Code if previously installed.)</li>
       <li>Click <strong>File &rarr; Open Folder</strong></li>
-      <li>Navigate to your extracted <code>Lesson01-Project\Lesson01\First Drive</code> folder</li>
+      <li>Navigate to <code>C:\FRC\bearbots-xrp-code\lesson01\First Drive</code></li>
       <li>Click <strong>Select Folder</strong></li>
     </ul>
 
@@ -339,14 +325,13 @@
 
     <p>You should see a file tree on the left with folders like <code>src</code>, files like <code>build.gradle</code>, and a <code>.wpilib</code> folder. If you see those, the project is open correctly.</p>
 
-    <h2>Step 3 - Build the project</h2>
+    <h2>Step 2 - Build the project</h2>
 
     <p>This is the moment of truth. If the build works, your environment is healthy.</p>
 
     <div class="hf-box hf-info">
       <span class="hf-label">How to build</span>
-      <p><strong>1.</strong> Click the WPILib hexagon logo in the top-right corner of VS Code
-      </p>
+      <p><strong>1.</strong> Click the WPILib hexagon logo in the top-right corner of VS Code</p>
       <p><strong>2.</strong> Type <code>WPILib: Build Robot Code</code></p>
       <p><strong>3.</strong> Press <strong>Enter</strong></p>
       <p><strong>4.</strong> Watch the terminal at the bottom of VS Code</p>
