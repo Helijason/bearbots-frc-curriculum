@@ -24,6 +24,7 @@ pdfmetrics.registerFont(TTFont('DVB', '/usr/share/fonts/truetype/dejavu/DejaVuSa
 
 - `DV` / `DVB` — used for step numbers, checkboxes, and any text needing proper Unicode rendering
 - `Helvetica` / `Helvetica-Bold` / `Helvetica-Oblique` — used everywhere else
+- **Do not use Unicode arrow/special characters (`→`, `—`) with Helvetica** — they may render as black boxes. Use ASCII equivalents (`->`, `-`) or switch to `DV` for those strings.
 
 ---
 
@@ -35,7 +36,7 @@ pdfmetrics.registerFont(TTFont('DVB', '/usr/share/fonts/truetype/dejavu/DejaVuSa
 | `TEAL_LT` | `#EAF4F4` | Box fill (teal sections) |
 | `PURPLE` | `#6B4A9B` | Section bar bg (secondary) |
 | `PURPLE_LT` | `#F0ECF8` | Box fill (purple sections) |
-| `ORANGE` | `#B8762A` | Section bar bg (tertiary / questions) |
+| `ORANGE` | `#B8762A` | Section bar bg (tertiary) |
 | `ORANGE_LT` | `#FAF3E8` | Box fill (orange sections, My Notes) |
 | `RULE` | `#CCCCCC` | Box stroke, ruled lines |
 | `TXT` | `#222222` | Body text |
@@ -99,13 +100,13 @@ FOOTER_H   = 26    # footer bar height
 └─────────────────────────────────────────────┘
   [CARD_GAP = 10]
 ┌──────────────────────┐ ┌────────────────────┐  ROW2_TOP_H = max(left, right)
-│  THE SETUP WORKFLOW  │ │  AFTER THIS LESSON │
-│  (teal, left col)    │ │  (purple, right)   │
+│  THE SETUP WORKFLOW  │ │  AFTER THIS LESSON │  capped so bottom row gets
+│  (teal, left col)    │ │  (purple, right)   │  at least 42% of available space
 └──────────────────────┘ └────────────────────┘
   [CARD_GAP = 10]
-┌──────────────────────┐ ┌────────────────────┐  ROW2_BOT_H = expands to fill
-│  QUESTIONS I STILL   │ │  KEY VOCABULARY    │  remaining space above footer
-│  HAVE (orange, left) │ │  (teal, right)     │
+┌──────────────────────┐ ┌────────────────────┐  ROW2_BOT_H = fills remaining
+│  BOTTOM-LEFT SECTION │ │  KEY VOCABULARY    │  space above footer
+│  (lesson-specific)   │ │  (teal, right)     │
 └──────────────────────┘ └────────────────────┘
   [CARD_GAP = 10]
 ┌─────────────────────────────────────────────┐  FOOTER_H = 26, pinned to MB
@@ -114,18 +115,19 @@ FOOTER_H   = 26    # footer bar height
 ```
 
 **Height rules:**
-- `ROW2_TOP_H = max(SETUP_H, AFTER_H)` — both boxes in the row are the same height, driven by whichever has more content
-- `ROW2_BOT_H` — dynamically expands to fill all remaining space above the footer. The bottom row always touches the footer gap.
+- `ROW2_TOP_H = min(max(SETUP_H, AFTER_H), max_top_h)` — driven by content, but capped to protect bottom row
+- `ROW2_BOT_H` — dynamically expands to fill all remaining space above the footer. Always touches the footer gap.
+- **Bottom row priority:** bottom row gets at least 42% of available space between concepts and footer. Cap the top row height accordingly: `max_top_h = available - CARD_GAP - max(90, available * 0.42)`
 - If total content overflows, `CARD_GAP` is reduced proportionally (minimum 3 pt)
 
 ---
 
 ## Section Box Drawing
 
-Every content section (Big Idea, Key Concepts, Setup Workflow, etc.) is drawn as:
+Every content section is drawn as:
 
 1. **Rounded rectangle** (r=5) with light fill and `RULE` stroke, lw=0.75
-2. **Colored bar** on top — rounded at top corners only (achieved by drawing a full roundRect extending below and covering the bottom round with a plain rect)
+2. **Colored bar** on top — rounded at top corners only. Achieved by drawing a full `roundRect` extending `r` below the bar top, then covering the unwanted bottom rounding with a plain `rect`.
 3. **White bar label text** — `Helvetica-Bold` 7.5 pt, left-aligned, 8 pt from left edge, vertically centered in bar
 
 ```python
@@ -136,6 +138,7 @@ def section_box(c, x, y, w, h, label, bar_color, box_fill, r=5, bar_h=22):
     # 2. bar — rounded top only
     c.setFillColor(bar_color); c.setLineWidth(0)
     c.roundRect(x, y+h-bar_h, w, bar_h+r, r, fill=1, stroke=0)  # extends r below
+    c.rect(x, y+h-bar_h, w, r, fill=1, stroke=0)                 # cover bottom round
     # 3. label
     c.setFillColor(WHITE); c.setFont("Helvetica-Bold", 7.5)
     c.drawString(x+8, y+h-bar_h/2-3.5, label)
@@ -148,7 +151,8 @@ def section_box(c, x, y, w, h, label, bar_color, box_fill, r=5, bar_h=22):
 - Teal rounded rectangle (`r=6`) spanning full content width, height 68 pt
 - **Left side:**
   - Module line: `"MODULE X  —  LESSON XX"` — `Helvetica-Bold` 8 pt, color `#A8D4D4`, 10 pt from left, 15 pt from top
-  - Title: lesson title — `Helvetica-Bold` 24 pt, `WHITE`, 10 pt from left, 50 pt from top
+  - Title: lesson title — `Helvetica-Bold` 20 pt, `WHITE`, 10 pt from left, 50 pt from top
+  - **Title length rule:** keep short enough to fit ~400 pt at 20 pt bold without touching the badge. Shorten from the official lesson title if needed; update `site-config.js` to match.
 - **Right side (right-aligned, 50 pt from right edge to leave room for badge):**
   - Stack line: `"Java  |  AdvantageKit  |  XRP"` — `Helvetica-Bold` 8.5 pt, `#A8D4D4`
   - Keep line: `"Keep this card. Add it to your binder."` — `Helvetica-Oblique` 7.5 pt, `#BBDDDD`
@@ -169,23 +173,26 @@ def section_box(c, x, y, w, h, label, bar_color, box_fill, r=5, bar_h=22):
 
 - Full content width, `TEAL` bar, `TEAL_LT` fill
 - Contains **5 concept cards** in a horizontal row with 4 pt gaps between them
-- Each card: `card_w = (CW - 4*4) / 5`
+- Card width: `card_w = (CW - 4*4) / 5`
+- Cards sit inside the section box with `card_pad_top = 5` and `card_pad_bot = 5` below the bar
+- Card height: `card_h = CONCEPTS_H - BAR_H - card_pad_top - card_pad_bot`
 
-**Card structure (bottom to top in canvas coords):**
+**Card structure (top to bottom):**
 
 ```
-┌──────────────────┐  ← rounded rect, white fill, RULE stroke
-│  description     │  centered text, Helvetica 7.5 pt, 3 lines
-│  (3 lines)       │  vertically centered in lower portion
-├──────────────────┤  ← colored bar, flat bottom / rounded top
-│  Role label      │  Helvetica 7 pt, white, centered (lower bar)
-│  CONCEPT NAME    │  Helvetica-Bold 7.5 pt, white, centered (upper bar)
+┌──────────────────┐  ← rounded rect, white fill, RULE stroke lw=0.75, r=4
+│  CONCEPT NAME    │  Helvetica-Bold 7.5 pt (6.5 if too wide), white, centered
+│  Role label      │  Helvetica 7 pt, white, centered
+├──────────────────┤  ← bottom of coloured bar
+│  description     │  Helvetica 7.5 pt, TXT, centered, 3 lines max
+│  (3 lines)       │  vertically centered in remaining card height
 └──────────────────┘
 ```
 
 - **Bar heights:** name row = 16 pt, role row = 12 pt, total bar = 28 pt
-- If title wraps to 2 lines: reduce font to 6.5 pt, line height 8.5 pt
-- Description: split on `\n`, centered, vertically centered in remaining card height
+- Bar draw: `roundRect` for top rounding + `rect` to cover bottom rounding (same pattern as section_box)
+- Description: split on `\n`, 3 lines max, line height 9 pt, vertically centered in `card_h - total_bar_h`
+- If concept name is too wide at 7.5 pt, reduce to 6.5 pt
 
 ---
 
@@ -193,41 +200,63 @@ def section_box(c, x, y, w, h, label, bar_color, box_fill, r=5, bar_h=22):
 
 **Column widths:** both columns = `COL_W = (CW - GAP) / 2` exactly. Gap between = 7 pt.
 
-**Row height rule:** within each row, both boxes are drawn at `max(left_h, right_h)`.
+**Row height rule:** within each row, both boxes drawn at the same height.
+- Top row: `min(max(SETUP_H, AFTER_H), max_top_h)` — see bottom row priority rule above
+- Bottom row: fills all remaining space
 
 ### THE SETUP WORKFLOW (top-left, TEAL)
 
 - Numbered steps: bold step number (`DVB` 7.5 pt) + regular text (`DV` 7.5 pt)
-- Step number drawn at x+8, text at x+8+14 (14 pt indent)
+- Step number at x+8; text at x+8+14 (14 pt indent)
 - Line height 11 pt, 3 pt gap between steps
 - Text wraps within `COL_W - 16 - 14` pt
+- Start y: `box_top_y + box_h - BAR_H - PAD - line_h` (first baseline below bar)
 
 ### AFTER THIS LESSON I CAN... (top-right, PURPLE)
 
 - Checkbox items with drawn checkboxes (not unicode)
-- Checkbox: 8×8 pt white rect, `#888888` stroke, lw=0.75, drawn at rx+8
-- Text: `DV` 7.5 pt, starts at rx+8+14 (14 pt indent from left edge)
+- Checkbox: 8×8 pt white rect, `#888888` stroke, lw=0.75
+- **Checkbox vertical alignment:** centre the checkbox on the first line baseline of each item: `cb_y = cy - cb_size/2 + font_size/2 - 1`
+- Text: `DV` 7.5 pt, starts at x+8+14 (14 pt indent from box left)
 - Line height 11 pt, 3 pt gap between items
+- Start y: same formula as Setup Workflow
 
-### QUESTIONS I STILL HAVE (bottom-left, ORANGE)
+### BOTTOM-LEFT SECTION (lesson-specific, TEAL by default)
 
-- Italic prompt: `Helvetica-Oblique` 8 pt, `TXT_MED`
-- Ruled lines: `RULE` color, lw=0.5, spaced 18 pt apart, 8 pt from left/right edges
-- Height expands dynamically to fill available space above footer
+The bottom-left section label and content vary per lesson. Examples:
+
+| Lesson | Label | Content type |
+|---|---|---|
+| 01 | QUESTIONS I STILL HAVE | Ruled lines (ORANGE bar) |
+| 02 | PROGRAM FLOW | Embedded image (TEAL bar) |
+
+**Ruled lines variant:**
+- Italic prompt: `Helvetica-Oblique` 8 pt, `TXT_MED`, 14 pt below bar
+- Lines: `RULE` color, lw=0.5, spaced 18 pt, 8 pt from left/right edges
+
+**Embedded image variant:**
+- Use `c.drawImage(path, x, y, w, h, preserveAspectRatio=True, mask='auto')`
+- Pad image 6 pt inside the section box on all sides
+- Available image area: `w - 12` wide, `h - BAR_H - 12` tall
+- Maintain aspect ratio: compare box aspect to image aspect, constrain by the binding dimension, centre on the other axis
+- Bar color: TEAL, fill: TEAL_LT
 
 ### KEY VOCABULARY (bottom-right, TEAL)
 
-- Each entry: **bold term** (`Helvetica-Bold` 7.5 pt) + ` —` + regular definition (`Helvetica` 7.5 pt)
-- Term and dash drawn separately to allow bold/normal on same line
+- **Two-column layout:** terms left-aligned, definitions left-aligned at a fixed indent
+- **Column break:** measure widest term with `Helvetica-Bold` at 7.5 pt; add 8 pt gap → `col_break = max_term_w + 8`
+- Term: `Helvetica-Bold` 7.5 pt, `TXT`
+- Definition: `Helvetica` 7.5 pt, `TXT`, wraps within `COL_W - 16 - col_break`
+- **No dash separator between term and definition**
 - Line height 11 pt, 3 pt gap between entries
-- Height matches Questions box (both set to `ROW2_BOT_H_draw`)
+- Start y: same formula as other sections
 
 ---
 
 ## Footer
 
-- Teal (`TEAL`) rounded rectangle (`r=4`), height 26 pt, **pinned to `MB`** (bottom margin)
-- Three text elements in white, all vertically centered:
+- Teal (`TEAL`) rounded rectangle (`r=4`), height 26 pt, **pinned to `MB`**
+- Three text elements in white, all vertically centered at `y + h/2 - 3.5`:
   - Left: `"FRC Programming Curriculum — Lesson XX"` — `Helvetica-Bold` 7.5 pt
   - Center: `"Next: Lesson XX — [next lesson title]"` — `Helvetica` 7.5 pt, `drawCentredString`
   - Right: `"Keep this. Collect all 8."` — `Helvetica` 7.5 pt, `drawRightString`
@@ -238,10 +267,10 @@ def section_box(c, x, y, w, h, label, bar_color, box_fill, r=5, bar_h=22):
 
 - **Header** — identical to page 1
 - **MY NOTES section** — full content width, `TEAL` bar, `ORANGE_LT` fill
-  - Height: `notes_top - MB - FOOTER_H - CARD_GAP * 2` (fills between header gap and footer gap)
   - Y position: `MB + FOOTER_H + CARD_GAP`
-  - Italic prompt at top: `"Write anything here — surprises, connections, things to look up later."`
-  - Ruled lines: `RULE` lw=0.5, spaced 22 pt, starting 32 pt below bar, stopping 10 pt from bottom
+  - Height: fills from that y to `hdr_y - CARD_GAP`
+  - Italic prompt: `"Write anything here — surprises, connections, things to look up later."` — 14 pt below bar
+  - Ruled lines: `RULE` lw=0.5, spaced 22 pt, starting 32 pt below bar top, stopping 8 pt from bottom
 - **Footer** — identical to page 1
 
 ---
@@ -252,21 +281,21 @@ When generating a new lesson card, change only these:
 
 ```python
 # ── HEADER ────────────────────────────────────────────────────────────────────
-module_line  = "MODULE X  —  LESSON XX"   # e.g. "MODULE 1  —  LESSON 01"
-title        = "Lesson title here"         # e.g. "Setup + first drive"
-badge_num    = "01"                        # lesson number as string
+module_line  = "MODULE X  —  LESSON XX"   # e.g. "MODULE 1  —  LESSON 02"
+title        = "Lesson title here"         # shortened to fit header at 20pt bold
+badge_num    = "02"                        # lesson number as string
 
 # ── BIG IDEA ──────────────────────────────────────────────────────────────────
 big_idea_bold   = "The bold headline statement."
 big_idea_italic = "The supporting sentence in italics."
 
-# ── KEY CONCEPTS (5 entries) ──────────────────────────────────────────────────
+# ── KEY CONCEPTS (always exactly 5 entries) ───────────────────────────────────
 concepts = [
     ("Concept Name",  "Role label",  "Line 1\nLine 2\nLine 3"),
-    ...  # always exactly 5 cards
+    ...
 ]
 
-# ── SETUP WORKFLOW (or equivalent left-column workflow) ───────────────────────
+# ── SETUP WORKFLOW ────────────────────────────────────────────────────────────
 left_col_label = "THE SETUP WORKFLOW"      # or lesson-specific label
 steps = [
     ("1", "Step description text"),
@@ -279,15 +308,19 @@ checks = [
     ...
 ]
 
+# ── BOTTOM-LEFT SECTION ───────────────────────────────────────────────────────
+# Define bot_left_label and a draw_bot_left(c, x, y, w, h) function per lesson.
+# Default: ruled lines. Alternative: embedded image.
+
 # ── VOCABULARY ────────────────────────────────────────────────────────────────
 vocab = [
-    ("Term",  "Definition text"),
-    ...  # 4–6 entries
+    ("Term",  "Definition text — no dash, two-column layout"),
+    ...  # 4-6 entries
 ]
 
 # ── FOOTER ───────────────────────────────────────────────────────────────────
-footer_left   = "FRC Programming Curriculum — Lesson 01"
-footer_center = "Next: Lesson 02 — Next lesson title here."
+footer_left   = "FRC Programming Curriculum — Lesson XX"
+footer_center = "Next: Lesson XX — Next lesson title here."
 footer_right  = "Keep this. Collect all 8."
 ```
 
@@ -295,9 +328,15 @@ footer_right  = "Keep this. Collect all 8."
 
 ## Generation Notes
 
-- The **bottom row always expands** to fill remaining page height. Don't hard-code its height.
-- The **overflow guard** auto-reduces `CARD_GAP` if total content height exceeds available space. Keep it — content-heavy lessons may need it.
-- Keep concept card descriptions to **3 lines max**. Longer text won't fit in the card area.
-- Keep checklist items **concise** — each item should fit in 1–2 wrapped lines at 7.5 pt.
-- Keep step text **concise** — steps that wrap to 3+ lines push the box very tall.
-- The right-column panel for lessons that aren't Lesson 01 may use a **different label and content type** (e.g. "KEYBOARD DRIVING KEYS" in Lesson 1's original). The bar color stays `PURPLE` and fill stays `PURPLE_LT`. The content inside can be any canvas-drawn elements.
+- **Unicode safety:** avoid `→`, `—`, and other non-ASCII in Helvetica strings. Use `->` and `-` or switch to `DV`/`DVB` fonts.
+- **Bottom row always expands** to fill remaining page height. Never hard-code its height.
+- **Bottom row priority:** give it at least 42% of the space between concepts and footer. Cap top row height to enforce this.
+- **Overflow guard:** auto-reduce `CARD_GAP` if total content height exceeds available space (minimum 3 pt). Keep this logic — content-heavy lessons need it.
+- **Concept card descriptions:** 3 lines max. Content beyond 3 lines won't fit.
+- **Checklist items:** keep concise — 1–2 wrapped lines at 7.5 pt per item.
+- **Step text:** keep concise — steps wrapping to 3+ lines push the top row very tall, starving the bottom row.
+- **Checkbox alignment:** always vertically centre checkbox on the first line baseline of its item, not a fixed offset from the box top.
+- **Vocab column break:** always measured dynamically from the widest term. Never hardcode the indent.
+- **Title length:** the card header title at 20 pt bold must fit in ~400 pt. Shorten from the official lesson title where needed and update `site-config.js` to match.
+- **Bottom-left section:** varies by lesson. Label, bar color, and content type are all per-lesson decisions. Define a `draw_bot_left()` function per lesson rather than hardcoding ruled lines.
+- **Image embedding:** use `preserveAspectRatio=True, mask='auto'`. Always compute draw dimensions maintaining aspect ratio — never stretch.

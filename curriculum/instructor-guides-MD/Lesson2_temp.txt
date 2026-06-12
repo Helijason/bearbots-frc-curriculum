@@ -1,0 +1,135 @@
+Constants Scavenger Hunt
+========================
+
+HUNT 1: Motor Speed Limit
+--------------------------
+Hard coded 0.8 in Drive.java.
+
+    // Clamp inputs to valid range.
+    // Clamping ensures any value above or below some certain number gets "clamped"
+    // to that number, so it stays within some range.
+    xaxisSpeed = MathUtil.clamp(xaxisSpeed, -1.0, 1.0) * 0.8; // limit to 80% speed
+    zaxisRotate = MathUtil.clamp(zaxisRotate, -1.0, 1.0);
+
+Add Constant: DriveConstants.java
+
+    /** Maximum drive speed as a fraction of full power [0.0, 1.0]. */
+    public static final double kSpeedLimit = 0.8;
+
+Drive.java becomes:
+
+    xaxisSpeed = MathUtil.clamp(xaxisSpeed, -1.0, 1.0) * DriveConstants.kSpeedLimit;
+
+
+HUNT 2: Controller Deadband
+-----------------------------
+Hard coded 0.1 in RobotContainer.java.
+
+    drive.setDefaultCommand(
+        new ArcadeDrive(
+            drive,
+            () -> -MathUtil.applyDeadband(controller.getRawAxis(kForwardAxis), 0.1), // ignore small stick drift
+            () -> -MathUtil.applyDeadband(controller.getRawAxis(kRotationAxis), 0.1)));
+
+Add Constant: Constants.java — OperatorConstants
+
+    /** Joystick deadband — inputs smaller than this are treated as zero. */
+    public static final double kDeadband = 0.1;
+
+RobotContainer.java becomes:
+
+    drive.setDefaultCommand(
+        new ArcadeDrive(
+            drive,
+            () -> -MathUtil.applyDeadband(controller.getRawAxis(kForwardAxis), kDeadband),
+            () -> -MathUtil.applyDeadband(controller.getRawAxis(kRotationAxis), kDeadband)));
+
+HUNT 3: Max Arm Angle
+----------------------
+Hard coded 120 in Arm.java setAngle().
+
+    public void setAngle(double angleDeg) {
+        angleDeg = Math.min(angleDeg, 120); // don't go past safe limit
+        io.setAngle(angleDeg);
+
+        Logger.recordOutput("Arm/Commanded/AngleDeg", angleDeg);
+    }
+
+Update Constant: ArmConstants.java — change kMaxAngleDeg from 180.0 to 120.0
+
+    /** Maximum allowed servo angle in degrees. */
+    public static final double kMaxAngleDeg = 120.0;
+
+Arm.java becomes:
+
+    angleDeg = Math.min(angleDeg, ArmConstants.kMaxAngleDeg);
+
+HUNT 4: Wheel Circumference
+-----------------------------
+Hard coded 0.1885 in DriveConstants.java.
+
+    public static final double kEncoderDistancePerPulseMeters =
+        0.1885 / kCountsPerWheelRevolution; // wheel circumference in meters / kCountsPerWheelRevolution
+
+Add Constant: DriveConstants.java
+
+    /** Wheel circumference in meters (pi * diameter). */
+    public static final double kWheelCircumferenceMeters = Math.PI * kWheelDiameterMeters;
+
+DriveConstants.java becomes:
+
+    public static final double kEncoderDistancePerPulseMeters =
+        kWheelCircumferenceMeters / kCountsPerWheelRevolution;
+
+HUNT 5: Auto Timing Constants
+-------------------------------
+Hard coded 2.0 and 1.3 in AutonomousTime.java.
+ 
+    new RunCommand(() -> drive.arcadeDrive(0.6, 0.0), drive).withTimeout(2.0),  // hard coded timer
+    new RunCommand(() -> drive.arcadeDrive(0.0, 0.5), drive).withTimeout(1.3),  // hard coded timer
+    new RunCommand(() -> drive.arcadeDrive(0.6, 0.0), drive).withTimeout(2.0),  // hard coded timer
+    new RunCommand(() -> drive.arcadeDrive(0.0, -0.5), drive).withTimeout(1.3)); // hard coded timer
+ 
+Add Constants: Constants.java — new AutoConstants inner class
+ 
+    public static final class AutoConstants {
+        private AutoConstants() {}
+ 
+        /** Duration to drive forward in time-based auto (seconds). */
+        public static final double kAutoDriveTimeSeconds = 2.0;
+ 
+        /** Duration to turn in time-based auto (seconds). */
+        public static final double kAutoTurnTimeSeconds = 1.3;
+    }
+ 
+AutonomousTime.java becomes:
+ 
+    new RunCommand(() -> drive.arcadeDrive(0.6, 0.0), drive).withTimeout(AutoConstants.kAutoDriveTimeSeconds),
+    new RunCommand(() -> drive.arcadeDrive(0.0, 0.5), drive).withTimeout(AutoConstants.kAutoTurnTimeSeconds),
+    new RunCommand(() -> drive.arcadeDrive(0.6, 0.0), drive).withTimeout(AutoConstants.kAutoDriveTimeSeconds),
+    new RunCommand(() -> drive.arcadeDrive(0.0, -0.5), drive).withTimeout(AutoConstants.kAutoTurnTimeSeconds));
+ 
+NOTE: This hunt is intentionally more challenging — students must identify
+two related magic numbers, create a new inner class in Constants.java, and
+update multiple call sites. Use as a stretch goal or Silver/Gold challenge.
+
+
+HUNT 6: Project Name String
+-----------------------------
+Hard coded "Activity2" in Robot.java.
+
+    Logger.recordMetadata("ProjectName", "Activity2");
+
+Add Constant: Constants.java
+
+    /** Project name logged to AdvantageKit metadata on startup. */
+    public static final String kProjectName = "Activity2";
+
+Robot.java becomes:
+
+    Logger.recordMetadata("ProjectName", kProjectName);
+
+Add import to Robot.java:
+
+    import static frc.robot.Constants.kProjectName;
+
