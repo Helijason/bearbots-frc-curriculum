@@ -378,6 +378,14 @@ git clone https://github.com/Helijason/bearbots-xrp-code</pre></div>
       </div>
     </div>
 
+<div class="hf-box hf-warning">
+      <span class="hf-label">One-time setup — do this before your first commit</span>
+      <p>Git needs to know who you are before it can save any snapshots. Run these two commands in the VS Code terminal:</p>
+      <div class="code-block"><pre>git config --global user.name "Your Name"
+git config --global user.email "you@example.com"</pre></div>
+      <p>You only do this once per machine. Use your real name and the email tied to your GitHub account.</p>
+    </div>
+
     <h2>Git basics — your three commands</h2>
     <p>Git tracks changes in snapshots called <strong>commits</strong>. Think of each commit as a save point you can return to. Here are the three commands you'll use every session.</p>
 
@@ -402,43 +410,27 @@ git clone https://github.com/Helijason/bearbots-xrp-code</pre></div>
     </div>
 
     <!-- Git cheat sheet reference box -->
-    <div style="border:2px solid var(--teal); border-radius:var(--radius); overflow:hidden; margin:1rem 0;">
-      <div style="background:var(--teal); padding:0.5rem 0.75rem; display:flex; align-items:center; gap:0.5rem;">
-        <span style="color:white; font-weight:700; font-size:0.85rem;">📋 Git Quick Reference</span>
-        <span style="color:#A8D4D4; font-size:0.78rem; margin-left:auto;">keep this — you'll use it every lesson</span>
-      </div>
-      <div style="padding:0.75rem; background:var(--teal-light);">
-        <table style="width:100%; border-collapse:collapse; font-size:0.85rem;">
-          <tr>
-            <td style="padding:0.35rem 0.5rem; font-family:var(--font-mono); color:var(--teal); font-weight:700; white-space:nowrap; border-bottom:1px solid var(--gray-border);">git --version</td>
-            <td style="padding:0.35rem 0.5rem; color:var(--mid); border-bottom:1px solid var(--gray-border);">Confirm Git is installed</td>
-          </tr>
-          <tr>
-            <td style="padding:0.35rem 0.5rem; font-family:var(--font-mono); color:var(--teal); font-weight:700; white-space:nowrap; border-bottom:1px solid var(--gray-border);">git clone &lt;url&gt;</td>
-            <td style="padding:0.35rem 0.5rem; color:var(--mid); border-bottom:1px solid var(--gray-border);">Download a repository for the first time</td>
-          </tr>
-          <tr>
-            <td style="padding:0.35rem 0.5rem; font-family:var(--font-mono); color:var(--teal); font-weight:700; white-space:nowrap; border-bottom:1px solid var(--gray-border);">git pull</td>
-            <td style="padding:0.35rem 0.5rem; color:var(--mid); border-bottom:1px solid var(--gray-border);">Get latest updates — run at the start of every session</td>
-          </tr>
-          <tr>
-            <td style="padding:0.35rem 0.5rem; font-family:var(--font-mono); color:var(--teal); font-weight:700; white-space:nowrap; border-bottom:1px solid var(--gray-border);">git add .</td>
-            <td style="padding:0.35rem 0.5rem; color:var(--mid); border-bottom:1px solid var(--gray-border);">Stage all changed files</td>
-          </tr>
-          <tr>
-            <td style="padding:0.35rem 0.5rem; font-family:var(--font-mono); color:var(--teal); font-weight:700; white-space:nowrap; border-bottom:1px solid var(--gray-border);">git commit -m "msg"</td>
-            <td style="padding:0.35rem 0.5rem; color:var(--mid); border-bottom:1px solid var(--gray-border);">Save a snapshot with a description</td>
-          </tr>
-          <tr>
-            <td style="padding:0.35rem 0.5rem; font-family:var(--font-mono); color:var(--teal); font-weight:700; white-space:nowrap;">git push</td>
-            <td style="padding:0.35rem 0.5rem; color:var(--mid);">Upload commits to GitHub (covered later)</td>
-          </tr>
-        </table>
-      </div>
-    </div>
+<div class="ref-box">
+  <div class="ref-box-header">
+    <span class="ref-box-title">📋 Git Quick Reference</span>
+    <span class="ref-box-subtitle">keep this — you'll use it every lesson</span>
+  </div>
+  <div class="ref-box-body">
+    <table class="ref-table">
+      <tr><td>git config --global user.name "Name"</td><td>Set your name — one time per machine</td></tr>
+      <tr><td>git config --global user.email "e@mail"</td><td>Set your email — one time per machine</td></tr>
+      <tr><td>git --version</td><td>Confirm Git is installed</td></tr>
+      <tr><td>git clone &lt;url&gt;</td><td>Download a repository for the first time</td></tr>
+      <tr><td>git pull</td><td>Get latest updates — run at the start of every session</td></tr>
+      <tr><td>git add .</td><td>Stage all changed files</td></tr>
+      <tr><td>git commit -m "msg"</td><td>Save a snapshot with a description</td></tr>
+      <tr><td>git push</td><td>Upload commits to GitHub (covered later)</td></tr>
+    </table>
+  </div>
+</div>
 
-    <h2>Step 3 — What the vanilla project generates</h2>
-    <p>Look at the vanilla project first. Open the Explorer panel (<code>Ctrl+Shift+E</code>) and expand <code>src/main/java/frc/robot/</code>. You should see exactly these files:</p>
+    <h2>Step 3 — What the XRP-TEMPLATE project generates</h2>
+    <p>Look at the XRP-TEMPLATE project first. Open the Explorer panel (<code>Ctrl+Shift+E</code>) and expand <code>src/main/java/frc/robot/</code>. You should see exactly these files:</p>
 
     <div style="display:flex; flex-direction:column; gap:0.5rem; margin: 1rem 0;">
 
@@ -461,7 +453,7 @@ git clone https://github.com/Helijason/bearbots-xrp-code</pre></div>
       </div>
       <div id="file-robot" style="display:none; background:var(--code-bg); border:1px solid var(--code-border); border-radius:var(--radius); padding:1rem; margin-top:-0.25rem;">
         <p style="font-size:0.875rem; color:var(--mid); margin-bottom:0.75rem;"><strong>Job:</strong> Contains lifecycle methods — <code>robotPeriodic()</code>, <code>autonomousInit()</code>, <code>teleopInit()</code>, etc. Called automatically by WPILib at the right times.</p>
-        <p style="font-size:0.875rem; color:var(--mid); margin-bottom:0.75rem;"><strong>Vanilla gives you:</strong> <code>extends TimedRobot</code>. Notice that. You'll see why it changes in the comparison section below.</p>
+        <p style="font-size:0.875rem; color:var(--mid); margin-bottom:0.75rem;"><strong>XRP-TEMPLATE gives you:</strong> <code>extends TimedRobot</code>. Notice that. You'll see why it changes in the comparison section below.</p>
         <p style="font-size:0.875rem; color:var(--mid); margin-bottom:0.75rem;"><strong>Most important line:</strong> <code>CommandScheduler.getInstance().run()</code> in <code>robotPeriodic()</code>. Without it, no commands ever execute. Ever.</p>
         <div class="code-block"><pre>
 <span class="kw">@Override</span>
@@ -485,7 +477,7 @@ git clone https://github.com/Helijason/bearbots-xrp-code</pre></div>
         <p>A place for numbers that don't change. Starts nearly empty.</p>
       </div>
       <div id="file-constants" style="display:none; background:var(--code-bg); border:1px solid var(--code-border); border-radius:var(--radius); padding:1rem; margin-top:-0.25rem;">
-        <p style="font-size:0.875rem; color:var(--mid); margin-bottom:0.75rem;"><strong>Vanilla gives you:</strong> an almost empty file with one comment: <em>"place constants here."</em> That's it.</p>
+        <p style="font-size:0.875rem; color:var(--mid); margin-bottom:0.75rem;"><strong>XRP-TEMPLATE gives you:</strong> an almost empty file with one comment: <em>"place constants here."</em> That's it.</p>
         <p style="font-size:0.875rem; color:var(--mid); margin-bottom:0.75rem;"><strong>The intent:</strong> motor IDs, speed limits, PID gains — anything that's a fixed value that might need changing later. Hardcode a motor ID in a subsystem and you'll search 6 files when wiring changes. Put it in Constants.java and you change it once.</p>
         <div class="hf-box hf-sidebar" style="margin:0.5rem 0 0;">
           <span class="hf-label">Constants.java isn't the only constants file</span>
@@ -526,8 +518,8 @@ git clone https://github.com/Helijason/bearbots-xrp-code</pre></div>
 
     </div>
 
-    <h2>Step 4 — Compare vanilla vs BearBots</h2>
-    <p>Now open both projects side by side. The BearBots project isn't vanilla — we made deliberate changes before you got here. Each card below shows one difference, why it was a problem, and why the change fixes it.</p>
+    <h2>Step 4 — Compare XRP-TEMPLATE vs BearBots</h2>
+    <p>Now open both projects side by side. The BearBots project isn't XRP-TEMPLATE — we made deliberate changes before you got here. Each card below shows one difference, why it was a problem, and why the change fixes it.</p>
 
     <div class="hf-box hf-brain" style="margin-bottom:1rem;">
       <span class="hf-label">Your job</span>
@@ -558,6 +550,17 @@ git clone https://github.com/Helijason/bearbots-xrp-code</pre></div>
         font-size:0.7rem; font-weight:700; text-transform:uppercase;
         letter-spacing:0.05em; margin-bottom:0.35rem;
       }
+      .diff-panel pre {
+        margin: 0;
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+        line-height: 1.6;
+        white-space: pre;
+        border-radius: 4px;
+        padding: 0.35rem 0.5rem;
+      }
+      .diff-panel.vanilla pre { background: #f0f0f0; color: #555; }
+      .diff-panel.bearbots pre { background: var(--teal-light); color: var(--teal); }
       .diff-panel.vanilla .diff-panel-label { color:var(--muted); }
       .diff-panel.bearbots .diff-panel-label { color:var(--teal); }
       .diff-panel code {
@@ -608,12 +611,12 @@ git clone https://github.com/Helijason/bearbots-xrp-code</pre></div>
       </div>
       <div class="diff-panels">
         <div class="diff-panel vanilla">
-          <div class="diff-panel-label">📄 Vanilla</div>
-          <code>public class Robot<br>  extends TimedRobot</code>
+          <div class="diff-panel-label">📄 XRP-TEMPLATE</div>
+          <pre>public class Robot extends <strong>TimedRobot</strong></pre>
         </div>
         <div class="diff-panel bearbots">
           <div class="diff-panel-label">🐻 BearBots</div>
-          <code>public class Robot<br>  extends LoggedRobot</code>
+          <pre>public class Robot extends <strong>LoggedRobot</strong></pre>
         </div>
       </div>
       <div class="diff-problem">
@@ -637,12 +640,27 @@ git clone https://github.com/Helijason/bearbots-xrp-code</pre></div>
       </div>
       <div class="diff-panels">
         <div class="diff-panel vanilla">
-          <div class="diff-panel-label">📄 Vanilla</div>
-          <code>public Robot() {<br>  robotContainer =<br>    new RobotContainer();<br>}</code>
+          <div class="diff-panel-label">📄 XRP-TEMPLATE</div>
+          <pre>public Robot() {
+  m_chooser.setDefaultOption(
+    "Default Auto", kDefaultAuto);
+  m_chooser.addOption(
+    "My Auto", kCustomAuto);
+  SmartDashboard.putData(
+    "Auto choices", m_chooser);
+}</pre>
         </div>
         <div class="diff-panel bearbots">
           <div class="diff-panel-label">🐻 BearBots</div>
-          <code>public Robot() {<br>  Logger.start();<br>  robotContainer =<br>    new RobotContainer();<br>}</code>
+          <pre>public Robot() {
+  Logger.recordMetadata(
+    "ProjectName", "XRP-AKit");
+  Logger.addDataReceiver(
+    new NT4Publisher());
+  Logger.start();
+  robotContainer =
+    new RobotContainer();
+}</pre>
         </div>
       </div>
       <div class="diff-problem">
@@ -666,24 +684,30 @@ git clone https://github.com/Helijason/bearbots-xrp-code</pre></div>
       </div>
       <div class="diff-panels">
         <div class="diff-panel vanilla">
-          <div class="diff-panel-label">📄 Vanilla</div>
-          <code>// (nothing)<br>// no mode awareness</code>
+          <div class="diff-panel-label">📄 XRP-TEMPLATE</div>
+          <pre>// no Logger config
+// no data receivers</pre>
         </div>
         <div class="diff-panel bearbots">
           <div class="diff-panel-label">🐻 BearBots</div>
-          <code>if (Constants.currentMode<br>  == Mode.REAL) {<br>  // file logger<br>} else if ...<br>  // NT logger</code>
+          <pre>Logger.recordMetadata(
+  "ProjectName",
+  "XRP-AKit");
+Logger.addDataReceiver(
+  new NT4Publisher());
+Logger.start();</pre>
         </div>
       </div>
       <div class="diff-problem">
         <div class="diff-problem-label">⚠️ Problem this solves</div>
-        <p>Code runs the same whether it's on a real robot, in simulation, or replaying a log. The wrong hardware layer loads silently — motors that don't exist, sensors that return zero — and nobody knows why the sim behaves differently from the real robot.</p>
+        <p>Without a data receiver, AdvantageKit has nowhere to send data. <code>NT4Publisher</code> streams everything to NetworkTables so AdvantageScope can see it live during simulation.</p>
       </div>
       <button class="diff-why-toggle" onclick="toggleWhy(this)">
         <span class="dw-arrow">▶</span> Why we changed this
       </button>
       <div class="diff-why-content">
-        <p><code>Constants.currentMode</code> tells Logger which data receivers to attach. On the real robot: log to a USB file for later replay. In simulation: log to NetworkTables so AdvantageScope sees it live. In replay mode: read from a saved log file instead of hardware.</p>
-        <p>One codebase, three behaviors, zero code changes between them. That's the whole AdvantageKit value proposition.</p>
+        <p><code>Logger.addDataReceiver(new NT4Publisher())</code> tells AdvantageKit to publish all logged values to NetworkTables. That's what AdvantageScope connects to. Without it, <code>Logger.start()</code> runs but nothing appears in AdvantageScope.</p>
+        <p>On a real robot you'd also add a file logger to save data for replay. For the XRP simulator, NT4Publisher is all we need.</p>
       </div>
     </div>
 
@@ -695,12 +719,19 @@ git clone https://github.com/Helijason/bearbots-xrp-code</pre></div>
       </div>
       <div class="diff-panels">
         <div class="diff-panel vanilla">
-          <div class="diff-panel-label">📄 Vanilla</div>
-          <code>// place constants here<br>// (empty)</code>
+          <div class="diff-panel-label">📄 XRP-TEMPLATE</div>
+          <pre>// Constants.java
+// does not exist</pre>
         </div>
         <div class="diff-panel bearbots">
           <div class="diff-panel-label">🐻 BearBots</div>
-          <code>public enum Mode {<br>  REAL, SIM, REPLAY<br>}<br>public static final Mode<br>  currentMode = Mode.SIM;</code>
+          <pre>public static final
+  RobotMode currentMode =
+  RobotMode.SIM;
+
+public enum RobotMode {
+  REAL, SIM, REPLAY
+}</pre>
         </div>
       </div>
       <div class="diff-problem">
@@ -711,8 +742,8 @@ git clone https://github.com/Helijason/bearbots-xrp-code</pre></div>
         <span class="dw-arrow">▶</span> Why we changed this
       </button>
       <div class="diff-why-content">
-        <p>One field controls the entire IO layer. Set <code>currentMode = Mode.SIM</code> and the codebase loads simulated hardware. Set it to <code>Mode.REAL</code> and it talks to real motors. Set it to <code>Mode.REPLAY</code> and it reads from a saved log file.</p>
-        <p>On a roboRIO, the code auto-detects REAL using <code>RobotBase.isReal()</code> so you never accidentally deploy sim code. In VS Code, you set SIM manually. This is covered in Lesson 4 when we go deep on the IO pattern.</p>
+        <p>One field controls the entire IO layer. Set <code>currentMode = RobotMode.SIM</code> and the codebase loads simulated hardware. Set it to <code>RobotMode.REAL</code> and it talks to real motors. Set it to <code>RobotMode.REPLAY</code> and it reads from a saved log file.</p>
+        <p>On a roboRIO, the code auto-detects REAL using <code>RobotBase.isReal()</code> so you never accidentally deploy sim code. In VS Code, you set SIM manually. This is covered in <span class="lesson-ref" data-lesson="04"></span> when we go deep on the IO pattern.</p>
       </div>
     </div>
 
@@ -724,23 +755,31 @@ git clone https://github.com/Helijason/bearbots-xrp-code</pre></div>
       </div>
       <div class="diff-panels">
         <div class="diff-panel vanilla">
-          <div class="diff-panel-label">📄 Vanilla</div>
-          <code>// place constants here<br>// (empty)</code>
+          <div class="diff-panel-label">📄 XRP-TEMPLATE</div>
+          <pre>// Constants.java
+// does not exist</pre>
         </div>
         <div class="diff-panel bearbots">
           <div class="diff-panel-label">🐻 BearBots</div>
-          <code>public static final<br>  class DriveConstants {<br>  public static final int<br>    kLeftMotorPort = 1;<br>  ...<br>}</code>
+          <pre>public static final
+  class DriveHardware {
+  public static final int
+    kLeftMotorChannel = 1;
+  public static final int
+    kRightMotorChannel = 0;
+  ...
+}</pre>
         </div>
       </div>
       <div class="diff-problem">
         <div class="diff-problem-label">⚠️ Problem this solves</div>
-        <p>Magic numbers scattered across subsystem files. Motor port hardcoded as <code>1</code> in three places. Wiring changes on build day. You hunt through files, miss one, and the robot drives in circles at your first match.</p>
+        <p>Magic numbers scattered across subsystem files. Motor channel hardcoded as <code>0</code> or <code>1</code> in multiple places. Wiring changes on build day. You hunt through files, miss one, and the robot drives in circles at your first match.</p>
       </div>
       <button class="diff-why-toggle" onclick="toggleWhy(this)">
         <span class="dw-arrow">▶</span> Why we changed this
       </button>
       <div class="diff-why-content">
-        <p>Inner classes group related constants together without needing separate files. <code>Constants.DriveConstants.kLeftMotorPort</code> is unambiguous about what it is and where to find it. Change it once, everything that references it updates automatically.</p>
+        <p>Inner classes group related constants together without needing separate files. <code>Constants.DriveHardware.kLeftMotorChannel</code> is unambiguous about what it is and where to find it. Change it once, everything that references it updates automatically.</p>
         <p>This is a <strong>team design decision</strong> — there's no single right answer. BearBots uses inner classes as a middle ground. As the codebase grows, teams often split into separate files: <code>ArmConstants.java</code>, <code>FieldConstants.java</code>, <code>VisionConstants.java</code>. Start here, split when it gets crowded. The pattern is more important than the file count.</p>
       </div>
     </div>
@@ -754,12 +793,28 @@ git clone https://github.com/Helijason/bearbots-xrp-code</pre></div>
       </div>
       <div class="diff-panels">
         <div class="diff-panel vanilla">
-          <div class="diff-panel-label">📄 Vanilla</div>
-          <code>// WPILib deps only<br>// no AdvantageKit</code>
+          <div class="diff-panel-label">📄 XRP-TEMPLATE</div>
+          <pre>dependencies {
+  annotationProcessor
+    wpi.java.deps
+    .wpilibAnnotations()
+  implementation
+    wpi.java.deps.wpilib()
+  // no AdvantageKit
+}</pre>
         </div>
         <div class="diff-panel bearbots">
           <div class="diff-panel-label">🐻 BearBots</div>
-          <code>// AdvantageKit vendor<br>// dep block added by<br>// Manage Vendor Libraries</code>
+          <pre>dependencies {
+  // ... same as template
+  def akitJson =
+    new JsonSlurper()
+    .parseText(...)
+  annotationProcessor
+    "org.littletonrobotics
+    .akit:akit-autolog:
+    $akitJson.version"
+}</pre>
         </div>
       </div>
       <div class="diff-problem">
@@ -779,49 +834,194 @@ git clone https://github.com/Helijason/bearbots-xrp-code</pre></div>
     <h2>How the boot sequence works</h2>
     <p>The files don't run independently — they start each other in a fixed order every time the robot powers on.</p>
 
-    <div style="background:var(--code-bg); border:1px solid var(--code-border); border-radius:var(--radius); padding:1.25rem; margin:0.75rem 0; overflow-x:auto;">
-      <svg viewBox="0 0 560 220" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:560px;display:block;margin:0 auto;">
-        <defs>
-          <marker id="arr" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
-            <polygon points="0 0, 8 3, 0 6" fill="#1D6A72"/>
-          </marker>
-        </defs>
-        <!-- Boxes -->
-        <rect x="10"  y="85" width="100" height="38" rx="7" fill="#E1F5EE" stroke="#1D6A72" stroke-width="1.5"/>
-        <text x="60"  y="100" text-anchor="middle" font-family="'Segoe UI',sans-serif" font-size="11" font-weight="700" fill="#1D6A72">Main.java</text>
-        <text x="60"  y="115" text-anchor="middle" font-family="'Cascadia Code','Consolas',monospace" font-size="9" fill="#444">startRobot()</text>
+<!-- ── Boot sequence diagram inject ── -->
+<div style="position:relative; display:flex; gap:0; align-items:flex-start;">
 
-        <rect x="145" y="85" width="110" height="38" rx="7" fill="#E1F5EE" stroke="#1D6A72" stroke-width="1.5"/>
-        <text x="200" y="100" text-anchor="middle" font-family="'Segoe UI',sans-serif" font-size="11" font-weight="700" fill="#1D6A72">Robot.java</text>
-        <text x="200" y="115" text-anchor="middle" font-family="'Cascadia Code','Consolas',monospace" font-size="9" fill="#444">constructor</text>
+  <!-- Diagram container -->
+  <div id="diagram-boot-sequence" style="flex:1; background:#F0F4FA; border:1px solid #D0DCF0; border-radius:8px; padding:1.25rem; margin:0.75rem 0; overflow-x:auto;"></div>
 
-        <rect x="290" y="85" width="125" height="38" rx="7" fill="#EEEDFE" stroke="#4A3B8C" stroke-width="1.5"/>
-        <text x="352" y="100" text-anchor="middle" font-family="'Segoe UI',sans-serif" font-size="11" font-weight="700" fill="#4A3B8C">RobotContainer</text>
-        <text x="352" y="115" text-anchor="middle" font-family="'Cascadia Code','Consolas',monospace" font-size="9" fill="#444">subsystems + bindings</text>
-
-        <rect x="450" y="85" width="100" height="38" rx="7" fill="#FEF3E2" stroke="#92600A" stroke-width="1.5"/>
-        <text x="500" y="100" text-anchor="middle" font-family="'Segoe UI',sans-serif" font-size="11" font-weight="700" fill="#92600A">Constants.java</text>
-        <text x="500" y="115" text-anchor="middle" font-family="'Cascadia Code','Consolas',monospace" font-size="9" fill="#444">values read</text>
-
-        <!-- Loop box -->
-        <rect x="100" y="160" width="220" height="38" rx="7" fill="#1D6A72" stroke="none"/>
-        <text x="210" y="177" text-anchor="middle" font-family="'Segoe UI',sans-serif" font-size="10" font-weight="700" fill="white">Every 20ms: robotPeriodic()</text>
-        <text x="210" y="191" text-anchor="middle" font-family="'Cascadia Code','Consolas',monospace" font-size="9" fill="#9FE1CB">CommandScheduler.getInstance().run()</text>
-
-        <!-- Arrows startup -->
-        <line x1="110" y1="104" x2="143" y2="104" stroke="#1D6A72" stroke-width="1.5" marker-end="url(#arr)"/>
-        <line x1="255" y1="104" x2="288" y2="104" stroke="#1D6A72" stroke-width="1.5" marker-end="url(#arr)"/>
-        <line x1="415" y1="104" x2="448" y2="104" stroke="#1D6A72" stroke-width="1.5" marker-end="url(#arr)"/>
-
-        <!-- Arrow to loop -->
-        <line x1="200" y1="123" x2="200" y2="158" stroke="#1D6A72" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arr)"/>
-
-        <!-- Labels -->
-        <text x="280" y="20" text-anchor="middle" font-family="'Segoe UI',sans-serif" font-size="10" fill="#666">Boot sequence (runs once)</text>
-        <line x1="10" y1="25" x2="550" y2="25" stroke="#CCCCCC" stroke-width="0.75"/>
-        <text x="280" y="148" text-anchor="middle" font-family="'Segoe UI',sans-serif" font-size="10" fill="#666">Then loops forever ↓</text>
-      </svg>
+  <!-- Slide panel -->
+  <div id="boot-panel" style="
+    width:0; overflow:hidden; transition:width 0.25s ease;
+    background:#FFFFFF; border:1px solid #D0DCF0; border-left:none;
+    border-radius:0 8px 8px 0; margin:0.75rem 0 0.75rem -1px;
+    font-family:'Segoe UI',sans-serif; box-sizing:border-box;
+    position:sticky; top:1rem; flex-shrink:0;
+  ">
+    <div id="boot-panel-inner" style="width:300px; padding:1.25rem; box-sizing:border-box;">
+      <button onclick="closePanel()" style="
+        position:absolute; top:10px; right:12px;
+        background:none; border:none; font-size:16px; cursor:pointer;
+        color:#666; line-height:1;
+      ">&#x2715;</button>
+      <div id="boot-panel-tag" style="
+        font-size:0.65rem; font-weight:700; letter-spacing:0.1em;
+        text-transform:uppercase; padding:0.2rem 0.6rem;
+        border-radius:20px; display:inline-block; margin-bottom:0.6rem;
+        background:#E1F5EE; color:#1D6A72;
+      "></div>
+      <div id="boot-panel-title" style="font-size:1rem; font-weight:700; color:#1A1A1A; margin-bottom:0.5rem;"></div>
+      <div id="boot-panel-body" style="font-size:0.85rem; color:#444; line-height:1.65;"></div>
+      <div id="boot-panel-link" style="margin-top:0.9rem;"></div>
     </div>
+  </div>
+</div>
+
+<script>
+const NODE_DATA = {
+  main: {
+    tag: "Boot sequence",
+    title: "🚀 The ignition switch",
+    body: "<code>Main.java</code> is the true entry point — the JVM starts here. It calls <code>RobotBase.startRobot()</code>, which initializes the HAL, connects to the Driver Station, and hands control to your <code>Robot</code> class. You never edit this file. It exists so the JVM has somewhere to start.",
+    link: "https://github.wpilib.org/allwpilib/docs/release/java/edu/wpi/first/wpilibj/RobotBase.html",
+    linkText: "RobotBase API docs &#x2192;"
+  },
+  robot: {
+    tag: "Boot sequence",
+    title: "🤖 The robot's brain stem",
+    body: "The <code>Robot</code> constructor runs once at boot. It creates <code>RobotContainer</code>, calls <code>Logger.start()</code> to activate AdvantageKit, and registers <code>robotPeriodic()</code> to run every 20ms via <code>CommandScheduler.getInstance().run()</code>. Outside of those two things, this class should be nearly empty.",
+    link: "https://docs.wpilib.org/en/stable/docs/software/commandbased/structuring-command-based-project.html",
+    linkText: "Command-based project structure &#x2192;"
+  },
+  robotcontainer: {
+    tag: "Boot sequence",
+    title: "🧩 Where the robot is assembled",
+    body: "All subsystems are instantiated here and wired to their IO implementations. Button bindings are also configured here via <code>configureBindings()</code>. This is the one file that knows about both hardware and controls — the rest of the code stays modular.",
+    link: "https://docs.wpilib.org/en/stable/docs/software/commandbased/structuring-command-based-project.html#robotcontainer",
+    linkText: "RobotContainer structure docs &#x2192;"
+  },
+  constants: {
+    tag: "Boot sequence",
+    title: "📐 The source of truth",
+    body: "<code>Constants.java</code> stores fixed values — motor port numbers, speed limits, PID gains — that are read at boot. Centralizing them here means you change a value once and it applies everywhere. Some teams split constants across multiple files (e.g. <code>DriveConstants</code>, <code>ArmConstants</code>) as the project grows.",
+    link: "https://docs.wpilib.org/en/stable/docs/software/commandbased/structuring-command-based-project.html#constants",
+    linkText: "Constants structure docs &#x2192;"
+  },
+  inputs: {
+    tag: "20ms loop — step 1",
+    title: "📸 Freeze the world",
+    body: "At the very top of every loop, AdvantageKit snapshots all sensor readings. <code>Logger.processInputs()</code> is called once per subsystem — it reads hardware via the IO layer, records those values to the log, and makes them available for the rest of the cycle. Everything downstream sees the same frozen snapshot, so no sensor value can change mid-loop while a command is halfway through using it.",
+    link: "https://docs.advantagekit.org/data-flow/recording-inputs/io-interfaces/",
+    linkText: "AKit: IO interfaces &amp; input recording &#x2192;"
+  },
+  scheduler: {
+    tag: "20ms loop — step 2",
+    title: "📋 The to-do list",
+    body: "The scheduler runs in a fixed order: first it calls <code>periodic()</code> on every registered subsystem, then polls all trigger conditions to see if new commands should fire, then executes all currently-scheduled commands. If two commands compete for the same subsystem, the newer one cancels the older one.",
+    link: "https://docs.wpilib.org/en/stable/docs/software/commandbased/command-scheduler.html",
+    linkText: "CommandScheduler docs &#x2192;"
+  },
+  outputs: {
+    tag: "20ms loop — step 3",
+    title: "⚡ Send the volts",
+    body: "After all logic has run for this cycle, the IO layer writes the resulting motor voltages and servo positions to hardware. AdvantageKit logs these outputs so that during replay you can see exactly what the robot was told to do — and verify whether the hardware responded correctly.",
+    link: "https://docs.advantagekit.org/data-flow/recording-outputs/",
+    linkText: "AKit: recording outputs &#x2192;"
+  },
+  telemetry: {
+    tag: "20ms loop — step 4",
+    title: "📡 Write the black box",
+    body: "<code>Logger.recordOutput()</code> writes calculated values — odometry poses, state machine states, PID targets — to the log file and NetworkTables. This is the data AdvantageScope reads and graphs. Unlike inputs, outputs are recalculated during replay so you can add new <code>recordOutput</code> calls after the fact and re-run the log.",
+    link: "https://docs.advantagekit.org/data-flow/recording-outputs/",
+    linkText: "AKit: recording outputs &#x2192;"
+  },
+  disabled: {
+    tag: "Robot mode",
+    title: "🔒 Safe but awake",
+    body: "The scheduler still ticks every 20ms but no commands execute and all motor outputs are zeroed by WPILib automatically. The robot is listening but not acting. This is the state during pre-match setup, e-stop, and any time the Driver Station disables the robot.",
+    link: "https://docs.wpilib.org/en/stable/docs/software/commandbased/command-scheduler.html",
+    linkText: "CommandScheduler — disabled behavior &#x2192;"
+  },
+  teleop: {
+    tag: "Robot mode",
+    title: "🎮 You're in control",
+    body: "Controller bindings are active and default commands run. Every button press or trigger condition can schedule a command. If no button command is currently using a subsystem, the default command for that subsystem runs automatically. This is the primary mode during the driver-controlled period.",
+    link: "https://docs.wpilib.org/en/stable/docs/software/commandbased/binding-commands-to-triggers.html",
+    linkText: "Binding commands to triggers &#x2192;"
+  },
+  auto: {
+    tag: "Robot mode",
+    title: "🤖 Robot drives itself",
+    body: "A single auto command is scheduled at the start of the autonomous period via <code>autonomousInit()</code>. No controller input is read. The robot executes a pre-programmed routine using the exact same command framework as teleop — commands, subsystems, and requirements all behave identically.",
+    link: "https://docs.wpilib.org/en/stable/docs/software/commandbased/structuring-command-based-project.html",
+    linkText: "Autonomous command structure &#x2192;"
+  },
+  "subsystems-created": {
+    tag: "RobotContainer",
+    title: "🏗️ Building the robot in code",
+    body: "Each subsystem is instantiated with <code>new SubsystemName(new IOImpl())</code>. The IO implementation is injected here — swap <code>DriveIOXRP</code> for <code>DriveIOSim</code> and the subsystem's logic never changes. This is the dependency injection pattern that makes AdvantageKit simulation possible.",
+    link: "https://docs.advantagekit.org/data-flow/recording-inputs/io-interfaces/",
+    linkText: "AKit: IO layer pattern &#x2192;"
+  },
+  "io-injected": {
+    tag: "RobotContainer",
+    title: "🔌 The hardware handshake",
+    body: "The subsystem receives its IO object in its constructor. All hardware calls go through this object — the subsystem only calls <code>io.updateInputs(inputs)</code> and sets outputs like <code>io.setVoltage(volts)</code>. The subsystem never touches motors or sensors directly, which is what makes log replay work.",
+    link: "https://docs.advantagekit.org/data-flow/recording-inputs/io-interfaces/",
+    linkText: "AKit: IO interfaces &#x2192;"
+  },
+  "default-commands": {
+    tag: "RobotContainer",
+    title: "🏃 What to do when idle",
+    body: "A default command runs whenever no other command requires the subsystem. <code>ArcadeDrive</code> is the classic example — it runs constantly from the joystick unless a button command interrupts it. Default commands should never return <code>true</code> from <code>isFinished()</code>, because they would just be immediately re-scheduled.",
+    link: "https://docs.wpilib.org/en/stable/docs/software/commandbased/subsystems.html#default-commands",
+    linkText: "WPILib: default commands &#x2192;"
+  },
+  "configure-bindings": {
+    tag: "RobotContainer",
+    title: "🎛️ Wiring the controller",
+    body: "This method maps physical buttons and logical conditions to commands using WPILib's <code>Trigger</code> API. <code>whileTrue()</code> runs a command while the button is held and cancels it on release. <code>onTrue()</code> schedules once on press. <code>toggleOnTrue()</code> alternates between scheduled and cancelled on each press.",
+    link: "https://docs.wpilib.org/en/stable/docs/software/commandbased/binding-commands-to-triggers.html",
+    linkText: "Binding commands to triggers &#x2192;"
+  },
+  "button-binding": {
+    tag: "RobotContainer — bindings",
+    title: "🔘 One button, one job",
+    body: "Each binding connects a controller button to a command instance. <code>whileTrue()</code> is most common for mechanisms — the arm runs while A is held, stops on release. The command declares which subsystem it requires via <code>addRequirements()</code>, so the scheduler can manage conflicts automatically.",
+    link: "https://docs.wpilib.org/en/stable/docs/software/commandbased/binding-commands-to-triggers.html#whiletrue",
+    linkText: "whileTrue binding docs &#x2192;"
+  },
+  "trigger-binding": {
+    tag: "RobotContainer — bindings",
+    title: "⚡ Logic as a trigger",
+    body: "Any boolean condition — not just buttons — can be a trigger. Sensor thresholds, time elapsed, game state, or combinations of buttons (using <code>.and()</code> / <code>.or()</code>) can all schedule commands the same way a button press does. <code>onTrue()</code> fires once when the condition transitions from false to true.",
+    link: "https://docs.wpilib.org/en/stable/docs/software/commandbased/binding-commands-to-triggers.html#ontrue",
+    linkText: "Trigger API docs &#x2192;"
+  },
+  "scheduler-view": {
+    tag: "RobotContainer",
+    title: "🗂️ The scheduler's registry",
+    body: "After boot the scheduler knows every subsystem, its default command, and all active bindings. When a button command ends or is interrupted, the scheduler automatically restores the default command for that subsystem. A command requiring multiple subsystems locks all of them — no other command can use any of those subsystems while it runs.",
+    link: "https://docs.wpilib.org/en/stable/docs/software/commandbased/command-scheduler.html",
+    linkText: "CommandScheduler docs &#x2192;"
+  }
+};
+
+function openPanel(nodeKey) {
+  const data = NODE_DATA[nodeKey];
+  if (!data) return;
+  document.getElementById('boot-panel-tag').textContent = data.tag;
+  document.getElementById('boot-panel-title').textContent = data.title;
+  document.getElementById('boot-panel-body').innerHTML = data.body;
+  document.getElementById('boot-panel-link').innerHTML =
+    '<a href="' + data.link + '" target="_blank" rel="noopener" style="font-size:0.8rem;color:#1D6A72;text-decoration:none;border-bottom:1px solid #9FE1CB;">' + data.linkText + '</a>';
+  document.getElementById('boot-panel').style.width = '300px';
+}
+
+function closePanel() {
+  document.getElementById('boot-panel').style.width = '0';
+}
+
+fetch('diagrams/boot-sequence.svg')
+  .then(r => r.text())
+  .then(svg => {
+    document.getElementById('diagram-boot-sequence').innerHTML = svg;
+    document.querySelectorAll('#diagram-boot-sequence [data-node]').forEach(el => {
+      el.addEventListener('click', () => openPanel(el.dataset.node));
+    });
+  });
+</script>
+
 
     <div class="chat-thread">
       <div class="bubble bubble-q">
