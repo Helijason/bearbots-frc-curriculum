@@ -102,7 +102,7 @@ If the subsystem folder doesn't appear: check it's instantiated in `RobotContain
 
 ## Competition Connection
 
-> **The Bear Bots robot has four subsystems:** `DriveSubsystem`, `ElevatorSubsystem`, `ScoopSubsystem`, `ArmSubsystem`. You designed these — or something very close — on the whiteboard today before seeing the answer.
+> **The BearBots robot has four subsystems:** `DriveSubsystem`, `ElevatorSubsystem`, `ScoopSubsystem`, `ArmSubsystem`. You designed these — or something very close — on the whiteboard today before seeing the answer.
 >
 > Each subsystem owns exactly one mechanism. If the scoop breaks, the drivetrain keeps driving. If the elevator breaks, the arm still works. That independence is why the robot can compete even when something goes wrong.
 

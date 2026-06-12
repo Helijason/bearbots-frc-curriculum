@@ -53,7 +53,7 @@
 |---|---|---|---|
 | 0–10 min | **Hook** | Side-by-side comparison: monolithic vs structured. Count the lines. Ask which they'd rather debug at 11pm. | Look at both. Form opinions. Argue. |
 | 10–25 min | **Concept** | Cafeteria analogy. `periodic()` vs commands table. `CommandScheduler` relationship. | Follow along. Ask questions. |
-| 25–55 min | **"Design the Robot" whiteboard** | Present Orbit Odyssey game. Facilitate the boundary debate — don't settle it too fast. Reveal Bear Bots robot design at end. | Whiteboard which subsystems they'd create. Justify every boundary decision. Argue about edge cases. |
+| 25–55 min | **"Design the Robot" whiteboard** | Present Orbit Odyssey game. Facilitate the boundary debate — don't settle it too fast. Reveal BearBots robot design at end. | Whiteboard which subsystems they'd create. Justify every boundary decision. Argue about edge cases. |
 | 55–80 min | **Tools demo** | Live demo: create subsystem with WPILib tool. Show what it generates and what it doesn't. Add AdvantageKit structure on top. Register in `RobotContainer`. Run sim. Verify in AdvantageScope. | Replicate on their own laptop. Verify subsystem folder appears. |
 | 80–120 min | **Bronze/Silver/Gold practice** | Circulate. Ask "what do you expect?" before every run. Redirect with questions, not answers. | Bronze: identify + create. Silver: add `@AutoLogOutput` and verify in AdvantageScope. Gold: full architecture design from scratch. |
 | 120–150 min | **Broken robot lab** | Circulate. Don't give answers — give direction. Require sim confirmation for every fix. | Find and fix the three bugs. Must run the sim to confirm each fix, not just read the code. |
@@ -338,7 +338,7 @@ Students design a complete subsystem architecture for a given robot description 
 
 ---
 
-## Phase 9 — Bear Bots Robot Reveal + Wrap (175–180 min)
+## Phase 9 — BearBots Robot Reveal + Wrap (175–180 min)
 
 *The payoff for the whiteboard. Students designed a robot. Now they find out what the team actually decided — and why it matches.*
 
@@ -348,9 +348,9 @@ After the peer code review or `@AutoLogOutput` race wraps up, call the group tog
 
 > **Script — the reveal**
 >
-> *"You spent the last 30 minutes arguing about what this robot needs. Drivetrain, something that lifts, something that scoops, something on the back. Here's what the Bear Bots team decided."*
+> *"You spent the last 30 minutes arguing about what this robot needs. Drivetrain, something that lifts, something that scoops, something on the back. Here's what the BearBots team decided."*
 
-Draw or show the Bear Bots robot diagram:
+Draw or show the BearBots robot diagram:
 
 ```
 FRONT:  Scoop (servo-controlled tilt) mounted on Elevator (vertical lift)

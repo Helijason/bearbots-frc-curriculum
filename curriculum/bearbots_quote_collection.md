@@ -1,4 +1,4 @@
-# Bear Bots Quotes & Humor Bank
+# BearBots Quotes & Humor Bank
 
 > A living document. Add student quotes during build season — they're often the best ones.
 
@@ -8,7 +8,7 @@
 
 - **Inspiration / Mindset** — open a lesson, frame a concept, motivate after a rough day
 - **Humor** — break tension, keep energy up, make the room laugh
-- **Your Voice** — Jason's original quotes; use freely, attribute to "Bear Bots"
+- **Your Voice** — Jason's original quotes; use freely, attribute to "BearBots"
 
 Pick 2–3 per lesson page. Mix one serious + one funny when possible.
 
@@ -19,7 +19,7 @@ Pick 2–3 per lesson page. Mix one serious + one funny when possible.
 
 ### Inspiration
 - "The secret of getting ahead is getting started." — Mark Twain
-- "A journey of a thousand miles begins with a single `git init`." — Bear Bots adaptation
+- "A journey of a thousand miles begins with a single `git init`." — BearBots adaptation
 
 ### Humor
 - "It compiled. I have no idea why. I'm not touching it." — Unknown programmer
@@ -33,7 +33,7 @@ Pick 2–3 per lesson page. Mix one serious + one funny when possible.
 
 ### Inspiration
 - "If I have seen further, it is by standing on the shoulders of giants." — Isaac Newton
-- "Good programmers write code humans can read. Great programmers write code robots can run." — Bear Bots
+- "Good programmers write code humans can read. Great programmers write code robots can run." — BearBots
 
 ### Humor
 - "Before software can be reusable, it first has to be usable." — Ralph Johnson
@@ -60,7 +60,7 @@ Pick 2–3 per lesson page. Mix one serious + one funny when possible.
 *Theme: Separation of concerns, hiding complexity, testing*
 
 ### Inspiration
-- "Robots do robot things. Humans do human things." — Jason / Bear Bots ⭐
+- "Robots do robot things. Humans do human things." — Jason / BearBots ⭐
 - "The art of programming is the art of organizing complexity." — Edsger Dijkstra
 - "Make it work, make it right, make it fast — in that order." — Kent Beck
 
@@ -129,7 +129,7 @@ Pick 2–3 per lesson page. Mix one serious + one funny when possible.
 - "Fall seven times. Stand up eight." — Japanese proverb
 
 ### On Robots Specifically
-- "A robot will always do exactly what you tell it to. That's the problem." — Bear Bots
+- "A robot will always do exactly what you tell it to. That's the problem." — BearBots
 - "Why was the robot calm? Good programming." — Unknown *(groan-worthy, use it)*
 
 ---

@@ -1,110 +1,79 @@
-# Module 1 — Lesson 02: What Did VSCode Just Create?
-
-**Stack:** Java | AdvantageKit | XRP
-**Card #:** 02 — *Keep this. Add it to your binder.*
+# Lesson 02 Summary Card — Content Variables
+# Matches Lesson_SummaryCard_Format.md spec exactly.
 
 ---
 
-## The Big Idea
+## HEADER
 
-> Understand the template before you modify it.
-> Editing files you don't understand is how you create bugs you can't explain.
-
----
-
-## Key Concepts
-
-| File | Role | What it does |
-|---|---|---|
-| **Main.java** | Entry point | Starts the robot. Do not modify. Ever. |
-| **Robot.java** | Lifecycle | `extends LoggedRobot`. Runs `CommandScheduler`. Logger setup lives here. |
-| **RobotContainer** | Switchboard | Creates subsystems. Wires buttons. Provides auto command. |
-| **Constants.java** | Number vault | Motor IDs live here. Mode enum lives here. Never hardcode numbers. |
-| **build.gradle** | Build recipe | WPILib version. Vendor deps. Don't edit by hand. |
+module_line  = "MODULE 1  —  LESSON 02"
+title        = "Template Structure + File Roles"
+badge_num    = "02"
 
 ---
 
-## Simulation GUI Panels
+## BIG IDEA
 
-| Panel | Purpose |
-|---|---|
-| **Robot State** | Enable/disable. Switch modes. Enable before driving — nothing works disabled. |
-| **Joysticks** | Map keyboard or controller to robot inputs. Drag `Keyboard 0` to `Joystick[0]`. |
-| **System Console** | Print statements, errors, stack traces. Check here first when something is wrong. |
-| **NetworkTables** | Live values published by the robot. AdvantageKit data appears as `AdvantageKit/...` |
+big_idea_bold   = "Every file has one job. Know which file to edit before you touch anything."
+big_idea_italic = "The BearBots project adds AdvantageKit logging and a clean constants structure to the WPILib template."
 
 ---
 
-## The Simulator Workflow
+## KEY CONCEPTS (5 cards)
 
-1. `Ctrl+Shift+P` → Simulate Robot Code
-2. Select `halsim_gui` → OK
-3. Joysticks: drag `Keyboard 0` to `Joystick[0]`
-4. Open AdvantageScope → Connect to Simulator
-5. Robot State → Teleoperated → Enable
-6. Click Sim GUI → drive with W/A/S/D
-7. In AdvantageScope: drag `LeftPositionMeters` and `GyroYawDegrees` to graphs
-
----
-
-## Keyboard Driving Keys
-
-| Key | Action |
-|---|---|
-| **W** | Forward (Left stick Y −) |
-| **S** | Backward (Left stick Y +) |
-| **A** | Turn left (Left stick X −) |
-| **D** | Turn right (Left stick X +) |
-
-> Sim GUI must be focused for keys to work.
-> Enable robot before driving — nothing moves disabled.
-> These match the default arcade drive command in RobotContainer.
+concepts = [
+    ("Robot.java",          "Lifecycle manager",  "Extends LoggedRobot.\nRuns CommandScheduler.\nCalled every 20ms."),
+    ("RobotContainer",      "Wiring hub",         "Subsystems created here.\nButton bindings here.\nIO layer injected here."),
+    ("Constants.java",      "Source of truth",    "Motor ports, speed limits.\nInner classes group values.\nChange once, updates everywhere."),
+    ("AdvantageKit",        "Logging layer",      "Logger.start() at boot.\nNT4Publisher feeds AScope.\nEvery loop cycle captured."),
+    ("Simulator",           "Test bench",         "Simulate before hardware.\nDrag Keyboard 0 → Joystick[0].\nGraph encoders in AScope."),
+]
 
 ---
 
-## After This Lesson I Can…
+## SETUP WORKFLOW (left col, TEAL)
 
-- [ ] Name every template file and its job
-- [ ] Use `Ctrl+Shift+P` to build and simulate
-- [ ] Launch sim and identify all four Simulation GUI panels
-- [ ] Drive with keyboard and verify inputs in the Joysticks panel
-- [ ] Connect AdvantageScope to simulator and graph `LeftPositionMeters`
-- [ ] Explain why `LoggedRobot` extends `TimedRobot`
-- [ ] Find and fix the three common Robot.java bugs
+left_col_label = "THE SETUP WORKFLOW"
 
----
-
-## Key Vocabulary
-
-- **LoggedRobot** — AdvantageKit base class extending `TimedRobot` — adds logging to each cycle
-- **CommandScheduler** — The engine that runs commands — must be called in `robotPeriodic()`
-- **Simulator** — Runs robot code on your laptop — same logic, no hardware needed
-- **AdvantageScope** — Visualization tool that shows logged data from sim or real robot — bundled with WPILib
-- **System Console** — The simulator panel that shows errors and print output — check here first when debugging
-- **vendordeps** — JSON files specifying which third-party libraries (like AdvantageKit) to include
+steps = [
+    ("1", "Create XRP-Template project → explore vanilla file structure"),
+    ("2", "Install Git → git config name + email → clone bearbots-xrp-code"),
+    ("3", "git pull → build project → BUILD SUCCESSFUL"),
+    ("4", "Simulate Robot Code → enable halsim_gui → sim window opens"),
+    ("5", "Connect AdvantageScope → Drive/ folder → graph LeftPositionMeters"),
+    ("6", "Drive with WASD → predict graph shape before each maneuver"),
+    ("7", "Broken Robot Lab — fix 4 bugs using symptom descriptions only"),
+]
 
 ---
 
-## Questions I Still Have
+## AFTER THIS LESSON I CAN... (right col, PURPLE)
 
-*Write your questions here. Bring them next session.*
-
-## My Notes
-
-*Write anything here — surprises, connections, things to look up later.*
-
----
-
----
-
-## Competition Connection
-
-> **First look at Orbit Odyssey.** This lesson ends with a pair brainstorm — what does this robot need to DO to score points? Keep your answers. Next lesson you'll map them directly to subsystem files.
->
-> Every file you learned today has a job on the competition robot. `Constants.java` holds your park distance and kP. `RobotContainer` wires your auto command to the AutoChooser. Understanding the template now means you won't be guessing later.
+checks = [
+    "Name the job of each file: Main, Robot, RobotContainer, Constants, build.gradle",
+    "Explain why extends LoggedRobot instead of TimedRobot",
+    "Use git add / commit / pull to save my work",
+    "Launch the simulator and connect AdvantageScope",
+    "Read encoder graphs and describe what the robot is doing",
+    "Find a bug from a symptom description alone",
+]
 
 ---
 
-*FRC Programming Curriculum — Lesson 02*
-*Next: Lesson 03 — What is a subsystem?*
-*Keep this. Collect all 8.*
+## KEY VOCABULARY (right col, TEAL)
+
+vocab = [
+    ("LoggedRobot",    "AdvantageKit base class — wraps each 20ms loop with data capture"),
+    ("RobotContainer", "Where subsystems are created and buttons are wired to commands"),
+    ("Constants.java", "Central file for fixed values — inner classes group related constants"),
+    ("git commit",     "Saves a labeled snapshot of code you can return to"),
+    ("NT4Publisher",   "Streams AdvantageKit log data to NetworkTables for AdvantageScope"),
+]
+
+---
+
+## FOOTER
+
+footer_left   = "FRC Programming Curriculum — Lesson 02"
+footer_center = "Next: Lesson 03 — What is a subsystem?"
+footer_right  = "Keep this. Collect all 8."
+

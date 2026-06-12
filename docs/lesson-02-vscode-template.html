@@ -846,7 +846,7 @@ public enum RobotMode {
     background:#FFFFFF; border:1px solid #D0DCF0; border-left:none;
     border-radius:0 8px 8px 0; margin:0.75rem 0 0.75rem -1px;
     font-family:'Segoe UI',sans-serif; box-sizing:border-box;
-    position:relative; flex-shrink:0;
+    position:sticky; top:10rem; flex-shrink:0;
   ">
     <div id="boot-panel-inner" style="width:300px; padding:1.25rem; box-sizing:border-box;">
       <button onclick="closePanel()" style="
@@ -1023,24 +1023,48 @@ fetch('diagrams/boot-sequence.svg')
 </script>
 
 
-    <div class="chat-thread">
-      <div class="bubble bubble-q">
-        <div class="bubble-who">Student</div>
-        So Robot.java creates RobotContainer, and RobotContainer creates subsystems?
-      </div>
-      <div class="bubble bubble-a">
-        <div class="bubble-who">Exactly right</div>
-        Robot.java creates one RobotContainer in its constructor. RobotContainer creates all the subsystems. Then every 20ms, Robot.java calls robotPeriodic(), which runs the CommandScheduler, which calls periodic() on every subsystem. That's the whole loop.
-      </div>
-      <div class="bubble bubble-q">
-        <div class="bubble-who">Student</div>
-        What's LoggedRobot vs TimedRobot? The template gives me TimedRobot.
-      </div>
-      <div class="bubble bubble-a">
-        <div class="bubble-who">Good catch</div>
-        LoggedRobot extends TimedRobot — it wraps each loop cycle with AdvantageKit logging. When we add AdvantageKit we change <code>extends TimedRobot</code> to <code>extends LoggedRobot</code>. All lifecycle methods work the same. You just get logging for free.
-      </div>
-    </div>
+<div class="chat-thread">
+  <div class="bubble bubble-q">
+    <div class="bubble-who">Student</div>
+    So Robot.java creates RobotContainer, and RobotContainer creates subsystems?
+  </div>
+  <div class="bubble bubble-a">
+    <div class="bubble-who">Exactly right</div>
+    Robot.java creates one RobotContainer in its constructor. RobotContainer creates all the subsystems. Then every 20ms, Robot.java calls robotPeriodic(), which runs the CommandScheduler, which calls periodic() on every subsystem. That's the whole loop.
+  </div>
+  <div class="bubble bubble-q">
+    <div class="bubble-who">Student</div>
+    What's LoggedRobot vs TimedRobot? The template gives me TimedRobot.
+  </div>
+  <div class="bubble bubble-a">
+    <div class="bubble-who">Good catch</div>
+    LoggedRobot extends TimedRobot — it wraps each loop cycle with AdvantageKit logging. When we add AdvantageKit we change <code>extends TimedRobot</code> to <code>extends LoggedRobot</code>. All lifecycle methods work the same. You just get logging for free.
+  </div>
+  <div class="bubble bubble-q">
+    <div class="bubble-who">Student</div>
+    Why does the arrow curve back on the left side of the loop box?
+  </div>
+  <div class="bubble bubble-a">
+    <div class="bubble-who">That's the loop!</div>
+    That arrow is showing that after step 4, the robot doesn't stop — it immediately starts over at step 1. Every 20ms. Forever. Until you disable it or pull the battery. The robot is basically a very fast, very obedient hamster wheel.
+  </div>
+  <div class="bubble bubble-q">
+    <div class="bubble-who">Student</div>
+    What happens if our code takes longer than 20ms to run?
+  </div>
+  <div class="bubble bubble-a">
+    <div class="bubble-who">Loop overrun — and it's bad</div>
+    WPILib schedules robotPeriodic() every 20ms like clockwork. If your code takes 25ms, the next cycle starts 5ms late. Now your sensor readings are stale, your motor updates are delayed, and your control loop is drifting. Do it enough and the Driver Station prints a loop overrun warning. The fix: never put <code>Thread.sleep()</code>, heavy file I/O, or slow network calls inside periodic methods. Keep the loop lean.
+  </div>
+  <div class="bubble bubble-q">
+    <div class="bubble-who">Student</div>
+    Does autonomous use completely different code from teleop?
+  </div>
+  <div class="bubble bubble-a">
+    <div class="bubble-who">Nope — same commands, different trigger</div>
+    The exact same command classes you bind to buttons in teleop can run during autonomous. The only difference is what schedules them. In teleop a button press does it. In auto, <code>autonomousInit()</code> schedules one top-level command that kicks everything off. The subsystems, the IO layer, the scheduler — all identical.
+  </div>
+</div>
 
     <div class="hf-box hf-sidebar">
       <span class="hf-label">Common questions</span>
@@ -1069,11 +1093,18 @@ fetch('diagrams/boot-sequence.svg')
 
     <p>Before you ever touch the XRP, you need to be comfortable in the simulator. This is where you'll spend most of your development time. Real hardware is for verifying — simulation is for building.</p>
 
+    <div class="hf-box hf-sidebar">
+      <span class="hf-label">Why we're using the BearBots project here</span>
+      <p>The XRP-Template has no logging — AdvantageScope connects but the panel is empty. The BearBots project already has AdvantageKit wired up, so you get real data immediately. Close the XRP-Template project and open <code>bearbots-xrp-code</code> before launching the simulator.</p>
+      <p><strong>To add AK to a template you'd need to:</strong> add the AdvantageKit vendordep via <code>WPILib: Manage Vendor Libraries</code>, change <code>extends TimedRobot</code> → <code>extends LoggedRobot</code>, call <code>Logger.start()</code> in <code>robotInit()</code>, and wrap each subsystem's IO in the <code>IO</code>/<code>IOInputs</code> pattern. That's Lesson 3.</p>
+      <p><strong>Most teams skip retrofitting entirely</strong> — the AK developers recommend starting from an official template. The BearBots competition robot uses the <a href="https://docs.advantagekit.org/getting-started/template-projects/talonfx-swerve-template/" target="_blank">TalonFX(S) Swerve Template</a> as its foundation.</p>
+    </div>
+
     <h2>Launch the simulator</h2>
 
     <div class="hf-box hf-info">
       <span class="hf-label">Step by step</span>
-      <p><strong>1.</strong> Press <code>Ctrl+Shift+P</code></p>
+      <p><strong>1.</strong> Click the WPILib hexagon logo in the top right corner of VS Code</p>
       <p><strong>2.</strong> Type <code>WPILib: Simulate Robot Code</code> → Enter</p>
       <p><strong>3.</strong> Dialog asks which extensions to load — check <strong>halsim_gui</strong> → OK</p>
       <p><strong>4.</strong> Wait for build. The Robot Simulation window opens automatically.</p>
@@ -1114,7 +1145,7 @@ fetch('diagrams/boot-sequence.svg')
     <div class="hf-box hf-info">
       <span class="hf-label">Connect to the simulator</span>
       <p><strong>1.</strong> Open AdvantageScope (bundled with WPILib Game Tools — no separate install)</p>
-      <p><strong>2.</strong> File → <strong>Connect to Simulator</strong> (or <code>Ctrl+K</code>)</p>
+      <p><strong>2.</strong> File → <strong>Connect to Simulator</strong> (or <code>Ctrl+Shift+K</code>)</p>
       <p><strong>3.</strong> Left panel populates — look for the <code>AdvantageKit/</code> folder</p>
       <p><strong>4.</strong> Connect <em>before</em> enabling the robot so you don't miss the first seconds of data</p>
     </div>
@@ -1143,8 +1174,8 @@ fetch('diagrams/boot-sequence.svg')
       <p><strong>4.</strong> Move the sticks — watch axis values update in the Joysticks panel to confirm it's working</p>
     </div>
 
-    <h2>XRP hardware ports</h2>
-    <p>When we move to physical hardware, these are the port-to-subsystem mappings for the BearBots XRP.</p>
+<h2>XRP hardware ports</h2>
+    <p>When we move to physical hardware, these are the port-to-subsystem mappings for the BearBots XRP. (<a href="https://docs.wpilib.org/en/stable/docs/xrp-robot/getting-to-know-xrp.html" target="_blank">WPILib XRP hardware reference</a>) More information can be found by searching for the SparkFun XRP robot. <a href="https://docs.sparkfun.com/SparkFun_XRP_Controller/introduction/" target="_blank">SparkFun XRP Controller Hardware Overview</a></p>
 
     <table class="hw-table">
       <thead>
@@ -1155,19 +1186,19 @@ fetch('diagrams/boot-sequence.svg')
           <th>Direction</th>
         </tr>
       </thead>
-      <tbody>
-        <tr><td>Right drive motor</td><td>Motor 0</td><td class="hw-plain">DriveSubsystem</td><td class="hw-plain">Output</td></tr>
-        <tr><td>Left drive motor</td><td>Motor 1</td><td class="hw-plain">DriveSubsystem</td><td class="hw-plain">Output</td></tr>
-        <tr><td>Right encoder</td><td>Motor 0 built-in</td><td class="hw-plain">DriveSubsystem</td><td class="hw-plain">Input</td></tr>
-        <tr><td>Left encoder</td><td>Motor 1 built-in</td><td class="hw-plain">DriveSubsystem</td><td class="hw-plain">Input</td></tr>
+<tbody>
+        <tr><td>Left drive motor</td><td>XRPMotor 0</td><td class="hw-plain">DriveSubsystem</td><td class="hw-plain">Output</td></tr>
+        <tr><td>Right drive motor</td><td>XRPMotor 1</td><td class="hw-plain">DriveSubsystem</td><td class="hw-plain">Output</td></tr>
+        <tr><td>Left encoder</td><td>DIO 4 / 5</td><td class="hw-plain">DriveSubsystem</td><td class="hw-plain">Input</td></tr>
+        <tr><td>Right encoder</td><td>DIO 6 / 7</td><td class="hw-plain">DriveSubsystem</td><td class="hw-plain">Input</td></tr>
         <tr><td>Gyro</td><td>XRPGyro</td><td class="hw-plain">DriveSubsystem</td><td class="hw-plain">Input</td></tr>
-        <tr><td>Arm servo</td><td>Device 4 → Servo 1</td><td class="hw-plain">ArmSubsystem</td><td class="hw-plain">Output</td></tr>
+        <tr><td>Arm servo</td><td>XRPServo 4 → Servo 1</td><td class="hw-plain">ArmSubsystem</td><td class="hw-plain">Output</td></tr>
       </tbody>
     </table>
 
     <div class="hf-box hf-warning">
-      <span class="hf-label">Motor 0 is the RIGHT motor</span>
-      <p>This is counterintuitive. Motor 0 = right, Motor 1 = left. Flag this in your mental model now — it will bite you if you forget.</p>
+      <span class="hf-label">Right motor needs to be inverted</span>
+      <p>Per the WPILib docs: the right motor spins backward when positive output is applied. The corresponding motor controller must be inverted in code. This is already handled in <code>DriveIOXRP.java</code>.</p>
     </div>
 
     <div class="hf-box hf-brain">

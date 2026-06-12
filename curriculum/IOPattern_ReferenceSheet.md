@@ -1,6 +1,6 @@
 # AdvantageKit IO pattern — reference sheet
 
-**Bear Bots FRC Curriculum**
+**BearBots FRC Curriculum**
 **Stack:** Java | AdvantageKit | XRP
 
 ---
@@ -174,5 +174,5 @@ Commands → subsystem logic → Logger.recordOutput() ────────�
 
 ---
 
-*Bear Bots FRC Curriculum — IO Pattern Reference Sheet*
+*BearBots FRC Curriculum — IO Pattern Reference Sheet*
 *Companion to: StudentReferenceCard.md*
