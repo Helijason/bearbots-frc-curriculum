@@ -21,11 +21,11 @@ big_idea_italic = "The BearBots project adds AdvantageKit logging and a clean co
 ## KEY CONCEPTS (5 cards)
 
 concepts = [
-    ("Robot.java",          "Lifecycle manager",  "Extends LoggedRobot.\nRuns CommandScheduler.\nCalled every 20ms."),
-    ("RobotContainer",      "Wiring hub",         "Subsystems created here.\nButton bindings here.\nIO layer injected here."),
-    ("Constants.java",      "Source of truth",    "Motor ports, speed limits.\nInner classes group values.\nChange once, updates everywhere."),
-    ("AdvantageKit",        "Logging layer",      "Logger.start() at boot.\nNT4Publisher feeds AScope.\nEvery loop cycle captured."),
-    ("Simulator",           "Test bench",         "Simulate before hardware.\nDrag Keyboard 0 → Joystick[0].\nGraph encoders in AScope."),
+    ("Robot.java",      "Lifecycle manager", "Extends LoggedRobot.\nRuns CommandScheduler.\nCalled every 20ms."),
+    ("RobotContainer",  "Wiring hub",        "Subsystems created here.\nButton bindings here.\nIO layer injected here."),
+    ("Constants.java",  "Source of truth",   "Motor ports, speed limits.\nInner classes group values.\nDefine in one place."),
+    ("AdvantageKit",    "Logging layer",     "Logger.start() at boot.\nNT4Publisher feeds AScope.\nEvery loop cycle captured."),
+    ("Simulator",       "Test bench",        "Simulate before hardware.\nDrag Keyboard 0 -> Joystick[0].\nGraph encoders in AScope."),
 ]
 
 ---
@@ -35,13 +35,15 @@ concepts = [
 left_col_label = "THE SETUP WORKFLOW"
 
 steps = [
-    ("1", "Create XRP-Template project → explore vanilla file structure"),
-    ("2", "Install Git → git config name + email → clone bearbots-xrp-code"),
-    ("3", "git pull → build project → BUILD SUCCESSFUL"),
-    ("4", "Simulate Robot Code → enable halsim_gui → sim window opens"),
-    ("5", "Connect AdvantageScope → Drive/ folder → graph LeftPositionMeters"),
-    ("6", "Drive with WASD → predict graph shape before each maneuver"),
-    ("7", "Broken Robot Lab — fix 4 bugs using symptom descriptions only"),
+    ("1", "Create XRP-Template project, explore XRP-Template file structure"),
+    ("2", "Install Git: download, accept defaults, restart VS Code"),
+    ("3", "git config user.name and user.email — one time per machine"),
+    ("4", "Clone: git clone <repo url> into C:\\FRC"),
+    ("5", "git pull — get latest files"),
+    ("6", "Simulate Robot Code, enable halsim_gui"),
+    ("7", "Connect AdvantageScope, graph LeftPositionMeters"),
+    ("8", "Drive with WASD, predict graph shapes"),
+    ("9", "Broken Robot Lab: fix bugs using symptom descriptions only"),
 ]
 
 ---
@@ -59,12 +61,21 @@ checks = [
 
 ---
 
+## BOTTOM-LEFT SECTION (left col, TEAL)
+
+bot_left_label = "PROGRAM FLOW"
+# Content: boot sequence image embedded from boot_sequence.png
+# Scaled to fit with 6pt padding, aspect ratio preserved (951x1074 px)
+
+---
+
 ## KEY VOCABULARY (right col, TEAL)
+# Two-column layout. Widest term sets definition indent. No dash separator.
 
 vocab = [
-    ("LoggedRobot",    "AdvantageKit base class — wraps each 20ms loop with data capture"),
+    ("LoggedRobot",    "AdvantageKit base class, wraps each 20ms loop with data capture"),
     ("RobotContainer", "Where subsystems are created and buttons are wired to commands"),
-    ("Constants.java", "Central file for fixed values — inner classes group related constants"),
+    ("Constants.java", "Central file for fixed values, inner classes group related constants"),
     ("git commit",     "Saves a labeled snapshot of code you can return to"),
     ("NT4Publisher",   "Streams AdvantageKit log data to NetworkTables for AdvantageScope"),
 ]
