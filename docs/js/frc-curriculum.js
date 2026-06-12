@@ -112,6 +112,13 @@ function initPage() {
     });
   }
 
+  // Inject cross-lesson references
+    document.querySelectorAll('.lesson-ref').forEach(el => {
+      const id = el.dataset.lesson;
+      const l = SITE_CONFIG.lessons[id];
+      if (l) el.textContent = `Lesson ${l.lesson} — ${l.title}`;
+    });
+
   const labelText = `Module ${lesson.module} - Lesson ${lesson.lesson}`;
  
   // lesson-label (header + footer)
