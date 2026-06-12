@@ -1,6 +1,6 @@
 # Summary Card Format Specification
 
-*Reference for generating all Bear Bots lesson summary cards. Match this exactly.*
+*Reference for generating all BearBots lesson summary cards. Match this exactly.*
 
 ---
 

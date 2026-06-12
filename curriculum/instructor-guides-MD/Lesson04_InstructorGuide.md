@@ -2,7 +2,7 @@
 
 # The IO Pattern and AdvantageKit Architecture
 
-*The IO Pattern and AdvantageKit Architecture — applied to the Bear Bots elevator, scoop, and arm.*
+*The IO Pattern and AdvantageKit Architecture — applied to the BearBots elevator, scoop, and arm.*
 
 > **Instructor Edition — Not for student distribution**
 
@@ -41,7 +41,7 @@
 - XRP robots assembled with elevator and scoop attachment — one per student or pair
 - Elevator carriage manually positioned at the bottom before class
 - Scoop servo manually positioned flat before class
-- VSCode open on projector with the Bear Bots starter project
+- VSCode open on projector with the BearBots starter project
 - AdvantageScope open and ready
 - WPILib XRP documentation open in a browser tab on the projector:
   `https://docs.wpilib.org/en/stable/docs/xrp-robot/`

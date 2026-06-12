@@ -377,7 +377,7 @@ Each pair shares their top 2–3 robot requirements. Write them on the whiteboar
 >
 > *"Keep that list in your head. Next lesson we talk about subsystems — how robots break their jobs into separate files. When we do that whiteboard, you're going to recognize these exact tasks. The code structure we build over the next five lessons is a direct answer to what you just wrote down."*
 
-> **Do NOT reveal the Bear Bots robot design here.** That reveal happens at the end of Lesson 03 after students have worked through the design themselves.
+> **Do NOT reveal the BearBots robot design here.** That reveal happens at the end of Lesson 03 after students have worked through the design themselves.
 
 ---
 

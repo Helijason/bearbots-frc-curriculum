@@ -28,7 +28,7 @@ const SITE_CONFIG = {
     "02": {
       module: 1,
       lesson: "02",
-      title: "WPILib Template Structure and File Roles",
+      title: "Template Structure + File Roles",
       subtitle: "Walk through every generated file and understand why it exists before touching anything.",
       description: "Walk through every generated file and understand why it exists before touching anything.",
       hardware: "Laptop",

@@ -1,14 +1,14 @@
-# Bear Bots — Orbit Odyssey Game Modifications
+# BearBots — Orbit Odyssey Game Modifications
 
 *This document captures all differences between standard Orbit Odyssey rules
-and the Bear Bots summer camp version. Reference this before writing student
+and the BearBots summer camp version. Reference this before writing student
 materials, lesson content, or competition day procedures.*
 
 ---
 
 ## Overview
 
-Bear Bots runs Orbit Odyssey in a **1v1 round-robin format** with **identical
+BearBots runs Orbit Odyssey in a **1v1 round-robin format** with **identical
 robot chassis** for all students. Standard rules apply except where noted below.
 The field, field elements, and match structure are unchanged.
 
@@ -19,7 +19,7 @@ The field, field elements, and match structure are unchanged.
 | Element | Quantity | Source | Notes |
 |---|---|---|---|
 | Rubble | 12 | Pre-loaded on field | Standard from official game |
-| Ping pong balls | TBD | Side hoppers, player-loaded | Bear Bots addition |
+| Ping pong balls | TBD | Side hoppers, player-loaded | BearBots addition |
 | Large ball | 1 | Pre-placed near high pedestal | Endgame target only |
 
 **Ping pong balls** are loaded into a hopper on each side of the field before
@@ -79,7 +79,7 @@ High risk, high reward. A parked robot earns guaranteed points with no risk.
 
 ## Differences from Standard Orbit Odyssey
 
-| Rule | Standard | Bear Bots |
+| Rule | Standard | BearBots |
 |---|---|---|
 | Game elements | Rubble only | Rubble + ping pong balls |
 | Element holding limit | 1 at a time | No limit |
