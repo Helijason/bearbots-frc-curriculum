@@ -133,3 +133,26 @@ Add import to Robot.java:
 
     import static frc.robot.Constants.kProjectName;
 
+
+Extensions — If You Finish Early
+==================================
+These all go in robotPeriodic() in Robot.java.
+
+Loop count:
+    Add a counter field at the top of the Robot class:
+        private int loopCount = 0;
+    Then in robotPeriodic():
+        loopCount++;
+        Logger.recordOutput("LoopCount", loopCount);
+
+Timer:
+    Logger.recordOutput("UptimeSeconds", Timer.getFPGATimestamp());
+
+Boolean:
+    Logger.recordOutput("RobotAlive", true);
+    (What does a boolean look like in AdvantageScope?)
+
+Favorite number:
+    Logger.recordOutput("FavoriteNumber", 42);
+
+

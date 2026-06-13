@@ -36,7 +36,7 @@ const SITE_CONFIG = {
       tools: "VS Code WPILib, AdvantageKit",
       duration: "3 hours",
       filename: "lesson-02-vscode-template.html",
-      status: "soon",  // "ready", "current", "review", "soon"
+      status: "ready",  // "ready", "current", "review", "soon"
       prev: "01",
       next: "03"
     },
@@ -121,7 +121,7 @@ const SITE_CONFIG = {
       title: "Competition Day - Orbit Odyssey",
       subtitle: "Everything you built. One field. Real matches. 1v1 round-robin - every student competes individually.",
       description: "Final tweaks, practice runs, competitive matches, awards, and curriculum close.",
-      hardware: "XRP robot",
+      hardware: "Laptop/XRP robot",
       prereq: "Lesson 07",
       tools: "XRP robot, Game Field",
       duration: "3 hours",
@@ -132,3 +132,5 @@ const SITE_CONFIG = {
     }
   }
 };
+const ORBIT_KEY = 'orbit_unlocked_02';
+const BYPASS_CODE = 'ORBIT!';
