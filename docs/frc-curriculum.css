@@ -853,3 +853,8 @@ code {
   .bubble { max-width: 95%; }
   .section-nav { top: 48px; }
 }
+
+img {
+    max-width: 100%;
+    height: auto;
+}

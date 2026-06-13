@@ -238,20 +238,21 @@
   </div>
 
   <nav class="section-nav">
-    <button class="section-nav-btn active" data-section="files">Part 1 — The Files</button>
-    <button class="section-nav-btn" data-section="simulator">Part 2 — The Simulator</button>
-    <button class="section-nav-btn" data-section="data">Part 3 — Read the Data</button>
-    <button class="section-nav-btn" data-section="challenges">Part 4 — Hands-On</button>
-    <button class="section-nav-btn" data-section="lab">Part 5 — Broken Robot Lab</button>
-    <button class="section-nav-btn" data-section="match">Part 6 — Symptom Match</button>
-    <button class="section-nav-btn" data-section="orbit">Part 7 — Orbit Odyssey</button>
+    <button class="section-nav-btn active" data-section="setup">Part 1 — Git + Project Setup</button>
+    <button class="section-nav-btn" data-section="files">Part 2 — The Files</button>
+    <button class="section-nav-btn" data-section="simulator">Part 3 — The Simulator</button>
+    <button class="section-nav-btn" data-section="data">Part 4 — Read the Data</button>
+    <button class="section-nav-btn" data-section="challenges">Part 5 — Hands-On</button>
+    <button class="section-nav-btn" data-section="lab">Part 6 — Broken Robot Lab</button>
+    <button class="section-nav-btn" data-section="match">Part 7 — Symptom Match</button>
+    <button class="section-nav-btn" data-section="orbit">Part 8 — Orbit Odyssey</button>
   </nav>
 
 
   <!-- ═══════════════════════════════════════════════════════
-       PART 1 — THE FILES
+       PART 1 — GIT + PROJECT SETUP
        ═══════════════════════════════════════════════════════ -->
-  <div class="lesson-section active" id="section-files">
+  <div class="lesson-section active" id="section-setup">
 
     <div class="hf-box hf-brain">
       <span class="hf-label">Your brain right now</span>
@@ -429,7 +430,14 @@ git config --global user.email "you@example.com"</pre></div>
   </div>
 </div>
 
-    <h2>Step 3 — What the XRP-TEMPLATE project generates</h2>
+  </div><!-- /section-setup -->
+
+  <!-- ═══════════════════════════════════════════════════════
+       PART 2 — THE FILES
+       ═══════════════════════════════════════════════════════ -->
+  <div class="lesson-section" id="section-files">
+
+    <h2>Step 1 — What the XRP-TEMPLATE project generates</h2>
     <p>Look at the XRP-TEMPLATE project first. Open the Explorer panel (<code>Ctrl+Shift+E</code>) and expand <code>src/main/java/frc/robot/</code>. You should see exactly these files:</p>
 
     <div style="display:flex; flex-direction:column; gap:0.5rem; margin: 1rem 0;">
@@ -518,7 +526,7 @@ git config --global user.email "you@example.com"</pre></div>
 
     </div>
 
-    <h2>Step 4 — Compare XRP-TEMPLATE vs BearBots</h2>
+    <h2>Step 2 — Compare XRP-TEMPLATE vs BearBots</h2>
     <p>Now open both projects side by side. The BearBots project isn't XRP-TEMPLATE — we made deliberate changes before you got here. Each card below shows one difference, why it was a problem, and why the change fixes it.</p>
 
     <div class="hf-box hf-brain" style="margin-bottom:1rem;">
@@ -625,6 +633,7 @@ git config --global user.email "you@example.com"</pre></div>
       </div>
       <button class="diff-why-toggle" onclick="toggleWhy(this)">
         <span class="dw-arrow">▶</span> Why we changed this
+        <h4><span style="font-size:0.75rem;color:var(--muted);font-weight:400;">click to expand</span></h4>
       </button>
       <div class="diff-why-content">
         <p><code>LoggedRobot</code> extends <code>TimedRobot</code> — every lifecycle method works identically. The difference is that LoggedRobot wraps each 20ms loop cycle with AdvantageKit data capture. Every input the robot reads, every output it commands, timestamped and saved. You can replay the entire match in simulation later and see exactly what happened, when it happened.</p>
@@ -669,6 +678,7 @@ git config --global user.email "you@example.com"</pre></div>
       </div>
       <button class="diff-why-toggle" onclick="toggleWhy(this)">
         <span class="dw-arrow">▶</span> Why we changed this
+        <h4><span style="font-size:0.75rem;color:var(--muted);font-weight:400;">click to expand</span></h4>
       </button>
       <div class="diff-why-content">
         <p><code>Logger.start()</code> initializes all data sinks and starts the capture loop. It must happen before <code>new RobotContainer()</code> — subsystems are created inside RobotContainer, and we need logging active before their first <code>periodic()</code> call so no data is missed from boot.</p>
@@ -704,6 +714,7 @@ Logger.start();</pre>
       </div>
       <button class="diff-why-toggle" onclick="toggleWhy(this)">
         <span class="dw-arrow">▶</span> Why we changed this
+        <h4><span style="font-size:0.75rem;color:var(--muted);font-weight:400;">click to expand</span></h4>
       </button>
       <div class="diff-why-content">
         <p><code>Logger.addDataReceiver(new NT4Publisher())</code> tells AdvantageKit to publish all logged values to NetworkTables. That's what AdvantageScope connects to. Without it, <code>Logger.start()</code> runs but nothing appears in AdvantageScope.</p>
@@ -740,6 +751,7 @@ public enum RobotMode {
       </div>
       <button class="diff-why-toggle" onclick="toggleWhy(this)">
         <span class="dw-arrow">▶</span> Why we changed this
+        <h4><span style="font-size:0.75rem;color:var(--muted);font-weight:400;">click to expand</span></h4>
       </button>
       <div class="diff-why-content">
         <p>One field controls the entire IO layer. Set <code>currentMode = RobotMode.SIM</code> and the codebase loads simulated hardware. Set it to <code>RobotMode.REAL</code> and it talks to real motors. Set it to <code>RobotMode.REPLAY</code> and it reads from a saved log file.</p>
@@ -777,6 +789,7 @@ public enum RobotMode {
       </div>
       <button class="diff-why-toggle" onclick="toggleWhy(this)">
         <span class="dw-arrow">▶</span> Why we changed this
+        <h4><span style="font-size:0.75rem;color:var(--muted);font-weight:400;">click to expand</span></h4>
       </button>
       <div class="diff-why-content">
         <p>Inner classes group related constants together without needing separate files. <code>Constants.DriveHardware.kLeftMotorChannel</code> is unambiguous about what it is and where to find it. Change it once, everything that references it updates automatically.</p>
@@ -823,6 +836,7 @@ public enum RobotMode {
       </div>
       <button class="diff-why-toggle" onclick="toggleWhy(this)">
         <span class="dw-arrow">▶</span> Why we changed this
+        <h4><span style="font-size:0.75rem;color:var(--muted);font-weight:400;">click to expand</span></h4>
       </button>
       <div class="diff-why-content">
         <p>You never edit this block by hand. Running <code>WPILib: Manage Vendor Libraries → Install new libraries (online)</code> and pasting the AdvantageKit URL writes this automatically. The vendor dep tells Gradle where to download the AdvantageKit JAR and how to include it in the build.</p>
@@ -833,6 +847,7 @@ public enum RobotMode {
 
     <h2>How the boot sequence works</h2>
     <p>The files don't run independently — they start each other in a fixed order every time the robot powers on.</p>
+    <p style="font-size:0.85rem; color:#1D6A72; font-style:italic;">💡 Click any box in the diagram for more information.</p>
 
 <!-- ── Boot sequence diagram inject ── -->
 <div style="position:relative; display:flex; gap:0; align-items:flex-start;">
@@ -842,27 +857,28 @@ public enum RobotMode {
 
   <!-- Slide panel -->
   <div id="boot-panel" style="
+
     width:0; overflow:hidden; transition:width 0.25s ease;
     background:#FFFFFF; border:1px solid #D0DCF0; border-left:none;
     border-radius:0 8px 8px 0; margin:0.75rem 0 0.75rem -1px;
     font-family:'Segoe UI',sans-serif; box-sizing:border-box;
     position:sticky; top:10rem; flex-shrink:0;
   ">
-    <div id="boot-panel-inner" style="width:300px; padding:1.25rem; box-sizing:border-box;">
+    <div id="boot-panel-inner" style="width:240px; padding:0.65rem; box-sizing:border-box;">
       <button onclick="closePanel()" style="
         position:absolute; top:10px; right:12px;
         background:none; border:none; font-size:16px; cursor:pointer;
         color:#666; line-height:1;
       ">&#x2715;</button>
       <div id="boot-panel-tag" style="
-        font-size:0.65rem; font-weight:700; letter-spacing:0.1em;
+        font-size:0.5rem; font-weight:700; letter-spacing:0.1em;
         text-transform:uppercase; padding:0.2rem 0.6rem;
         border-radius:20px; display:inline-block; margin-bottom:0.6rem;
         background:#E1F5EE; color:#1D6A72;
       "></div>
-      <div id="boot-panel-title" style="font-size:1rem; font-weight:700; color:#1A1A1A; margin-bottom:0.5rem;"></div>
-      <div id="boot-panel-body" style="font-size:0.85rem; color:#444; line-height:1.65;"></div>
-      <div id="boot-panel-link" style="margin-top:0.9rem;"></div>
+      <div id="boot-panel-title" style="font-size:0.65em; font-weight:600; color:#1A1A1A; margin-bottom:0.25rem;"></div>
+      <div id="boot-panel-body" style="font-size:0.5rem; color:#444; line-height:1.65;"></div>
+      <div id="boot-panel-link" style="margin-top:0.45rem;"></div>
     </div>
   </div>
 </div>
@@ -990,7 +1006,7 @@ const NODE_DATA = {
   },
   "scheduler-view": {
     tag: "RobotContainer",
-    title: "🗂️ The scheduler's registry",
+    title: "🗂️ The Command Schedulerscheduler's registry",
     body: "After boot the scheduler knows every subsystem, its default command, and all active bindings. When a button command ends or is interrupted, the scheduler automatically restores the default command for that subsystem. A command requiring multiple subsystems locks all of them — no other command can use any of those subsystems while it runs.",
     link: "https://docs.wpilib.org/en/stable/docs/software/commandbased/command-scheduler.html",
     linkText: "CommandScheduler docs &#x2192;"
@@ -1004,8 +1020,8 @@ function openPanel(nodeKey) {
   document.getElementById('boot-panel-title').textContent = data.title;
   document.getElementById('boot-panel-body').innerHTML = data.body;
   document.getElementById('boot-panel-link').innerHTML =
-    '<a href="' + data.link + '" target="_blank" rel="noopener" style="font-size:0.8rem;color:#1D6A72;text-decoration:none;border-bottom:1px solid #9FE1CB;">' + data.linkText + '</a>';
-  document.getElementById('boot-panel').style.width = '300px';
+    '<a href="' + data.link + '" target="_blank" rel="noopener" style="font-size:0.65rem;color:#1D6A72;text-decoration:none;border-bottom:1px solid #9FE1CB;">' + data.linkText + '</a>';
+  document.getElementById('boot-panel').style.width = '240px';
 }
 
 function closePanel() {
@@ -1075,19 +1091,19 @@ fetch('diagrams/boot-sequence.svg')
 
     <div class="hf-box hf-brain">
       <span class="hf-label">Before you move on</span>
-      <p>Without looking: if a command doesn't run when you press a button, which file do you check first? Write it down before moving to Part 2.</p>
+      <p>Without looking: if a command doesn't run when you press a button, which file do you check first? Write it down before moving to Part 3.</p>
     </div>
 
   </div><!-- /section-files -->
 
 
   <!-- ═══════════════════════════════════════════════════════
-       PART 2 — THE SIMULATOR
+       PART 3 — THE SIMULATOR
        ═══════════════════════════════════════════════════════ -->
   <div class="lesson-section" id="section-simulator">
 
     <div class="hf-box hf-brain">
-      <span class="hf-label">Answer from Part 1</span>
+      <span class="hf-label">Answer from Part 2</span>
       <p>Check <strong>RobotContainer first</strong> — button bindings live there. If the binding exists and still nothing happens, check that <code>CommandScheduler.getInstance().run()</code> is in <code>robotPeriodic()</code>. No scheduler call = no commands, ever, no matter how perfect your bindings are.</p>
     </div>
 
@@ -1095,7 +1111,7 @@ fetch('diagrams/boot-sequence.svg')
 
     <div class="hf-box hf-sidebar">
       <span class="hf-label">Why we're using the BearBots project here</span>
-      <p>The XRP-Template has no logging — AdvantageScope connects but the panel is empty. The BearBots project already has AdvantageKit wired up, so you get real data immediately. Close the XRP-Template project and open <code>bearbots-xrp-code</code> before launching the simulator.</p>
+      <p>The XRP-Template has no logging — AdvantageScope connects but the panel is empty. The BearBots project already has AdvantageKit wired up, so you get real data immediately. Close the XRP-Template project and open <code>bearbots-xrp-code\Lesson01\First Drive</code> before launching the simulator.</p>
       <p><strong>To add AK to a template you'd need to:</strong> add the AdvantageKit vendordep via <code>WPILib: Manage Vendor Libraries</code>, change <code>extends TimedRobot</code> → <code>extends LoggedRobot</code>, call <code>Logger.start()</code> in <code>robotInit()</code>, and wrap each subsystem's IO in the <code>IO</code>/<code>IOInputs</code> pattern. That's Lesson 3.</p>
       <p><strong>Most teams skip retrofitting entirely</strong> — the AK developers recommend starting from an official template. The BearBots competition robot uses the <a href="https://docs.advantagekit.org/getting-started/template-projects/talonfx-swerve-template/" target="_blank">TalonFX(S) Swerve Template</a> as its foundation.</p>
     </div>
@@ -1144,8 +1160,8 @@ fetch('diagrams/boot-sequence.svg')
 
     <div class="hf-box hf-info">
       <span class="hf-label">Connect to the simulator</span>
-      <p><strong>1.</strong> Open AdvantageScope (bundled with WPILib Game Tools — no separate install)</p>
-      <p><strong>2.</strong> File → <strong>Connect to Simulator</strong> (or <code>Ctrl+Shift+K</code>)</p>
+      <p><strong>1.</strong> Open AdvantageScope</p>
+      <p><strong>2.</strong> File → <strong>Connect to Simulator</strong> (or in Windows <code>Ctrl+Shift+K</code>)</p>
       <p><strong>3.</strong> Left panel populates — look for the <code>AdvantageKit/</code> folder</p>
       <p><strong>4.</strong> Connect <em>before</em> enabling the robot so you don't miss the first seconds of data</p>
     </div>
@@ -1176,6 +1192,7 @@ fetch('diagrams/boot-sequence.svg')
 
 <h2>XRP hardware ports</h2>
     <p>When we move to physical hardware, these are the port-to-subsystem mappings for the BearBots XRP. (<a href="https://docs.wpilib.org/en/stable/docs/xrp-robot/getting-to-know-xrp.html" target="_blank">WPILib XRP hardware reference</a>) More information can be found by searching for the SparkFun XRP robot. <a href="https://docs.sparkfun.com/SparkFun_XRP_Controller/introduction/" target="_blank">SparkFun XRP Controller Hardware Overview</a></p>
+    <img src="images/lesson02/XRP-Controller-Board-Annotated.webp" alt="XRP Controller Hardware.">
 
     <table class="hw-table">
       <thead>
@@ -1265,7 +1282,7 @@ fetch('diagrams/boot-sequence.svg')
     </div>
 
     <div class="hf-box hf-brain">
-      <span class="hf-label">Before Part 4</span>
+      <span class="hf-label">Before Part 5</span>
       <p>In your own words: how would you tell from encoder data alone whether the robot drove straight or turned? No code — just the concept.</p>
     </div>
 
@@ -1393,7 +1410,7 @@ fetch('diagrams/boot-sequence.svg')
       <p>Build the project. It should still compile. If it doesn't, you moved something but didn't update the reference. Find the broken reference and fix it.</p>
     </div>
 
-    <h2>Activity 3 — Add Your Name to the Robot</h2>
+    <h2>Activity 2b — Add Your Name to the Robot</h2>
     <p>Make the robot log who's driving it. One line of code.</p>
 
     <div class="hf-box hf-info">
@@ -1422,11 +1439,7 @@ fetch('diagrams/boot-sequence.svg')
     <p class="bug-lab-intro">
       Four robots. Four different files. Each one compiles and launches — and then something goes wrong. Your job: read the symptom, find the bug, fix it. Each bug lives in a <strong>different file</strong>.
     </p>
-
-    <div class="hf-box hf-warning">
-      <span class="hf-label">Rules</span>
-      <p>Hints cost one candy each. You have to ask — they won't be offered. Work in pairs for Bugs 1–2, solo for Bugs 3–4.</p>
-    </div>
+    <p class="bug-lab-intro"><strong>Before you click anything</strong> — read the symptom and write down your guess. How did you do?</p>
 
     <div class="bug-lab" data-lab="lesson-02">
 
@@ -1529,7 +1542,7 @@ fetch('diagrams/boot-sequence.svg')
       </div>
 
       <div class="success-banner">
-        All 4 bugs found. Swapped axes, blown output constant, missing inversion, wrong base class — all real mistakes from real FRC codebases. Head to Part 6.
+        All 4 bugs found. Swapped axes, blown output constant, missing inversion, wrong base class — all real mistakes from real FRC codebases. Head to Part 7.
       </div>
 
     </div><!-- /bug-lab -->
@@ -1542,7 +1555,7 @@ fetch('diagrams/boot-sequence.svg')
        ═══════════════════════════════════════════════════════ -->
   <div class="lesson-section" id="section-match">
 
-    <p>Match each bug symptom from the lab to the file where it lives. Get all four right to unlock Part 7.</p>
+    <p>Match each bug symptom from the lab to the file where it lives. Get all four right to unlock Part 8.</p>
 
     <div class="sm-widget" id="sm-widget">
       <div class="sm-instruction">Tap a symptom to select it (turns orange), then tap the file it came from. Tap a placed symptom to remove it.</div>
@@ -1590,9 +1603,10 @@ fetch('diagrams/boot-sequence.svg')
     <!-- Instructor bypass -->
     <div style="margin-top:1.5rem; padding-top:1rem; border-top:1px solid var(--gray-border);">
       <div id="orbit-bypass">
-        <input type="text" id="bypass-input" placeholder="Instructor code">
+        <input type="text" id="bypass-input" placeholder="Instructor code" autocomplete="off" onkeydown="if(event.key==='Enter') orbitBypass()">
         <button onclick="orbitBypass()">Unlock</button>
         <span class="bypass-err" id="bypass-err"></span>
+        <span id="bypass-ok" style="display:none; color:#2D6B6B; font-weight:bold; margin-left:0.5rem;">✓ Instructor unlocked Part 8</span>
       </div>
     </div>
 
@@ -1600,14 +1614,14 @@ fetch('diagrams/boot-sequence.svg')
 
 
   <!-- ═══════════════════════════════════════════════════════
-       PART 7 — ORBIT ODYSSEY
+       PART 8 — ORBIT ODYSSEY
        ═══════════════════════════════════════════════════════ -->
   <div class="lesson-section" id="section-orbit">
 
     <!-- Locked state -->
     <div id="orbit-locked">
       <div class="lock-icon">🔒</div>
-      <p>Complete the Symptom Match in Part 6 to unlock this section.</p>
+      <p>Complete the Symptom Match in Part 7 to unlock this section.</p>
       <p style="font-size:0.8rem; color:var(--muted);">Or ask your instructor for the unlock code.</p>
     </div>
 
@@ -1616,8 +1630,10 @@ fetch('diagrams/boot-sequence.svg')
 
       <div class="hf-box hf-brain">
         <span class="hf-label">You earned this</span>
-        <p>You built a project, read the files, ran the simulator, logged data, and fixed four bugs. Now meet the game you'll be programming your robot to play.</p>
+        <p>You built a project, read the files, ran the simulator, logged data, and fixed four bugs. Now meet the game you'll be programming your robot to play. Note that there will be differences from the published game manual.</p>
       </div>
+
+      <a href="pdfs/orbit-odyssey-manual_V1.pdf" target="_blank">Orbit Odyssey Rules (PDF)</a>
 
       <h2>Orbit Odyssey — the game</h2>
       <p>Two robots, one field, three types of game elements. Your robot has 2.5 minutes to score as many points as possible.</p>
@@ -1679,11 +1695,6 @@ fetch('diagrams/boot-sequence.svg')
           <span class="hf-label">Round 3</span>
           <p>If you had to organize all those robot actions into groups — mechanisms that work independently — how many groups would there be? What would you call them?</p>
         </div>
-
-        <div class="hf-box hf-brain" style="margin-top:0.75rem;">
-          <span class="hf-label">Don't reveal this yet</span>
-          <p>The groups students name in Round 3 are the subsystems from Lesson 3. Let them discover the names themselves. Same concept, different vocabulary — they've already figured it out.</p>
-        </div>
       </div>
 
     </div><!-- /orbit-content -->
@@ -1691,13 +1702,14 @@ fetch('diagrams/boot-sequence.svg')
   </div><!-- /section-orbit -->
 
   <nav class="section-nav section-nav--bottom">
-    <button class="section-nav-btn active" data-section="files">Part 1 — The Files</button>
-    <button class="section-nav-btn" data-section="simulator">Part 2 — The Simulator</button>
-    <button class="section-nav-btn" data-section="data">Part 3 — Read the Data</button>
-    <button class="section-nav-btn" data-section="challenges">Part 4 — Hands-On</button>
-    <button class="section-nav-btn" data-section="lab">Part 5 — Broken Robot Lab</button>
-    <button class="section-nav-btn" data-section="match">Part 6 — Symptom Match</button>
-    <button class="section-nav-btn" data-section="orbit">Part 7 — Orbit Odyssey</button>
+    <button class="section-nav-btn active" data-section="setup">Part 1 — Git + Project Setup</button>
+    <button class="section-nav-btn" data-section="files">Part 2 — The Files</button>
+    <button class="section-nav-btn" data-section="simulator">Part 3 — The Simulator</button>
+    <button class="section-nav-btn" data-section="data">Part 4 — Read the Data</button>
+    <button class="section-nav-btn" data-section="challenges">Part 5 — Hands-On</button>
+    <button class="section-nav-btn" data-section="lab">Part 6 — Broken Robot Lab</button>
+    <button class="section-nav-btn" data-section="match">Part 7 — Symptom Match</button>
+    <button class="section-nav-btn" data-section="orbit">Part 8 — Orbit Odyssey</button>
   </nav>
 
 </div><!-- /page-container -->
@@ -1902,7 +1914,7 @@ function smCheck() {
   feedbackEl.classList.add('show');
   if (correct === 4) {
     feedbackEl.className = 'sm-feedback show perfect';
-    feedbackEl.textContent = '✅ All 4 correct — Part 7 unlocked!';
+    feedbackEl.textContent = '✅ All 4 correct — Part 8 unlocked!';
     orbitUnlock();
   } else {
     feedbackEl.className = 'sm-feedback show partial';
@@ -1921,8 +1933,7 @@ function smReset() {
 }
 
 /* ── Orbit Odyssey unlock ──────────────────────────────────── */
-const ORBIT_KEY = 'orbit_unlocked_02';
-const BYPASS_CODE = 'ORBIT';
+/* ** It's not here! ****************************************** */
 
 function orbitUnlock() {
   localStorage.setItem(ORBIT_KEY, '1');
@@ -1935,6 +1946,7 @@ function orbitBypass() {
   const err = document.getElementById('bypass-err');
   if (val === BYPASS_CODE) {
     err.textContent = '';
+    document.getElementById('bypass-ok').style.display = 'inline';
     orbitUnlock();
   } else {
     err.textContent = 'Wrong code.';
