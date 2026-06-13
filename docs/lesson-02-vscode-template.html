@@ -1537,7 +1537,7 @@ fetch('diagrams/boot-sequence.svg')
           <div class="bug-joke">The motors face opposite directions on the chassis. Running them the same way is not cooperation. It's a disagreement with wheels.</div>
           <p>On a differential drive, the left and right motors are mechanically mirrored. To make both wheels push forward, one motor must be inverted. Here only <code>rightMotor</code> is inverted — left runs backwards relative to right, producing a spin instead of straight motion.</p>
           <div class="bug-fix-label">Fix</div>
-          <div class="bug-fix">leftMotor.setInverted(true);<br>rightMotor.setInverted(true);</div>
+          <div class="bug-fix">leftMotor.setInverted(true);<br>rightMotor.setInverted(false);</div>
         </div>
       </div>
 
