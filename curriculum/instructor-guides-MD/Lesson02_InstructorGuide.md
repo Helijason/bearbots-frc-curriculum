@@ -28,6 +28,7 @@
 - Students can move a hardcoded value into `Constants.java` and verify nothing breaks
 - Students can add a logged output and find it by name in AdvantageScope
 - Students can find and fix at least two bugs in a broken robot project
+- Students can match a bug symptom to the file it lives in
 
 ---
 
@@ -35,72 +36,113 @@
 
 ### Room setup
 
-- VSCode open on projector with a freshly generated WPILib project
+- VSCode open on projector with a freshly generated XRP template project
+- BearBots project (`bearbots-xrp-code`) cloned and open on all student machines (or USB drive distributed)
 - AdvantageScope available on instructor laptop and all student laptops (bundled with WPILib)
-- Student laptops have WPILib 2026 installed
 - Digital handout open in browser: `lesson-02-vscode-template.html`
+- Broken robot lab seeded project loaded and ready (provided separately)
+- Orbit Odyssey PDF open and queued: `pdfs/orbit-odyssey-manual_V1.pdf`
 
 > **The most important instructor mindset for this lesson**
 >
 > Resist the urge to skip the file tour. Students who don't understand the template will spend the rest of the season editing the wrong files. 20 minutes of foundation here prevents hours of confusion later.
 
+> **Bypass code for Part 8 (Orbit Odyssey unlock)**
+>
+> Bypass code: **`ORBIT!`** — enters in the instructor bypass field on Part 7 (Symptom Match). Use this if a student can't complete Symptom Match due to technical issues, or to unlock it for the whole class at the end of the lab. Do not give students this code unprompted.
+
 ---
 
 ## Session Timing
 
-| Time | Phase | You do | Students do |
-|---|---|---|---|
-| 0–5 min | **Hook** | Open fresh project. Count the files. Ask: what is all this? | Explore the file tree. Guess what each file does. |
-| 5–30 min | **File tour** | Walk through each file. Click to expand on projector. Think out loud. | Follow along. Ask questions. Note anything surprising. |
-| 30–60 min | **Simulator** | Live demo: launch sim, walk through GUI panels, connect AdvantageScope, drive with keyboard. | Watch the demo, then replicate it on their own laptop. |
-| 60–90 min | **Constants scavenger hunt** | Seed the starter project with misplaced magic numbers. Circulate. | Find hardcoded values in wrong files. Move them to `Constants.java`. Rebuild and verify. |
-| 90–110 min | **"Add your name to the robot"** | Demo: add a string constant, log it with `Logger.recordOutput`, find it in AdvantageScope. | Add their own name constant. Verify it appears live in AdvantageScope. |
-| 110–140 min | **Graph racing** | Facilitate. Call out interesting moments. Ask "what do you expect?" before each run. | Take turns driving. Add logged values to a shared graph. Experiment with patterns. |
-| 140–160 min | **Controller Bingo / "What's the Robot Thinking?"** | Run the activity. For Bingo: print cards. For guessing game: drive a hidden pattern. | Controller Bingo: match axis/button values to squares. Guessing game: sketch what the robot did from graphs alone. |
-| 160–175 min | **Broken robot lab** | Circulate. Redirect with questions, not answers. | Find and fix three bugs in a broken project independently. |
-| 175–180 min | **Connect + wrap** | Open the Lesson 04 starter project. Show how the template grew into structure. | Recognize the template files in a real project. |
-
-> **Activity notes**
->
-> Controller Bingo and "What's the Robot Thinking?" are alternatives — pick one based on student energy and available controllers. Bingo works better early in the block; the guessing game works better as a closer. Both can be cut if the scavenger hunt or graph racing runs long — they are enrichment, not essential. The broken robot lab should always happen.
+| Time | Phase | Part | You do | Students do |
+|---|---|---|---|---|
+| 0–5 min | **Hook** | — | Scroll file tree silently. Ask: what is all this? | Explore the file tree. Guess what each file does. |
+| 5–30 min | **Git + project setup** | Part 1 | Walk through Git install (online or offline), clone, and the three Git commands. | Install Git if needed, clone the BearBots repo, run `git --version` to confirm. |
+| 30–60 min | **File tour** | Part 2 | Walk through each file. Click expandable cards on the projector. Step through the boot sequence diagram. | Follow along. Ask questions. Note anything surprising. Use the "before you move on" brain prompt before switching parts. |
+| 60–80 min | **Simulator demo** | Part 3 | Live demo: launch sim, walk through GUI panels, connect AdvantageScope, drive with keyboard. Walk through XRP hardware port table. | Replicate each step on their own laptop. Don't move on until they've driven and watched a value move in AdvantageScope. |
+| 80–100 min | **Read the data** | Part 4 | Run Graph Racing. Drive hidden patterns. Call out interesting moments. | Set up graphs. Watch encoders. Predict maneuvers before each run. Closest prediction wins candy. |
+| 100–130 min | **Hands-on challenges** | Part 5 | Circulate. Facilitate. Don't give answers. | Activity 1 (File Prediction game), Activity 2 (Scavenger Hunt — all 6 hunts), Activity 2b (Add Your Name). |
+| 130–155 min | **Broken robot lab** | Part 6 | Circulate. Redirect with questions, not answers. Ask "what does the symptom tell you?" | Find and fix 4 bugs independently. Read the symptom before clicking anything. |
+| 155–165 min | **Symptom match** | Part 7 | Circulate. Encourage students to work from memory first. Use bypass if time is critical. | Match each bug symptom to its file. All 4 correct unlocks Part 8. |
+| 165–180 min | **Orbit Odyssey** | Part 8 | Introduce the game. Read scoring table. Run brainstorm if time permits. | Read scoring. Pair brainstorm: what does the robot need to do? (Optional: "Going Further" discussion.) |
 
 > **If running short**
-> The scavenger hunt and graph racing are the highest-value new activities. Cut Controller Bingo first, then "Add your name," keeping the broken robot lab intact.
+> Cut Graph Racing (Part 4) first, then Activity 1 (File Prediction) from Part 5. Scavenger Hunt, Add Your Name, the Broken Robot Lab, and Symptom Match should always happen. Part 8 (Orbit Odyssey) can be shortened to the scoring table read-only — skip the brainstorm.
 
 ---
 
-## Phase 1 — Hook (0–5 min)
+## Part 1 — Git + Project Setup (5–30 min)
 
-### Opening
+### Opening hook (0–5 min)
 
-Open a fresh WPILib project on the projector. Don't say anything. Just scroll through the file tree slowly. Let students see the files. Then ask:
+Open a fresh XRP template project on the projector. Don't say anything. Scroll the file tree slowly. Then:
 
 > **Script**
 >
 > *"VSCode just created these files. You didn't write any of them. Before we touch anything — does anyone want to guess what each one does?"*
 >
-> Wait for guesses. Even wrong guesses are useful — they tell you what students already know. Validate the good ones. Defer the rest to the file tour.
+> Wait for guesses. Even wrong guesses are useful. Validate the good ones. Defer the rest to Part 2.
+
+### Git install and clone (5–25 min)
+
+Have students check Git first:
+
+```
+git --version
+```
+
+If Git is installed, skip to clone. If not, use the appropriate path:
+
+- **Online:** Direct to git-scm.com → download installer → run with defaults → restart VS Code terminal
+- **Offline:** USB drive contains the installer — same steps without the download
+
+> **5th-grade version: what is Git?**
+>
+> Git is a time machine for your code. Every time you commit, you save a snapshot you can return to. If you break something at 11pm, you can go back to the version that worked. On a team, it lets two people work on the same project without overwriting each other.
+
+The three commands students will use every session:
+
+| Command | When |
+|---|---|
+| `git add .` | After making changes — stages all modified files |
+| `git commit -m "message"` | Saves a snapshot with a description |
+| `git pull` | Start of every session — gets latest updates from GitHub |
+
+> **On `git push`**
+>
+> Push uploads commits to GitHub so teammates can see them. Students will do this later. For now, they commit locally — work is saved and tracked even without pushing. Don't go deep on push today.
+
+### After clone
+
+Have students open the BearBots project (`bearbots-xrp-code`) in a VS Code window. Keep the XRP-Template open in a second window — they'll compare both in Part 2.
 
 ---
 
-## Phase 2 — File Tour (5–30 min)
+## Part 2 — The Files (30–60 min)
 
 ### Walking through each file
 
-For each file: open it on the projector, explain its job in one sentence, explain what breaks if it's missing, and explain the one thing students will most likely get wrong about it.
+For each file: open on projector, explain job in one sentence, explain what breaks if missing, explain the most common mistake.
+
+Students use the expandable file cards in the handout to follow along. Each card has an expand toggle — encourage them to click before you explain, not after.
 
 ### `Main.java`
 
-- **Job:** entry point. Calls `RobotBase.startRobot(Robot::new)`. That's all it does.
+- **Job:** entry point. Calls `RobotBase.startRobot(Robot::new)`. That's all.
 - **Missing:** robot doesn't start. Not even a compile error — just silence.
 - **Most likely mistake:** adding code here. The comment says not to. People do it anyway.
+
+> **5th-grade version**
+>
+> Main.java is the ignition switch. It exists so the JVM has somewhere to start. After it fires `startRobot()`, it steps aside forever. You never add code here.
 
 ### `Robot.java`
 
 - **Job:** lifecycle manager. Contains `robotPeriodic()`, `autonomousInit()`, `teleopInit()`, etc.
-- **Key point:** extends `LoggedRobot`, not `TimedRobot`. `LoggedRobot` extends `TimedRobot` — all the same methods work, plus AdvantageKit logging around each cycle.
+- **XRP-Template:** `extends TimedRobot`. BearBots: `extends LoggedRobot`. That's Diff Card 1 in the handout.
 - **Most important line:** `CommandScheduler.getInstance().run()` in `robotPeriodic()`. Without it, no commands ever execute.
-- **Most likely mistake:** removing the CommandScheduler call or recreating `RobotContainer` in `teleopInit()`.
+- **Most likely mistake:** removing the CommandScheduler call, or putting subsystem logic here instead of in a subsystem class.
 
 ### `RobotContainer.java`
 
@@ -110,9 +152,10 @@ For each file: open it on the projector, explain its job in one sentence, explai
 
 ### `Constants.java`
 
-- **Job:** number vault. Motor IDs, speeds, PID gains, the Mode enum for AdvantageKit.
-- **Missing:** constants are hardcoded in five different files. One wiring change breaks everything.
-- **Most likely mistake:** not using it at all, then spending 2 hours finding hardcoded motor ID 4 when it should be 5.
+- **Job:** number vault. Motor IDs, speeds, PID gains. XRP-Template ships it nearly empty.
+- **Missing:** magic numbers scattered across five files. One wiring change breaks everything.
+- **Key point:** this isn't the only constants file. Real teams split: `TunerConstants`, `FieldConstants`, `ArmConstants`. That's a design decision. BearBots uses inner classes as a middle ground.
+- **Most likely mistake:** not using it at all.
 
 ### `build.gradle`
 
@@ -120,208 +163,317 @@ For each file: open it on the projector, explain its job in one sentence, explai
 - **Edited by:** the WPILib tools (`Manage Vendor Libraries`), not by hand.
 - **Most likely mistake:** editing it manually and breaking version alignment.
 
+### `ExampleSubsystem.java` / `ExampleCommand.java`
+
+- Template scaffolding. No real hardware, no real logic. Deleted in BearBots project.
+- Replaced by `DriveSubsystem.java` and actual robot files. Covered in Lesson 3.
+
+### Six diff cards
+
+Walk through each diff card in Part 2 of the handout. For each: find the difference in the BearBots project before reading the card.
+
+| Card | File | Change |
+|---|---|---|
+| 1 | `Robot.java` | `extends TimedRobot` → `extends LoggedRobot` |
+| 2 | `Robot.java` | Logger setup block added to constructor |
+| 3 | `RobotContainer.java` | IO injection pattern — `new DriveIOXRP()` passed to subsystem |
+| 4 | `RobotContainer.java` | Default command wired up |
+| 5 | `Constants.java` | Inner class structure — `DriveHardware`, etc. |
+| 6 | `build.gradle` | AdvantageKit vendor dependency added |
+
 > **The `LoggedRobot` vs `TimedRobot` question**
 >
-> Students will ask about this. The answer: `LoggedRobot` extends `TimedRobot`. Same lifecycle methods, same timing. AdvantageKit adds a logging wrapper around each cycle. The command framework isn't a base class — it's opt-in through `CommandScheduler.run()` in `robotPeriodic()`.
+> Students will ask. `LoggedRobot` extends `TimedRobot`. Same lifecycle methods, same timing. AdvantageKit adds a logging wrapper around each cycle. The command framework is opt-in through `CommandScheduler.run()` in `robotPeriodic()`.
 
-> **How the files connect**
+### Boot sequence diagram
+
+The handout has an interactive boot sequence diagram. Each node is clickable and opens a detail panel. Walk through it on the projector:
+
+1. `Main.java` → `RobotBase.startRobot()` 
+2. `Robot` constructor → `Logger.start()` → `new RobotContainer()`
+3. `RobotContainer` → instantiates subsystems with IO → wires bindings
+4. Every 20ms: `robotPeriodic()` → `Logger.processInputs()` → CommandScheduler → outputs → `Logger.recordOutput()`
+
+> **Common questions to expect**
 >
-> Robot.java creates one RobotContainer in its constructor. RobotContainer creates all the subsystems. Then every 20ms, Robot.java calls `robotPeriodic()`, which runs the CommandScheduler, which calls `periodic()` on every subsystem. That's the whole loop.
+> - *"Can I put everything in Robot.java?"* — Yes. Works for two weeks. Then 800 lines, merge conflicts, and everyone cries.
+> - *"What's the vendordeps folder?"* — JSON files telling the build system where to download vendor libraries.
+> - *"What happens if code takes longer than 20ms?"* — Loop overrun. Sensor readings go stale, motor updates drift. WPILib prints a warning. Never put `Thread.sleep()` or file I/O in periodic methods.
+
+> **"Before you move on" brain prompt in the handout**
+>
+> *"Without looking: if a command doesn't run when you press a button, which file do you check first?"*
+> Answer: **RobotContainer first** (binding lives there), then confirm `CommandScheduler.getInstance().run()` is in `robotPeriodic()`.
 
 ---
 
-## Phase 3 — Simulator Demo (30–60 min)
+## Part 3 — The Simulator (60–80 min)
 
-### Live simulator walkthrough
+*Do this live on the projector. Students follow on their own laptops. Go slowly — every step matters.*
 
-Do this live on the projector. Students follow along on their own laptops. Go slowly — this workflow is new and every step matters.
+### Step 1 — Switch to BearBots project
 
-#### Step 1 — Launch the simulator
+Close the XRP-Template project. Open `bearbots-xrp-code\Lesson01\First Drive`. The XRP-Template has no logging — AdvantageScope connects but shows nothing. BearBots has AdvantageKit wired up so students get real data immediately.
 
-- `Ctrl+Shift+P` → WPILib: Simulate Robot Code
-- When prompted: check `halsim_gui`, click OK
+### Step 2 — Launch the simulator
+
+- WPILib hexagon → `WPILib: Simulate Robot Code` → Enter
+- Check `halsim_gui` → OK
 - Wait for build. Simulation GUI opens automatically.
 
-#### Step 2 — Understand the Simulation GUI panels
-
-Walk through each panel before driving. Students should know what they're looking at.
+### Step 3 — Understand the GUI panels
 
 | Panel | Purpose |
 |---|---|
-| **Robot State** | Enable/disable the robot. Switch between Teleop, Auto, and Test modes. If you forget to enable — nothing moves. |
-| **Joysticks** | Map keyboard or real controller inputs to robot joystick slots. Drag `Keyboard 0` to `Joystick[0]`. |
-| **System Console** | Shows print statements, errors, and stack traces from robot code. Always check here first when something goes wrong. |
-| **NetworkTables** | Shows all values published to NetworkTables in real time. AdvantageKit data appears as `AdvantageKit/...` |
+| **Robot State** | Enable/disable. Switch Teleop/Auto/Test modes. Forgetting to enable is the #1 student mistake. |
+| **Joysticks** | Map keyboard or controller to robot joystick slots. Drag `Keyboard 0` to `Joystick[0]`. |
+| **System Console** | Print statements, errors, stack traces. Check here first when nothing works. |
+| **NetworkTables** | Live values from robot code. AdvantageKit data appears as `AdvantageKit/…` |
 
-> **"Nothing is happening" almost always means one of two things:** robot not enabled, or there's an error in System Console. Check both before assuming the code is wrong.
+> **"Nothing is happening" almost always means:** robot not enabled, or there's an error in System Console. Check both before assuming the code is wrong.
 
-#### Step 3 — Set up keyboard driving
+### Step 4 — Connect AdvantageScope
 
-- In Simulation GUI → Joysticks panel
-- Drag `Keyboard 0` to `Joystick[0]` slot
-- Robot State panel → Teleoperated → Enable
-- Click back on Simulation GUI (keyboard only works when this window is focused)
+- Open AdvantageScope
+- File → **Connect to Simulator** (Windows: `Ctrl+Shift+K`)
+- Left panel populates — look for `AdvantageKit/` folder
+- Connect **before** enabling the robot — don't miss first-cycle data
 
-#### Step 4 — Connect AdvantageScope
+### Step 5 — Set up keyboard driving
 
-- Open AdvantageScope (bundled with WPILib)
-- File → Connect to Simulator (or `Ctrl+K`)
-- Left panel shows log key tree — `AdvantageKit/` should appear
-- Connect BEFORE enabling the robot — otherwise first seconds of data are lost
-
-#### Step 5 — Drive and observe
-
-- Press `W` to drive forward, `S` backward, `A`/`D` to turn
-- In AdvantageScope: find `Drive/` folder, drag `LeftPositionMeters` to graph
-- Drag `GyroYawDegrees` to a second graph tab
-- Watch the graphs update as the robot moves
-- Ask: *'What happens to the graph when you spin in place?'*
-
-> **Keyboard default mappings**
->
-> - `W` — Forward (Left stick Y negative)
-> - `S` — Backward (Left stick Y positive)
-> - `A` — Turn left (Left stick X negative)
-> - `D` — Turn right (Left stick X positive)
->
-> These match the default arcade drive command in RobotContainer.
+- Simulation GUI → Joysticks panel → drag `Keyboard 0` to `Joystick[0]`
+- Robot State → Teleoperated → Enable
+- Click back on Simulation GUI window (keyboard only works when focused)
+- Default keys: **W** forward, **S** backward, **A** turn left, **D** turn right
 
 > **If a student has a real controller**
->
-> Plug it in BEFORE launching sim. It appears automatically in the Joysticks panel. Drag to `Joystick[0]`. Move the sticks and watch axis values change in the panel to confirm it's working. Left stick Y = forward/back, Left stick X = turn.
+> Plug in before launching sim. Appears automatically in Joysticks panel. Drag to `Joystick[0]`. Move sticks — watch axis values update in the panel.
 
-> **Common simulator mistakes to watch for**
+### Step 6 — XRP hardware port table
+
+The handout has the XRP port table. Walk through it before moving to sim driving:
+
+| Device | Port | Subsystem | Direction |
+|---|---|---|---|
+| Left drive motor | XRPMotor 0 | DriveSubsystem | Output |
+| Right drive motor | XRPMotor 1 | DriveSubsystem | Output |
+| Left encoder | DIO 4 / 5 | DriveSubsystem | Input |
+| Right encoder | DIO 6 / 7 | DriveSubsystem | Input |
+| Gyro | XRPGyro | DriveSubsystem | Input |
+| Arm servo | XRPServo 4 → Servo 1 | ArmSubsystem | Output |
+
+> **Right motor inversion**
 >
-> - Robot not enabled — nothing moves, students think code is broken. Check Robot State panel.
-> - AdvantageScope not connected — graphs show nothing. Connect before enabling.
-> - Keyboard not working — Simulation GUI window must be focused. Click it.
-> - Graphs flat while driving — `updateInputs()` has a bug.
-> - Graphs jump to big numbers immediately — check unit conversion (inches vs meters).
+> Per WPILib docs: right motor spins backward when positive output is applied. It must be inverted in code. This is already handled in `DriveIOXRP.java`. Bug 4 in the lab deliberately removes this inversion — students fix it there.
+
+> **"Do this right now" brain prompt in the handout**
+>
+> *"Launch the simulator. Connect AdvantageScope. Enable in Teleop. Drive with the keyboard. Watch at least one value move in AdvantageScope. Don't move on until you've done this."*
+
+> **Common mistakes to watch for**
+>
+> - Robot not enabled → nothing moves, students think code is broken
+> - AdvantageScope not connected → graphs flat
+> - Keyboard not working → Simulation GUI window not focused
+> - Graphs jump to huge numbers → unit conversion issue (inches vs meters)
 
 ---
 
-## Phase 4 — Constants Scavenger Hunt (60–90 min)
+## Part 4 — Read the Data (80–100 min)
 
-*Students learn where things go by finding things in the wrong place.*
+*Graph Racing: competitive enough to be fun. Teaches graph literacy as a side effect.*
 
 ### Setup
 
-Before class, seed the starter project with misplaced values — motor IDs in `Robot.java`, a drive speed hardcoded in `RobotContainer`, a PID gain buried in a comment. Students get this version.
+Everyone sets up the same two graphs in AdvantageScope:
 
-### What students do
+1. Expand `Drive/` folder in left panel
+2. Drag `LeftPositionMeters` to graph area
+3. Drag `RightPositionMeters` onto the same graph tab
+4. Enable in Teleop, start driving
 
-- Find every hardcoded number or string that doesn't belong where it is
-- Move each one to `Constants.java` with a descriptive name
-- Rebuild. Verify `BUILD SUCCESSFUL`. Verify behavior in sim is unchanged.
+### Prediction round
 
-> **What to say**
->
-> *"A future teammate — or future you — is going to need to change the drive speed at 11pm before a competition. If it's buried in `RobotContainer` line 47, good luck. If it's `Constants.DRIVE_SPEED`, it takes 10 seconds."*
+Before each maneuver, students predict what the graph will look like. Closest prediction wins candy.
 
-### Common struggles
-
-| Issue | Response |
+| Maneuver | What the graph should show |
 |---|---|
-| Student isn't sure something counts as a magic number | Ask: "Would a new teammate know what that number means without context?" |
-| Student breaks the build moving a constant | Walk through the import or reference error — this is a useful mistake |
-| Student finishes early | Ask them to add two new constants that don't exist yet but probably should |
+| Drive straight forward 2 seconds | Both encoders increase equally |
+| Spin in place 2 seconds | Encoders go opposite directions |
+| Instructor's mystery pattern | Class describes what they see, then you reveal |
+
+### "What is the robot doing?"
+
+You drive. Students watch only the encoder graphs — no watching the 3D model window.
+
+The handout has a chat thread scaffolding this:
+- *"Both encoders went up equally"* → drove straight
+- *"Comparing left and right tells you rotation rate"* → students discover odometry
+
+> **Facilitation notes**
+>
+> Keep turns short — 60–90 seconds each. After each run, ask the driver: "Did the graph match what you expected?" The most interesting moments are mismatches — student expects symmetry, gets asymmetry. That's a conversation about the robot, not a failure.
+
+> **"Before Part 5" brain prompt in the handout**
+>
+> *"In your own words: how would you tell from encoder data alone whether the robot drove straight or turned? No code — just the concept."*
 
 ---
 
-## Phase 5 — "Add Your Name to the Robot" (90–110 min)
+## Part 5 — Hands-On Challenges (100–130 min)
+
+*Three activities. Students work at their own pace. All have extensions.*
+
+### Activity 1 — File Prediction Game
+
+Pairs. Two rounds. Tap-to-select (not drag-and-drop — iPad compatible).
+
+**Round 1 — File → Role:** Match each filename to its role description.
+
+| Tile | Correct target |
+|---|---|
+| Main.java | First thing that runs on boot |
+| Robot.java | Lifecycle manager |
+| RobotContainer.java | Subsystems + button bindings |
+| Constants.java | All the magic numbers |
+| build.gradle | Vendor library config |
+
+**Round 2 — Snippet → File:** Match code snippets to the file they belong in.
+
+| Snippet | File |
+|---|---|
+| `RobotBase.startRobot(Robot::new)` | Main.java |
+| `CommandScheduler.getInstance().run()` | Robot.java |
+| `new RobotContainer()` | Robot.java constructor |
+| `controller.leftBumper().onTrue(...)` | RobotContainer.java |
+| `static final double kMaxOutput = 1.0` | Constants.java |
+
+> **Facilitation**
+> Don't correct pairs during Round 1 — let them use the "Check answers" button and work out wrong answers themselves. Move on when the round clicks for most of the group.
+
+### Activity 2 — Constants Scavenger Hunt
+
+Six magic numbers are hiding in the seeded project — hardcoded directly in files instead of Constants.java or relevant constant classes. Students find each one, move it, and rebuild.
+
+**The six hunts (from `Lesson2_temp.txt`):**
+
+| Hunt | What | Where it's hardcoded | Where it moves |
+|---|---|---|---|
+| 1 | Speed limit `0.8` | `Drive.java` | `DriveConstants.kSpeedLimit` |
+| 2 | Joystick deadband `0.1` | `RobotContainer.java` | `OperatorConstants.kDeadband` |
+| 3 | Max arm angle `120` | `Arm.java setAngle()` | `ArmConstants.kMaxAngleDeg` (change from 180.0 → 120.0) |
+| 4 | Wheel circumference `0.1885` | `DriveConstants.java` | `DriveConstants.kWheelCircumferenceMeters` using `Math.PI * kWheelDiameterMeters` |
+| 5 | Delay times `2.0` and `1.3` | `AutonomousTime.java` | New `AutoConstants` inner class in `Constants.java` |
+| 6 | Project name string `"Activity2"` | `Robot.java` | `Constants.kProjectName` |
+
+> **Hunt 5 is the hardest** — two related magic numbers, a new inner class, and multiple call sites. Use as Silver/Gold challenge or skip for struggling students.
+
+> **Pro tip from the handout**
+> Build after each hunt. If the reference breaks, students know which change caused it.
+
+> **Instructor moves**
+> - Walk the room. Don't point at the bug — ask "where does that value get used?"
+> - If a student breaks the build: "Good. What does the error say? Which file? Which line?" Walk them through the import or reference fix. This is a valuable mistake.
+> - If a student finishes all 6: direct to extensions (loop count, uptime timer, boolean, favorite number — all in `robotPeriodic()`).
+
+### Extensions (if finished early)
+
+All go in `robotPeriodic()`:
+
+- **Loop count:** add `private int loopCount = 0;` field, then `loopCount++; Logger.recordOutput("LoopCount", loopCount);`
+- **Uptime timer:** `Logger.recordOutput("UptimeSeconds", Timer.getFPGATimestamp());`
+- **Boolean:** `Logger.recordOutput("RobotAlive", true);` — ask: what does a boolean look like in AdvantageScope?
+- **Favorite number:** `Logger.recordOutput("FavoriteNumber", 42);`
+
+### Activity 2b — Add Your Name to the Robot
 
 *First time a student's code produces visible output in a real data stream.*
 
-### What students do
+1. In `Constants.java`: `public static final String PILOT_NAME = "Your Name";`
+2. In `Robot.java` inside `robotPeriodic()`: `Logger.recordOutput("Pilot", Constants.PILOT_NAME);`
+3. Run the simulator. Open AdvantageScope. Find `Pilot` in the log tree.
 
-- Add a `public static final String PILOT_NAME = "YourName";` to `Constants.java`
-- In `Robot.java` or `RobotContainer.java`, add: `Logger.recordOutput("Pilot", Constants.PILOT_NAME);`
-- Run the simulator. Open AdvantageScope. Find `Pilot` in the log tree.
-
-### Why this works
-
-It's silly, but every student sees their name appear in a robot data stream for the first time. The concept — that anything you log shows up in AdvantageScope — becomes concrete and personal before they need to rely on it for debugging.
+> **Why this works**
+>
+> Every student sees their name appear in a robot data stream for the first time. The concept — anything you log shows up in AdvantageScope — becomes concrete and personal before they need it for debugging.
 
 > **Extension**
-> Ask students to also log the current timestamp or a random number. Watching a value update live in AdvantageScope every 20ms is more memorable than any explanation of the logging loop.
+> Ask students to log a timestamp or random number. Watching a value update live in AdvantageScope every 20ms is more memorable than any explanation of the logging loop.
 
 ---
 
-## Phase 6 — Graph Racing (110–140 min)
+## Part 6 — Broken Robot Lab (130–155 min)
 
-*Competitive enough to be fun. Teaches graph reading as a side effect.*
+*Four robots. Four different files. Each compiles and launches — then something goes wrong. Students read the symptom, find the bug, fix it.*
 
-### What students do
+> **Redirect with questions, not answers.**
+> "What does the symptom tell you about where the problem is?" not "look at line 5."
 
-- Each student adds one logged value to a shared AdvantageScope graph: left velocity, right velocity, heading, or a value of their choosing
-- Students take turns driving the simulated robot while the rest of the class watches the graph
-- Between turns, instructor asks: *"What do you expect the graph to do if they spin in place? Floor it and brake? Drive a perfect square?"*
+### Bug answers
 
-### Facilitation notes
+**Bug 1 — `Robot.java`: `extends TimedRobot` instead of `LoggedRobot`**
 
-- Keep turns short — 60–90 seconds each
-- After each run, ask the driver: "Did the graph match what you expected?"
-- The most interesting moments are mismatches — student expects symmetry, gets asymmetry. That's a conversation about the robot, not a failure.
+- Symptom: Simulator starts, robot drives, AdvantageScope shows no log data at all. `AdvantageKit/` folder never appears.
+- Fix: `public class Robot extends LoggedRobot {`
+- Why: `TimedRobot` doesn't know about AdvantageKit. The logger attaches hooks to `LoggedRobot`'s loop cycle. Without it, no inputs are captured.
 
-> **If a student has a real game controller**
-> Plug it in before launching sim. It appears automatically in the Joysticks panel. Drag to `Joystick[0]`. This is worth doing live in front of the class — the plug-and-play moment is satisfying.
+**Bug 2 — `RobotContainer.java`: joystick axes swapped**
 
----
+- Symptom: Pushing joystick forward makes the robot spin. Pushing left makes it drive forward. Controls feel 90° rotated.
+- Buggy code: `() -> -controller.getLeftX()` labeled `// forward`, `() -> -controller.getLeftY()` labeled `// turn`
+- Fix: swap them — Y axis is forward/backward, X axis is turn
+- Why: The comments label them correctly; the arguments are reversed.
 
-## Phase 7 — Controller Bingo / "What's the Robot Thinking?" (140–160 min)
+**Bug 3 — `Constants.java`: `kMaxOutput = 100.0` instead of `1.0`**
 
-*Pick one based on student energy and available hardware.*
+- Symptom: Slightest joystick input = instant full speed. No proportional control.
+- Fix: `public static final double kMaxOutput = 1.0;`
+- Why: Motor output is clamped to [-1, 1]. Multiplying by 100 immediately saturates the clamp. The motor sees 1.0 the instant the joystick moves.
 
-### Option A — Controller Bingo
+**Bug 4 — `DriveSubsystem.java`: left motor not inverted**
 
-Print bingo cards with axis/button values (e.g., "Left stick Y > 0.8", "Button 3 pressed", "Both triggers held"). Students plug in a controller and watch raw values in the Simulation GUI joystick panel. First to complete a row wins.
+- Symptom: Driving "forward" makes robot spin in place. Left encoder goes negative while right goes positive.
+- Buggy code: only `rightMotor.setInverted(true)` — left motor runs same direction as right
+- Fix: `leftMotor.setInverted(true); rightMotor.setInverted(true);`
+- Why: Left and right motors face opposite directions on the chassis. Both must be inverted to push forward together on the XRP.
 
-- Works best with multiple controller types — different controllers map differently
-- Teaches controller mapping without any lecture
-- Prep: generate bingo cards before class
-
-### Option B — "What's the Robot Thinking?"
-
-Instructor drives a secret pattern (figure-8, square, stop-and-go) while students watch only the AdvantageScope graphs — no simulator window visible. Students sketch what they think the robot did. Then reveal and compare.
-
-- Teaches graph literacy directly
-- Best conceptual bridge to Week 5 (replay mode) — logs are the robot's memory
-- No prep required beyond a planned driving pattern
-
-> **If time is short, cut this phase entirely.** The broken robot lab is more essential.
-
----
-
-## Phase 8 — Broken Robot Lab (160–175 min)
-
-*Students find and fix three bugs in a broken project independently. Redirect with questions, not answers.*
-
-### Broken robot lab answers
-
-- **Bug 1:** `extends TimedRobot` — should be `LoggedRobot`
-- **Bug 2:** `CommandScheduler` never called in `robotPeriodic()` — no commands run
-- **Bug 3:** `RobotContainer` recreated in `teleopInit()` — destroys all subsystems and bindings
-
----
-
-## Phase 9 — Connect + Wrap (175–180 min)
-
-Show students the same files they just learned about — now with AdvantageKit wired in. Ask: which parts look familiar?
-
-- `Main.java` — identical to template
-- `Robot.java` — same structure, plus Logger setup block
-- `Constants.java` — same structure, plus Mode enum
-- `RobotContainer.java` — more complete, but same job
-
-> **Teaser for Lesson 03**
+> **Note on Bug 4 and XRP motor ports**
 >
-> *"Next lesson we figure out what goes in those subsystem files — and why putting everything in `Robot.java` is a terrible idea that always sounds fine until it isn't. We'll also start talking about what robot we're actually building — and why it matters."*
+> The code in the lab shows `XRPMotor leftMotor = new XRPMotor(1)` and `XRPMotor rightMotor = new XRPMotor(0)`. Per WPILib docs: XRPMotor 0 = Left, XRPMotor 1 = Right. The right motor is inverted in the actual `DriveIOXRP.java`. The bug here is specifically the missing left motor inversion, not the port numbers.
+
+> **Progress tracker in the handout**
+>
+> Four dots — one per bug found. Students tap a bug line to reveal it. All 4 found triggers a success banner: "Head to Part 7."
 
 ---
 
-## Phase 10 — Orbit Odyssey Game Intro (use remaining time or open of next session)
+## Part 7 — Symptom Match (155–165 min)
 
-*First time students see the competition they're building toward. Keep it energizing — don't turn it into a lecture. Pairs talk first, group shares second.*
+*Unlock gate for Part 8. Students match each bug symptom to the file it came from. All 4 correct unlocks Orbit Odyssey.*
+
+### Correct matches
+
+| Symptom | File |
+|---|---|
+| "AdvantageKit/ folder never appears in AdvantageScope" | `Robot.java` |
+| "Push joystick forward → robot spins. Push left → drives forward." | `RobotContainer.java` |
+| "Slightest joystick input = instant full speed" | `Constants.java` |
+| "Encoders go opposite directions when driving straight" | `DriveSubsystem.java` |
+
+### Unlock logic
+
+- Student gets all 4 correct → Part 8 unlocks automatically (saved to localStorage)
+- Student can't complete it → use instructor bypass code: **`ORBIT!`**
+- Once unlocked, Part 8 stays unlocked on that browser/device
+
+> **Facilitation**
+> Encourage students to work from memory first — no scrolling back to the lab. This is a recall exercise. If a student is truly stuck after trying, let them peek at one bug to unblock.
+
+---
+
+## Part 8 — Orbit Odyssey (165–180 min)
+
+*First time students see the competition they're building toward. Keep it energizing — don't turn it into a lecture.*
 
 > **Instructor mindset**
 >
@@ -329,51 +481,37 @@ Show students the same files they just learned about — now with AdvantageKit w
 
 ### Setup
 
-- Orbit Odyssey game manual PDF open on projector
-- Gameplay video queued if available
-- Whiteboard available for pair share-out
+- Orbit Odyssey PDF open on projector (linked from Part 8 of the handout)
+- Scoring table visible in the handout
 
-### Step 1 — Watch or read (5 min)
+### Scoring table
 
-Play a gameplay video if you have one. If not, show the field diagram and read the game overview aloud — slowly, with the diagram visible the whole time.
+| Action | Points |
+|---|---|
+| Rubble in Low Zone | 1 |
+| Rubble in High Goal | 3 |
+| Ping pong ball in Low Zone | 2 |
+| Ping pong ball in High Goal | 5 |
+| Large ball on High Pedestal | 10 |
+| Robot parked in Low Zone | 3 |
 
-> **Script**
->
-> *"This is what we're building toward. By the end of this program, your robot will compete in this game. Don't worry about every rule yet — just watch and ask yourself: what does the robot need to DO?"*
+**No penalties. No element holding limits. No robot inspection. Focus on scoring.**
 
-### Step 2 — Pair brainstorm Round 1: Game tasks (5 min)
+**Format: 1v1 round-robin — every student competes against every other student.**
 
-One person drives discussion, one writes. Prompt:
+### "Going Further" brainstorm (if time permits)
 
-> *"List everything the robot needs to do to score points. Be specific — 'drive' isn't enough. 'Drive to the Low Rubble Zone and stop' is better."*
+Run if you have 10+ minutes remaining. Sets up Lesson 3's subsystem introduction.
 
-Prompts to circulate with if pairs stall:
-- *"What happens in autonomous? What scores points there?"*
-- *"What's the highest-value thing a robot can do in driver-controlled?"*
-- *"What does 'endgame' mean for this game?"*
+**Round 1 (2 min pairs):** List every physical action the robot needs to do to score rubble in the High Goal. Don't say "pick it up" — describe the specific movements.
 
-### Step 3 — Pair brainstorm Round 2: Robot requirements (5 min)
+**Round 2 (2 min pairs):** Which actions could the robot do on its own during autonomous? Which ones require a human driver? Why?
 
-Same pairs. New prompt:
+**Round 3 (2 min pairs):** If you had to organize all those robot actions into groups — mechanisms that work independently — how many groups would there be? What would you call them?
 
-> *"Now think about the robot itself. What does it physically need to be able to do? What does it need to pick up? Where does it need to deliver things?"*
+**Share out (5 min):** Each pair shares top 2–3 requirements. Write them on the whiteboard without editing. Let duplicates stack. Don't resolve debates. Surface the questions, not the answers.
 
-Prompts if pairs stall:
-- *"The amplifier is a wiffle ball. How would you carry it?"*
-- *"Rubble goes into a zone. How do you push or carry it there?"*
-- *"The robot fits in a 10-inch cube. Does that change anything?"*
-
-### Step 4 — Share out (5 min)
-
-Each pair shares their top 2–3 robot requirements. Write them on the whiteboard without editing. Let duplicates stack — that tells you what the class agrees on. Don't resolve debates. Surface the questions, not the answers.
-
-> **What to listen for**
->
-> Students who think mechanically ("we need something to push the rubble") — acknowledge it. Students who stay abstract ("it needs to be fast") — redirect: *"Fast at what specifically?"*
-
-### Step 5 — Plant the seed (2 min)
-
-> **Script**
+> **Teaser for Lesson 03**
 >
 > *"Keep that list in your head. Next lesson we talk about subsystems — how robots break their jobs into separate files. When we do that whiteboard, you're going to recognize these exact tasks. The code structure we build over the next five lessons is a direct answer to what you just wrote down."*
 
