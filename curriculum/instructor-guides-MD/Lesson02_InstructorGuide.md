@@ -355,6 +355,71 @@ Pairs. Two rounds. Tap-to-select (not drag-and-drop — iPad compatible).
 
 Six magic numbers are hiding in the seeded project — hardcoded directly in files instead of Constants.java or relevant constant classes. Students find each one, move it, and rebuild.
 
+#### Pre-hunt reference — teach before students start
+
+The handout now includes a three-box reference block before the checklist. Walk through it on the projector before releasing students to work independently.
+
+**Box 1 — How to declare a constant**
+
+The three-word recipe: `public static final`. Every constant in WPILib uses this pattern.
+
+```java
+public static final double kSpeedLimit = 0.8;
+public static final int    kLeftMotorPort = 0;
+public static final String kProjectName = "BearBots";
+```
+
+- `public` — any file can read it
+- `static` — belongs to the class, not an instance; no `new Constants()` needed
+- `final` — locked after startup; can never be reassigned
+
+Constants live inside **inner classes** inside `Constants.java`. If the inner class doesn't exist yet, students create it — copy the `public static class` block and give it a new name.
+
+> **5th-grade version**
+>
+> A constant is a sticky note on the wall that everyone can read but nobody can change. `public` means it's posted where everyone can see it. `static` means it belongs to the room, not any one person. `final` means it's laminated — you can read it but you can't write on it.
+
+**Box 2 — How to import and use a constant**
+
+```java
+// At the top of Drive.java
+import frc.robot.Constants.DriveConstants;
+
+// Then use it
+xaxisSpeed = MathUtil.clamp(xaxisSpeed, -1.0, 1.0) * DriveConstants.kSpeedLimit;
+```
+
+No import? Use the fully-qualified name: `Constants.DriveConstants.kSpeedLimit`
+
+> **VS Code quick-fix import**
+>
+> Type the constant name — VS Code underlines it red. Hover (or `Ctrl+.`) → **Add import**. VS Code writes the import line automatically. This is the one VS Code shortcut worth explicitly demoing before the hunt starts.
+
+**Box 3 — The `k` naming rule**
+
+All WPILib constants start with lowercase `k`, followed by UpperCamelCase. This is the convention across every WPILib source file — students who use it look like they've been writing robot code for years.
+
+| Category | Examples |
+|---|---|
+| Speeds / power | `kSpeedLimit`, `kMaxTurnSpeed`, `kAutodriveSpeed` |
+| Angles | `kMaxAngleDeg`, `kStowedAngleDeg`, `kScoringAngleDeg` |
+| Distances | `kWheelCircumferenceMeters`, `kTrackWidthMeters` |
+| Timing | `kDriveTimeSeconds`, `kTurnTimeSeconds` |
+| Ports / IDs | `kLeftMotorPort`, `kRightMotorPort`, `kControllerPort` |
+| Strings | `kProjectName`, `kAutoDefault` |
+
+Key rules:
+
+- Always start with `k` — `speedLimit` ✗ → `kSpeedLimit` ✓
+- Include the **unit** when ambiguous — `kMaxAngle` ✗ → `kMaxAngleDeg` ✓ (prevents passing degrees into a function expecting radians)
+- No abbreviations unless obvious — `kWC` ✗ → `kWheelCircumferenceMeters` ✓
+- Drop the class name from the constant — `DriveConstants.kDriveSpeed` ✗ → `DriveConstants.kSpeed` ✓
+- Booleans use `kIs` or `kEnable` prefix — `kMotorInverted` ✗ → `kIsRightMotorInverted` ✓
+
+> **Why the unit rule matters**
+>
+> WPILib uses it everywhere: `kMaxVelocityMetersPerSecond`, `kWheelRadiusMeters`. A function expecting radians and receiving degrees gives you a robot that overshoots by 57×. The unit in the name is a free sanity check every time anyone reads the code.
+
 **The six hunts (from `Lesson2_temp.txt`):**
 
 | Hunt | What | Where it's hardcoded | Where it moves |
