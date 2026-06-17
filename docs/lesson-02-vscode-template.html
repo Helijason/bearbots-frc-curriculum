@@ -1388,6 +1388,111 @@ fetch('diagrams/boot-sequence.svg')
       </div>
     </div><!-- /fp-widget -->
 
+    <!-- 1 ── How to declare a constant ───────────────────── -->
+    <div class="hf-box hf-info" style="margin-top:1rem;">
+      <span class="hf-label">How to declare a constant</span>
+      <p>Every constant follows the same three-word recipe: <code>public static final</code>.</p>
+      <div class="code-block"><pre>
+    <span class="kw">public static final double</span> kSpeedLimit = <span class="num">0.8</span>;
+    <span class="kw">public static final int</span>    kLeftMotorPort = <span class="num">0</span>;
+    <span class="kw">public static final String</span> kProjectName = <span class="str">"BearBots"</span>;</pre></div>
+      <p style="margin-top:0.6rem;"><strong>Why all three?</strong></p>
+      <ul style="margin:0.3rem 0 0 1.1rem; font-size:0.875rem; color:var(--mid); line-height:1.7;">
+        <li><code>public</code> — any file in the project can read it</li>
+        <li><code>static</code> — belongs to the class itself, not an object; no <code>new Constants()</code> needed</li>
+        <li><code>final</code> — can never be reassigned after startup; the value is locked</li>
+      </ul>
+      <p style="margin-top:0.6rem;">Constants live inside <strong>inner classes</strong> in <code>Constants.java</code> to keep them grouped:</p>
+      <div class="code-block"><pre>
+    <span class="kw">public final class</span> Constants {
+
+        <span class="kw">public static class</span> DriveConstants {
+            <span class="cm">/** Maximum drive speed as a fraction of full power [0.0, 1.0]. */</span>
+            <span class="kw">public static final double</span> kSpeedLimit = <span class="num">0.8</span>;
+            <span class="kw">public static final double</span> kDeadband    = <span class="num">0.1</span>;
+        }
+
+        <span class="kw">public static class</span> ArmConstants {
+            <span class="kw">public static final double</span> kMaxAngleDeg    = <span class="num">120.0</span>;
+            <span class="kw">public static final double</span> kStowedAngleDeg = <span class="num">5.0</span>;
+        }
+
+        <span class="kw">public static class</span> AutoConstants {
+            <span class="kw">public static final double</span> kDriveTimeSeconds = <span class="num">2.0</span>;
+            <span class="kw">public static final double</span> kTurnTimeSeconds  = <span class="num">1.3</span>;
+        }
+    }</pre></div>
+      <p style="margin-top:0.5rem; font-size:0.85rem; color:var(--muted);">If the inner class you need doesn't exist yet, just add it — copy the <code>public static class</code> block and give it a new name.</p>
+    </div>
+
+    <!-- 2 ── How to import and use a constant ─────────────── -->
+    <div class="hf-box hf-info" style="margin-top:0.75rem;">
+      <span class="hf-label">How to use a constant in another file</span>
+      <p>Add an <code>import</code> at the top of the file, then use the constant by name.</p>
+      <div class="code-block"><pre>
+    <span class="cm">// At the top of Drive.java — import the inner class you need</span>
+    <span class="kw">import</span> frc.robot.Constants.DriveConstants;
+
+    <span class="cm">// Then use it anywhere in the file</span>
+    xaxisSpeed = MathUtil.clamp(xaxisSpeed, <span class="num">-1.0</span>, <span class="num">1.0</span>) * DriveConstants.kSpeedLimit;</pre></div>
+      <p style="margin-top:0.6rem;">No import? Use the fully-qualified name instead:</p>
+      <div class="code-block"><pre>
+    xaxisSpeed = MathUtil.clamp(xaxisSpeed, <span class="num">-1.0</span>, <span class="num">1.0</span>) * Constants.DriveConstants.kSpeedLimit;</pre></div>
+      <p style="margin-top:0.5rem; font-size:0.85rem; color:var(--muted);">VS Code will offer to add the import automatically — hover the red underline and click <strong>Quick Fix → Add import</strong>.</p>
+    </div>
+
+    <!-- 3 ── Naming rules ─────────────────────────────────── -->
+    <div class="hf-box hf-sidebar" style="margin-top:0.75rem;">
+      <span class="hf-label">How to name constants — the k rule</span>
+      <p>All WPILib constants start with a lowercase <code>k</code>, followed by UpperCamelCase. This is the convention used everywhere in WPILib's own source code — use it so your code looks familiar to every FRC programmer who reads it.</p>
+
+      <table style="width:100%; font-size:0.8rem; border-collapse:collapse; margin:0.6rem 0;">
+        <tr style="background:var(--teal); color:white;">
+          <th style="padding:0.3rem 0.6rem; text-align:left;">Category</th>
+          <th style="padding:0.3rem 0.6rem; text-align:left;">Examples</th>
+        </tr>
+        <tr>
+          <td style="padding:0.35rem 0.6rem; border-bottom:1px solid var(--gray-border); color:var(--mid); font-weight:600;">Speeds / power</td>
+          <td style="padding:0.35rem 0.6rem; border-bottom:1px solid var(--gray-border);"><code>kSpeedLimit</code> &nbsp; <code>kMaxTurnSpeed</code> &nbsp; <code>kAutodriveSpeed</code></td>
+        </tr>
+        <tr>
+          <td style="padding:0.35rem 0.6rem; border-bottom:1px solid var(--gray-border); color:var(--mid); font-weight:600;">Angles</td>
+          <td style="padding:0.35rem 0.6rem; border-bottom:1px solid var(--gray-border);"><code>kMaxAngleDeg</code> &nbsp; <code>kStowedAngleDeg</code> &nbsp; <code>kScoringAngleDeg</code></td>
+        </tr>
+        <tr>
+          <td style="padding:0.35rem 0.6rem; border-bottom:1px solid var(--gray-border); color:var(--mid); font-weight:600;">Distances</td>
+          <td style="padding:0.35rem 0.6rem; border-bottom:1px solid var(--gray-border);"><code>kWheelCircumferenceMeters</code> &nbsp; <code>kTrackWidthMeters</code></td>
+        </tr>
+        <tr>
+          <td style="padding:0.35rem 0.6rem; border-bottom:1px solid var(--gray-border); color:var(--mid); font-weight:600;">Timing</td>
+          <td style="padding:0.35rem 0.6rem; border-bottom:1px solid var(--gray-border);"><code>kDriveTimeSeconds</code> &nbsp; <code>kTurnTimeSeconds</code></td>
+        </tr>
+        <tr>
+          <td style="padding:0.35rem 0.6rem; border-bottom:1px solid var(--gray-border); color:var(--mid); font-weight:600;">Ports / IDs</td>
+          <td style="padding:0.35rem 0.6rem; border-bottom:1px solid var(--gray-border);"><code>kLeftMotorPort</code> &nbsp; <code>kRightMotorPort</code> &nbsp; <code>kControllerPort</code></td>
+        </tr>
+        <tr>
+          <td style="padding:0.35rem 0.6rem; color:var(--mid); font-weight:600;">Strings / names</td>
+          <td style="padding:0.35rem 0.6rem;"><code>kProjectName</code> &nbsp; <code>kAutoDefault</code></td>
+        </tr>
+      </table>
+
+      <p style="margin-top:0.25rem;"><strong>Rules worth memorising:</strong></p>
+      <ul style="margin:0.3rem 0 0 1.1rem; font-size:0.875rem; color:var(--mid); line-height:1.9;">
+        <li>Always start with <code>k</code> — <code>speedLimit</code> ✗ &nbsp; <code>kSpeedLimit</code> ✓</li>
+        <li>Put the <strong>unit in the name</strong> when it could be ambiguous — <code>kMaxAngle</code> ✗ &nbsp; <code>kMaxAngleDeg</code> ✓</li>
+        <li>No abbreviations unless obvious — <code>kWC</code> ✗ &nbsp; <code>kWheelCircumferenceMeters</code> ✓</li>
+        <li>Drop the class name from the constant — <code>DriveConstants.kDriveSpeed</code> ✗ &nbsp; <code>DriveConstants.kSpeed</code> ✓</li>
+        <li>Booleans: use <code>kIs</code> or <code>kEnable</code> prefix — <code>kMotorInverted</code> ✗ &nbsp; <code>kIsRightMotorInverted</code> ✓</li>
+      </ul>
+
+      <div class="hf-box hf-warning" style="margin-top:0.75rem; margin-bottom:0;">
+        <span class="hf-label">The unit rule prevents real bugs</span>
+        <p>WPILib uses it everywhere: <code>kMaxVelocityMetersPerSecond</code>, <code>kWheelRadiusMeters</code>. A function expecting radians and receiving degrees gives you a robot that spins 57× further than intended. The unit in the name is a free sanity check every time you read the code.</p>
+      </div>
+    </div>
+    <!-- ════ end constants guide block ════ -->
+
     <h2>Activity 2 — Constants Scavenger Hunt</h2>
     <p>Six magic numbers are hiding in the project — hardcoded directly in subsystem files instead of Constants.java, ArmSubsystem, and DriveSubsystem where they belong. Find each one, move it to Constants.java, and check it off.</p>
 
