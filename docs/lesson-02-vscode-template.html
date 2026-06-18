@@ -1393,36 +1393,46 @@ fetch('diagrams/boot-sequence.svg')
       <span class="hf-label">How to declare a constant</span>
       <p>Every constant follows the same three-word recipe: <code>public static final</code>.</p>
       <div class="code-block"><pre>
-    <span class="kw">public static final double</span> kSpeedLimit = <span class="num">0.8</span>;
-    <span class="kw">public static final int</span>    kLeftMotorPort = <span class="num">0</span>;
-    <span class="kw">public static final String</span> kProjectName = <span class="str">"BearBots"</span>;</pre></div>
+<span class="kw">public static final double</span> kSpeedLimit  = <span class="num">0.8</span>;
+<span class="kw">public static final int</span>    kLeftMotorPort = <span class="num">0</span>;
+<span class="kw">public static final String</span> kProjectName = <span class="str">"BearBots"</span>;</pre></div>
       <p style="margin-top:0.6rem;"><strong>Why all three?</strong></p>
-      <ul style="margin:0.3rem 0 0 1.1rem; font-size:0.875rem; color:var(--mid); line-height:1.7;">
+      <ul style="margin:0.3rem 0 0 1.1rem; font-size:0.875rem; color:var(--mid); line-height:1.9;">
         <li><code>public</code> — any file in the project can read it</li>
-        <li><code>static</code> — belongs to the class itself, not an object; no <code>new Constants()</code> needed</li>
+        <li><code>static</code> — belongs to the class itself, not an object; no <code>new DriveConstants()</code> needed</li>
         <li><code>final</code> — can never be reassigned after startup; the value is locked</li>
       </ul>
-      <p style="margin-top:0.6rem;">Constants live inside <strong>inner classes</strong> in <code>Constants.java</code> to keep them grouped:</p>
+
+      <div class="hf-box hf-warning" style="margin-top:0.75rem; margin-bottom:0.75rem;">
+        <span class="hf-label">Why not the other keywords?</span>
+        <ul style="margin:0.3rem 0 0 1.1rem; font-size:0.875rem; color:var(--mid); line-height:1.9;">
+          <li><code>private</code> instead of <code>public</code> — the constant becomes invisible to other files. Defeats the purpose.</li>
+          <li>No <code>static</code> — you'd need a <code>new DriveConstants()</code> object to read it. Never what you want.</li>
+          <li>No <code>final</code> — the value can be overwritten at runtime. It becomes a variable, not a constant.</li>
+        </ul>
+      </div>
+
+      <p>Each subsystem gets its own constants file. Start with the files you need and add more as the project grows:</p>
       <div class="code-block"><pre>
-    <span class="kw">public final class</span> Constants {
+<span class="cm">// DriveConstants.java</span>
+<span class="kw">public final class</span> DriveConstants {
+    <span class="kw">public static final double</span> kSpeedLimit  = <span class="num">0.8</span>;
+    <span class="kw">public static final double</span> kDeadband    = <span class="num">0.1</span>;
+    <span class="kw">public static final int</span>    kLeftMotorPort  = <span class="num">0</span>;
+    <span class="kw">public static final int</span>    kRightMotorPort = <span class="num">1</span>;
+}
 
-        <span class="kw">public static class</span> DriveConstants {
-            <span class="cm">/** Maximum drive speed as a fraction of full power [0.0, 1.0]. */</span>
-            <span class="kw">public static final double</span> kSpeedLimit = <span class="num">0.8</span>;
-            <span class="kw">public static final double</span> kDeadband    = <span class="num">0.1</span>;
-        }
+<span class="cm">// ArmConstants.java</span>
+<span class="kw">public final class</span> ArmConstants {
+    <span class="kw">public static final double</span> kMaxAngleDeg    = <span class="num">120.0</span>;
+    <span class="kw">public static final double</span> kStowedAngleDeg = <span class="num">5.0</span>;
+}
 
-        <span class="kw">public static class</span> ArmConstants {
-            <span class="kw">public static final double</span> kMaxAngleDeg    = <span class="num">120.0</span>;
-            <span class="kw">public static final double</span> kStowedAngleDeg = <span class="num">5.0</span>;
-        }
-
-        <span class="kw">public static class</span> AutoConstants {
-            <span class="kw">public static final double</span> kDriveTimeSeconds = <span class="num">2.0</span>;
-            <span class="kw">public static final double</span> kTurnTimeSeconds  = <span class="num">1.3</span>;
-        }
-    }</pre></div>
-      <p style="margin-top:0.5rem; font-size:0.85rem; color:var(--muted);">VS Code will offer to add the import automatically — hover the red underline and click <strong>Quick Fix → Add import</strong>.</p>
+<span class="cm">// AutoConstants.java</span>
+<span class="kw">public final class</span> AutoConstants {
+    <span class="kw">public static final double</span> kDriveTimeSeconds = <span class="num">2.0</span>;
+    <span class="kw">public static final double</span> kTurnTimeSeconds  = <span class="num">1.3</span>;
+}</pre></div>
     </div>
 
     <!-- 2 ── How to import and use a constant ─────────────── -->
@@ -1430,15 +1440,18 @@ fetch('diagrams/boot-sequence.svg')
       <span class="hf-label">How to use a constant in another file</span>
       <p>Add an <code>import</code> at the top of the file, then use the constant by name.</p>
       <div class="code-block"><pre>
-    <span class="cm">// At the top of Drive.java — import the inner class you need</span>
-    <span class="kw">import</span> frc.robot.Constants.DriveConstants;
+<span class="cm">// At the top of Drive.java — import the constants file you need</span>
+<span class="kw">import</span> frc.robot.DriveConstants;
 
-    <span class="cm">// Then use it anywhere in the file</span>
-    xaxisSpeed = MathUtil.clamp(xaxisSpeed, <span class="num">-1.0</span>, <span class="num">1.0</span>) * DriveConstants.kSpeedLimit;</pre></div>
+<span class="cm">// Then use it anywhere in the file</span>
+xaxisSpeed = MathUtil.clamp(xaxisSpeed, <span class="num">-1.0</span>, <span class="num">1.0</span>) * DriveConstants.kSpeedLimit;</pre></div>
       <p style="margin-top:0.6rem;">No import? Use the fully-qualified name instead:</p>
       <div class="code-block"><pre>
-    xaxisSpeed = MathUtil.clamp(xaxisSpeed, <span class="num">-1.0</span>, <span class="num">1.0</span>) * Constants.DriveConstants.kSpeedLimit;</pre></div>
-      <p style="margin-top:0.5rem; font-size:0.85rem; color:var(--muted);">VS Code will offer to add the import automatically — hover the red underline and click <strong>Quick Fix → Add import</strong>.</p>
+xaxisSpeed = MathUtil.clamp(xaxisSpeed, <span class="num">-1.0</span>, <span class="num">1.0</span>) * DriveConstants.kSpeedLimit;</pre></div>
+      <div class="hf-box hf-tip" style="margin-top:0.75rem; margin-bottom:0;">
+        <span class="hf-label">VS Code quick-fix import  (Ctrl+.)</span>
+        <p>Type a constant class name that hasn't been imported yet — VS Code underlines it red. Hover it and press <strong>Ctrl+.</strong> then choose <strong>Add import</strong>. VS Code writes the import line for you.</p>
+      </div>
     </div>
 
     <!-- 3 ── Naming rules ─────────────────────────────────── -->
@@ -1461,19 +1474,23 @@ fetch('diagrams/boot-sequence.svg')
         </tr>
         <tr>
           <td style="padding:0.35rem 0.6rem; border-bottom:1px solid var(--gray-border); color:var(--mid); font-weight:600;">Distances</td>
-          <td style="padding:0.35rem 0.6rem; border-bottom:1px solid var(--gray-border);"><code>kWheelCircumferenceMeters</code> &nbsp; <code>kTrackWidthMeters</code></td>
+          <td style="padding:0.35rem 0.6rem; border-bottom:1px solid var(--gray-border);"><code>kWheelCircumferenceMeters</code> &nbsp; <code>kTrackWidthMeters</code> &nbsp; <code>kWheelRadiusMeters</code></td>
         </tr>
         <tr>
           <td style="padding:0.35rem 0.6rem; border-bottom:1px solid var(--gray-border); color:var(--mid); font-weight:600;">Timing</td>
-          <td style="padding:0.35rem 0.6rem; border-bottom:1px solid var(--gray-border);"><code>kDriveTimeSeconds</code> &nbsp; <code>kTurnTimeSeconds</code></td>
+          <td style="padding:0.35rem 0.6rem; border-bottom:1px solid var(--gray-border);"><code>kDriveTimeSeconds</code> &nbsp; <code>kTurnTimeSeconds</code> &nbsp; <code>kWaitTimeSeconds</code></td>
         </tr>
         <tr>
           <td style="padding:0.35rem 0.6rem; border-bottom:1px solid var(--gray-border); color:var(--mid); font-weight:600;">Ports / IDs</td>
           <td style="padding:0.35rem 0.6rem; border-bottom:1px solid var(--gray-border);"><code>kLeftMotorPort</code> &nbsp; <code>kRightMotorPort</code> &nbsp; <code>kControllerPort</code></td>
         </tr>
         <tr>
-          <td style="padding:0.35rem 0.6rem; color:var(--mid); font-weight:600;">Strings / names</td>
-          <td style="padding:0.35rem 0.6rem;"><code>kProjectName</code> &nbsp; <code>kAutoDefault</code></td>
+          <td style="padding:0.35rem 0.6rem; border-bottom:1px solid var(--gray-border); color:var(--mid); font-weight:600;">Strings / names</td>
+          <td style="padding:0.35rem 0.6rem; border-bottom:1px solid var(--gray-border);"><code>kProjectName</code> &nbsp; <code>kAutoDefault</code> &nbsp; <code>kLogPrefix</code></td>
+        </tr>
+        <tr>
+          <td style="padding:0.35rem 0.6rem; color:var(--mid); font-weight:600;">Booleans</td>
+          <td style="padding:0.35rem 0.6rem;"><code>kIsRightInverted</code> &nbsp; <code>kEnableLogging</code> &nbsp; <code>kIsSimulation</code></td>
         </tr>
       </table>
 
@@ -1494,7 +1511,7 @@ fetch('diagrams/boot-sequence.svg')
     <!-- ════ end constants guide block ════ -->
 
     <h2>Activity 2 — Constants Scavenger Hunt</h2>
-    <p>Six magic numbers are hiding in the project — hardcoded directly in subsystem files instead of Constants.java, ArmSubsystem, and DriveSubsystem where they belong. Find each one, move it to Constants.java, and check it off.</p>
+    <p>Six magic numbers are hiding in the project — hardcoded directly in subsystem files instead of their appropriate constants file. Find each one, move it to the right place, and check it off.</p>
 
     <div class="hf-box hf-tip">
       <span class="hf-label">Pro tip</span>
