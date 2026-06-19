@@ -8,29 +8,57 @@
   <style>
     /* ── Lesson 03 local styles ─────────────────────────────── */
 
-    /* Animated periodic diagram */
-    .periodic-diagram { margin: 1.2rem 0; background: var(--code-bg); border: 1px solid var(--code-border); border-radius: var(--radius-lg); padding: 1.2rem; }
-    .periodic-diagram h4 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-bottom: 0.75rem; }
-    .pd-loop-row { display: flex; align-items: center; gap: 0; overflow: hidden; margin-bottom: 0.5rem; }
-    .pd-cycle { display: flex; align-items: center; justify-content: center; min-width: 68px; height: 36px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; flex-shrink: 0; transition: transform 0.15s; }
-    .pd-cycle.teal  { background: var(--teal); color: var(--white); }
-    .pd-cycle.gray  { background: var(--gray-border); color: var(--mid); }
-    .pd-cycle.amber { background: var(--amber); color: var(--white); }
-    .pd-cycle.red   { background: var(--red); color: var(--white); }
-    .pd-arrow { font-size: 0.9rem; color: var(--muted); padding: 0 3px; flex-shrink: 0; }
-    .pd-label { font-size: 0.78rem; color: var(--muted); margin-bottom: 0.25rem; }
-    .pd-legend { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 0.75rem; }
-    .pd-legend-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.76rem; color: var(--mid); }
-    .pd-legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
-    .pd-controls { display: flex; gap: 0.5rem; margin-top: 0.75rem; }
-    .pd-btn { padding: 0.35rem 0.9rem; border-radius: 6px; font-size: 0.8rem; font-weight: 600; border: none; cursor: pointer; transition: background 0.15s; }
-    .pd-btn.play  { background: var(--teal); color: var(--white); }
-    .pd-btn.play:hover { background: #145860; }
-    .pd-btn.reset { background: var(--gray-bg); color: var(--mid); border: 1px solid var(--gray-border); }
-    .pd-btn.reset:hover { background: #e8e8e8; }
-    .pd-highlight { box-shadow: 0 0 0 3px rgba(29,106,114,0.45); transform: scale(1.08); z-index: 1; position: relative; }
-    .pd-bad-highlight { box-shadow: 0 0 0 3px rgba(163,45,45,0.45); transform: scale(1.08); z-index: 1; position: relative; }
-    .pd-status { font-size: 0.78rem; color: var(--muted); margin-top: 0.5rem; min-height: 1.2em; font-style: italic; }
+    /* ── Scheduler Terminal Widget ───────────────────────── */
+    .sched-widget { margin: 1.2rem 0; border: 1px solid #aaa; overflow: hidden; box-shadow: 2px 2px 6px rgba(0,0,0,0.25); }
+    .sched-titlebar { background: #f0f0f0; border-bottom: 1px solid #aaa; padding: 4px 10px; font-family: 'Segoe UI', Arial, sans-serif; font-size: 0.78rem; color: #000; font-weight: bold; }
+    .sched-body { display: grid; grid-template-columns: 1fr 260px; align-items: stretch; height: 26rem; }
+    @media (max-width: 720px) { .sched-body { grid-template-columns: 1fr; height: auto; } }
+    .sched-terminal { background: #000; min-height: 0; height: 100%; overflow-y: auto; padding: 0.5rem 0.75rem; font-family: Consolas, 'Courier New', monospace; font-size: 0.78rem; line-height: 1.65; border-right: 1px solid #333; }
+    .sched-flowchart { background: #111; padding: 0.6rem 0.4rem; display: flex; flex-direction: column; align-items: center; gap: 0; min-height: 0; height: 100%; overflow-y: auto; }
+    .t-line { display: flex; gap: 0.5rem; animation: tFade 0.1s ease; }
+    @keyframes tFade { from { opacity:0; } to { opacity:1; } }
+    .t-line.divider { border-top: 1px solid #333; margin: 0.3rem 0; }
+    .t-ts  { color: #555; min-width: 5.5rem; flex-shrink: 0; font-size: 0.73rem; padding-top: 0.05rem; }
+    .t-tag { min-width: 7.5rem; flex-shrink: 0; font-weight: 700; }
+    .t-msg { color: #c0c0c0; flex: 1; }
+    .t-line.periodic    .t-tag { color: #569cd6; }
+    .t-line.trigger     .t-tag { color: #9cdcfe; }
+    .t-line.sched       .t-tag { color: #4ec9b0; }
+    .t-line.cmd-init    .t-tag { color: #4ec9b0; }
+    .t-line.cmd-exec    .t-tag { color: #3dc973; }
+    .t-line.cmd-end     .t-tag { color: #808080; }
+    .t-line.conflict    .t-tag { color: #d7ba7d; }
+    .t-line.default-cmd .t-tag { color: #b5cea8; }
+    .t-line.bad-motor   .t-tag { color: #f44747; }
+    .t-line.warn        .t-tag { color: #d7ba7d; }
+    .t-line.summary-good .t-msg { color: #3dc973; font-weight: 700; }
+    .t-line.summary-bad  .t-msg { color: #f44747; font-weight: 700; }
+    .fc-node { border: 1px solid #444; border-radius: 3px; padding: 0.25rem 0.4rem; font-family: Consolas, 'Courier New', monospace; font-size: 0.67rem; color: #606060; text-align: center; width: 100%; max-width: 210px; transition: all 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .fc-node.active      { border-color: #4ec9b0; color: #4ec9b0; background: rgba(78,201,176,0.08); }
+    .fc-node.active-bad  { border-color: #f44747; color: #f44747; background: rgba(244,71,71,0.08); }
+    .fc-node.active-warn { border-color: #d7ba7d; color: #d7ba7d; background: rgba(215,186,125,0.08); }
+    .fc-arrow { color: #444; font-size: 0.7rem; line-height: 1.1; text-align: center; }
+    .fc-branch { display: flex; gap: 0.3rem; width: 100%; max-width: 210px; }
+    .fc-branch-node { flex: 1; border: 1px solid #444; border-radius: 3px; padding: 0.2rem 0.25rem; font-family: Consolas, 'Courier New', monospace; font-size: 0.62rem; color: #606060; text-align: center; transition: all 0.2s; }
+    .fc-branch-node.active      { border-color: #4ec9b0; color: #4ec9b0; background: rgba(78,201,176,0.08); }
+    .fc-branch-node.active-warn { border-color: #d7ba7d; color: #d7ba7d; background: rgba(215,186,125,0.08); }
+    .fc-source { font-family: Consolas,'Courier New',monospace; font-size: 0.6rem; color: #444; margin-top: 0.4rem; text-align: center; }
+    .fc-source a { color: #569cd6; }
+    .sched-controls { background: #f0f0f0; border-top: 1px solid #aaa; padding: 0.45rem 0.75rem; display: flex; flex-wrap: wrap; gap: 0.4rem 0.5rem; align-items: center; row-gap: 0.5rem; }
+    .sc-btn { padding: 0.28rem 0.75rem; font-family: 'Segoe UI', Arial, sans-serif; font-size: 0.78rem; font-weight: 600; border: 1px solid #888; border-radius: 2px; cursor: pointer; }
+    .sc-btn.good     { background: #dff0e8; border-color: #2e7d5a; color: #1a4d35; }
+    .sc-btn.good:hover { background: #c5e8d8; }
+    .sc-btn.bad      { background: #fde8e8; border-color: #b71c1c; color: #7f0000; }
+    .sc-btn.bad:hover  { background: #fbd0d0; }
+    .sc-btn.conflict { background: #fff8e1; border-color: #f57f17; color: #6d3c00; }
+    .sc-btn.conflict:hover { background: #fff0c0; }
+    .sc-btn.reset    { background: #f0f0f0; border-color: #888; color: #333; }
+    .sc-btn.reset:hover  { background: #e0e0e0; }
+    .sc-nav { display: flex; align-items: center; gap: 0.35rem; margin-left: auto; }
+    .sc-btn.nav { background: #e8e8e8; border-color: #666; color: #222; min-width: 2.2rem; }
+    .sc-btn.nav:hover:not(:disabled) { background: #d6d6d6; }
+    .sc-btn.nav:disabled { opacity: 0.4; cursor: default; }
+    .sc-step-label { font-family: 'Segoe UI',Arial,sans-serif; font-size: 0.74rem; color: #555; min-width: 4.2rem; text-align: center; }
 
     /* Code diff toggle */
     .diff-container { margin: 1rem 0; }
@@ -58,7 +86,11 @@
     .ann-note.open { display: block; }
     .ann-note code { background: rgba(29,106,114,0.12); padding: 0.1rem 0.3rem; border-radius: 3px; font-family: var(--font-mono); }
     .ann-separator { height: 1px; background: var(--code-border); }
-    .ann-group-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); padding: 0.3rem 0.75rem; background: var(--code-bg); border-bottom: 1px solid var(--code-border); }
+    .ann-group-label { cursor: pointer; user-select: none; }
+    .ann-group-label::before { content: '▸'; font-size: 0.7em; color: var(--muted); margin-right: 0.5em; display: inline-block; transition: transform 0.12s; }
+    .ann-group-label.open::before { content: '▾'; }
+    .ann-group-desc { display: none; font-size: 0.75rem; color: var(--dark); padding: 0.4rem 0.75rem; background: #fff; border-bottom: 1px solid var(--code-border); font-style: italic; }
+    .ann-group-desc.open { display: block; }
 
     /* Step builder */
     .step-builder { margin: 1rem 0; }
@@ -255,58 +287,95 @@
     </div>
 
     <h2>Why periodic() cannot control motors</h2>
-    <p>This is the rule students break most often. Watch what actually happens when you put motor control in <code>periodic()</code> versus in a command:</p>
+    <p>This is the rule students break most often. The answer isn't just "because the mentor said so" — there's a structural reason rooted in how the CommandScheduler works.</p>
 
-    <div class="periodic-diagram" id="pd-diagram">
-      <h4>Robot loop — 50 cycles per second</h4>
-      <p class="pd-label" id="pd-scenario-label">Scenario: normal operation, motors controlled by a command</p>
-      <div class="pd-loop-row" id="pd-row"></div>
-      <p class="pd-status" id="pd-status">Press Play to animate the robot loop.</p>
-      <div style="display:flex;gap:0.5rem;margin-top:0.4rem;flex-wrap:wrap;">
-        <button class="pd-btn play" onclick="pdPlay('good')">▶ Play — Good (motor in command)</button>
-        <button class="pd-btn play" style="background:var(--red)" onclick="pdPlay('bad')">▶ Play — Bad (motor in periodic)</button>
-        <button class="pd-btn reset" onclick="pdReset()">↺ Reset</button>
+    <p>The CommandScheduler is the engine that runs your robot's commands. Each 20ms loop it follows a precise sequence (documented at <a href="https://docs.wpilib.org/en/stable/docs/software/commandbased/command-scheduler.html" target="_blank" rel="noopener">docs.wpilib.org</a>): it calls every subsystem's <code>periodic()</code> first, then polls triggers and buttons, then runs active commands. The key insight: <strong><code>periodic()</code> runs unconditionally — the scheduler calls it at step&nbsp;1 every loop and has no way to skip, delay, or interrupt it.</strong> Commands are what the scheduler can start, stop, interrupt, and coordinate.</p>
+
+    <p>If you put motor output in <code>periodic()</code>, you've placed it outside the scheduler's reach. A command can't override it. A disable can't stop it cleanly. Two things can try to drive the motor with no coordination. The simulator below shows what the scheduler actually sees in three scenarios.</p>
+
+    <div class="sched-widget">
+      <div class="sched-titlebar">CommandScheduler — Robot Loop Simulator</div>
+      <div class="sched-body">
+        <div class="sched-terminal" id="sched-term"></div>
+        <div class="sched-flowchart" id="sched-fc">
+          <div class="fc-node" id="fc-robot">Robot.robotPeriodic()</div>
+          <div class="fc-arrow">▼</div>
+          <div class="fc-node" id="fc-sched">CommandScheduler.run()</div>
+          <div class="fc-arrow">▼</div>
+          <div class="fc-node" id="fc-periodic">1 periodic() — all subsystems</div>
+          <div class="fc-arrow">▼</div>
+          <div class="fc-node" id="fc-triggers">2 poll triggers → schedule</div>
+          <div class="fc-arrow">▼</div>
+          <div class="fc-branch">
+            <div class="fc-branch-node" id="fc-cancel">kCancelSelf→<br>cancel old</div>
+            <div class="fc-branch-node" id="fc-reject">kCancelIncoming→<br>reject new</div>
+          </div>
+          <div class="fc-arrow">▼</div>
+          <div class="fc-node" id="fc-exec">3 execute() → end finished</div>
+          <div class="fc-arrow">▼</div>
+          <div class="fc-node" id="fc-default">4 schedule default cmds</div>
+          <div class="fc-source"><a href="https://docs.wpilib.org/en/stable/docs/software/commandbased/command-scheduler.html" target="_blank" rel="noopener">docs.wpilib.org — Command Scheduler</a></div>
+        </div>
       </div>
-      <div class="pd-legend">
-        <div class="pd-legend-item"><div class="pd-legend-dot" style="background:var(--teal)"></div> periodic() runs (always)</div>
-        <div class="pd-legend-item"><div class="pd-legend-dot" style="background:var(--gray-border)"></div> command idle</div>
-        <div class="pd-legend-item"><div class="pd-legend-dot" style="background:#4A3B8C"></div> command active</div>
-        <div class="pd-legend-item"><div class="pd-legend-dot" style="background:var(--red)"></div> motor stuck ON (bad)</div>
+      <div class="sched-controls">
+        <button class="sc-btn good"     onclick="schedPlay('good')">▶ Good — motor in command</button>
+        <button class="sc-btn bad"      onclick="schedPlay('bad')">▶ Bad — motor in periodic()</button>
+        <button class="sc-btn conflict" onclick="schedPlay('conflict')">▶ Conflict — two commands</button>
+        <button class="sc-btn reset"    onclick="schedReset()">↺ Clear</button>
+        <div class="sc-nav">
+          <button class="sc-btn nav" id="sc-prev" onclick="schedPrev()" disabled>◀ Prev</button>
+          <span class="sc-step-label" id="sc-step-label">—</span>
+          <button class="sc-btn nav" id="sc-next" onclick="schedNext()" disabled>Next ▶</button>
+        </div>
       </div>
+    </div>
+
+<div class="hf-box hf-info">
+      <span class="hf-label">What the three scenarios show</span>
+      <p><strong style="color:#146854;">Good:</strong> <code>periodic()</code> reads sensors only. A drive command is scheduled, runs for several cycles, ends cleanly. The scheduler controls the full lifecycle.</p>
+      <p><strong style="color:#b82e2e;">Bad:</strong> Motor output is inside <code>periodic()</code>. The scheduler calls it at step&nbsp;1 — unconditionally, every loop. It cannot skip it or cancel it. A robot disable has no effect on <code>periodic()</code>. The motor runs until power is cut.</p>
+      <p><strong style="color:#9c6f0d;">Conflict:</strong> Two commands both require <code>Drive</code>. The scheduler detects this at step&nbsp;3 and resolves it via <code>getInterruptionBehavior()</code> — either cancelling the old command (kCancelSelf, the default) or rejecting the new one (kCancelIncoming). No undefined behavior. This is the framework working correctly.</p>
+    </div>
+
+    <div class="callout-connect">
+      <strong>The key distinction:</strong> <code>periodic()</code> is invisible to the scheduler's resource management system. It is not a command. It has no requirements. The scheduler cannot prevent it from conflicting with a command. Putting motor output in <code>periodic()</code> bypasses every safety guarantee the framework provides.
     </div>
 
     <h2>periodic() vs commands — bad code / good code</h2>
 
     <div class="diff-container">
       <div class="diff-tabs">
-        <button class="diff-tab bad active" onclick="diffSwitch('motordiff','bad',this)">❌ Motor control in periodic()</button>
+        <button class="diff-tab bad active" onclick="diffSwitch('motordiff','bad',this)">❌ Motor output in periodic()</button>
         <button class="diff-tab good" onclick="diffSwitch('motordiff','good',this)">✅ Motor control in a command</button>
       </div>
       <div class="diff-pane bad-pane active" id="motordiff-bad">
         <div class="code-block"><pre>
 <span class="kw">@Override</span>
 <span class="kw">public void</span> periodic() {
-    <span class="cm">// ❌ WRONG — this runs 50 times per second, forever</span>
-    <span class="cm">// The motor will run the moment the robot enables</span>
-    <span class="cm">// and NEVER STOP, even when disabled</span>
-    leftMotor.set(<span class="num">0.5</span>);
-    rightMotor.set(<span class="num">0.5</span>);
+    <span class="cm">// ❌ WRONG — a beginner's natural instinct:</span>
+    <span class="cm">// "periodic() runs every loop, so I'll read the joystick here"</span>
+    <span class="cm">// Problem: scheduler calls this unconditionally at step 1.</span>
+    <span class="cm">// No command can override it. No disable can stop it cleanly.</span>
+    <span class="kw">double</span> speed = controller.getLeftY(); <span class="cm">// reads joystick</span>
+    leftMotor.set(speed);
+    rightMotor.set(-speed);
 }</pre></div>
       </div>
       <div class="diff-pane good-pane" id="motordiff-good">
         <div class="code-block"><pre>
 <span class="kw">@Override</span>
 <span class="kw">public void</span> periodic() {
-    <span class="cm">// ✅ CORRECT — read sensors and log only</span>
+    <span class="cm">// ✅ CORRECT — sensors and logging only</span>
     io.updateInputs(inputs);
     Logger.processInputs(<span class="str">"Drive"</span>, inputs);
 }
 
-<span class="cm">// Motor control lives in a Command — can be stopped/interrupted</span>
-<span class="kw">public</span> Command driveCommand(DoubleSupplier left, DoubleSupplier right) {
+<span class="cm">// Motor output lives in a Command — scheduler controls lifecycle</span>
+<span class="cm">// In RobotContainer: drive.setDefaultCommand(drive.defaultDriveCommand(controller));</span>
+<span class="kw">public</span> Command defaultDriveCommand(XboxController controller) {
     <span class="kw">return</span> run(() -> {
-        leftMotor.set(left.getAsDouble());
-        rightMotor.set(right.getAsDouble());
+        <span class="kw">double</span> speed = controller.getLeftY();
+        io.setVoltage(speed * kMaxBatteryVoltage, -speed * kMaxBatteryVoltage);
     });
 }</pre></div>
       </div>
@@ -325,8 +394,8 @@
 
     <span class="kw">@Override</span>
     <span class="kw">public void</span> periodic() {
-        <span class="cm">// Runs every 20ms. Read sensors, log data.</span>
-        <span class="cm">// NOT motor control.</span>
+        <span class="cm">// Called at step 1 by the CommandScheduler every 20ms.</span>
+        <span class="cm">// Read sensors, log data. No motor/servo output.</span>
     }
 }</pre>
     </div>
@@ -356,11 +425,12 @@
       <span class="hf-label">There are no dumb questions</span>
       <p><strong>Q: Can a subsystem control two mechanisms?</strong></p>
       <p>Technically yes. It's almost always a bad idea. If two mechanisms are so tightly coupled that they must always be controlled together, they might belong in one subsystem. Otherwise separate them.</p>
+      <p><strong>Q: What if two separate subsystems need to coordinate, like a scoop angle that depends on elevator height?</strong></p>
+      <p>Ask yourself: does the logic belong in <code>ElevatorSubsystem.periodic()</code>? That works, but now Elevator knows about Scoop — tight coupling. Flip it — put it in <code>ScoopSubsystem.periodic()</code> instead? Same problem, just reversed. What if a third class owned both, and decided when each one should move? That's the <strong>superstructure</strong> pattern — a coordinator that sits above multiple subsystems without owning hardware itself. We're naming it here; building one comes later.</p>
       <p><strong>Q: How does a subsystem communicate with another subsystem?</strong></p>
       <p>Through commands in RobotContainer. Subsystems don't talk to each other directly — that would create dependencies that make debugging much harder. Commands coordinate between subsystems.</p>
       <p><strong>Q: What's the difference between periodic() and a command?</strong></p>
-      <p><code>periodic()</code> runs every loop cycle regardless — use it for reading sensors and logging. Commands run when scheduled — use them for actions triggered by buttons or autonomous. Sensor reading goes in <code>periodic()</code>. Motor control goes in commands.</p>
-    </div>
+      <p><code>periodic()</code> runs every loop cycle regardless — use it for reading sensors and logging. Commands run when scheduled — use them for actions triggered by buttons or autonomous. Sensor reading goes in <code>periodic()</code>. Motor control goes in commands.</p>    </div>
 
     <!-- Embedded concept quiz -->
     <h2>Quick check — before Part 2</h2>
@@ -435,7 +505,8 @@
 
     <div class="ann-block" id="arm-annotated">
 
-      <div class="ann-group-label">Package + Imports</div>
+      <div class="ann-group-label" onclick="annGroupToggle('pkg')">Package + Imports <span class="ann-file-badge">Arm.java</span></div>
+      <div class="ann-group-desc" id="ann-group-pkg">Declares where this file lives in the project, and pulls in outside classes it needs.</div>
 
       <div class="ann-line has-note" onclick="annToggle('pkg')">
         <span class="ann-line-num">1</span>
@@ -443,7 +514,7 @@
         <span class="ann-line-icon">⬤</span>
       </div>
       <div class="ann-note" id="ann-pkg">
-        The package declaration matches the folder path: <code>src/main/java/frc/robot/subsystems/arm/</code>. Notice this subsystem has its own sub-folder <code>arm/</code> — not just dropped in the top-level <code>subsystems/</code> folder. That's because the IO pattern means there are multiple files for this subsystem: <code>Arm.java</code>, <code>ArmIO.java</code>, <code>ArmIOXRP.java</code>, <code>ArmConstants.java</code>. Grouping them in a sub-folder keeps things tidy. You'll understand why in Part 4.
+        The package declaration matches the folder path: <code>src/main/java/frc/robot/subsystems/arm/</code>. Notice this subsystem has its own sub-folder <code>arm/</code> — not just dropped in the top-level <code>subsystems/</code> folder. That's because the IO pattern means there are multiple files for this subsystem: <code>Arm.java</code> (this file), <code>ArmIO.java</code>, <code>ArmIOXRP.java</code>, <code>ArmConstants.java</code>. Grouping them in a sub-folder keeps things tidy. You'll understand why in Part 4.
       </div>
 
       <div class="ann-line" onclick="">
@@ -462,11 +533,12 @@
         <span class="ann-line-icon">⬤</span>
       </div>
       <div class="ann-note" id="ann-imports-wpi">
-        <code>Pose3d</code> and <code>Rotation3d</code> are WPILib geometry types — they describe position and angle in 3D space. The <code>LoggedMechanism2d</code> imports are AdvantageKit types that let us draw the arm's current position as a 2D diagram inside AdvantageScope. <strong>Notice: there is no import of XRPServo here.</strong> The subsystem doesn't know what hardware it's running on. That's the IO pattern — you'll see it in Part 4.
+        <code>Pose3d</code> and <code>Rotation3d</code> are WPILib geometry types — they describe position and angle in 3D space. The <code>LoggedMechanism2d</code> imports are AdvantageKit types that let us draw the arm's current position as a 2D diagram inside AdvantageScope. <strong>Notice: there is no import of XRPServo here.</strong> The subsystem doesn't know what hardware it's running on. That's the IO pattern — you'll see it in Part 4. (Hardware-specific code lives in <code>ArmIOXRP.java</code>, not here.)
       </div>
 
       <div class="ann-separator"></div>
-      <div class="ann-group-label">Class Declaration + Fields</div>
+      <div class="ann-group-label" onclick="annGroupToggle('fields')">Class Declaration + Fields <span class="ann-file-badge">Arm.java</span></div>
+      <div class="ann-group-desc" id="ann-group-fields">Names the class, registers it as a subsystem, and lists the data it holds onto between loop cycles.</div>
 
       <div class="ann-line has-note" onclick="annToggle('extends')">
         <span class="ann-line-num">11</span>
@@ -483,7 +555,7 @@
         <span class="ann-line-icon">⬤</span>
       </div>
       <div class="ann-note" id="ann-io-field">
-        This is the IO pattern in one line. <code>ArmIO</code> is an <em>interface</em> — it defines what operations the arm hardware can do (like <code>setAngle()</code>) without specifying <em>how</em> they're done. The actual hardware object (an XRP servo, a simulation stub, or a real FRC motor controller) gets passed in through the constructor. The subsystem never knows which one it's talking to — and that's the point. Full explanation in Part 4.
+        This is the IO pattern in one line. <code>ArmIO</code> is an <em>interface</em> — defined in <code>ArmIO.java</code> — it defines what operations the arm hardware can do (like <code>setAngle()</code>) without specifying <em>how</em> they're done. The actual hardware object (an XRP servo, a simulation stub, or a real FRC motor controller — implemented in <code>ArmIOXRP.java</code>) gets passed in through the constructor. The subsystem never knows which one it's talking to — and that's the point. Full explanation in Part 4.
       </div>
 
       <div class="ann-line has-note" onclick="annToggle('inputs')">
@@ -492,7 +564,7 @@
         <span class="ann-line-icon">⬤</span>
       </div>
       <div class="ann-note" id="ann-inputs">
-        <code>ArmIOInputsAutoLogged</code> is a class that AdvantageKit generates automatically from the <code>@AutoLog</code> annotation in <code>ArmIO.java</code>. It holds all the sensor values the IO layer reads (like <code>commandedAngleDeg</code>). The <code>AutoLogged</code> suffix means every field in it is automatically recorded to the log file — you don't have to write any logging code for inputs.
+        <code>ArmIOInputsAutoLogged</code> is a class that AdvantageKit generates automatically — at compile time — from the <code>@AutoLog</code> annotation on the inputs class in <code>ArmIO.java</code>. It holds all the sensor values the IO layer reads (like <code>commandedAngleDeg</code>). The <code>AutoLogged</code> suffix means every field in it is automatically recorded to the log file — you don't have to write any logging code for inputs.
       </div>
 
       <div class="ann-line has-note" onclick="annToggle('mech2d')">
@@ -505,7 +577,8 @@
       </div>
 
       <div class="ann-separator"></div>
-      <div class="ann-group-label">Constructor</div>
+      <div class="ann-group-label" onclick="annGroupToggle('ctor')">Constructor <span class="ann-file-badge">Arm.java</span></div>
+      <div class="ann-group-desc" id="ann-group-ctor">Runs once when the subsystem is created — sets up its starting state and receives any objects it depends on.</div>
 
       <div class="ann-line has-note" onclick="annToggle('constructor')">
         <span class="ann-line-num">21–23</span>
@@ -513,11 +586,12 @@
         <span class="ann-line-icon">⬤</span>
       </div>
       <div class="ann-note" id="ann-constructor">
-        The constructor receives an <code>ArmIO</code> object and stores it. This is called <strong>dependency injection</strong> — instead of the subsystem creating its own hardware, the hardware is passed in from outside (from <code>RobotContainer</code>). This means <code>RobotContainer</code> decides whether to pass in an XRP servo implementation or a simulation stub — the <code>Arm</code> subsystem itself never changes. Three lines. Enormous consequences.
+        The constructor receives an <code>ArmIO</code> object and stores it. This is called <strong>dependency injection</strong> — instead of the subsystem creating its own hardware, the hardware is passed in from outside (from <code>RobotContainer.java</code>). This means <code>RobotContainer</code> decides whether to pass in an XRP servo implementation (<code>ArmIOXRP</code>) or a simulation stub — the <code>Arm</code> subsystem itself never changes. Three lines. Enormous consequences.
       </div>
 
       <div class="ann-separator"></div>
-      <div class="ann-group-label">periodic()</div>
+      <div class="ann-group-label" onclick="annGroupToggle('periodic')">periodic() <span class="ann-file-badge">Arm.java</span></div>
+      <div class="ann-group-desc" id="ann-group-periodic">Runs automatically every 20ms loop cycle, for as long as the robot is on — reads sensors and updates logging/visuals.</div>
 
       <div class="ann-line has-note" onclick="annToggle('periodic-inputs')">
         <span class="ann-line-num">26–27</span>
@@ -525,7 +599,7 @@
         <span class="ann-line-icon">⬤</span>
       </div>
       <div class="ann-note" id="ann-periodic-inputs">
-        These two lines are the heartbeat of every AdvantageKit subsystem. <code>io.updateInputs(inputs)</code> asks the IO layer to read all hardware sensors and fill in the <code>inputs</code> object. <code>Logger.processInputs("Arm", inputs)</code> records all those values to the log file under the key <code>Arm/</code>. After these two lines, the rest of <code>periodic()</code> (and any commands) can read from <code>inputs</code> — they're all seeing the same frozen snapshot from this loop cycle.
+        These two lines are the heartbeat of every AdvantageKit subsystem. <code>io.updateInputs(inputs)</code> asks the IO layer — implemented in <code>ArmIOXRP.java</code> — to read all hardware sensors and fill in the <code>inputs</code> object. <code>Logger.processInputs("Arm", inputs)</code> records all those values to the log file under the key <code>Arm/</code>. After these two lines, the rest of <code>periodic()</code> (and any commands) can read from <code>inputs</code> — they're all seeing the same frozen snapshot from this loop cycle.
       </div>
 
       <div class="ann-line has-note" onclick="annToggle('periodic-vis')">
@@ -538,7 +612,8 @@
       </div>
 
       <div class="ann-separator"></div>
-      <div class="ann-group-label">Methods</div>
+      <div class="ann-group-label" onclick="annGroupToggle('methods')">Methods <span class="ann-file-badge">Arm.java</span></div>
+      <div class="ann-group-desc" id="ann-group-methods">The public actions other code (commands) can call to make this subsystem do something.</div>
 
       <div class="ann-line has-note" onclick="annToggle('setangle')">
         <span class="ann-line-num">44–47</span>
@@ -546,7 +621,7 @@
         <span class="ann-line-icon">⬤</span>
       </div>
       <div class="ann-note" id="ann-setangle">
-        <code>setAngle()</code> is the subsystem's primary output method. It does two things: calls <code>io.setAngle(angleDeg)</code> to actually move the hardware, and calls <code>Logger.recordOutput("Arm/Commanded/AngleDeg", angleDeg)</code> to log what angle was commanded. Commands call <code>setAngle()</code> — they don't touch <code>io</code> directly. The subsystem is the gatekeeper for all hardware access.
+        <code>setAngle()</code> is the subsystem's primary output method. It does two things: calls <code>io.setAngle(angleDeg)</code> to actually move the hardware (handled in <code>ArmIOXRP.java</code>), and calls <code>Logger.recordOutput("Arm/Commanded/AngleDeg", angleDeg)</code> to log what angle was commanded. Commands call <code>setAngle()</code> — they don't touch <code>io</code> directly. The subsystem is the gatekeeper for all hardware access.
       </div>
 
       <div class="ann-line has-note" onclick="annToggle('stop')">
@@ -555,7 +630,7 @@
         <span class="ann-line-icon">⬤</span>
       </div>
       <div class="ann-note" id="ann-stop">
-        <code>stop()</code> doesn't cut power to the servo — it moves the arm to a safe stowed position. For a servo, "stopped" means holding a safe angle, not going limp. <code>ArmConstants.kStowedAngleDeg</code> is defined in <code>ArmConstants.java</code> — one place, one value. If you need to change the stow angle, you change it there and it updates everywhere. This is the <strong>safe state pattern</strong>: every subsystem should know its own safe position and be able to go there on demand.
+        <code>stop()</code> doesn't cut power to the servo — it moves the arm to a safe stowed position. For a servo, "stopped" means holding a safe angle, not going limp. <code>ArmConstants.kStowedAngleDeg</code> is defined in <strong><code>ArmConstants.java</code></strong> — a separate file, one place, one value. If you need to change the stow angle, you change it there and it updates everywhere. This is the <strong>safe state pattern</strong>: every subsystem should know its own safe position and be able to go there on demand.
       </div>
 
       <div class="ann-line has-note" onclick="annToggle('getter')">
@@ -783,43 +858,36 @@
           <div class="code-block"><pre>
 <span class="kw">public class</span> RobotContainer {
 
-    <span class="cm">// Subsystems — add scoop alongside the existing declarations</span>
+    <span class="cm">// Subsystems — declared then assigned in constructor (IO pattern)</span>
     <span class="kw">private final</span> Drive drive;
     <span class="kw">private final</span> Arm arm;
-    <span class="kw">private final</span> Scoop scoop;  <span class="cm">// ← add this line</span>
+    <span class="kw">private final</span> Scoop scoop;  <span class="cm">// ← add this declaration</span>
 
     <span class="kw">public</span> RobotContainer() {
-        <span class="cm">// Add the scoop case inside the existing switch block</span>
         <span class="kw">switch</span> (Constants.currentMode) {
             <span class="kw">case</span> REAL:
                 drive = <span class="kw">new</span> Drive(<span class="kw">new</span> DriveIOXRP());
                 arm   = <span class="kw">new</span> Arm(<span class="kw">new</span> ArmIOXRP());
-                scoop = <span class="kw">new</span> Scoop(<span class="kw">new</span> ScoopIOXRP());  <span class="cm">// ← add</span>
+                scoop = <span class="kw">new</span> Scoop(<span class="kw">new</span> ScoopIOXRP());  <span class="cm">// ← add (Lesson 04)</span>
                 <span class="kw">break</span>;
             <span class="kw">case</span> SIM:
                 drive = <span class="kw">new</span> Drive(<span class="kw">new</span> DriveIOSim());
                 arm   = <span class="kw">new</span> Arm(<span class="kw">new</span> ArmIOSim());
-                scoop = <span class="kw">new</span> Scoop(<span class="kw">new</span> ScoopIOSim());   <span class="cm">// ← add</span>
+                scoop = <span class="kw">new</span> Scoop(<span class="kw">new</span> ScoopIOSim());   <span class="cm">// ← add (Lesson 04)</span>
                 <span class="kw">break</span>;
             <span class="kw">default</span>:  <span class="cm">// log replay</span>
                 drive = <span class="kw">new</span> Drive(<span class="kw">new</span> DriveIO() {});
                 arm   = <span class="kw">new</span> Arm(<span class="kw">new</span> ArmIO() {});
-                scoop = <span class="kw">new</span> Scoop(<span class="kw">new</span> ScoopIO() {});   <span class="cm">// ← add</span>
+                scoop = <span class="kw">new</span> Scoop(<span class="kw">new</span> ScoopIO() {});   <span class="cm">// ← add (Lesson 04)</span>
                 <span class="kw">break</span>;
         }
-
         configureButtonBindings();
         configureAutonomous();
     }
 
     <span class="kw">private void</span> configureButtonBindings() {
-        <span class="cm">// Wire button A to set scoop to CARRY position</span>
         controller.a().onTrue(scoop.setGoalCommand(Scoop.Goal.CARRY));
-
-        <span class="cm">// Wire button B to dump</span>
         controller.b().onTrue(scoop.setGoalCommand(Scoop.Goal.DUMP));
-
-        <span class="cm">// Wire button X to return to flat</span>
         controller.x().onTrue(scoop.setGoalCommand(Scoop.Goal.FLAT));
     }
 }</pre></div>
@@ -893,7 +961,7 @@
       "import edu.wpi.first.wpilibj2.command.SubsystemBase;",
       "import org.littletonrobotics.junction.AutoLogOutput;",
       "",
-      "public class ${1:MySubsystem} extends SubsystemBase {",
+      "public class ${1:MyClass} extends SubsystemBase {",
       "",
       "    public enum ${1:My}Goal {",
       "        ${2:DEFAULT}",
@@ -902,7 +970,7 @@
       "    @AutoLogOutput",
       "    private ${1:My}Goal goal = ${1:My}Goal.${2:DEFAULT};",
       "",
-      "    public ${1:MySubsystem}() {",
+      "    public ${1:MyClass}() {",
       "        // Configure hardware here",
       "    }",
       "",
@@ -1063,11 +1131,10 @@
     </div>
 
     <h2>How RobotContainer wires it together</h2>
-    <p>The subsystem never decides which implementation it gets. <code>RobotContainer</code> makes that decision at startup by switching on <code>Constants.currentMode</code> — REAL, SIM, or log replay:</p>
+    <p>The subsystem never decides which implementation it gets. <code>RobotContainer</code> makes that decision at startup based on whether the code is running in simulation or on real hardware:</p>
 
     <div class="code-block"><pre>
 <span class="kw">public</span> RobotContainer() {
-    <span class="cm">// Constants.currentMode switches between REAL, SIM, and replay</span>
     <span class="kw">switch</span> (Constants.currentMode) {
         <span class="kw">case</span> REAL:
             arm = <span class="kw">new</span> Arm(<span class="kw">new</span> ArmIOXRP());  <span class="cm">// real XRP servo</span>
@@ -1080,7 +1147,7 @@
             <span class="kw">break</span>;
     }
 }</pre></div>
-    <div class="code-annotation">The Arm subsystem itself never changes. Swap the implementation by changing one line per case in RobotContainer. That's the entire point.</div>
+    <div class="code-annotation">The Arm subsystem itself never changes. Swap the implementation per case in RobotContainer. That's the entire point.</div>
 
     <h2>Why this matters for simulation</h2>
 
@@ -1468,6 +1535,11 @@ function annToggle(id) {
   if (line) line.classList.toggle('open', !isOpen);
 }
 
+function annGroupToggle(id) {
+  document.getElementById('ann-group-' + id).classList.toggle('open');
+  event.currentTarget.classList.toggle('open');
+}
+
 /* ── Step builder accordion ───────────────────────────────── */
 function sbToggle(id) {
   const step = document.getElementById(id);
@@ -1485,101 +1557,184 @@ function diffSwitch(id, pane, btn) {
   if (target) target.classList.add('active');
 }
 
-/* ── Animated periodic diagram ────────────────────────────── */
-let pdTimer = null;
-let pdCurrentCycle = 0;
-let pdMode = 'good';
-const PD_CYCLES = 8;
+/* ── Scheduler terminal + flowchart ─────────────────────────
+   Scheduler.run() order per WPILib docs:
+     docs.wpilib.org/en/stable/docs/software/commandbased/command-scheduler.html
+     1 periodic() all subsystems  2 poll triggers→schedule (conflict res. here)
+     3 execute()→end finished     4 schedule default cmds
+   ─────────────────────────────────────────────────────────── */
+let schedScript   = null;
+let schedStep     = 0;
+let schedMode     = null;
+let schedLoopNums = [];
 
-function pdBuildRow(mode) {
-  const row = document.getElementById('pd-row');
-  row.innerHTML = '';
-  for (let i = 0; i < PD_CYCLES; i++) {
-    if (i > 0) {
-      const arrow = document.createElement('span');
-      arrow.className = 'pd-arrow';
-      arrow.textContent = '→';
-      row.appendChild(arrow);
-    }
-    const cell = document.createElement('div');
-    cell.className = 'pd-cycle teal';
-    cell.id = 'pd-cell-' + i;
-    if (mode === 'bad') {
-      cell.textContent = 'periodic()';
-    } else {
-      cell.textContent = i >= 2 && i <= 5 ? 'CMD active' : 'periodic()';
-      if (i >= 2 && i <= 5) cell.className = 'pd-cycle'; // will color later
-    }
-    row.appendChild(cell);
+function tAppend(entry, loopNum) {
+  const term = document.getElementById('sched-term');
+  if (!term) return;
+  if (entry.type === 'divider') {
+    const d = document.createElement('div'); d.className = 't-line divider'; term.appendChild(d); return;
   }
-  // Color good mode cells
-  if (mode === 'good') {
-    for (let i = 0; i < PD_CYCLES; i++) {
-      const cell = document.getElementById('pd-cell-' + i);
-      if (i >= 2 && i <= 5) {
-        cell.className = 'pd-cycle';
-        cell.style.background = '#4A3B8C';
-        cell.style.color = '#fff';
-        cell.textContent = 'CMD active';
-      } else {
-        cell.className = 'pd-cycle teal';
-        cell.textContent = 'periodic()';
-      }
-    }
+  const line = document.createElement('div');
+  line.className = 't-line ' + (entry.type || '');
+  const ts = loopNum != null ? `loop-${String(loopNum).padStart(2,'0')}` : '          ';
+  line.innerHTML = `<span class="t-ts">${ts}</span><span class="t-tag">${entry.tag||''}</span><span class="t-msg">${entry.msg}</span>`;
+  term.appendChild(line);
+  term.scrollTop = term.scrollHeight;
+  if (entry.fc) {
+    if (entry.fc === 'fc-cancel' || entry.fc === 'fc-reject') fcActivateBranch(entry.fc, entry.cls || 'active');
+    else fcActivate(entry.fc, entry.cls || 'active');
   }
 }
 
-function pdPlay(mode) {
-  pdReset();
-  pdMode = mode;
-  pdCurrentCycle = 0;
-  pdBuildRow(mode);
-  const label = document.getElementById('pd-scenario-label');
-  label.textContent = mode === 'good'
-    ? 'Scenario: motor in a command — starts on cycle 3, ends on cycle 6'
-    : 'Scenario: motor control in periodic() — motor runs every single cycle';
-
-  pdTimer = setInterval(() => {
-    const prev = document.getElementById('pd-cell-' + (pdCurrentCycle - 1));
-    if (prev) {
-      prev.classList.remove('pd-highlight', 'pd-bad-highlight');
-    }
-    if (pdCurrentCycle >= PD_CYCLES) {
-      clearInterval(pdTimer);
-      document.getElementById('pd-status').textContent =
-        mode === 'good'
-          ? 'Done. Command ran for 4 cycles, then ended cleanly. periodic() kept running throughout.'
-          : '⚠ Motor ran every cycle with no way to stop it. periodic() cannot be interrupted.';
-      return;
-    }
-    const cell = document.getElementById('pd-cell-' + pdCurrentCycle);
-    if (cell) {
-      if (mode === 'bad') {
-        cell.classList.add('pd-bad-highlight');
-        cell.className = 'pd-cycle red pd-bad-highlight';
-        cell.textContent = '🔴 MOTOR ON';
-        document.getElementById('pd-status').textContent =
-          `Cycle ${pdCurrentCycle + 1}: periodic() runs → motor forced to 0.5. Every. Single. Time.`;
-      } else {
-        cell.classList.add('pd-highlight');
-        const isCmd = pdCurrentCycle >= 2 && pdCurrentCycle <= 5;
-        document.getElementById('pd-status').textContent = isCmd
-          ? `Cycle ${pdCurrentCycle + 1}: command active → motor running (can be interrupted)`
-          : `Cycle ${pdCurrentCycle + 1}: periodic() reading sensors and logging`;
-      }
-    }
-    pdCurrentCycle++;
-  }, 600);
+function schedUpdateNav() {
+  const prev = document.getElementById('sc-prev');
+  const next = document.getElementById('sc-next');
+  const label = document.getElementById('sc-step-label');
+  if (!schedScript) {
+    if (prev) prev.disabled = true;
+    if (next) next.disabled = true;
+    if (label) label.textContent = '—';
+    return;
+  }
+  if (prev) prev.disabled = (schedStep <= 0);
+  if (next) next.disabled = (schedStep >= schedScript.length);
+  if (label) label.textContent = `${schedStep} / ${schedScript.length}`;
 }
 
-function pdReset() {
-  if (pdTimer) clearInterval(pdTimer);
-  pdCurrentCycle = 0;
-  const row = document.getElementById('pd-row');
-  row.innerHTML = '';
-  document.getElementById('pd-status').textContent = 'Press Play to animate the robot loop.';
-  document.getElementById('pd-scenario-label').textContent = 'Scenario: normal operation, motors controlled by a command';
+function schedPlay(mode) {
+  const term = document.getElementById('sched-term');
+  if (term) term.innerHTML = '';
+  fcClear();
+  schedMode = mode;
+  schedScript = SCHED_SCRIPTS[mode];
+  schedStep = 0;
+  schedLoopNums = schedScript.map(e => e.loop != null ? e.loop : null);
+  const hdr = document.createElement('div');
+  hdr.className = 't-line';
+  const labels = { good:'▶ GOOD — motor output in a Command', bad:'▶ BAD — motor output in periodic()', conflict:'▶ CONFLICT — two commands, same subsystem' };
+  const colors = { good:'#4ec9b0', bad:'#f44747', conflict:'#d7ba7d' };
+  hdr.innerHTML = `<span class="t-ts"></span><span class="t-tag"></span><span class="t-msg" style="color:${colors[mode]};font-weight:700;">D:\\frc> simulate.exe --scenario ${mode}</span>`;
+  if (term) term.appendChild(hdr);
+  schedUpdateNav();
 }
+
+function schedNext() {
+  if (!schedScript || schedStep >= schedScript.length) return;
+  const entry = schedScript[schedStep];
+  tAppend(entry, schedLoopNums[schedStep]);
+  schedStep++;
+  schedUpdateNav();
+}
+
+function schedPrev() {
+  if (!schedScript || schedStep <= 0) return;
+  schedStep--;
+  const term = document.getElementById('sched-term');
+  if (term && term.lastElementChild) term.removeChild(term.lastElementChild);
+  fcClear();
+  for (let i = 0; i < schedStep; i++) {
+    const e = schedScript[i];
+    if (e.fc) {
+      if (e.fc === 'fc-cancel' || e.fc === 'fc-reject') fcActivateBranch(e.fc, e.cls || 'active');
+      else fcActivate(e.fc, e.cls || 'active');
+    }
+  }
+  schedUpdateNav();
+}
+
+function schedReset() {
+  schedScript = null;
+  schedStep = 0;
+  schedMode = null;
+  const term = document.getElementById('sched-term');
+  if (term) term.innerHTML = '';
+  fcClear();
+  schedUpdateNav();
+}
+
+const FC_NODES = ['fc-robot','fc-sched','fc-periodic','fc-triggers','fc-exec','fc-default'];
+
+function fcClear() {
+  FC_NODES.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.className = 'fc-node';
+  });
+  ['fc-cancel','fc-reject'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.className = 'fc-branch-node';
+  });
+}
+
+function fcActivate(nodeId, cls) {
+  fcClear();
+  const el = document.getElementById(nodeId);
+  if (el) el.className = (el.classList.contains('fc-branch-node') ? 'fc-branch-node ' : 'fc-node ') + (cls || 'active');
+}
+
+function fcActivateBranch(branchId, cls) {
+  fcClear();
+  const reqs = document.getElementById('fc-triggers');
+  if (reqs) reqs.className = 'fc-node active-warn';
+  const el = document.getElementById(branchId);
+  if (el) el.className = 'fc-branch-node ' + (cls || 'active');
+}
+
+const SCHED_SCRIPTS = {
+good: [
+    { loop:1, fc:'fc-robot',    cls:'active',     tag:'[20ms loop]',  type:'periodic',    msg:'Robot.robotPeriodic() called' },
+    { loop:1, fc:'fc-sched',    cls:'active',     tag:'',             type:'sched',       msg:'CommandScheduler.getInstance().run() called' },
+    { loop:1, fc:'fc-periodic', cls:'active',     tag:'periodic()', type:'periodic',    msg:'Drive.periodic() → io.updateInputs() + Logger.processInputs()' },
+    { loop:1, fc:'fc-periodic', cls:'active',     tag:'periodic()', type:'periodic',    msg:'Scoop.periodic() → scoopServo.setAngle(goal==FLAT → 0°)' },
+    { loop:1, fc:'fc-triggers', cls:'active',     tag:'triggers',   type:'trigger',     msg:'polling button bindings... joystick left-Y moved' },
+    { loop:1, fc:'fc-triggers', cls:'active',     tag:'reqs check', type:'sched',       msg:'defaultDriveCommand needs Drive — no conflict' },
+    { loop:1, fc:'fc-cancel',   cls:'active',     tag:'→ init',     type:'cmd-init',    msg:'defaultDriveCommand.initialize() called — scheduled' },
+    { loop:1, fc:'fc-exec',     cls:'active',     tag:'execute()',   type:'cmd-exec',    msg:'defaultDriveCommand.execute() → io.setVoltage(left, right)' },
+    { loop:1, fc:'fc-exec',     cls:'active',     tag:'finished?',  type:'cmd-exec',    msg:'isFinished() → false (runs until interrupted)' },
+    { loop:1, fc:'fc-default',  cls:'active',     tag:'defaults',   type:'default-cmd', msg:'Scoop free → ScoopHoldCommand scheduled as default' },
+    { loop:2, fc:'fc-robot',    cls:'active',     tag:'[20ms loop]',  type:'periodic',    msg:'[next loop] Robot.robotPeriodic() called' },
+    { loop:2, fc:'fc-sched',    cls:'active',     tag:'',             type:'sched',       msg:'CommandScheduler.getInstance().run() called' },
+    { loop:2, fc:'fc-periodic', cls:'active',     tag:'periodic()', type:'periodic',    msg:'Drive.periodic() → sensors logged again' },
+    { loop:2, fc:'fc-triggers', cls:'active',     tag:'triggers',   type:'trigger',     msg:'button released → defaultDriveCommand interrupted' },
+    { loop:2, fc:'fc-exec',     cls:'active',     tag:'end(true)',  type:'cmd-end',     msg:'defaultDriveCommand.end(interrupted=true) → motors stop' },
+    { loop:2, fc:'fc-default',  cls:'active',     tag:'defaults',   type:'default-cmd', msg:'Drive free → defaultDriveCommand rescheduled' },
+    { fc:'fc-default',  cls:'active',     tag:'',             type:'summary-good', msg:'✓ Scheduler managed full lifecycle. Clean start, clean stop.' },
+  ],
+bad: [
+    { loop:1, fc:'fc-robot',    cls:'active',     tag:'[20ms loop]',  type:'periodic',    msg:'Robot.robotPeriodic() called' },
+    { loop:1, fc:'fc-sched',    cls:'active',     tag:'',             type:'sched',       msg:'CommandScheduler.getInstance().run() called' },
+    { loop:1, fc:'fc-periodic', cls:'active-bad', tag:'periodic()', type:'bad-motor',   msg:'Drive.periodic() called at step 1 — unconditionally' },
+    { loop:1, fc:'fc-periodic', cls:'active-bad', tag:'periodic()', type:'bad-motor',   msg:'controller.getLeftY() read + leftMotor.set(speed) called' },
+    { fc:'fc-periodic', cls:'active-bad', tag:'Note:', type:'bad-motor',   msg:'Scheduler has NO mechanism to skip or cancel periodic()' },
+    { loop:1, fc:'fc-periodic', cls:'active',     tag:'periodic()', type:'periodic',    msg:'Scoop.periodic() → scoopServo.setAngle(goal==FLAT → 0°)' },
+    { loop:1, fc:'fc-triggers', cls:'active',     tag:'triggers',   type:'trigger',     msg:'polling triggers... nothing else scheduled' },
+    { loop:1, fc:'fc-exec',     cls:'active',     tag:'execute()',   type:'cmd-exec',    msg:'no active commands — nothing to execute this loop' },
+    { loop:2, fc:'fc-robot',    cls:'active',     tag:'[20ms loop]',  type:'periodic',    msg:'[next loop] Robot.robotPeriodic() called' },
+    { loop:2, fc:'fc-sched',    cls:'active',     tag:'',             type:'sched',       msg:'CommandScheduler.getInstance().run() called' },
+    { loop:2, fc:'fc-periodic', cls:'active-bad', tag:'periodic()', type:'bad-motor',   msg:'Drive.periodic() → motors set again. Always.' },
+    { fc:'fc-triggers', cls:'active-warn',tag:'[DS event]',   type:'warn',        msg:'Driver station: DISABLE robot requested' },
+    { loop:3, fc:'fc-robot',    cls:'active',     tag:'[20ms loop]',  type:'periodic',    msg:'[next loop] Robot.robotPeriodic() called' },
+    { loop:3, fc:'fc-sched',    cls:'active',     tag:'',             type:'sched',       msg:'CommandScheduler.getInstance().run() called' },
+    { loop:3, fc:'fc-periodic', cls:'active-bad', tag:'periodic()', type:'bad-motor',   msg:'Drive.periodic() → motors still running. Disable does not stop periodic().' },
+    { loop:3, fc:'fc-periodic', cls:'active-bad', tag:'periodic()', type:'bad-motor',   msg:'periodic() is not a command. No requirements. Scheduler cannot touch it.' },
+    { fc:'fc-periodic', cls:'active-bad', tag:'',             type:'summary-bad',  msg:'✗ Motor output in periodic() is invisible to the scheduler. No clean stop possible.' },
+  ],
+conflict: [
+    { loop:1, fc:'fc-robot',    cls:'active',     tag:'[20ms loop]',  type:'periodic',    msg:'Robot.robotPeriodic() called' },
+    { loop:1, fc:'fc-sched',    cls:'active',     tag:'',             type:'sched',       msg:'CommandScheduler.getInstance().run() called' },
+    { loop:1, fc:'fc-periodic', cls:'active',     tag:'periodic()', type:'periodic',    msg:'Drive.periodic() → sensors logged' },
+    { loop:1, fc:'fc-periodic', cls:'active',     tag:'periodic()', type:'periodic',    msg:'Scoop.periodic() → scoop servo angle logged' },
+    { loop:1, fc:'fc-triggers', cls:'active-warn',tag:'triggers',   type:'trigger',     msg:'button B pressed — AutoDriveCommand wants to schedule' },
+    { loop:1, fc:'fc-triggers', cls:'active-warn',tag:'reqs check', type:'conflict',    msg:'CONFLICT: Drive already required by DriveCommand' },
+    { loop:1, fc:'fc-triggers', cls:'active-warn',tag:'checking',   type:'conflict',    msg:'calling DriveCommand.getInterruptionBehavior()...' },
+    { loop:1, fc:'fc-cancel',   cls:'active',     tag:'→ kCancelSelf', type:'cmd-init',   msg:'kCancelSelf (default): DriveCommand.end(interrupted=true)' },
+    { loop:1, fc:'fc-cancel',   cls:'active',     tag:'→ init new',   type:'cmd-init',    msg:'AutoDriveCommand.initialize() → now running' },
+    { loop:1, fc:'fc-exec',     cls:'active',     tag:'execute()',   type:'cmd-exec',    msg:'AutoDriveCommand.execute() → autonomous motor control' },
+    { fc:'fc-triggers', cls:'active-warn',tag:'alt path',   type:'conflict',    msg:'IF DriveCommand had used kCancelIncoming instead:' },
+    { fc:'fc-reject',   cls:'active-warn',tag:'→ kCancelIncoming',type:'warn',    msg:'AutoDriveCommand rejected. DriveCommand keeps running.' },
+    { fc:'fc-exec',     cls:'active',     tag:'execute()',   type:'cmd-exec',    msg:'DriveCommand.execute() continues uninterrupted (hypothetical)' },
+    { fc:'fc-default',  cls:'active',     tag:'',             type:'summary-good', msg:'✓ Conflict resolved by scheduler. No undefined behavior. Framework working.' },
+  ]
+};
 
 /* ── Subsystem Sort widget ────────────────────────────────── */
 let ssSelected = null;

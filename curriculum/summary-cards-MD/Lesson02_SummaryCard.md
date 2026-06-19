@@ -23,7 +23,7 @@ big_idea_italic = "The BearBots project adds AdvantageKit logging and a clean co
 concepts = [
     ("Robot.java",      "Lifecycle manager", "Extends LoggedRobot.\nRuns CommandScheduler.\nCalled every 20ms."),
     ("RobotContainer",  "Wiring hub",        "Subsystems created here.\nButton bindings here.\nIO layer injected here."),
-    ("Constants.java",  "Source of truth",   "public static final double.\nk-prefix names the value.\nInner classes group values."),
+    ("Constants.java",  "Source of truth",   "public static final double.\nk-prefix names the value.\nOne file per subsystem."),
     ("AdvantageKit",    "Logging layer",     "Logger.start() at boot.\nNT4Publisher feeds AScope.\nEvery loop cycle captured."),
     ("Simulator",       "Test bench",        "Simulate before hardware.\nDrag Keyboard 0 -> Joystick[0].\nGraph encoders in AScope."),
 ]
@@ -75,7 +75,7 @@ bot_left_label = "PROGRAM FLOW"
 vocab = [
     ("LoggedRobot",    "AdvantageKit base class, wraps each 20ms loop with data capture"),
     ("RobotContainer", "Where subsystems are created and buttons are wired to commands"),
-    ("Constants.java", "Fixed values using public static final; k-prefix names group by inner class"),
+    ("Constants.java", "Fixed values using public static final; k-prefix names; one file per subsystem"),
     ("git commit",     "Saves a labeled snapshot of code you can return to"),
     ("NT4Publisher",   "Streams AdvantageKit log data to NetworkTables for AdvantageScope"),
 ]
