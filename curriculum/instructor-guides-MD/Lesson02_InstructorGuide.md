@@ -154,7 +154,7 @@ Students use the expandable file cards in the handout to follow along. Each card
 
 - **Job:** number vault. Motor IDs, speeds, PID gains. XRP-Template ships it nearly empty.
 - **Missing:** magic numbers scattered across five files. One wiring change breaks everything.
-- **Key point:** this isn't the only constants file. Real teams split: `TunerConstants`, `FieldConstants`, `ArmConstants`. That's a design decision. BearBots uses inner classes as a middle ground.
+- **Key point:** this isn't the only constants file. Real teams split: `TunerConstants`, `FieldConstants`, `ArmConstants`. BearBots encourages separate files from the start — one file per subsystem (`DriveConstants.java`, `ArmConstants.java`, etc.).
 - **Most likely mistake:** not using it at all.
 
 ### `build.gradle`
@@ -178,7 +178,7 @@ Walk through each diff card in Part 2 of the handout. For each: find the differe
 | 2 | `Robot.java` | Logger setup block added to constructor |
 | 3 | `RobotContainer.java` | IO injection pattern — `new DriveIOXRP()` passed to subsystem |
 | 4 | `RobotContainer.java` | Default command wired up |
-| 5 | `Constants.java` | Inner class structure — `DriveHardware`, etc. |
+| 5 | `Constants.java` | Separate constants files — `DriveConstants.java`, `ArmConstants.java`, etc. |
 | 6 | `build.gradle` | AdvantageKit vendor dependency added |
 
 > **The `LoggedRobot` vs `TimedRobot` question**
@@ -373,7 +373,7 @@ public static final String kProjectName = "BearBots";
 - `static` — belongs to the class, not an instance; no `new Constants()` needed
 - `final` — locked after startup; can never be reassigned
 
-Constants live inside **inner classes** inside `Constants.java`. If the inner class doesn't exist yet, students create it — copy the `public static class` block and give it a new name.
+Each subsystem gets its own constants file. If the file doesn't exist yet, create it — a new `public final class` with the subsystem name (e.g. `ScoopConstants.java`).
 
 > **5th-grade version**
 >
@@ -383,13 +383,13 @@ Constants live inside **inner classes** inside `Constants.java`. If the inner cl
 
 ```java
 // At the top of Drive.java
-import frc.robot.Constants.DriveConstants;
+import frc.robot.DriveConstants;
 
 // Then use it
 xaxisSpeed = MathUtil.clamp(xaxisSpeed, -1.0, 1.0) * DriveConstants.kSpeedLimit;
 ```
 
-No import? Use the fully-qualified name: `Constants.DriveConstants.kSpeedLimit`
+No import? Use the fully-qualified name: `DriveConstants.kSpeedLimit`
 
 > **VS Code quick-fix import**
 >
@@ -428,10 +428,10 @@ Key rules:
 | 2 | Joystick deadband `0.1` | `RobotContainer.java` | `OperatorConstants.kDeadband` |
 | 3 | Max arm angle `120` | `Arm.java setAngle()` | `ArmConstants.kMaxAngleDeg` (change from 180.0 → 120.0) |
 | 4 | Wheel circumference `0.1885` | `DriveConstants.java` | `DriveConstants.kWheelCircumferenceMeters` using `Math.PI * kWheelDiameterMeters` |
-| 5 | Delay times `2.0` and `1.3` | `AutonomousTime.java` | New `AutoConstants` inner class in `Constants.java` |
+| 5 | Delay times `2.0` and `1.3` | `AutonomousTime.java` | New `AutoConstants.java` file in the constants package |
 | 6 | Project name string `"Activity2"` | `Robot.java` | `Constants.kProjectName` |
 
-> **Hunt 5 is the hardest** — two related magic numbers, a new inner class, and multiple call sites. Use as Silver/Gold challenge or skip for struggling students.
+> **Hunt 5 is the hardest** — two related magic numbers, a new constants file, and multiple call sites. Use as Silver/Gold challenge or skip for struggling students.
 
 > **Pro tip from the handout**
 > Build after each hunt. If the reference breaks, students know which change caused it.
