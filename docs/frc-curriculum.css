@@ -401,6 +401,9 @@ code {
   line-height: 1.8;
   color: var(--dark);
   white-space: pre;
+  font-variant-ligatures: none;
+  -webkit-font-feature-settings: "liga" 0, "calt" 0;
+  font-feature-settings: "liga" 0, "calt" 0;
 }
  
 .code-block .kw  { color: var(--blue); font-weight: 500; }

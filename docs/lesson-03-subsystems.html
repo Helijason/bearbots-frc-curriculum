@@ -123,6 +123,7 @@
     .io-followup .code-block pre { font-size: 0.7rem; line-height: 1.4; }
 
     .code-block .cm-add { color: #1a7a4c; font-style: italic; font-weight: 600; }
+    .code-block .line-add { display: inline-block; width: 100%; background: rgba(26, 122, 76, 0.08); border-left: 3px solid #1a7a4c; margin-left: -1.5rem; padding-left: calc(1.5rem - 3px); }
 
     /* Subsystem sort widget (tap-to-sort, same pattern as L02) */
     .ss-widget { margin: 1.2rem 0; }
@@ -248,7 +249,7 @@
         <p class="aside">Deceptively simple. Servo angles are everything.</p>
       </div>
       <div class="info-card">
-        <h4>Arm        </h4>
+        <h4>Arm</h4>
         <p>Rear arm for game piece control. Owns the arm servo.</p>
         <p class="aside">The one mechanism everyone forgets to test first</p>
       </div>
@@ -868,8 +869,8 @@
         <div class="sb-step-body">
           <p><strong>Never create subsystem files by hand.</strong> The tool generates the correct package declaration, imports, and class structure. Getting these wrong causes confusing build errors.</p>
           <div class="hf-box hf-info" style="margin:0.5rem 0;">
-            <span class="hf-label">First, make a folder for Scoop</span>
-            <p>In VS Code Explorer, right-click <code>src/main/java/frc/robot/subsystems/</code> → <em>New Folder</em> → type <code>scoop</code> → Enter. Just like <code>Arm.java</code> lives inside its own <code>arm/</code> folder, <code>Scoop</code> gets its own <code>scoop/</code> folder too, even though right now it's only going to hold one file. You'll add more files here later.</p>
+            <span class="hf-label">First, make a folder for scoop</span>
+            <p>In VS Code Explorer, right-click <code>src/main/java/frc/robot/subsystems/</code> → <em>New Folder</em> → type <code>scoop</code> → Enter. Just like <code>Arm.java</code> lives inside its own <code>arm/</code> folder, <code>Scoop.java</code> gets its own <code>scoop/</code> folder too, even though right now it's only going to hold one file. You'll add more files here later.</p>
           </div>
           <div class="hf-box hf-info" style="margin:0.5rem 0;">
             <span class="hf-label">Then, create the class inside that folder</span>
@@ -885,13 +886,13 @@
 <span class="kw">public class</span> Scoop <span class="kw">extends</span> SubsystemBase {
     <span class="cm-add">/** Creates a new scoop. */</span>
     <span class="kw">public</span> Scoop() {
-        <span class="cm-add">// Constructor - runs once at startup</span>
+<span class="line-add">        <span class="cm-add">// Constructor - runs once at startup</span></span>
     }
 
     <span class="kw">@Override</span>
     <span class="kw">public void</span> periodic() {
-        <span class="cm-add">// Called every 20ms (50Hz)</span>
-        <span class="cm-add">// Sensors and logging only - no motor control</span>
+<span class="line-add">        <span class="cm-add">// Called every 20ms (50Hz)</span></span>
+<span class="line-add">        <span class="cm-add">// Sensors and logging only - no motor control</span></span>
     }
 }</pre></div>
           <div class="code-annotation">Build now: <code>Ctrl+Shift+P</code> → <em>WPILib: Build Robot Code</em>. Should compile with no errors. If it doesn't, check the package declaration matches your folder.</div>
@@ -908,16 +909,16 @@
         <div class="sb-step-body">
           <p>The scoop is driven by an XRP servo on port 4. Add it as a private field - nothing outside this class should access the servo directly.</p>
           <div class="code-block"><pre>
-<span class="kw">package</span> frc.robot.subsystems;
+<span class="kw">package</span> frc.robot.subsystems.scoop;
 
 <span class="kw">import</span> edu.wpi.first.wpilibj2.command.SubsystemBase;
-<span class="kw">import</span> edu.wpi.first.wpilibj.xrp.XRPServo;  <span class="cm-add">// ← add this import</span>
+<span class="line-add"><span class="kw">import</span> edu.wpi.first.wpilibj.xrp.XRPServo;  <span class="cm-add">// ← add this import</span></span>
 
 <span class="kw">public class</span> Scoop <span class="kw">extends</span> SubsystemBase {
-  <span class="cm-add">/** Creates a new scoop. */</span>
-    <span class="kw">private final</span> XRPServo scoopServo = <span class="kw">new</span> XRPServo(<span class="num">4</span>); <span class="cm-add">// ← add this field</span>
+<span class="line-add">    <span class="kw">private final</span> XRPServo scoopServo = <span class="kw">new</span> XRPServo(<span class="num">4</span>); <span class="cm-add">// ← add this field</span></span>
 
-        <span class="kw">public</span> Scoop() {
+    <span class="cm-add">/** Creates a new scoop. */</span>
+    <span class="kw">public</span> Scoop() {
         <span class="cm-add">// Constructor - runs once at startup</span>
     }
 
@@ -945,19 +946,33 @@
         <div class="sb-step-body">
           <p>Instead of using raw angles like <code>setAngle(45.0)</code> scattered through your code, define named positions. An <code>enum</code> is perfect - it limits the legal values to exactly the ones you define.</p>
           <div class="code-block"><pre>
+<span class="kw">package</span> frc.robot.subsystems.scoop;
+
+<span class="kw">import</span> edu.wpi.first.wpilibj2.command.SubsystemBase;
+<span class="kw">import</span> edu.wpi.first.wpilibj.xrp.XRPServo;
+
 <span class="kw">public class</span> Scoop <span class="kw">extends</span> SubsystemBase {
 
-    <span class="cm">// Named positions - no magic numbers in commands</span>
+<span class="line-add">    <span class="cm-add">// ← add this enum - named positions, no magic numbers in commands</span>
     <span class="kw">public enum</span> Goal {
-        FLAT,   <span class="cm">// servo at 0° - resting position</span>
-        CARRY,  <span class="cm">// servo at 45° - holding game piece</span>
-        DUMP    <span class="cm">// servo at 90° - releasing game piece</span>
-    }
+        FLAT,   <span class="cm-add">// servo at 0° - resting position</span>
+        CARRY,  <span class="cm-add">// servo at 45° - holding game piece</span>
+        DUMP    <span class="cm-add">// servo at 90° - releasing game piece</span>
+    }</span>
 
     <span class="kw">private final</span> XRPServo scoopServo = <span class="kw">new</span> XRPServo(<span class="num">4</span>);
-    <span class="kw">private</span> Goal goal = Goal.FLAT; <span class="cm">// start flat</span>
+<span class="line-add">    <span class="kw">private</span> Goal goal = Goal.FLAT; <span class="cm-add">// ← add this field - start flat</span></span>
 
-    <span class="cm">// ... rest of class</span>
+    <span class="cm-add">/** Creates a new scoop. */</span>
+    <span class="kw">public</span> Scoop() {
+        <span class="cm-add">// Constructor - runs once at startup</span>
+    }
+
+    <span class="kw">@Override</span>
+    <span class="kw">public void</span> periodic() {
+        <span class="cm-add">// Called every 20ms (50Hz)</span>
+        <span class="cm-add">// Sensors and logging only - no motor control</span>
+    }
 }</pre></div>
           <div class="code-annotation">Now a command says <code>setGoal(Goal.DUMP)</code> instead of <code>setAngle(90.0)</code>. Readable, safe, and you can't accidentally pass an invalid angle.</div>
         </div>
@@ -973,13 +988,16 @@
         <div class="sb-step-body">
           <p><code>@AutoLogOutput</code> is an AdvantageKit annotation. Put it above a field and AdvantageKit automatically records that field to the log every loop cycle - no <code>Logger.recordOutput()</code> call needed. One annotation, instant visibility.</p>
           <div class="code-block"><pre>
-<span class="kw">import</span> org.littletonrobotics.junction.AutoLogOutput;  <span class="cm">// ← add import</span>
+import edu.wpi.first.wpilibj.xrp.XRPServo;
+<span class="line-add"><span class="kw">import</span> org.littletonrobotics.junction.AutoLogOutput;  <span class="cm-add">// ← add this import</span></span>
 
-<span class="cm">// In the class body:</span>
-<span class="kw">@AutoLogOutput</span>
+<span class="cm-add">/** Creates a new scoop. */</span>
+private final XRPServo scoopServo = new XRPServo(4);
+<span class="line-add"><span class="kw">@AutoLogOutput</span>  <span class="cm-add">// ← add this annotation</span></span>
 <span class="kw">private</span> Goal goal = Goal.FLAT;</pre></div>
-          <div class="code-annotation">After building and simulating, look for <code>Scoop/Goal</code> in the AdvantageScope log tree. It'll show FLAT, CARRY, or DUMP in real time.</div>
+          <div class="code-annotation">After building and simulating, look for <code>RealOutputs/Scoop/Goal</code> in the AdvantageScope log tree. It'll show FLAT, CARRY, or DUMP in real time.</div>
           <div class="hf-box hf-sidebar" style="margin-top:0.6rem;">
+
             <span class="hf-label">@AutoLogOutput vs Logger.recordOutput()</span>
             <p><code>@AutoLogOutput</code> works on fields - it logs the field's value every loop cycle automatically. <code>Logger.recordOutput()</code> is a manual call you write in code - useful for computed values or one-off outputs. Use <code>@AutoLogOutput</code> whenever possible; it's less code and harder to forget.</p>
           </div>
@@ -996,21 +1014,32 @@
         <div class="sb-step-body">
           <p>Add two methods: a simple setter, and a factory method that wraps it in a command. Commands are how the outside world controls the subsystem.</p>
           <div class="code-block"><pre>
-<span class="cm">// Simple setter - changes the goal field</span>
-<span class="kw">public void</span> setGoal(Goal newGoal) {
-    goal = newGoal;
-}
+    <span class="cm">/** Creates a new scoop. */</span>
+    <span class="kw">public</span> Scoop() {
+        <span class="cm">// Constructor - runs once at startup</span>
+    }
 
-<span class="cm">// Returns a command that sets the goal once, then ends</span>
-<span class="cm">// runOnce() = run the lambda once, then the command is done</span>
-<span class="kw">public</span> Command setGoalCommand(Goal newGoal) {
-    <span class="kw">return</span> runOnce(() -> setGoal(newGoal));
-}
+<span class="line-add">    <span class="cm-add">// ← add this method - simple setter, changes the goal field</span>
+    <span class="kw">public void</span> setGoal(Goal newGoal) {
+        goal = newGoal;
+    }</span>
 
-<span class="cm">// Safe state - called when a command is interrupted</span>
-<span class="kw">public void</span> stop() {
-    setGoal(Goal.FLAT);  <span class="cm">// return to resting position</span>
-}</pre></div>
+<span class="line-add">    <span class="cm-add">// ← add this method - returns a command that sets the goal once, then ends</span>
+    <span class="cm-add">// runOnce() = run the lambda once, then the command is done</span>
+    <span class="kw">public</span> Command setGoalCommand(Goal newGoal) {
+        <span class="kw">return</span> runOnce(() -> setGoal(newGoal));
+    }</span>
+
+<span class="line-add">    <span class="cm-add">// ← add this method - safe state, called when a command is interrupted</span>
+    <span class="kw">public void</span> stop() {
+        setGoal(Goal.FLAT);  <span class="cm-add">// return to resting position</span>
+    }</span>
+
+    <span class="kw">@Override</span>
+    <span class="kw">public void</span> periodic() {
+        <span class="cm">// Called every 20ms (50Hz)</span>
+        <span class="cm">// Sensors and logging only - no motor control</span>
+    }</pre></div>
           <div class="code-annotation"><code>runOnce()</code> is a WPILib helper available inside SubsystemBase. It creates a command that automatically requires this subsystem, runs the lambda once, then ends. You don't need to call <code>addRequirements(this)</code> manually.</div>
         </div>
       </div>
@@ -1031,18 +1060,18 @@
           <div class="code-block"><pre>
 <span class="kw">@Override</span>
 <span class="kw">public void</span> periodic() {
-    <span class="cm">// Apply current goal to servo</span>
+<span class="line-add">    <span class="cm-add">// ← add this switch - apply current goal to servo</span>
     <span class="kw">switch</span> (goal) {
         <span class="kw">case</span> FLAT  -> scoopServo.setAngle(<span class="num">0.0</span>);
         <span class="kw">case</span> CARRY -> scoopServo.setAngle(<span class="num">45.0</span>);
         <span class="kw">case</span> DUMP  -> scoopServo.setAngle(<span class="num">90.0</span>);
-    }
+    }</span>
 }</pre></div>
           <div class="code-annotation">Angle values are placeholders - tune them on the real robot. The structure is correct.</div>
         </div>
       </div>
 
-      <!-- Step 7 -->
+<!-- Step 7 -->
       <div class="sb-step" id="sbstep-7">
         <div class="sb-step-header" onclick="sbToggle('sbstep-7')">
           <div class="sb-step-num">7</div>
@@ -1052,39 +1081,67 @@
         <div class="sb-step-body">
           <p>The subsystem exists on disk but doesn't exist at runtime yet. Instantiate it in <code>RobotContainer</code> and wire a button to test it.</p>
           <div class="code-block"><pre>
+<span class="line-add"><span class="kw">import</span> frc.robot.subsystems.scoop.Scoop;  <span class="cm-add">// ← add this import</span></span>
+
 <span class="kw">public class</span> RobotContainer {
 
     <span class="cm">// Subsystems - declared then assigned in constructor (IO pattern)</span>
     <span class="kw">private final</span> Drive drive;
     <span class="kw">private final</span> Arm arm;
-    <span class="kw">private final</span> Scoop scoop;  <span class="cm">// ← add this declaration</span>
+<span class="line-add">    <span class="kw">private final</span> Scoop scoop;  <span class="cm-add">// ← add this declaration</span></span>
 
     <span class="kw">public</span> RobotContainer() {
         <span class="kw">switch</span> (Constants.currentMode) {
             <span class="kw">case</span> REAL:
                 drive = <span class="kw">new</span> Drive(<span class="kw">new</span> DriveIOXRP());
                 arm   = <span class="kw">new</span> Arm(<span class="kw">new</span> ArmIOXRP());
-                scoop = <span class="kw">new</span> Scoop(<span class="kw">new</span> ScoopIOXRP());  <span class="cm">// ← add (Lesson 04)</span>
                 <span class="kw">break</span>;
             <span class="kw">case</span> SIM:
                 drive = <span class="kw">new</span> Drive(<span class="kw">new</span> DriveIOSim());
                 arm   = <span class="kw">new</span> Arm(<span class="kw">new</span> ArmIOSim());
-                scoop = <span class="kw">new</span> Scoop(<span class="kw">new</span> ScoopIOSim());   <span class="cm">// ← add (Lesson 04)</span>
                 <span class="kw">break</span>;
             <span class="kw">default</span>:  <span class="cm">// log replay</span>
                 drive = <span class="kw">new</span> Drive(<span class="kw">new</span> DriveIO() {});
                 arm   = <span class="kw">new</span> Arm(<span class="kw">new</span> ArmIO() {});
-                scoop = <span class="kw">new</span> Scoop(<span class="kw">new</span> ScoopIO() {});   <span class="cm">// ← add (Lesson 04)</span>
                 <span class="kw">break</span>;
         }
+<span class="line-add">        scoop = <span class="kw">new</span> Scoop();  <span class="cm-add">// ← add this - no IO yet, same in every mode (Lesson 04 changes this)</span></span>
         configureButtonBindings();
         configureAutonomous();
     }
 
     <span class="kw">private void</span> configureButtonBindings() {
-        controller.a().onTrue(scoop.setGoalCommand(Scoop.Goal.CARRY));
-        controller.b().onTrue(scoop.setGoalCommand(Scoop.Goal.DUMP));
-        controller.x().onTrue(scoop.setGoalCommand(Scoop.Goal.FLAT));
+        <span class="cm">// Default command: arcade drive with left stick.</span>
+        <span class="cm">// Axis 1 (left stick Y) is negated - joystick forward = negative value.</span>
+        drive.setDefaultCommand(
+            <span class="kw">new</span> ArcadeDrive(
+                drive,
+                () -> -controller.getRawAxis(kForwardAxis),
+                () -> -controller.getRawAxis(kRotationAxis)));
+
+        <span class="cm">// Onboard user button - prints to console.</span>
+        Trigger userButton = <span class="kw">new</span> Trigger(onboardIO::getUserButtonPressed);
+        userButton
+            .onTrue(<span class="kw">new</span> PrintCommand(<span class="str">"USER Button Pressed"</span>))
+            .onFalse(<span class="kw">new</span> PrintCommand(<span class="str">"USER Button Released"</span>));
+
+        <span class="cm">// A button - arm low position.</span>
+        <span class="kw">new</span> JoystickButton(controller, XboxController.Button.kA.value)
+            .onTrue(Commands.runOnce(() -> arm.setAngle(ArmConstants.kLowAngleDeg), arm))
+            .onFalse(Commands.runOnce(() -> arm.stop(), arm));
+
+        <span class="cm">// B button - arm high position, stow on release.</span>
+        <span class="kw">new</span> JoystickButton(controller, XboxController.Button.kB.value)
+            .onTrue(Commands.runOnce(() -> arm.setAngle(ArmConstants.kHighAngleDeg), arm))
+            .onFalse(Commands.runOnce(() -> arm.stop(), arm));
+
+<span class="line-add">        <span class="cm-add">// ← add this - D-pad controls the scoop</span>
+        <span class="kw">new</span> POVButton(controller, <span class="num">90</span>)  <span class="cm-add">// 6</span>
+            .onTrue(scoop.setGoalCommand(Scoop.Goal.FLAT));
+        <span class="kw">new</span> POVButton(controller, <span class="num">0</span>)   <span class="cm-add">// 8</span>
+            .onTrue(scoop.setGoalCommand(Scoop.Goal.CARRY));
+        <span class="kw">new</span> POVButton(controller, <span class="num">180</span>) <span class="cm-add">// 2</span>
+            .onTrue(scoop.setGoalCommand(Scoop.Goal.DUMP));</span>
     }
 }</pre></div>
         </div>
@@ -1106,7 +1163,7 @@
             <p><strong>4.</strong> Open AdvantageScope → File → Connect to Simulator</p>
             <p><strong>5.</strong> Robot State panel → <em>Teleoperated</em> → <em>Enable</em></p>
             <p><strong>6.</strong> In AdvantageScope left panel, look for <code>Scoop/</code> folder</p>
-            <p><strong>7.</strong> Press A/B/X on keyboard - watch <code>Scoop/Goal</code> change between FLAT, CARRY, DUMP</p>
+            <p><strong>7.</strong> Press 8/2/0 on keyboard - watch <code>Scoop/Goal</code> change between FLAT, CARRY, DUMP</p>
           </div>
           <p>If the folder doesn't appear: check that <code>scoop</code> is declared and assigned in <code>RobotContainer</code> and the build succeeded.</p>
         </div>
@@ -1131,7 +1188,7 @@
 
     <div class="hf-box hf-info" style="margin:0.75rem 0;">
       <span class="hf-label">How to open the snippet editor</span>
-      <p><code>Ctrl+Shift+P</code> → <em>Snippets: Configure User Snippets</em> → select <em>java.json</em> (or <em>New Global Snippets file</em> if Java isn't listed)</p>
+      <p><code>Ctrl+Shift+P</code> → <em>Snippets: Configure Snippets</em> → select <em>java.json</em> (or <em>New Global Snippets file</em> if Java isn't listed)</p>
     </div>
 
     <p>Add this to your <span class="file-badge">java.json</span>:</p>
@@ -1355,16 +1412,27 @@
         <ul class="task-list">
           <li>Build succeeds with zero errors</li>
           <li>Simulate - <code>Scoop/</code> folder appears in AdvantageScope</li>
-          <li>Press button A - <code>Goal</code> changes to CARRY in AdvantageScope</li>
-          <li>Press button B - <code>Goal</code> changes to DUMP</li>
-          <li>Press button X - <code>Goal</code> returns to FLAT</li>
+<li>Press D-pad up (8) - <code>Goal</code> changes to CARRY in AdvantageScope</li>
+          <li>Press D-pad down (2) - <code>Goal</code> changes to DUMP</li>
+          <li>Press D-pad right (6) - <code>Goal</code> returns to FLAT</li>
           <li>Add a <code>System.out.println("Scoop goal: " + goal)</code> inside <code>periodic()</code>. Does it print 50 times per second?</li>
         </ul>
         <div class="toggle-row">
           <button class="toggle-btn" data-target="b3-hint" data-open="Show hint" data-closed="Hide hint">Show hint</button>
         </div>
         <div class="toggle-content hint" id="b3-hint">
-          If <code>Scoop/</code> doesn't appear: check that <code>scoop</code> is declared and assigned in <code>RobotContainer</code> (not just the class file existing). The object has to actually be created. If the goal isn't changing: check your button binding in <code>configureButtonBindings()</code> and make sure the sim is enabled in Teleop mode.
+          If <code>Scoop/</code> doesn't appear: check that <code>scoop</code> is declared and assigned in <code>RobotContainer</code> (not just the class file existing). The object has to actually be created. If the goal isn't changing: check your button binding in <code>configureButtonBindings()</code> and make sure the sim is enabled in Teleop mode. Want a faster way to check without AdvantageScope open? Add a print statement to <code>periodic()</code> that only fires on change:
+          <div class="code-block"><pre>private Goal lastGoal = null;
+
+@Override
+public void periodic() {
+    if (goal != lastGoal) {
+        System.out.println("Scoop goal: " + goal);
+        lastGoal = goal;
+    }
+    <span class="cm-add">// ... rest of periodic</span>
+}</pre></div>
+          This prints one line per button press instead of flooding the console at 50Hz. Output shows up in the VS Code terminal you used to launch <em>WPILib: Simulate Robot Code</em>.
         </div>
       </div>
 
@@ -1459,9 +1527,9 @@
       </div>
 
       <div class="code-lab">
-        <div class="code-lab-line"><span class="line-num">1</span><span class="line-code"><span class="kw">public class</span> Drive <span class="kw">extends</span> SubsystemBase {</span></div>
-        <div class="code-lab-line"><span class="line-num">2</span><span class="line-code">&nbsp;&nbsp;<span class="kw">private final</span> XRPMotor leftMotor = <span class="kw">new</span> XRPMotor(<span class="num">0</span>);</span></div>
-        <div class="code-lab-line"><span class="line-num">3</span><span class="line-code">&nbsp;&nbsp;<span class="kw">private final</span> XRPMotor rightMotor = <span class="kw">new</span> XRPMotor(<span class="num">1</span>);</span></div>
+        <div class="code-lab-line"><span class="line-num">1</span><span class="line-code"><span class="kw">public class</span> Scoop <span class="kw">extends</span> SubsystemBase {</span></div>
+        <div class="code-lab-line"><span class="line-num">2</span><span class="line-code">&nbsp;&nbsp;<span class="kw">private final</span> XRPMotor leftMotor = <span class="kw">new</span> XRPMotor(DriveConstants.kLeftMotorPort);</span></div>
+        <div class="code-lab-line"><span class="line-num">3</span><span class="line-code">&nbsp;&nbsp;<span class="kw">private final</span> XRPMotor rightMotor = <span class="kw">new</span> XRPMotor(DriveConstants.kRightMotorPort);</span></div>
         <div class="code-lab-line bug-line" data-bug="1"><span class="line-num">4</span><span class="line-code">&nbsp;&nbsp;<span class="kw">private final</span> XRPServo scoopServo = <span class="kw">new</span> XRPServo(<span class="num">4</span>);&nbsp;&nbsp;<span class="cm">// convenient!</span></span></div>
         <div class="code-lab-line"><span class="line-num">5</span><span class="line-code">&nbsp;</span></div>
         <div class="code-lab-line"><span class="line-num">6</span><span class="line-code">&nbsp;&nbsp;<span class="kw">@Override</span></span></div>
@@ -1726,7 +1794,7 @@ bad: [
     { fc:'fc-triggers', cls:'active-warn',tag:'[DS event]',   type:'warn',        msg:'Driver station: DISABLE robot requested' },
     { loop:3, fc:'fc-robot',    cls:'active',     tag:'[20ms loop]',  type:'periodic',    msg:'[next loop] Robot.robotPeriodic() called' },
     { loop:3, fc:'fc-sched',    cls:'active',     tag:'',             type:'sched',       msg:'CommandScheduler.getInstance().run() called' },
-    { loop:3, fc:'fc-periodic', cls:'active-bad', tag:'periodic()', type:'bad-motor',   msg:'Drive.periodic() → motors still running. Disable does not stop periodic().' },
+    { loop:3, fc:'fc-periodic', cls:'active-bad', tag:'periodic()', type:'bad-motor',   msg:'Drive.periodic() still calls leftMotor.set(speed) every loop, enabled or not.' },
     { loop:3, fc:'fc-periodic', cls:'active-bad', tag:'periodic()', type:'bad-motor',   msg:'periodic() is not a command. No requirements. Scheduler cannot touch it.' },
     { fc:'fc-periodic', cls:'active-bad', tag:'',             type:'summary-bad',  msg:'✗ Motor output in periodic() is invisible to the scheduler. No clean stop possible.' },
   ],
