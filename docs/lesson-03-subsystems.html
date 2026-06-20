@@ -14,7 +14,7 @@
     .sched-body { display: grid; grid-template-columns: 1fr 260px; align-items: stretch; height: 26rem; }
     @media (max-width: 720px) { .sched-body { grid-template-columns: 1fr; height: auto; } }
     .sched-terminal { background: #000; min-height: 0; height: 100%; overflow-y: auto; padding: 0.5rem 0.75rem; font-family: Consolas, 'Courier New', monospace; font-size: 0.78rem; line-height: 1.65; border-right: 1px solid #333; }
-    .sched-flowchart { background: #111; padding: 0.6rem 0.4rem; display: flex; flex-direction: column; align-items: center; gap: 0; min-height: 0; height: 100%; overflow-y: auto; }
+    .sched-flowchart { background: #111; padding: 2.5rem 0.4rem; display: flex; flex-direction: column; align-items: center; gap: 0; min-height: 0; height: 100%; overflow-y: auto; }
     .t-line { display: flex; gap: 0.5rem; animation: tFade 0.1s ease; }
     @keyframes tFade { from { opacity:0; } to { opacity:1; } }
     .t-line.divider { border-top: 1px solid #333; margin: 0.3rem 0; }
@@ -71,8 +71,9 @@
     .diff-pane { display: none; }
     .diff-pane.active { display: block; }
     .diff-pane .code-block { margin-top: 0; border-top-left-radius: 0; }
-    .diff-pane.bad-pane .code-block  { border: 1px solid var(--red-border); }
-    .diff-pane.good-pane .code-block { border: 1px solid var(--teal-border); }
+    .diff-pane .code-block pre { font-size: 0.7rem; line-height: 1.4; }
+    .diff-pane.bad-pane .code-block  { border: 1px solid var(--red-border); background: var(--red-light); }
+    .diff-pane.good-pane .code-block { border: 1px solid var(--teal-border); background: var(--teal-light); }
 
     /* Annotated code accordion */
     .ann-block { margin: 1rem 0; border: 1px solid var(--code-border); border-radius: var(--radius-lg); overflow: hidden; }
@@ -87,9 +88,9 @@
     .ann-note code { background: rgba(29,106,114,0.12); padding: 0.1rem 0.3rem; border-radius: 3px; font-family: var(--font-mono); }
     .ann-separator { height: 1px; background: var(--code-border); }
     .ann-group-label { cursor: pointer; user-select: none; }
-    .ann-group-label::before { content: '▸'; font-size: 0.7em; color: var(--muted); margin-right: 0.5em; display: inline-block; transition: transform 0.12s; }
+    .ann-group-label::before { content: '▸'; font-size: 1.4em; color: var(--muted); margin-right: 0.5em; display: inline-block; transition: transform 0.12s; }
     .ann-group-label.open::before { content: '▾'; }
-    .ann-group-desc { display: none; font-size: 0.75rem; color: var(--dark); padding: 0.4rem 0.75rem; background: #fff; border-bottom: 1px solid var(--code-border); font-style: italic; }
+    .ann-group-desc { display: none; font-size: 0.75rem; color: var(--dark); padding: 0.4rem 0.75rem; background: #EAF1F8; border-bottom: 1px solid var(--code-border); font-style: italic; }
     .ann-group-desc.open { display: block; }
 
     /* Step builder */
@@ -108,12 +109,20 @@
     /* IO side-by-side */
     .io-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin: 1rem 0; }
     @media (max-width: 700px) { .io-compare { grid-template-columns: 1fr; } }
-    .io-pane { border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--code-border); }
+    .io-pane { border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--code-border); display: flex; flex-direction: column; }
     .io-pane-label { padding: 0.4rem 0.75rem; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
     .io-pane.subsystem .io-pane-label { background: var(--teal); color: var(--white); }
     .io-pane.interface .io-pane-label { background: var(--purple); color: var(--white); }
     .io-pane.impl .io-pane-label { background: var(--amber); color: var(--white); }
-    .io-pane .code-block { margin: 0; border-radius: 0; border: none; border-top: 1px solid var(--code-border); }
+    .io-pane .code-block { margin: 0; border-radius: 0; border: none; border-top: 1px solid var(--code-border); flex: 1; background: #EAF1F8; }
+    .io-pane .code-block pre { font-size: 0.7rem; line-height: 1.4; }
+    #section-build .code-block pre { font-size: 0.7rem; line-height: 1.4; }
+
+    /* IO followup */
+    .io-followup .code-block { background: #EAF1F8; }
+    .io-followup .code-block pre { font-size: 0.7rem; line-height: 1.4; }
+
+    .code-block .cm-add { color: #1a7a4c; font-style: italic; font-weight: 600; }
 
     /* Subsystem sort widget (tap-to-sort, same pattern as L02) */
     .ss-widget { margin: 1.2rem 0; }
@@ -195,17 +204,17 @@
   </div>
 
   <nav class="section-nav">
-    <button class="section-nav-btn active" data-section="concept">Part 1 — The Concept</button>
-    <button class="section-nav-btn" data-section="arm">Part 2 — Reading a Real Subsystem</button>
-    <button class="section-nav-btn" data-section="build">Part 3 — Build Scoop</button>
-    <button class="section-nav-btn" data-section="io">Part 4 — The IO Pattern</button>
-    <button class="section-nav-btn" data-section="challenge">Part 5 — Try It Yourself</button>
-    <button class="section-nav-btn" data-section="lab">Part 6 — Broken Robot Lab</button>
+    <button class="section-nav-btn active" data-section="concept">Part 1 - The Concept</button>
+    <button class="section-nav-btn" data-section="arm">Part 2 - Reading a Real Subsystem</button>
+    <button class="section-nav-btn" data-section="io">Part 3 - The IO Pattern</button>
+    <button class="section-nav-btn" data-section="build">Part 4 - Build Scoop</button>
+    <button class="section-nav-btn" data-section="challenge">Part 5 - Try It Yourself</button>
+    <button class="section-nav-btn" data-section="lab">Part 6 - Broken Robot Lab</button>
   </nav>
 
 
   <!-- ═══════════════════════════════════════════════════════
-       PART 1 — THE CONCEPT
+       PART 1 - THE CONCEPT
        ═══════════════════════════════════════════════════════ -->
   <div class="lesson-section active" id="section-concept">
 
@@ -215,7 +224,7 @@
     <div class="hf-box hf-brain">
       <span class="hf-label">Your brain is probably thinking this right now</span>
       <p>"That sounds like a people problem, not a code problem. Can't everyone just be careful?"</p>
-      <p>They can try. They will fail. Code structure isn't about discipline — it's about making the right thing easy and the wrong thing hard. Subsystems make it structurally impossible to accidentally edit the elevator while you're debugging the scoop.</p>
+      <p>They can try. They will fail. Code structure isn't about discipline - it's about making the right thing easy and the wrong thing hard. Subsystems make it structurally impossible to accidentally edit the elevator while you're debugging the scoop.</p>
     </div>
 
     <h2>The cafeteria analogy</h2>
@@ -248,53 +257,51 @@
     <h2>Three reasons the structure earns its complexity</h2>
 
     <div class="hf-box hf-info">
-      <span class="hf-label">Reason 1 — One job, one place</span>
+      <span class="hf-label">Reason 1 - One job, one place</span>
       <p>If the scoop is broken, you look in one file. Not everywhere. When you're debugging at 2am before competition, "one file" feels like a gift from the universe.</p>
     </div>
     <div class="hf-box hf-info">
-      <span class="hf-label">Reason 2 — Teammates can work in parallel</span>
-      <p>Two people editing the same file is a merge conflict waiting to ruin someone's day. With subsystems, one programmer works on the elevator while another works on the drivetrain — different files, no conflict.</p>
+      <span class="hf-label">Reason 2 - Teammates can work in parallel</span>
+      <p>Two people editing the same file is a merge conflict waiting to ruin someone's day. With subsystems, one programmer works on the elevator while another works on the drivetrain - different files, no conflict.</p>
     </div>
     <div class="hf-box hf-info">
-      <span class="hf-label">Reason 3 — WPILib enforces it</span>
+      <span class="hf-label">Reason 3 - WPILib enforces it</span>
       <p>The CommandScheduler prevents two commands from using the same subsystem at the same time. If one command is driving, it won't let another command accidentally also try to drive. This prevents the robot from doing contradictory things simultaneously. It has better conflict resolution than most group projects.</p>
     </div>
 
     <h2>What's inside a subsystem?</h2>
-    <p>A subsystem is a Java class that extends <code>SubsystemBase</code>. Here's the anatomy — every subsystem has the same four parts:</p>
+    <p>A subsystem is a Java class that extends <code>SubsystemBase</code>. Here's the anatomy - every subsystem has the same four parts:</p>
 
     <div class="info-grid">
       <div class="info-card">
-        <h4>1 — Fields</h4>
-        <p>Hardware objects (motors, servos, encoders), goal state, current state. Declared at the top of the class. Private — nothing outside the subsystem touches them directly.</p>
+        <h4>1 - Fields</h4>
+        <p>Hardware objects (motors, servos, encoders), goal state, current state. Declared at the top of the class. Private - nothing outside the subsystem touches them directly.</p>
         <p class="aside">The subsystem's private possessions</p>
       </div>
       <div class="info-card">
-        <h4>2 — Constructor</h4>
+        <h4>2 - Constructor</h4>
         <p>Runs once when the robot starts. Configure hardware, set initial state, register with the scheduler. This is where motors get inverted, encoders get reset, and ports get assigned.</p>
         <p class="aside">Robot startup checklist</p>
       </div>
       <div class="info-card">
-        <h4>3 — periodic()</h4>
+        <h4>3 - periodic()</h4>
         <p>Runs every 20ms, forever. Read sensors, log data, update internal state. <strong>No motor control here.</strong> Motor control goes in commands.</p>
         <p class="aside">The heartbeat. Every loop. Always.</p>
       </div>
       <div class="info-card">
-        <h4>4 — Methods &amp; Commands</h4>
+        <h4>4 - Methods &amp; Commands</h4>
         <p>Public methods that expose what the subsystem can do. Often return <code>Command</code> objects that callers can schedule. This is the subsystem's public API.</p>
         <p class="aside">What the rest of the robot is allowed to ask for</p>
       </div>
     </div>
 
     <h2>Why periodic() cannot control motors</h2>
-    <p>This is the rule students break most often. The answer isn't just "because the mentor said so" — there's a structural reason rooted in how the CommandScheduler works.</p>
-
-    <p>The CommandScheduler is the engine that runs your robot's commands. Each 20ms loop it follows a precise sequence (documented at <a href="https://docs.wpilib.org/en/stable/docs/software/commandbased/command-scheduler.html" target="_blank" rel="noopener">docs.wpilib.org</a>): it calls every subsystem's <code>periodic()</code> first, then polls triggers and buttons, then runs active commands. The key insight: <strong><code>periodic()</code> runs unconditionally — the scheduler calls it at step&nbsp;1 every loop and has no way to skip, delay, or interrupt it.</strong> Commands are what the scheduler can start, stop, interrupt, and coordinate.</p>
+    <p>The CommandScheduler is the engine that runs your robot's commands - this is true on every command-based WPILib robot, XRP or full FRC competition bot, not just this lesson's example. Each 20ms loop it follows a precise sequence (documented at <a href="https://docs.wpilib.org/en/stable/docs/software/commandbased/command-scheduler.html" target="_blank" rel="noopener">docs.wpilib.org</a>): it calls every subsystem's <code>periodic()</code> first, then polls triggers and buttons, then runs active commands. The key insight: <strong><code>periodic()</code> runs unconditionally - the scheduler calls it at step&nbsp;1 every loop and has no way to skip, delay, or interrupt it.</strong> Commands are what the scheduler can start, stop, interrupt, and coordinate. Try it below - step through three scenarios and watch exactly what the scheduler does each loop.</p>
 
     <p>If you put motor output in <code>periodic()</code>, you've placed it outside the scheduler's reach. A command can't override it. A disable can't stop it cleanly. Two things can try to drive the motor with no coordination. The simulator below shows what the scheduler actually sees in three scenarios.</p>
 
     <div class="sched-widget">
-      <div class="sched-titlebar">CommandScheduler — Robot Loop Simulator</div>
+      <div class="sched-titlebar">CommandScheduler - Robot Loop Simulator</div>
       <div class="sched-body">
         <div class="sched-terminal" id="sched-term"></div>
         <div class="sched-flowchart" id="sched-fc">
@@ -302,7 +309,7 @@
           <div class="fc-arrow">▼</div>
           <div class="fc-node" id="fc-sched">CommandScheduler.run()</div>
           <div class="fc-arrow">▼</div>
-          <div class="fc-node" id="fc-periodic">1 periodic() — all subsystems</div>
+          <div class="fc-node" id="fc-periodic">1 periodic() - all subsystems</div>
           <div class="fc-arrow">▼</div>
           <div class="fc-node" id="fc-triggers">2 poll triggers → schedule</div>
           <div class="fc-arrow">▼</div>
@@ -314,17 +321,17 @@
           <div class="fc-node" id="fc-exec">3 execute() → end finished</div>
           <div class="fc-arrow">▼</div>
           <div class="fc-node" id="fc-default">4 schedule default cmds</div>
-          <div class="fc-source"><a href="https://docs.wpilib.org/en/stable/docs/software/commandbased/command-scheduler.html" target="_blank" rel="noopener">docs.wpilib.org — Command Scheduler</a></div>
+          <div class="fc-source"><a href="https://docs.wpilib.org/en/stable/docs/software/commandbased/command-scheduler.html" target="_blank" rel="noopener">docs.wpilib.org - Command Scheduler</a></div>
         </div>
       </div>
       <div class="sched-controls">
-        <button class="sc-btn good"     onclick="schedPlay('good')">▶ Good — motor in command</button>
-        <button class="sc-btn bad"      onclick="schedPlay('bad')">▶ Bad — motor in periodic()</button>
-        <button class="sc-btn conflict" onclick="schedPlay('conflict')">▶ Conflict — two commands</button>
+        <button class="sc-btn good"     onclick="schedPlay('good')">▶ Good - motor in command</button>
+        <button class="sc-btn bad"      onclick="schedPlay('bad')">▶ Bad - motor in periodic()</button>
+        <button class="sc-btn conflict" onclick="schedPlay('conflict')">▶ Conflict - two commands</button>
         <button class="sc-btn reset"    onclick="schedReset()">↺ Clear</button>
         <div class="sc-nav">
           <button class="sc-btn nav" id="sc-prev" onclick="schedPrev()" disabled>◀ Prev</button>
-          <span class="sc-step-label" id="sc-step-label">—</span>
+          <span class="sc-step-label" id="sc-step-label">-</span>
           <button class="sc-btn nav" id="sc-next" onclick="schedNext()" disabled>Next ▶</button>
         </div>
       </div>
@@ -333,15 +340,15 @@
 <div class="hf-box hf-info">
       <span class="hf-label">What the three scenarios show</span>
       <p><strong style="color:#146854;">Good:</strong> <code>periodic()</code> reads sensors only. A drive command is scheduled, runs for several cycles, ends cleanly. The scheduler controls the full lifecycle.</p>
-      <p><strong style="color:#b82e2e;">Bad:</strong> Motor output is inside <code>periodic()</code>. The scheduler calls it at step&nbsp;1 — unconditionally, every loop. It cannot skip it or cancel it. A robot disable has no effect on <code>periodic()</code>. The motor runs until power is cut.</p>
-      <p><strong style="color:#9c6f0d;">Conflict:</strong> Two commands both require <code>Drive</code>. The scheduler detects this at step&nbsp;3 and resolves it via <code>getInterruptionBehavior()</code> — either cancelling the old command (kCancelSelf, the default) or rejecting the new one (kCancelIncoming). No undefined behavior. This is the framework working correctly.</p>
+      <p><strong style="color:#b82e2e;">Bad:</strong> Motor output is inside <code>periodic()</code>. The scheduler calls it at step&nbsp;1 - unconditionally, every loop. It cannot skip it or cancel it. A robot disable has no effect on <code>periodic()</code>. The motor runs until power is cut.</p>
+      <p><strong style="color:#9c6f0d;">Conflict:</strong> Two commands both require <code>Drive</code>. The scheduler detects this at step&nbsp;3 and resolves it via <code>getInterruptionBehavior()</code> - either cancelling the old command (kCancelSelf, the default) or rejecting the new one (kCancelIncoming). No undefined behavior. This is the framework working correctly.</p>
     </div>
 
     <div class="callout-connect">
       <strong>The key distinction:</strong> <code>periodic()</code> is invisible to the scheduler's resource management system. It is not a command. It has no requirements. The scheduler cannot prevent it from conflicting with a command. Putting motor output in <code>periodic()</code> bypasses every safety guarantee the framework provides.
     </div>
 
-    <h2>periodic() vs commands — bad code / good code</h2>
+    <h2>periodic() vs commands - bad code / good code</h2>
 
     <div class="diff-container">
       <div class="diff-tabs">
@@ -352,7 +359,7 @@
         <div class="code-block"><pre>
 <span class="kw">@Override</span>
 <span class="kw">public void</span> periodic() {
-    <span class="cm">// ❌ WRONG — a beginner's natural instinct:</span>
+    <span class="cm">// ❌ WRONG - a beginner's natural instinct:</span>
     <span class="cm">// "periodic() runs every loop, so I'll read the joystick here"</span>
     <span class="cm">// Problem: scheduler calls this unconditionally at step 1.</span>
     <span class="cm">// No command can override it. No disable can stop it cleanly.</span>
@@ -365,12 +372,12 @@
         <div class="code-block"><pre>
 <span class="kw">@Override</span>
 <span class="kw">public void</span> periodic() {
-    <span class="cm">// ✅ CORRECT — sensors and logging only</span>
+    <span class="cm">// ✅ CORRECT - sensors and logging only</span>
     io.updateInputs(inputs);
     Logger.processInputs(<span class="str">"Drive"</span>, inputs);
 }
 
-<span class="cm">// Motor output lives in a Command — scheduler controls lifecycle</span>
+<span class="cm">// Motor output lives in a Command - scheduler controls lifecycle</span>
 <span class="cm">// In RobotContainer: drive.setDefaultCommand(drive.defaultDriveCommand(controller));</span>
 <span class="kw">public</span> Command defaultDriveCommand(XboxController controller) {
     <span class="kw">return</span> run(() -> {
@@ -409,7 +416,7 @@
       </div>
       <div class="bubble bubble-a">
         <div class="bubble-who">Good question, common confusion</div>
-        No. The inheritance chain is: your Robot extends LoggedRobot, which extends TimedRobot. The command framework isn't a base class — it's a system that runs because you call CommandScheduler.getInstance().run() in robotPeriodic(). That one line is what makes the whole framework go.
+        No. The inheritance chain is: your Robot extends LoggedRobot, which extends TimedRobot. The command framework isn't a base class - it's a system that runs because you call CommandScheduler.getInstance().run() in robotPeriodic(). That one line is what makes the whole framework go.
       </div>
       <div class="bubble bubble-q">
         <div class="bubble-who">Student</div>
@@ -417,67 +424,68 @@
       </div>
       <div class="bubble bubble-a">
         <div class="bubble-who">Exactly</div>
-        It's opt-in. You could have a TimedRobot with no commands at all — just raw periodic methods. Command-based is a pattern we choose to use by running the scheduler. AdvantageKit's LoggedRobot wraps each loop cycle to capture data. These are two separate systems that work together.
+        It's opt-in. You could have a TimedRobot with no commands at all - just raw periodic methods. Command-based is a pattern we choose to use by running the scheduler. AdvantageKit's LoggedRobot wraps each loop cycle to capture data. These are two separate systems that work together.
       </div>
     </div>
 
-    <div class="hf-box hf-sidebar">
+<div class="hf-box hf-sidebar">
       <span class="hf-label">There are no dumb questions</span>
       <p><strong>Q: Can a subsystem control two mechanisms?</strong></p>
-      <p>Technically yes. It's almost always a bad idea. If two mechanisms are so tightly coupled that they must always be controlled together, they might belong in one subsystem. Otherwise separate them.</p>
+      <p>Depends what "two mechanisms" means. If two motors combine into one inseparable physical output - like a differential, where you can't even talk about "motor A's job" separately from "motor B's job," only the combined rotation and pitch they produce together - that's really one job done by two actuators. One subsystem, with the combine/inverse math inside it. But if two mechanisms are independently meaningful and just need to happen in sequence - like a climber and an elevator that extend, then deploy, then retract in order - keep them separate and coordinate with commands or a superstructure. The test isn't "do they move together," it's "can I describe what each motor does on its own?" If yes, separate subsystems. If the motors only make sense combined, one subsystem.</p>
       <p><strong>Q: What if two separate subsystems need to coordinate, like a scoop angle that depends on elevator height?</strong></p>
-      <p>Ask yourself: does the logic belong in <code>ElevatorSubsystem.periodic()</code>? That works, but now Elevator knows about Scoop — tight coupling. Flip it — put it in <code>ScoopSubsystem.periodic()</code> instead? Same problem, just reversed. What if a third class owned both, and decided when each one should move? That's the <strong>superstructure</strong> pattern — a coordinator that sits above multiple subsystems without owning hardware itself. We're naming it here; building one comes later.</p>
+      <p>Ask yourself: does the logic belong in <code>ElevatorSubsystem.periodic()</code>? That works, but now Elevator knows about Scoop - tight coupling. Flip it - put it in <code>ScoopSubsystem.periodic()</code> instead? Same problem, just reversed. What if a third class owned both, and decided when each one should move? That's the <strong>superstructure</strong> pattern - a coordinator that sits above multiple subsystems without owning hardware itself. We're naming it here; building one comes later.</p>
       <p><strong>Q: How does a subsystem communicate with another subsystem?</strong></p>
-      <p>Through commands in RobotContainer. Subsystems don't talk to each other directly — that would create dependencies that make debugging much harder. Commands coordinate between subsystems.</p>
+      <p>Through commands in RobotContainer. Subsystems don't talk to each other directly - that would create dependencies that make debugging much harder. Commands coordinate between subsystems.</p>
       <p><strong>Q: What's the difference between periodic() and a command?</strong></p>
-      <p><code>periodic()</code> runs every loop cycle regardless — use it for reading sensors and logging. Commands run when scheduled — use them for actions triggered by buttons or autonomous. Sensor reading goes in <code>periodic()</code>. Motor control goes in commands.</p>    </div>
+      <p><code>periodic()</code> runs every loop cycle regardless - use it for reading sensors and logging. Commands run when scheduled - use them for actions triggered by buttons or autonomous. Sensor reading goes in <code>periodic()</code>. Motor control goes in commands.</p>
+    </div>
 
     <!-- Embedded concept quiz -->
-    <h2>Quick check — before Part 2</h2>
+    <h2>Quick check - before Part 2</h2>
 
     <div class="inline-quiz">
-      <h4>Q1 — Which of these belongs in periodic()?</h4>
+      <h4>Q1 - Which of these belongs in periodic()?</h4>
       <div class="quiz-options">
         <button class="quiz-btn" data-quiz="q1" data-correct="false"
-          data-feedback-wrong="Nope — setting motor speed is motor control. That goes in a command."
+          data-feedback-wrong="Nope - setting motor speed is motor control. That goes in a command."
           data-feedback-correct="">leftMotor.set(0.5)</button>
         <button class="quiz-btn" data-quiz="q1" data-correct="true"
-          data-feedback-correct="✅ Correct — reading sensors and logging is exactly what periodic() is for."
+          data-feedback-correct="✅ Correct - reading sensors and logging is exactly what periodic() is for."
           data-feedback-wrong="">Logger.processInputs("Drive", inputs)</button>
         <button class="quiz-btn" data-quiz="q1" data-correct="false"
-          data-feedback-wrong="Nope — tilting the servo is an action. Actions go in commands."
+          data-feedback-wrong="Nope - tilting the servo is an action. Actions go in commands."
           data-feedback-correct="">scoopServo.setAngle(90)</button>
       </div>
       <div class="quiz-feedback-line" id="quiz-feedback-q1"></div>
     </div>
 
     <div class="inline-quiz">
-      <h4>Q2 — The BearBots robot has an elevator that lifts a scoop. Are these one subsystem or two?</h4>
+      <h4>Q2 - The BearBots robot has an elevator that lifts a scoop. Are these one subsystem or two?</h4>
       <div class="quiz-options">
         <button class="quiz-btn" data-quiz="q2" data-correct="false"
-          data-feedback-wrong="One subsystem mixes concerns — if the elevator breaks, you'd have to disable the scoop too. They can fail independently, so they should be separate."
-          data-feedback-correct="">One subsystem — they always move together</button>
+          data-feedback-wrong="One subsystem mixes concerns - if the elevator breaks, you'd have to disable the scoop too. They can fail independently, so they should be separate."
+          data-feedback-correct="">One subsystem - they always move together</button>
         <button class="quiz-btn" data-quiz="q2" data-correct="true"
-          data-feedback-correct="✅ Correct — each mechanism has its own motor and can fail independently. Separate subsystems. Commands coordinate them."
-          data-feedback-wrong="">Two subsystems — they can fail independently</button>
+          data-feedback-correct="✅ Correct - each mechanism has its own motor and can fail independently. Separate subsystems. Commands coordinate them."
+          data-feedback-wrong="">Two subsystems - they can fail independently</button>
         <button class="quiz-btn" data-quiz="q2" data-correct="false"
-          data-feedback-wrong="Any mechanism with a motor probably needs a subsystem. 'Complicated' isn't the threshold — 'separate motor' is."
+          data-feedback-wrong="Any mechanism with a motor probably needs a subsystem. 'Complicated' isn't the threshold - 'separate motor' is."
           data-feedback-correct="">Only if the elevator is complicated enough</button>
       </div>
       <div class="quiz-feedback-line" id="quiz-feedback-q2"></div>
     </div>
 
     <div class="inline-quiz">
-      <h4>Q3 — What happens if you DON'T instantiate a subsystem in RobotContainer?</h4>
+      <h4>Q3 - What happens if you DON'T instantiate a subsystem in RobotContainer?</h4>
       <div class="quiz-options">
         <button class="quiz-btn" data-quiz="q3" data-correct="false"
-          data-feedback-wrong="It won't compile-error — Java will happily compile a class that's never instantiated. The subsystem just never exists at runtime."
-          data-feedback-correct="">Build error — Java won't compile</button>
+          data-feedback-wrong="It won't compile-error - Java will happily compile a class that's never instantiated. The subsystem just never exists at runtime."
+          data-feedback-correct="">Build error - Java won't compile</button>
         <button class="quiz-btn" data-quiz="q3" data-correct="true"
-          data-feedback-correct="✅ Correct — the class exists on disk but the object is never created. periodic() never runs. Nothing happens. And you'll wonder why your subsystem folder isn't showing up in AdvantageScope."
-          data-feedback-wrong="">It compiles but the subsystem never runs — it doesn't exist</button>
+          data-feedback-correct="✅ Correct - the class exists on disk but the object is never created. periodic() never runs. Nothing happens. And you'll wonder why your subsystem folder isn't showing up in AdvantageScope."
+          data-feedback-wrong="">It compiles but the subsystem never runs - it doesn't exist</button>
         <button class="quiz-btn" data-quiz="q3" data-correct="false"
-          data-feedback-wrong="WPILib won't auto-discover it — you have to explicitly create the object in RobotContainer."
+          data-feedback-wrong="WPILib won't auto-discover it - you have to explicitly create the object in RobotContainer."
           data-feedback-correct="">WPILib auto-discovers it from the class name</button>
       </div>
       <div class="quiz-feedback-line" id="quiz-feedback-q3"></div>
@@ -492,15 +500,15 @@
 
 
   <!-- ═══════════════════════════════════════════════════════
-       PART 2 — READING A REAL SUBSYSTEM
+       PART 2 - READING A REAL SUBSYSTEM
        ═══════════════════════════════════════════════════════ -->
   <div class="lesson-section" id="section-arm">
 
-    <p>Reading real code is a skill. Before you write a subsystem from scratch, you need to be able to read one and explain every line. This is <span class="file-badge">Arm.java</span> — the actual BearBots arm subsystem. Click any highlighted line to see an explanation.</p>
+    <p>Reading real code is a skill. Before you write a subsystem from scratch, you need to be able to read one and explain every line. This is <span class="file-badge">Arm.java</span> - the actual BearBots arm subsystem. Click any highlighted line to see an explanation.</p>
 
     <div class="hf-box hf-info">
       <span class="hf-label">How to use this section</span>
-      <p>Lines with a <strong>⬤</strong> marker are annotated — tap or click them to open the explanation. Some lines are grouped. Work through the file top to bottom.</p>
+      <p>Lines with a <strong>⬤</strong> marker are annotated - tap or click them to open the explanation. Some lines are grouped. Work through the file top to bottom.</p>
     </div>
 
     <div class="ann-block" id="arm-annotated">
@@ -514,18 +522,18 @@
         <span class="ann-line-icon">⬤</span>
       </div>
       <div class="ann-note" id="ann-pkg">
-        The package declaration matches the folder path: <code>src/main/java/frc/robot/subsystems/arm/</code>. Notice this subsystem has its own sub-folder <code>arm/</code> — not just dropped in the top-level <code>subsystems/</code> folder. That's because the IO pattern means there are multiple files for this subsystem: <code>Arm.java</code> (this file), <code>ArmIO.java</code>, <code>ArmIOXRP.java</code>, <code>ArmConstants.java</code>. Grouping them in a sub-folder keeps things tidy. You'll understand why in Part 4.
+        The package declaration matches the folder path: <code>src/main/java/frc/robot/subsystems/arm/</code>. Notice this subsystem has its own sub-folder <code>arm/</code> - not just dropped in the top-level <code>subsystems/</code> folder. That's because the IO pattern means there are multiple files for this subsystem: <code>Arm.java</code> (this file), <code>ArmIO.java</code>, <code>ArmIOXRP.java</code>, <code>ArmConstants.java</code>. Grouping them in a sub-folder keeps things tidy. You'll understand why in Part 3.
       </div>
 
       <div class="ann-line" onclick="">
         <span class="ann-line-num">3</span>
         <span class="ann-line-code"><span class="kw">import</span> edu.wpi.first.math.geometry.Pose3d;</span>
-        <span class="ann-line-icon" style="color:var(--muted)">—</span>
+        <span class="ann-line-icon" style="color:var(--muted)">-</span>
       </div>
       <div class="ann-line" onclick="">
         <span class="ann-line-num">4</span>
         <span class="ann-line-code"><span class="kw">import</span> edu.wpi.first.math.geometry.Rotation3d;</span>
-        <span class="ann-line-icon" style="color:var(--muted)">—</span>
+        <span class="ann-line-icon" style="color:var(--muted)">-</span>
       </div>
       <div class="ann-line has-note" onclick="annToggle('imports-wpi')">
         <span class="ann-line-num">5–9</span>
@@ -533,7 +541,7 @@
         <span class="ann-line-icon">⬤</span>
       </div>
       <div class="ann-note" id="ann-imports-wpi">
-        <code>Pose3d</code> and <code>Rotation3d</code> are WPILib geometry types — they describe position and angle in 3D space. The <code>LoggedMechanism2d</code> imports are AdvantageKit types that let us draw the arm's current position as a 2D diagram inside AdvantageScope. <strong>Notice: there is no import of XRPServo here.</strong> The subsystem doesn't know what hardware it's running on. That's the IO pattern — you'll see it in Part 4. (Hardware-specific code lives in <code>ArmIOXRP.java</code>, not here.)
+        <code>Pose3d</code> and <code>Rotation3d</code> are WPILib geometry types - they describe position and angle in 3D space. The <code>LoggedMechanism2d</code> imports are AdvantageKit types that let us draw the arm's current position as a 2D diagram inside AdvantageScope. <strong>Notice: there is no import of XRPServo here.</strong> The subsystem doesn't know what hardware it's running on. That's the IO pattern - you'll see it in Part 3. (Hardware-specific code lives in <code>ArmIOXRP.java</code>, not here.)
       </div>
 
       <div class="ann-separator"></div>
@@ -546,7 +554,7 @@
         <span class="ann-line-icon">⬤</span>
       </div>
       <div class="ann-note" id="ann-extends">
-        <code>extends SubsystemBase</code> — this is the one thing that makes a class a WPILib subsystem. SubsystemBase registers the class with the CommandScheduler automatically, so <code>periodic()</code> gets called every loop cycle. Without this, it's just a Java class — the scheduler doesn't know it exists.
+        <code>extends SubsystemBase</code> - this is the one thing that makes a class a WPILib subsystem. SubsystemBase registers the class with the CommandScheduler automatically, so <code>periodic()</code> gets called every loop cycle. Without this, it's just a Java class - the scheduler doesn't know it exists.
       </div>
 
       <div class="ann-line has-note" onclick="annToggle('io-field')">
@@ -555,7 +563,7 @@
         <span class="ann-line-icon">⬤</span>
       </div>
       <div class="ann-note" id="ann-io-field">
-        This is the IO pattern in one line. <code>ArmIO</code> is an <em>interface</em> — defined in <code>ArmIO.java</code> — it defines what operations the arm hardware can do (like <code>setAngle()</code>) without specifying <em>how</em> they're done. The actual hardware object (an XRP servo, a simulation stub, or a real FRC motor controller — implemented in <code>ArmIOXRP.java</code>) gets passed in through the constructor. The subsystem never knows which one it's talking to — and that's the point. Full explanation in Part 4.
+        This is the IO pattern in one line. <code>ArmIO</code> is an <em>interface</em> - defined in <code>ArmIO.java</code> - it defines what operations the arm hardware can do (like <code>setAngle()</code>) without specifying <em>how</em> they're done. The actual hardware object (an XRP servo, a simulation stub, or a real FRC motor controller - implemented in <code>ArmIOXRP.java</code>) gets passed in through the constructor. The subsystem never knows which one it's talking to - and that's the point. Full explanation in Part 3.
       </div>
 
       <div class="ann-line has-note" onclick="annToggle('inputs')">
@@ -564,7 +572,7 @@
         <span class="ann-line-icon">⬤</span>
       </div>
       <div class="ann-note" id="ann-inputs">
-        <code>ArmIOInputsAutoLogged</code> is a class that AdvantageKit generates automatically — at compile time — from the <code>@AutoLog</code> annotation on the inputs class in <code>ArmIO.java</code>. It holds all the sensor values the IO layer reads (like <code>commandedAngleDeg</code>). The <code>AutoLogged</code> suffix means every field in it is automatically recorded to the log file — you don't have to write any logging code for inputs.
+        <code>ArmIOInputsAutoLogged</code> is a class that AdvantageKit generates automatically - at compile time - from the <code>@AutoLog</code> annotation on the inputs class in <code>ArmIO.java</code>. It holds all the sensor values the IO layer reads (like <code>commandedAngleDeg</code>). The <code>AutoLogged</code> suffix means every field in it is automatically recorded to the log file - you don't have to write any logging code for inputs.
       </div>
 
       <div class="ann-line has-note" onclick="annToggle('mech2d')">
@@ -573,12 +581,12 @@
         <span class="ann-line-icon">⬤</span>
       </div>
       <div class="ann-note" id="ann-mech2d">
-        <code>LoggedMechanism2d</code> is an AdvantageKit wrapper around WPILib's <code>Mechanism2d</code>. It draws a 2D stick-figure diagram of the arm in AdvantageScope — you can actually watch the arm move in the visualizer. The canvas is 3×3 meters. The <code>root</code> is where the arm pivots, and <code>armLigament</code> is the arm itself. All three fields are declared here and configured once — no setup needed in <code>periodic()</code>.
+        <code>LoggedMechanism2d</code> is an AdvantageKit wrapper around WPILib's <code>Mechanism2d</code>. It draws a 2D stick-figure diagram of the arm in AdvantageScope - you can actually watch the arm move in the visualizer. The canvas is 3×3 meters. The <code>root</code> is where the arm pivots, and <code>armLigament</code> is the arm itself. All three fields are declared here and configured once - no setup needed in <code>periodic()</code>.
       </div>
 
       <div class="ann-separator"></div>
       <div class="ann-group-label" onclick="annGroupToggle('ctor')">Constructor <span class="ann-file-badge">Arm.java</span></div>
-      <div class="ann-group-desc" id="ann-group-ctor">Runs once when the subsystem is created — sets up its starting state and receives any objects it depends on.</div>
+      <div class="ann-group-desc" id="ann-group-ctor">Runs once when the subsystem is created - sets up its starting state and receives any objects it depends on.</div>
 
       <div class="ann-line has-note" onclick="annToggle('constructor')">
         <span class="ann-line-num">21–23</span>
@@ -586,12 +594,12 @@
         <span class="ann-line-icon">⬤</span>
       </div>
       <div class="ann-note" id="ann-constructor">
-        The constructor receives an <code>ArmIO</code> object and stores it. This is called <strong>dependency injection</strong> — instead of the subsystem creating its own hardware, the hardware is passed in from outside (from <code>RobotContainer.java</code>). This means <code>RobotContainer</code> decides whether to pass in an XRP servo implementation (<code>ArmIOXRP</code>) or a simulation stub — the <code>Arm</code> subsystem itself never changes. Three lines. Enormous consequences.
+        The constructor receives an <code>ArmIO</code> object and stores it. This is called <strong>dependency injection</strong> - instead of the subsystem creating its own hardware, the hardware is passed in from outside (from <code>RobotContainer.java</code>). This means <code>RobotContainer</code> decides whether to pass in an XRP servo implementation (<code>ArmIOXRP</code>) or a simulation stub - the <code>Arm</code> subsystem itself never changes. Three lines. Enormous consequences.
       </div>
 
       <div class="ann-separator"></div>
       <div class="ann-group-label" onclick="annGroupToggle('periodic')">periodic() <span class="ann-file-badge">Arm.java</span></div>
-      <div class="ann-group-desc" id="ann-group-periodic">Runs automatically every 20ms loop cycle, for as long as the robot is on — reads sensors and updates logging/visuals.</div>
+      <div class="ann-group-desc" id="ann-group-periodic">Runs automatically every 20ms loop cycle, for as long as the robot is on - reads sensors and updates logging/visuals.</div>
 
       <div class="ann-line has-note" onclick="annToggle('periodic-inputs')">
         <span class="ann-line-num">26–27</span>
@@ -599,7 +607,7 @@
         <span class="ann-line-icon">⬤</span>
       </div>
       <div class="ann-note" id="ann-periodic-inputs">
-        These two lines are the heartbeat of every AdvantageKit subsystem. <code>io.updateInputs(inputs)</code> asks the IO layer — implemented in <code>ArmIOXRP.java</code> — to read all hardware sensors and fill in the <code>inputs</code> object. <code>Logger.processInputs("Arm", inputs)</code> records all those values to the log file under the key <code>Arm/</code>. After these two lines, the rest of <code>periodic()</code> (and any commands) can read from <code>inputs</code> — they're all seeing the same frozen snapshot from this loop cycle.
+        These two lines are the heartbeat of every AdvantageKit subsystem. <code>io.updateInputs(inputs)</code> asks the IO layer - implemented in <code>ArmIOXRP.java</code> - to read all hardware sensors and fill in the <code>inputs</code> object. <code>Logger.processInputs("Arm", inputs)</code> records all those values to the log file under the key <code>Arm/</code>. After these two lines, the rest of <code>periodic()</code> (and any commands) can read from <code>inputs</code> - they're all seeing the same frozen snapshot from this loop cycle.
       </div>
 
       <div class="ann-line has-note" onclick="annToggle('periodic-vis')">
@@ -608,7 +616,7 @@
         <span class="ann-line-icon">⬤</span>
       </div>
       <div class="ann-note" id="ann-periodic-vis">
-        After reading inputs, <code>periodic()</code> updates the visualization. <code>armLigament.setAngle(180 - inputs.commandedAngleDeg)</code> rotates the stick figure in AdvantageScope to match the real arm angle. The <code>180 -</code> is a coordinate system flip — AdvantageScope and the servo use different angle conventions. Then <code>Logger.recordOutput("FinalComponentPoses", ...)</code> logs the arm's 3D pose for the 3D robot model viewer. This is purely cosmetic — it makes the visualizer look right.
+        After reading inputs, <code>periodic()</code> updates the visualization. <code>armLigament.setAngle(180 - inputs.commandedAngleDeg)</code> rotates the stick figure in AdvantageScope to match the real arm angle. The <code>180 -</code> is a coordinate system flip - AdvantageScope and the servo use different angle conventions. Then <code>Logger.recordOutput("FinalComponentPoses", ...)</code> logs the arm's 3D pose for the 3D robot model viewer. This is purely cosmetic - it makes the visualizer look right.
       </div>
 
       <div class="ann-separator"></div>
@@ -621,7 +629,7 @@
         <span class="ann-line-icon">⬤</span>
       </div>
       <div class="ann-note" id="ann-setangle">
-        <code>setAngle()</code> is the subsystem's primary output method. It does two things: calls <code>io.setAngle(angleDeg)</code> to actually move the hardware (handled in <code>ArmIOXRP.java</code>), and calls <code>Logger.recordOutput("Arm/Commanded/AngleDeg", angleDeg)</code> to log what angle was commanded. Commands call <code>setAngle()</code> — they don't touch <code>io</code> directly. The subsystem is the gatekeeper for all hardware access.
+        <code>setAngle()</code> is the subsystem's primary output method. It does two things: calls <code>io.setAngle(angleDeg)</code> to actually move the hardware (handled in <code>ArmIOXRP.java</code>), and calls <code>Logger.recordOutput("Arm/Commanded/AngleDeg", angleDeg)</code> to log what angle was commanded. Commands call <code>setAngle()</code> - they don't touch <code>io</code> directly. The subsystem is the gatekeeper for all hardware access.
       </div>
 
       <div class="ann-line has-note" onclick="annToggle('stop')">
@@ -630,7 +638,7 @@
         <span class="ann-line-icon">⬤</span>
       </div>
       <div class="ann-note" id="ann-stop">
-        <code>stop()</code> doesn't cut power to the servo — it moves the arm to a safe stowed position. For a servo, "stopped" means holding a safe angle, not going limp. <code>ArmConstants.kStowedAngleDeg</code> is defined in <strong><code>ArmConstants.java</code></strong> — a separate file, one place, one value. If you need to change the stow angle, you change it there and it updates everywhere. This is the <strong>safe state pattern</strong>: every subsystem should know its own safe position and be able to go there on demand.
+        <code>stop()</code> doesn't cut power to the servo - it moves the arm to a safe stowed position. For a servo, "stopped" means holding a safe angle, not going limp. <code>ArmConstants.kStowedAngleDeg</code> is defined in <strong><code>ArmConstants.java</code></strong> - a separate file, one place, one value. If you need to change the stow angle, you change it there and it updates everywhere. This is the <strong>safe state pattern</strong>: every subsystem should know its own safe position and be able to go there on demand.
       </div>
 
       <div class="ann-line has-note" onclick="annToggle('getter')">
@@ -639,38 +647,218 @@
         <span class="ann-line-icon">⬤</span>
       </div>
       <div class="ann-note" id="ann-getter">
-        A getter that returns the last commanded angle. Commands or other parts of the code can read this to know what the arm is currently doing without accessing <code>inputs</code> directly. Because <code>inputs</code> is private, this getter is the only way to read the commanded angle from outside the subsystem — which is correct. Private fields, public interface.
+        A getter that returns the last commanded angle. Commands or other parts of the code can read this to know what the arm is currently doing without accessing <code>inputs</code> directly. Because <code>inputs</code> is private, this getter is the only way to read the commanded angle from outside the subsystem - which is correct. Private fields, public interface.
       </div>
 
     </div><!-- /ann-block -->
 
     <div class="callout-connect">
-      <strong>Notice what's missing:</strong> There's no <code>import frc.robot.xrp.XRPServo</code> anywhere in this file. The <code>Arm</code> subsystem has no idea it's running on XRP hardware. That abstraction is exactly what the IO pattern provides — and it's why this code runs identically in simulation and on the real robot. Full explanation in Part 4.
+      <strong>Notice what's missing:</strong> There's no <code>import frc.robot.xrp.XRPServo</code> anywhere in this file. The <code>Arm</code> subsystem has no idea it's running on XRP hardware. That abstraction is exactly what the IO pattern provides - and it's why this code runs identically in simulation and on the real robot. Full explanation in Part 3.
     </div>
 
     <div class="hf-box hf-brain">
-      <span class="hf-label">Before you move on — explain this out loud</span>
+      <span class="hf-label">Before you move on - explain this out loud</span>
       <p>Without looking: what are the four sections of <code>Arm.java</code>, and what does each one do? Specifically: why does <code>periodic()</code> call <code>io.updateInputs()</code> before anything else? What would break if it didn't?</p>
     </div>
 
   </div><!-- /section-arm -->
 
 
+
   <!-- ═══════════════════════════════════════════════════════
-       PART 3 — BUILD SCOOPSUBSYSTEM FROM SCRATCH
+       PART 3 - THE IO PATTERN
+       ═══════════════════════════════════════════════════════ -->
+  <div class="lesson-section" id="section-io">
+
+    <p>In Part 2 you read <code>Arm.java</code> and saw this line:</p>
+    <div class="code-block" style="margin:0.75rem 0;"><pre><span class="kw">private final</span> ArmIO io;</pre></div>
+    <p>That one line is the whole pattern, in miniature. This part explains why it exists, what the surrounding files look like, and how the pieces fit together. Once you understand it, you'll build <code>Scoop</code> in Part 4 the simple way, on purpose, knowing the full pattern is coming in Lesson 04.</p>
+
+    <h2>The problem with importing hardware directly</h2>
+
+    <div class="hf-box hf-brain">
+      <span class="hf-label">Imagine this scenario</span>
+      <p>A subsystem has <code>import edu.wpi.first.wpilibj.xrp.XRPServo</code> at the top. You've been testing in simulation all week. Match day arrives - you plug into the real FRC robot (which uses a different servo controller). The class name is different. Your subsystem won't compile on the competition robot without changes. You are now editing code at a competition. This is bad.</p>
+    </div>
+
+    <p>The IO pattern solves this by adding a layer of indirection. Instead of the subsystem knowing <em>which</em> hardware object to use, you define an <strong>interface</strong> that describes <em>what operations the hardware must support</em>. Then you write separate <strong>implementations</strong> for each hardware type, including a simulation implementation with no real hardware at all. The subsystem only ever talks to the interface, so it runs identically whether it's driving a real XRP servo or a simulated one. That's what makes testing your code on a laptop, with no robot present, possible.</p>
+
+    <h2>Four files instead of one</h2>
+
+    <div class="io-compare">
+      <div class="io-pane subsystem">
+        <div class="io-pane-label">Arm.java - the subsystem</div>
+        <div class="code-block"><pre>
+<span class="kw">public class</span> Arm <span class="kw">extends</span> SubsystemBase {
+
+  <span class="cm">// Talks to the interface - never to hardware</span>
+  <span class="kw">private final</span> ArmIO io;
+  <span class="kw">private final</span> ArmIOInputsAutoLogged inputs
+      = <span class="kw">new</span> ArmIOInputsAutoLogged();
+
+  <span class="kw">public</span> Arm(ArmIO io) {
+    <span class="kw">this</span>.io = io; <span class="cm">// injected from outside</span>
+  }
+
+  <span class="kw">@Override</span>
+  <span class="kw">public void</span> periodic() {
+    io.updateInputs(inputs);
+    Logger.processInputs(<span class="str">"Arm"</span>, inputs);
+  }
+
+  <span class="kw">public void</span> setAngle(<span class="kw">double</span> deg) {
+    io.setAngle(deg); <span class="cm">// through interface</span>
+  }
+}</pre></div>
+      </div>
+      <div class="io-pane interface">
+        <div class="io-pane-label">ArmIO.java - the interface</div>
+        <div class="code-block"><pre>
+<span class="kw">public interface</span> ArmIO {
+
+  <span class="cm">// The data the hardware reads each loop</span>
+  <span class="kw">@AutoLog</span>
+  <span class="kw">class</span> ArmIOInputs {
+    <span class="kw">public double</span> commandedAngleDeg = <span class="num">0.0</span>;
+  }
+
+  <span class="cm">// What any arm hardware implementation must do</span>
+  <span class="kw">default void</span> updateInputs(ArmIOInputs inputs) {}
+  <span class="kw">default void</span> setAngle(<span class="kw">double</span> angleDeg) {}
+}</pre></div>
+      </div>
+    </div>
+
+    <p>And then a separate implementation for each hardware type:</p>
+
+    <div class="io-compare">
+      <div class="io-pane impl">
+        <div class="io-pane-label">ArmIOXRP.java - XRP hardware implementation</div>
+        <div class="code-block"><pre>
+<span class="cm">// This file knows about XRP hardware</span>
+<span class="kw">import</span> edu.wpi.first.wpilibj.xrp.XRPServo;
+
+<span class="kw">public class</span> ArmIOXRP <span class="kw">implements</span> ArmIO {
+
+  <span class="kw">private final</span> XRPServo servo = <span class="kw">new</span> XRPServo(<span class="num">5</span>);
+
+  <span class="kw">@Override</span>
+  <span class="kw">public void</span> updateInputs(ArmIOInputs inputs) {
+    inputs.commandedAngleDeg = servo.getAngle();
+  }
+
+  <span class="kw">@Override</span>
+  <span class="kw">public void</span> setAngle(<span class="kw">double</span> deg) {
+    servo.setAngle(deg);
+  }
+}</pre></div>
+      </div>
+      <div class="io-pane interface" style="border-color:var(--code-border);">
+        <div class="io-pane-label" style="background:var(--teal);">ArmIOSim.java - simulation stub (Optional)</div>
+        <div class="code-block"><pre>
+<span class="cm">// This file knows about simulation</span>
+<span class="cm">// No hardware imports at all</span>
+
+<span class="kw">public class</span> ArmIOSim <span class="kw">implements</span> ArmIO {
+
+  <span class="kw">private double</span> angleDeg = <span class="num">0.0</span>;
+
+  <span class="kw">@Override</span>
+  <span class="kw">public void</span> updateInputs(ArmIOInputs inputs) {
+    inputs.commandedAngleDeg = angleDeg;
+  }
+
+  <span class="kw">@Override</span>
+  <span class="kw">public void</span> setAngle(<span class="kw">double</span> deg) {
+    angleDeg = deg; <span class="cm">// just store it</span>
+  }
+}</pre></div>
+      </div>
+    </div>
+
+    <h2>How RobotContainer wires it together</h2>
+    <p>The subsystem never decides which implementation it gets. <code>RobotContainer</code> makes that decision at startup based on whether the code is running in simulation or on real hardware:</p>
+
+<div class="io-followup">
+<div class="code-block"><pre>
+<span class="kw">public</span> RobotContainer() {
+    <span class="kw">switch</span> (Constants.currentMode) {
+        <span class="kw">case</span> REAL:
+            arm = <span class="kw">new</span> Arm(<span class="kw">new</span> ArmIOXRP());  <span class="cm">// real XRP servo</span>
+            <span class="kw">break</span>;
+        <span class="kw">case</span> SIM:
+            arm = <span class="kw">new</span> Arm(<span class="kw">new</span> ArmIOSim());   <span class="cm">// simulation stub</span>
+            <span class="kw">break</span>;
+        <span class="kw">default</span>:
+            arm = <span class="kw">new</span> Arm(<span class="kw">new</span> ArmIO() {});   <span class="cm">// log replay - no hardware</span>
+            <span class="kw">break</span>;
+    }
+}</pre></div>
+</div>
+    <div class="code-annotation">The Arm subsystem itself never changes. Swap the implementation per case in RobotContainer. That's the entire point.</div>
+
+    <h2>Why this matters for simulation</h2>
+
+    <div class="diff-container">
+      <div class="diff-tabs">
+        <button class="diff-tab bad active" onclick="diffSwitch('iodiff','bad',this)">Without IO pattern</button>
+        <button class="diff-tab good" onclick="diffSwitch('iodiff','good',this)">With IO pattern</button>
+      </div>
+      <div class="diff-pane bad-pane active" id="iodiff-bad">
+        <div class="code-block"><pre>
+<span class="cm">// Subsystem imports hardware directly</span>
+<span class="kw">import</span> edu.wpi.first.wpilibj.xrp.XRPServo;
+
+<span class="kw">public class</span> Scoop <span class="kw">extends</span> SubsystemBase {
+    <span class="kw">private final</span> XRPServo scoopServo = <span class="kw">new</span> XRPServo(<span class="num">4</span>);
+    <span class="cm">// ❌ This constructor always creates a real XRPServo</span>
+    <span class="cm">// ❌ Can't swap it out for simulation</span>
+    <span class="cm">// ❌ Any code changes for sim break the real robot build</span>
+}</pre></div>
+      </div>
+      <div class="diff-pane good-pane" id="iodiff-good">
+        <div class="code-block"><pre>
+<span class="cm">// Subsystem only knows about the interface</span>
+<span class="kw">public class</span> Scoop <span class="kw">extends</span> SubsystemBase {
+    <span class="kw">private final</span> ScoopIO io; <span class="cm">// interface, not hardware</span>
+
+    <span class="kw">public</span> Scoop(ScoopIO io) {
+        <span class="kw">this</span>.io = io; <span class="cm">// ✅ caller decides the hardware</span>
+    }
+    <span class="cm">// ✅ Same class runs in sim (ScoopIOSim) and on XRP (ScoopIOXRP)</span>
+    <span class="cm">// ✅ No code changes between environments</span>
+    <span class="cm">// ✅ Can test without physical hardware</span>
+}</pre></div>
+      </div>
+    </div>
+
+    <div class="callout-deferred">
+      <strong>Coming in Lesson 04:</strong> In Part 4 you'll build <code>Scoop</code> the simple way first - importing <code>XRPServo</code> directly, on purpose. Then in Lesson 04 you'll refactor it into the full IO pattern - creating <code>ScoopIO.java</code>, <code>ScoopIOXRP.java</code>, and <code>ScoopIOSim.java</code>. You'll also add the <code>akio</code> and <code>akioimpl</code> snippets to your <code>java.json</code>. For now, the key insight is: <strong>the subsystem talks to an interface, never to hardware directly.</strong>
+    </div>
+
+    <div class="hf-box hf-sidebar">
+      <span class="hf-label">Where did you already see this?</span>
+      <p>In Part 2, <code>Arm.java</code> line 12: <code>private final ArmIO io;</code>. That's the IO pattern. Line 21: <code>public Arm(ArmIO io) { this.io = io; }</code> - that's dependency injection.</p>
+    </div>
+
+  </div><!-- /section-io -->
+
+
+  <!-- ═══════════════════════════════════════════════════════
+       PART 4 - BUILD SCOOPSUBSYSTEM FROM SCRATCH
        ═══════════════════════════════════════════════════════ -->
   <div class="lesson-section" id="section-build">
 
-    <p>Now you build one. <code>Scoop</code> doesn't exist yet in the codebase. You're going to create it from the WPILib tool, then fill it out step by step. Each step below is expandable — read and do one step at a time, then open the next.</p>
+    <p>Now you build one. <code>Scoop</code> doesn't exist yet in the codebase. You're going to create it from the WPILib tool, then fill it out step by step. Each step below is expandable - read and do one step at a time, then open the next.</p>
 
     <div class="hf-box hf-warning">
-      <span class="hf-label">Important — we're skipping the IO pattern for now</span>
-      <p>You just saw that <code>Arm.java</code> uses <code>ArmIO io</code> instead of importing hardware directly. In this lesson, <code>Scoop</code> will import <code>XRPServo</code> directly — the simpler approach. That's intentional. Part 4 explains the IO pattern fully, and Lesson 04 is where you'll refactor this into the full two-file pattern. Build it simple first, understand the pattern second.</p>
+      <span class="hf-label">Important - we're deliberately skipping the IO pattern here</span>
+      <p>You just learned the IO pattern in Part 3 - <code>ArmIO io</code>, dependency injection, hardware swapped in from outside. <code>Scoop</code> won't use any of that yet. It'll import <code>XRPServo</code> directly - the simpler approach. That's intentional: build it simple first, refactor it into the full two-file pattern in Lesson 04. You now know exactly what you're choosing to skip, and why.</p>
     </div>
 
     <div class="step-builder">
 
-      <!-- Step 1 -->
+<!-- Step 1 -->
       <div class="sb-step open" id="sbstep-1">
         <div class="sb-step-header" onclick="sbToggle('sbstep-1')">
           <div class="sb-step-num">1</div>
@@ -680,26 +868,30 @@
         <div class="sb-step-body">
           <p><strong>Never create subsystem files by hand.</strong> The tool generates the correct package declaration, imports, and class structure. Getting these wrong causes confusing build errors.</p>
           <div class="hf-box hf-info" style="margin:0.5rem 0;">
-            <span class="hf-label">How to do it</span>
-            <p><strong>Option A (right-click):</strong> In VS Code Explorer, right-click <code>src/main/java/frc/robot/subsystems/</code> → <em>Create a new class/command</em> → <em>SubsystemBase</em> → type <code>Scoop</code> → Enter</p>
-            <p><strong>Option B (command palette):</strong> <code>Ctrl+Shift+P</code> → <em>WPILib: Create a new class</em> → <em>SubsystemBase</em> → type <code>Scoop</code> → Enter</p>
+            <span class="hf-label">First, make a folder for Scoop</span>
+            <p>In VS Code Explorer, right-click <code>src/main/java/frc/robot/subsystems/</code> → <em>New Folder</em> → type <code>scoop</code> → Enter. Just like <code>Arm.java</code> lives inside its own <code>arm/</code> folder, <code>Scoop</code> gets its own <code>scoop/</code> folder too, even though right now it's only going to hold one file. You'll add more files here later.</p>
           </div>
-          <p>The tool generates this file. Every line is intentional:</p>
+          <div class="hf-box hf-info" style="margin:0.5rem 0;">
+            <span class="hf-label">Then, create the class inside that folder</span>
+            <p><strong>Option A (right-click):</strong> In VS Code Explorer, right-click <code>src/main/java/frc/robot/subsystems/scoop/</code> → <em>Create a new class/command</em> → <em>Subsystem</em> → type <code>Scoop</code> → Enter</p>
+            <p><strong>Option B (command palette):</strong> <code>Ctrl+Shift+P</code> → <em>WPILib: Create a new class</em> → <em>SubsystemBase</em> → type <code>Scoop</code> → Enter. When prompted for the location, navigate into the <code>scoop/</code> folder you just created.</p>
+          </div>
+          <p>The tool generates this file. Extra comments added for clarity. Every line is intentional:</p>
           <div class="code-block"><pre>
-<span class="kw">package</span> frc.robot.subsystems;  <span class="cm">// matches folder structure</span>
+<span class="kw">package</span> frc.robot.subsystems.scoop;
 
 <span class="kw">import</span> edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 <span class="kw">public class</span> Scoop <span class="kw">extends</span> SubsystemBase {
-
+    <span class="cm-add">/** Creates a new scoop. */</span>
     <span class="kw">public</span> Scoop() {
-        <span class="cm">// Constructor — runs once at startup</span>
+        <span class="cm-add">// Constructor - runs once at startup</span>
     }
 
     <span class="kw">@Override</span>
     <span class="kw">public void</span> periodic() {
-        <span class="cm">// Called every 20ms (50Hz)</span>
-        <span class="cm">// Sensors and logging only — no motor control</span>
+        <span class="cm-add">// Called every 20ms (50Hz)</span>
+        <span class="cm-add">// Sensors and logging only - no motor control</span>
     }
 }</pre></div>
           <div class="code-annotation">Build now: <code>Ctrl+Shift+P</code> → <em>WPILib: Build Robot Code</em>. Should compile with no errors. If it doesn't, check the package declaration matches your folder.</div>
@@ -714,24 +906,28 @@
           <div class="sb-step-chevron">▶</div>
         </div>
         <div class="sb-step-body">
-          <p>The scoop is driven by an XRP servo on port 4. Add it as a private field — nothing outside this class should access the servo directly.</p>
+          <p>The scoop is driven by an XRP servo on port 4. Add it as a private field - nothing outside this class should access the servo directly.</p>
           <div class="code-block"><pre>
 <span class="kw">package</span> frc.robot.subsystems;
 
 <span class="kw">import</span> edu.wpi.first.wpilibj2.command.SubsystemBase;
-<span class="kw">import</span> edu.wpi.first.wpilibj.xrp.XRPServo;  <span class="cm">// ← add this import</span>
+<span class="kw">import</span> edu.wpi.first.wpilibj.xrp.XRPServo;  <span class="cm-add">// ← add this import</span>
 
 <span class="kw">public class</span> Scoop <span class="kw">extends</span> SubsystemBase {
+  <span class="cm-add">/** Creates a new scoop. */</span>
+    <span class="kw">private final</span> XRPServo scoopServo = <span class="kw">new</span> XRPServo(<span class="num">4</span>); <span class="cm-add">// ← add this field</span>
 
-    <span class="cm">// ← add this field</span>
-    <span class="kw">private final</span> XRPServo scoopServo = <span class="kw">new</span> XRPServo(<span class="num">4</span>);
-
-    <span class="kw">public</span> Scoop() { }
+        <span class="kw">public</span> Scoop() {
+        <span class="cm-add">// Constructor - runs once at startup</span>
+    }
 
     <span class="kw">@Override</span>
-    <span class="kw">public void</span> periodic() { }
+    <span class="kw">public void</span> periodic() {
+        <span class="cm-add">// Called every 20ms (50Hz)</span>
+        <span class="cm-add">// Sensors and logging only - no motor control</span>
+    }
 }</pre></div>
-          <div class="code-annotation">XRPServo port 4 = Servo 1 on the XRP hardware. This is the canonical BearBots port assignment — don't change it.</div>
+          <div class="code-annotation">XRPServo port 4 = Servo 1 on the XRP hardware. This is the canonical BearBots port assignment - don't change it.</div>
           <div class="hf-box hf-warning" style="margin-top:0.6rem;">
             <span class="hf-label">Note for Lesson 04</span>
             <p>This <code>import</code> of <code>XRPServo</code> directly in the subsystem is exactly what the IO pattern eliminates. You'll refactor this in Lesson 04. For now, it's the correct starting point.</p>
@@ -747,15 +943,15 @@
           <div class="sb-step-chevron">▶</div>
         </div>
         <div class="sb-step-body">
-          <p>Instead of using raw angles like <code>setAngle(45.0)</code> scattered through your code, define named positions. An <code>enum</code> is perfect — it limits the legal values to exactly the ones you define.</p>
+          <p>Instead of using raw angles like <code>setAngle(45.0)</code> scattered through your code, define named positions. An <code>enum</code> is perfect - it limits the legal values to exactly the ones you define.</p>
           <div class="code-block"><pre>
 <span class="kw">public class</span> Scoop <span class="kw">extends</span> SubsystemBase {
 
-    <span class="cm">// Named positions — no magic numbers in commands</span>
+    <span class="cm">// Named positions - no magic numbers in commands</span>
     <span class="kw">public enum</span> Goal {
-        FLAT,   <span class="cm">// servo at 0° — resting position</span>
-        CARRY,  <span class="cm">// servo at 45° — holding game piece</span>
-        DUMP    <span class="cm">// servo at 90° — releasing game piece</span>
+        FLAT,   <span class="cm">// servo at 0° - resting position</span>
+        CARRY,  <span class="cm">// servo at 45° - holding game piece</span>
+        DUMP    <span class="cm">// servo at 90° - releasing game piece</span>
     }
 
     <span class="kw">private final</span> XRPServo scoopServo = <span class="kw">new</span> XRPServo(<span class="num">4</span>);
@@ -775,7 +971,7 @@
           <div class="sb-step-chevron">▶</div>
         </div>
         <div class="sb-step-body">
-          <p><code>@AutoLogOutput</code> is an AdvantageKit annotation. Put it above a field and AdvantageKit automatically records that field to the log every loop cycle — no <code>Logger.recordOutput()</code> call needed. One annotation, instant visibility.</p>
+          <p><code>@AutoLogOutput</code> is an AdvantageKit annotation. Put it above a field and AdvantageKit automatically records that field to the log every loop cycle - no <code>Logger.recordOutput()</code> call needed. One annotation, instant visibility.</p>
           <div class="code-block"><pre>
 <span class="kw">import</span> org.littletonrobotics.junction.AutoLogOutput;  <span class="cm">// ← add import</span>
 
@@ -785,7 +981,7 @@
           <div class="code-annotation">After building and simulating, look for <code>Scoop/Goal</code> in the AdvantageScope log tree. It'll show FLAT, CARRY, or DUMP in real time.</div>
           <div class="hf-box hf-sidebar" style="margin-top:0.6rem;">
             <span class="hf-label">@AutoLogOutput vs Logger.recordOutput()</span>
-            <p><code>@AutoLogOutput</code> works on fields — it logs the field's value every loop cycle automatically. <code>Logger.recordOutput()</code> is a manual call you write in code — useful for computed values or one-off outputs. Use <code>@AutoLogOutput</code> whenever possible; it's less code and harder to forget.</p>
+            <p><code>@AutoLogOutput</code> works on fields - it logs the field's value every loop cycle automatically. <code>Logger.recordOutput()</code> is a manual call you write in code - useful for computed values or one-off outputs. Use <code>@AutoLogOutput</code> whenever possible; it's less code and harder to forget.</p>
           </div>
         </div>
       </div>
@@ -800,7 +996,7 @@
         <div class="sb-step-body">
           <p>Add two methods: a simple setter, and a factory method that wraps it in a command. Commands are how the outside world controls the subsystem.</p>
           <div class="code-block"><pre>
-<span class="cm">// Simple setter — changes the goal field</span>
+<span class="cm">// Simple setter - changes the goal field</span>
 <span class="kw">public void</span> setGoal(Goal newGoal) {
     goal = newGoal;
 }
@@ -811,7 +1007,7 @@
     <span class="kw">return</span> runOnce(() -> setGoal(newGoal));
 }
 
-<span class="cm">// Safe state — called when a command is interrupted</span>
+<span class="cm">// Safe state - called when a command is interrupted</span>
 <span class="kw">public void</span> stop() {
     setGoal(Goal.FLAT);  <span class="cm">// return to resting position</span>
 }</pre></div>
@@ -829,8 +1025,8 @@
         <div class="sb-step-body">
           <p>The goal is stored, but the servo isn't moving yet. <code>periodic()</code> reads the current goal and tells the servo where to go. This is the correct pattern: commands set the goal, <code>periodic()</code> applies it.</p>
           <div class="hf-box hf-warning" style="margin:0 0 0.6rem;">
-            <span class="hf-label">Wait — isn't this motor control in periodic()?</span>
-            <p>It looks like it, but this is actually the correct pattern for a servo. The command sets the <em>goal</em> (what position you want). <code>periodic()</code> reads that goal and applies it. The servo is always tracking the current goal — if the goal doesn't change, neither does the servo. This is different from <code>leftMotor.set(0.5)</code> in periodic(), which always pushes power regardless of any command state.</p>
+            <span class="hf-label">Wait - isn't this motor control in periodic()?</span>
+            <p>It looks like it, but this is actually the correct pattern for a servo. The command sets the <em>goal</em> (what position you want). <code>periodic()</code> reads that goal and applies it. The servo is always tracking the current goal - if the goal doesn't change, neither does the servo. This is different from <code>leftMotor.set(0.5)</code> in periodic(), which always pushes power regardless of any command state.</p>
           </div>
           <div class="code-block"><pre>
 <span class="kw">@Override</span>
@@ -842,7 +1038,7 @@
         <span class="kw">case</span> DUMP  -> scoopServo.setAngle(<span class="num">90.0</span>);
     }
 }</pre></div>
-          <div class="code-annotation">Angle values are placeholders — tune them on the real robot. The structure is correct.</div>
+          <div class="code-annotation">Angle values are placeholders - tune them on the real robot. The structure is correct.</div>
         </div>
       </div>
 
@@ -858,7 +1054,7 @@
           <div class="code-block"><pre>
 <span class="kw">public class</span> RobotContainer {
 
-    <span class="cm">// Subsystems — declared then assigned in constructor (IO pattern)</span>
+    <span class="cm">// Subsystems - declared then assigned in constructor (IO pattern)</span>
     <span class="kw">private final</span> Drive drive;
     <span class="kw">private final</span> Arm arm;
     <span class="kw">private final</span> Scoop scoop;  <span class="cm">// ← add this declaration</span>
@@ -904,19 +1100,15 @@
         <div class="sb-step-body">
           <div class="hf-box hf-info" style="margin:0 0 0.6rem;">
             <span class="hf-label">Verification workflow</span>
-            <p><strong>1.</strong> <code>Ctrl+Shift+P</code> → <em>WPILib: Build Robot Code</em> — must succeed, zero errors</p>
+            <p><strong>1.</strong> <code>Ctrl+Shift+P</code> → <em>WPILib: Build Robot Code</em> - must succeed, zero errors</p>
             <p><strong>2.</strong> <code>Ctrl+Shift+P</code> → <em>WPILib: Simulate Robot Code</em> → select <em>halsim_gui</em></p>
             <p><strong>3.</strong> Simulation GUI opens → Joysticks → drag <em>Keyboard 0</em> to <em>Joystick[0]</em></p>
             <p><strong>4.</strong> Open AdvantageScope → File → Connect to Simulator</p>
             <p><strong>5.</strong> Robot State panel → <em>Teleoperated</em> → <em>Enable</em></p>
             <p><strong>6.</strong> In AdvantageScope left panel, look for <code>Scoop/</code> folder</p>
-            <p><strong>7.</strong> Press A/B/X on keyboard — watch <code>Scoop/Goal</code> change between FLAT, CARRY, DUMP</p>
+            <p><strong>7.</strong> Press A/B/X on keyboard - watch <code>Scoop/Goal</code> change between FLAT, CARRY, DUMP</p>
           </div>
           <p>If the folder doesn't appear: check that <code>scoop</code> is declared and assigned in <code>RobotContainer</code> and the build succeeded.</p>
-          <div class="hf-box hf-brain" style="margin-top:0.6rem;">
-            <span class="hf-label">🍬 Candy check</span>
-            <p>Show your mentor: <code>Scoop/Goal</code> changing in AdvantageScope when you press buttons. That's a working subsystem with real-time logging. That's the whole point.</p>
-          </div>
         </div>
       </div>
 
@@ -924,14 +1116,14 @@
 
     <!-- Snippet section -->
     <hr class="section-rule">
-    <h2>Working smarter — VS Code Snippets</h2>
+    <h2>Working smarter - VS Code Snippets</h2>
 
-    <p>You just typed a lot of boilerplate. Fields, enums, constructor, periodic, methods. You'll do this again for <code>Elevator</code>. And again for every subsystem on every future robot. Senior programmers don't retype this — they use snippets.</p>
+    <p>You just typed a lot of boilerplate. Fields, enums, constructor, periodic, methods. You'll do this again for <code>Elevator</code>. And again for every subsystem on every future robot. Senior programmers don't retype this - they use snippets.</p>
 
     <div class="hf-box hf-info">
       <span class="hf-label">What is a VS Code snippet?</span>
       <p>A snippet is a keyboard shortcut that expands into a block of code. Type <code>aksubsystem</code>, press Tab, and VS Code fills in the entire SubsystemBase shell with fields, constructor, and periodic already stubbed. You fill in the name and the specifics.</p>
-      <p>FRC teams that maintain snippet libraries — including teams like 6328 (AdvantageKit authors) — type substantially less boilerplate. The pattern is always the same; the details differ.</p>
+      <p>FRC teams that maintain snippet libraries - including teams like 6328 (AdvantageKit authors) - type substantially less boilerplate. The pattern is always the same; the details differ.</p>
     </div>
 
     <h3>Creating the BearBots snippet file</h3>
@@ -999,12 +1191,12 @@
     <div class="hf-box hf-sidebar">
       <span class="hf-label">Snippets we'll add in future lessons</span>
       <p>As you build each new pattern, you'll add a matching snippet. Here's what's coming:</p>
-      <p><code>akio</code> — ArmIO interface shell (Lesson 04)<br>
-      <code>akioimpl</code> — ArmIOXRP implementation shell (Lesson 04)<br>
-      <code>akinputs</code> — @AutoLog inputs class (Lesson 04)<br>
-      <code>akcommand</code> — Full command class shell (Lesson 06)<br>
-      <code>akpcontrol</code> — P-control loop shell (Lesson 07)</p>
-      <p>By the end of the curriculum, your <code>java.json</code> is a complete BearBots toolkit. Teams share snippet files the same way they share code — commit it to the repo.</p>
+      <p><code>akio</code> - ArmIO interface shell (Lesson 04)<br>
+      <code>akioimpl</code> - ArmIOXRP implementation shell (Lesson 04)<br>
+      <code>akinputs</code> - @AutoLog inputs class (Lesson 04)<br>
+      <code>akcommand</code> - Full command class shell (Lesson 06)<br>
+      <code>akpcontrol</code> - P-control loop shell (Lesson 07)</p>
+      <p>By the end of the curriculum, your <code>java.json</code> is a complete BearBots toolkit. Teams share snippet files the same way they share code - commit it to the repo.</p>
     </div>
 
     <div class="hf-box hf-info">
@@ -1016,205 +1208,25 @@
 
   </div><!-- /section-build -->
 
-
   <!-- ═══════════════════════════════════════════════════════
-       PART 4 — THE IO PATTERN
-       ═══════════════════════════════════════════════════════ -->
-  <div class="lesson-section" id="section-io">
-
-    <p>In Part 2 you read <code>Arm.java</code> and saw this line:</p>
-    <div class="code-block" style="margin:0.75rem 0;"><pre><span class="kw">private final</span> ArmIO io;</pre></div>
-    <p>And in Part 3, you wrote this line in <code>Scoop</code>:</p>
-    <div class="code-block" style="margin:0.75rem 0;"><pre><span class="kw">private final</span> XRPServo scoopServo = <span class="kw">new</span> XRPServo(<span class="num">4</span>);</pre></div>
-    <p>These two approaches solve the same problem — "how does the subsystem talk to hardware?" — in completely different ways. This part explains why the IO pattern exists, what the two files look like, and why <code>Scoop</code> as you built it is already technically wrong (even though it works).</p>
-
-    <h2>The problem with importing hardware directly</h2>
-
-    <div class="hf-box hf-brain">
-      <span class="hf-label">Imagine this scenario</span>
-      <p>Your <code>Scoop</code> has <code>import edu.wpi.first.wpilibj.xrp.XRPServo</code> at the top. You've been testing in simulation all week. Match day arrives — you plug into the real FRC robot (which uses a different servo controller). The class name is different. Your subsystem won't compile on the competition robot without changes. You are now editing code at a competition. This is bad.</p>
-    </div>
-
-    <p>The IO pattern solves this by adding a layer of indirection. Instead of the subsystem knowing <em>which</em> hardware object to use, you define an <strong>interface</strong> that describes <em>what operations the hardware must support</em>. Then you write separate <strong>implementations</strong> for each hardware type. The subsystem only ever talks to the interface.</p>
-
-    <h2>Three files instead of one</h2>
-
-    <div class="io-compare">
-      <div class="io-pane subsystem">
-        <div class="io-pane-label">Arm.java — the subsystem</div>
-        <div class="code-block"><pre>
-<span class="kw">public class</span> Arm <span class="kw">extends</span> SubsystemBase {
-
-  <span class="cm">// Talks to the interface — never to hardware</span>
-  <span class="kw">private final</span> ArmIO io;
-  <span class="kw">private final</span> ArmIOInputsAutoLogged inputs
-      = <span class="kw">new</span> ArmIOInputsAutoLogged();
-
-  <span class="kw">public</span> Arm(ArmIO io) {
-    <span class="kw">this</span>.io = io; <span class="cm">// injected from outside</span>
-  }
-
-  <span class="kw">@Override</span>
-  <span class="kw">public void</span> periodic() {
-    io.updateInputs(inputs);
-    Logger.processInputs(<span class="str">"Arm"</span>, inputs);
-  }
-
-  <span class="kw">public void</span> setAngle(<span class="kw">double</span> deg) {
-    io.setAngle(deg); <span class="cm">// through interface</span>
-  }
-}</pre></div>
-      </div>
-      <div class="io-pane interface">
-        <div class="io-pane-label">ArmIO.java — the interface</div>
-        <div class="code-block"><pre>
-<span class="kw">public interface</span> ArmIO {
-
-  <span class="cm">// The data the hardware reads each loop</span>
-  <span class="kw">@AutoLog</span>
-  <span class="kw">class</span> ArmIOInputs {
-    <span class="kw">public double</span> commandedAngleDeg = <span class="num">0.0</span>;
-  }
-
-  <span class="cm">// What any arm hardware implementation must do</span>
-  <span class="kw">default void</span> updateInputs(ArmIOInputs inputs) {}
-  <span class="kw">default void</span> setAngle(<span class="kw">double</span> angleDeg) {}
-}</pre></div>
-      </div>
-    </div>
-
-    <p>And then a separate implementation for each hardware type:</p>
-
-    <div class="io-compare">
-      <div class="io-pane impl">
-        <div class="io-pane-label">ArmIOXRP.java — XRP hardware implementation</div>
-        <div class="code-block"><pre>
-<span class="cm">// This file knows about XRP hardware</span>
-<span class="kw">import</span> edu.wpi.first.wpilibj.xrp.XRPServo;
-
-<span class="kw">public class</span> ArmIOXRP <span class="kw">implements</span> ArmIO {
-
-  <span class="kw">private final</span> XRPServo servo = <span class="kw">new</span> XRPServo(<span class="num">5</span>);
-
-  <span class="kw">@Override</span>
-  <span class="kw">public void</span> updateInputs(ArmIOInputs inputs) {
-    inputs.commandedAngleDeg = servo.getAngle();
-  }
-
-  <span class="kw">@Override</span>
-  <span class="kw">public void</span> setAngle(<span class="kw">double</span> deg) {
-    servo.setAngle(deg);
-  }
-}</pre></div>
-      </div>
-      <div class="io-pane interface" style="border-color:var(--code-border);">
-        <div class="io-pane-label" style="background:var(--teal);">ArmIOSim.java — simulation stub</div>
-        <div class="code-block"><pre>
-<span class="cm">// This file knows about simulation</span>
-<span class="cm">// No hardware imports at all</span>
-
-<span class="kw">public class</span> ArmIOSim <span class="kw">implements</span> ArmIO {
-
-  <span class="kw">private double</span> angleDeg = <span class="num">0.0</span>;
-
-  <span class="kw">@Override</span>
-  <span class="kw">public void</span> updateInputs(ArmIOInputs inputs) {
-    inputs.commandedAngleDeg = angleDeg;
-  }
-
-  <span class="kw">@Override</span>
-  <span class="kw">public void</span> setAngle(<span class="kw">double</span> deg) {
-    angleDeg = deg; <span class="cm">// just store it</span>
-  }
-}</pre></div>
-      </div>
-    </div>
-
-    <h2>How RobotContainer wires it together</h2>
-    <p>The subsystem never decides which implementation it gets. <code>RobotContainer</code> makes that decision at startup based on whether the code is running in simulation or on real hardware:</p>
-
-    <div class="code-block"><pre>
-<span class="kw">public</span> RobotContainer() {
-    <span class="kw">switch</span> (Constants.currentMode) {
-        <span class="kw">case</span> REAL:
-            arm = <span class="kw">new</span> Arm(<span class="kw">new</span> ArmIOXRP());  <span class="cm">// real XRP servo</span>
-            <span class="kw">break</span>;
-        <span class="kw">case</span> SIM:
-            arm = <span class="kw">new</span> Arm(<span class="kw">new</span> ArmIOSim());   <span class="cm">// simulation stub</span>
-            <span class="kw">break</span>;
-        <span class="kw">default</span>:
-            arm = <span class="kw">new</span> Arm(<span class="kw">new</span> ArmIO() {});   <span class="cm">// log replay — no hardware</span>
-            <span class="kw">break</span>;
-    }
-}</pre></div>
-    <div class="code-annotation">The Arm subsystem itself never changes. Swap the implementation per case in RobotContainer. That's the entire point.</div>
-
-    <h2>Why this matters for simulation</h2>
-
-    <div class="diff-container">
-      <div class="diff-tabs">
-        <button class="diff-tab bad active" onclick="diffSwitch('iodiff','bad',this)">Without IO pattern</button>
-        <button class="diff-tab good" onclick="diffSwitch('iodiff','good',this)">With IO pattern</button>
-      </div>
-      <div class="diff-pane bad-pane active" id="iodiff-bad">
-        <div class="code-block"><pre>
-<span class="cm">// Subsystem imports hardware directly</span>
-<span class="kw">import</span> edu.wpi.first.wpilibj.xrp.XRPServo;
-
-<span class="kw">public class</span> Scoop <span class="kw">extends</span> SubsystemBase {
-    <span class="kw">private final</span> XRPServo scoopServo = <span class="kw">new</span> XRPServo(<span class="num">4</span>);
-    <span class="cm">// ❌ This constructor always creates a real XRPServo</span>
-    <span class="cm">// ❌ Can't swap it out for simulation</span>
-    <span class="cm">// ❌ Any code changes for sim break the real robot build</span>
-}</pre></div>
-      </div>
-      <div class="diff-pane good-pane" id="iodiff-good">
-        <div class="code-block"><pre>
-<span class="cm">// Subsystem only knows about the interface</span>
-<span class="kw">public class</span> Scoop <span class="kw">extends</span> SubsystemBase {
-    <span class="kw">private final</span> ScoopIO io; <span class="cm">// interface, not hardware</span>
-
-    <span class="kw">public</span> Scoop(ScoopIO io) {
-        <span class="kw">this</span>.io = io; <span class="cm">// ✅ caller decides the hardware</span>
-    }
-    <span class="cm">// ✅ Same class runs in sim (ScoopIOSim) and on XRP (ScoopIOXRP)</span>
-    <span class="cm">// ✅ No code changes between environments</span>
-    <span class="cm">// ✅ Can test without physical hardware</span>
-}</pre></div>
-      </div>
-    </div>
-
-    <div class="callout-deferred">
-      <strong>Coming in Lesson 04:</strong> You'll refactor <code>Scoop</code> from what you built in Part 3 into the full IO pattern — creating <code>ScoopIO.java</code>, <code>ScoopIOXRP.java</code>, and <code>ScoopIOSim.java</code>. You'll also add the <code>akio</code> and <code>akioimpl</code> snippets to your <code>java.json</code>. For now, the key insight is: <strong>the subsystem talks to an interface, never to hardware directly.</strong>
-    </div>
-
-    <div class="hf-box hf-sidebar">
-      <span class="hf-label">Where did you already see this?</span>
-      <p>In Part 2, <code>Arm.java</code> line 12: <code>private final ArmIO io;</code>. That's the IO pattern. Line 21: <code>public Arm(ArmIO io) { this.io = io; }</code> — that's dependency injection. You read the full pattern before you understood it. Now you do.</p>
-    </div>
-
-  </div><!-- /section-io -->
-
-
-  <!-- ═══════════════════════════════════════════════════════
-       PART 5 — TRY IT YOURSELF
+       PART 5 - TRY IT YOURSELF
        ═══════════════════════════════════════════════════════ -->
   <div class="lesson-section" id="section-challenge">
 
     <p>Two activities before the tiered challenges. First: sort mechanisms into subsystems. Second: tiered build challenge.</p>
 
-    <h2>Activity — Subsystem Design Sort</h2>
+    <h2>Activity - Subsystem Design Sort</h2>
     <p>Where does each mechanism belong? Sort them into the correct subsystem bucket. Tap a tile to select it (it turns teal), then tap a bucket to place it. Tap a placed tile to remove it.</p>
 
     <div class="ss-widget">
       <div class="ss-round-tabs">
-        <button class="ss-round-tab active" onclick="ssSwitchRound('r1', this)">Round 1 — BearBots Robot</button>
-        <button class="ss-round-tab" onclick="ssSwitchRound('r2', this)">Round 2 — Harder (with decoys)</button>
+        <button class="ss-round-tab active" onclick="ssSwitchRound('r1', this)">Round 1 - BearBots Robot</button>
+        <button class="ss-round-tab" onclick="ssSwitchRound('r2', this)">Round 2 - Harder (with decoys)</button>
       </div>
 
       <!-- Round 1 -->
       <div class="ss-round active" id="ss-r1">
-        <div class="ss-round-label">Round 1 — BearBots robot mechanisms</div>
+        <div class="ss-round-label">Round 1 - BearBots robot mechanisms</div>
         <div class="ss-instruction">Tap a tile to select it, then tap the subsystem it belongs in.</div>
 
         <div class="ss-tiles" id="ss-r1-tiles">
@@ -1262,8 +1274,8 @@
 
       <!-- Round 2 -->
       <div class="ss-round" id="ss-r2">
-        <div class="ss-round-label">Round 2 — With decoys (purple tiles)</div>
-        <div class="ss-instruction">Purple tiles are trickier — some don't belong in any mechanism subsystem. Use the "Doesn't belong in a mechanism subsystem" bucket for those.</div>
+        <div class="ss-round-label">Round 2 - With decoys (purple tiles)</div>
+        <div class="ss-instruction">Purple tiles are trickier - some don't belong in any mechanism subsystem. Use the "Doesn't belong in a mechanism subsystem" bucket for those.</div>
 
         <div class="ss-tiles" id="ss-r2-tiles">
           <div class="ss-tile" data-value="lmotor2" onclick="ssTileClick(this,'r2')">Left drive motor</div>
@@ -1316,10 +1328,10 @@
           <button class="toggle-btn" data-target="ss-r2-explain" data-open="Why do the decoys not belong?" data-closed="Hide explanation">Why do the decoys not belong?</button>
         </div>
         <div class="toggle-content" id="ss-r2-explain" style="display:none;">
-          <p><strong>Battery voltage monitor</strong> — this is a robot-level concern, not a mechanism. It doesn't own any motor or sensor that drives a mechanism. Typically read in <code>robotPeriodic()</code> or a dedicated diagnostics system.</p>
-          <p><strong>LED strip</strong> — technically could be its own <code>LEDSubsystem</code>, but it doesn't "control a mechanism" in the FRC sense. It's a signaling device. Many teams put it in its own subsystem, many don't. No servo or motor, so not a mechanism subsystem.</p>
-          <p><strong>Vision camera</strong> — also often its own subsystem (<code>Vision</code>), but it's a sensor, not a mechanism. It doesn't own any motor. It feeds data to <code>Drive</code> for pose correction.</p>
-          <p><strong>Power distribution hub (PDH)</strong> — robot-level hardware, monitored but not controlled by mechanism subsystems. Read in diagnostics or <code>robotPeriodic()</code>.</p>
+          <p><strong>Battery voltage monitor</strong> - this is a robot-level concern, not a mechanism. It doesn't own any motor or sensor that drives a mechanism. Typically read in <code>robotPeriodic()</code> or a dedicated diagnostics system.</p>
+          <p><strong>LED strip</strong> - technically could be its own <code>LEDSubsystem</code>, but it doesn't "control a mechanism" in the FRC sense. It's a signaling device. Many teams put it in its own subsystem, many don't. No servo or motor, so not a mechanism subsystem.</p>
+          <p><strong>Vision camera</strong> - also often its own subsystem (<code>Vision</code>), but it's a sensor, not a mechanism. It doesn't own any motor. It feeds data to <code>Drive</code> for pose correction.</p>
+          <p><strong>Power distribution hub (PDH)</strong> - robot-level hardware, monitored but not controlled by mechanism subsystems. Read in diagnostics or <code>robotPeriodic()</code>.</p>
         </div>
       </div>
 
@@ -1331,21 +1343,21 @@
     <p>Pick your tier. Each builds on the previous.</p>
 
     <div class="tier-tabs">
-      <button class="tier-tab bronze active" data-tier="bronze">Bronze — I built one</button>
-      <button class="tier-tab silver" data-tier="silver">Silver — I understand the pattern</button>
-      <button class="tier-tab gold" data-tier="gold">Gold — I can design from scratch</button>
+      <button class="tier-tab bronze active" data-tier="bronze">Bronze - I built one</button>
+      <button class="tier-tab silver" data-tier="silver">Silver - I understand the pattern</button>
+      <button class="tier-tab gold" data-tier="gold">Gold - I can design from scratch</button>
     </div>
 
     <div>
       <div class="tier-panel bronze active">
-        <span class="tier-label">Bronze — verify your Scoop subsystem</span>
-        <p>You built <code>Scoop</code> in Part 3. Now verify it completely.</p>
+        <span class="tier-label">Bronze - verify your Scoop subsystem</span>
+        <p>You built <code>Scoop</code> in Part 4. Now verify it completely.</p>
         <ul class="task-list">
           <li>Build succeeds with zero errors</li>
-          <li>Simulate — <code>Scoop/</code> folder appears in AdvantageScope</li>
-          <li>Press button A — <code>Goal</code> changes to CARRY in AdvantageScope</li>
-          <li>Press button B — <code>Goal</code> changes to DUMP</li>
-          <li>Press button X — <code>Goal</code> returns to FLAT</li>
+          <li>Simulate - <code>Scoop/</code> folder appears in AdvantageScope</li>
+          <li>Press button A - <code>Goal</code> changes to CARRY in AdvantageScope</li>
+          <li>Press button B - <code>Goal</code> changes to DUMP</li>
+          <li>Press button X - <code>Goal</code> returns to FLAT</li>
           <li>Add a <code>System.out.println("Scoop goal: " + goal)</code> inside <code>periodic()</code>. Does it print 50 times per second?</li>
         </ul>
         <div class="toggle-row">
@@ -1357,12 +1369,12 @@
       </div>
 
       <div class="tier-panel silver">
-        <span class="tier-label">Silver — add Elevator subsystem</span>
+        <span class="tier-label">Silver - add Elevator subsystem</span>
         <p>Use the <code>aksubsystem</code> snippet to create <code>Elevator</code>. It has a motor (not a servo) and an encoder.</p>
         <ul class="task-list">
-          <li>Trigger the <code>aksubsystem</code> snippet — fill in <code>Elevator</code></li>
+          <li>Trigger the <code>aksubsystem</code> snippet - fill in <code>Elevator</code></li>
           <li>Add an <code>ElevatorGoal</code> enum: <code>STOWED</code>, <code>LOW</code>, <code>HIGH</code></li>
-          <li>Add a motor field: <code>XRPMotor elevatorMotor = new XRPMotor(1)</code> — <em>wait, is port 1 correct? Check the port assignments.</em></li>
+          <li>Add a motor field: <code>XRPMotor elevatorMotor = new XRPMotor(1)</code> - <em>wait, is port 1 correct? Check the port assignments.</em></li>
           <li>In <code>periodic()</code>: apply a fixed speed when goal is LOW or HIGH, stop when STOWED</li>
           <li>Add <code>@AutoLogOutput</code> on the goal field</li>
           <li>Register in RobotContainer, wire buttons, verify in AdvantageScope</li>
@@ -1399,18 +1411,18 @@
           <button class="toggle-btn" data-target="s3-ans" data-open="Show which is correct and why" data-closed="Hide answer">Show which is correct and why</button>
         </div>
         <div class="toggle-content answer" id="s3-ans">
-          Option B is correct. Option A runs the motor forever at 40% regardless of goal state — the elevator will never stop. Option B checks the goal and applies the appropriate speed. When goal is STOWED, the motor is 0. Commands set the goal; periodic() applies it. This is the same pattern as the scoop servo.
+          Option B is correct. Option A runs the motor forever at 40% regardless of goal state - the elevator will never stop. Option B checks the goal and applies the appropriate speed. When goal is STOWED, the motor is 0. Commands set the goal; periodic() applies it. This is the same pattern as the scoop servo.
         </div>
       </div>
 
       <div class="tier-panel gold">
-        <span class="tier-label">Gold — design the full robot architecture</span>
+        <span class="tier-label">Gold - design the full robot architecture</span>
         <p>Before writing any code: design the complete subsystem structure for a new robot.</p>
         <ul class="task-list">
           <li>List every mechanism on the BearBots robot (real or extended-hypothetical)</li>
           <li>For each subsystem: what hardware does it own? What are its goal states? What commands does it expose?</li>
           <li>Identify coordination scenarios: the elevator rises → scoop must tilt up to retain the piece. Which commands coordinate these two subsystems? Where does that coordination live?</li>
-          <li>Create all subsystem shells using the <code>aksubsystem</code> snippet — no implementation yet</li>
+          <li>Create all subsystem shells using the <code>aksubsystem</code> snippet - no implementation yet</li>
           <li>Verify the project builds with all shells registered in RobotContainer</li>
           <li>Add a brief comment in each class describing what it owns and what commands it will eventually expose</li>
         </ul>
@@ -1418,7 +1430,7 @@
           <button class="toggle-btn" data-target="g3-hint" data-open="Show coordination hint" data-closed="Hide hint">Show coordination hint</button>
         </div>
         <div class="toggle-content hint" id="g3-hint">
-          Subsystems coordinate through commands, not direct method calls. The elevator rising while the scoop tilts is a command that <em>requires both subsystems</em> — it calls <code>elevator.setGoal(HIGH)</code> and <code>scoop.setGoal(CARRY)</code> in sequence or in parallel. The command lives in RobotContainer (or a dedicated auto/teleop command file), not inside either subsystem. That distinction is critical for scheduling: WPILib can interrupt either subsystem's default command when this coordinated command needs control.
+          Subsystems coordinate through commands, not direct method calls. The elevator rising while the scoop tilts is a command that <em>requires both subsystems</em> - it calls <code>elevator.setGoal(HIGH)</code> and <code>scoop.setGoal(CARRY)</code> in sequence or in parallel. The command lives in RobotContainer (or a dedicated auto/teleop command file), not inside either subsystem. That distinction is critical for scheduling: WPILib can interrupt either subsystem's default command when this coordinated command needs control.
         </div>
       </div>
     </div>
@@ -1427,12 +1439,12 @@
 
 
   <!-- ═══════════════════════════════════════════════════════
-       PART 6 — BROKEN ROBOT LAB
+       PART 6 - BROKEN ROBOT LAB
        ═══════════════════════════════════════════════════════ -->
   <div class="lesson-section" id="section-lab">
 
     <p class="bug-lab-intro">
-      Someone wrote this code. It compiles. It even runs. But it has <strong>4 structural bugs</strong> — the kind that cause mysterious behavior at competition when you least have time to fix them. Click any highlighted line to reveal the bug.
+      Someone wrote this code. It compiles. It even runs. But it has <strong>4 structural bugs</strong> - the kind that cause mysterious behavior at competition when you least have time to fix them. Click any highlighted line to reveal the bug.
     </p>
 
     <div class="bug-lab" data-lab="lesson-03">
@@ -1459,7 +1471,7 @@
         <div class="code-lab-line"><span class="line-num">10</span><span class="line-code">&nbsp;</span></div>
         <div class="code-lab-line"><span class="line-num">11</span><span class="line-code">&nbsp;&nbsp;<span class="kw">public</span> Command tiltScoop() {</span></div>
         <div class="code-lab-line"><span class="line-num">12</span><span class="line-code">&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span> runOnce(() -> scoopServo.setAngle(<span class="num">90.0</span>));</span></div>
-        <div class="code-lab-line bug-line" data-bug="3"><span class="line-num">13</span><span class="line-code">&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm">// this command requires Drive — correct!</span></span></div>
+        <div class="code-lab-line bug-line" data-bug="3"><span class="line-num">13</span><span class="line-code">&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm">// this command requires Drive - correct!</span></span></div>
         <div class="code-lab-line"><span class="line-num">14</span><span class="line-code">&nbsp;&nbsp;}</span></div>
         <div class="code-lab-line"><span class="line-num">15</span><span class="line-code">&nbsp;</span></div>
         <div class="code-lab-line"><span class="line-num">16</span><span class="line-code">&nbsp;&nbsp;<span class="kw">public</span> Command emergencyStop() {</span></div>
@@ -1470,39 +1482,39 @@
       </div>
 
       <div class="bug-reveal" data-bug="1">
-        <h4>Bug 1 — Scoop servo living inside Drive</h4>
+        <h4>Bug 1 - Scoop servo living inside Drive</h4>
         <div class="bug-joke">It was convenient. It is not correct. "Convenient" and "correct" are different things that feel the same until 11pm before competition.</div>
-        <p>The scoop servo belongs in <code>Scoop</code>. When the scoop misbehaves, you'll search <code>Drive</code> for the bug. Worse: a command that tilts the scoop will accidentally <em>require</em> <code>Drive</code> — which means the robot can't drive while tilting the scoop. One misplaced field locks out an entire subsystem.</p>
+        <p>The scoop servo belongs in <code>Scoop</code>. When the scoop misbehaves, you'll search <code>Drive</code> for the bug. Worse: a command that tilts the scoop will accidentally <em>require</em> <code>Drive</code> - which means the robot can't drive while tilting the scoop. One misplaced field locks out an entire subsystem.</p>
         <div class="bug-fix-label">Fix</div>
-        <div class="bug-fix">Move <code>scoopServo</code> to <code>Scoop.java</code>. You already built it in Part 3.</div>
+        <div class="bug-fix">Move <code>scoopServo</code> to <code>Scoop.java</code>. You already built it in Part 4.</div>
       </div>
 
       <div class="bug-reveal" data-bug="2">
-        <h4>Bug 2 — Motor control in periodic()</h4>
+        <h4>Bug 2 - Motor control in periodic()</h4>
         <div class="bug-joke">The robot drives forward. Forever. Without stopping. Even in autonomous. Even when disabled. This is what "always" means in robot code.</div>
-        <p>Motor control in <code>periodic()</code> runs every loop cycle regardless of mode or state. The robot will drive forward the moment it's enabled and never stop. Motor control belongs in commands — which can be started, stopped, and interrupted. <code>periodic()</code> is for reading sensors and logging only.</p>
+        <p>Motor control in <code>periodic()</code> runs every loop cycle regardless of mode or state. The robot will drive forward the moment it's enabled and never stop. Motor control belongs in commands - which can be started, stopped, and interrupted. <code>periodic()</code> is for reading sensors and logging only.</p>
         <div class="bug-fix-label">Fix</div>
         <div class="bug-fix">Move motor control into a default drive command. Set it as the default command in RobotContainer. <code>periodic()</code> reads sensors and logs only.</div>
       </div>
 
       <div class="bug-reveal" data-bug="3">
-        <h4>Bug 3 — tiltScoop() requires Drive, not Scoop</h4>
-        <div class="bug-joke">The comment says "requires Drive — correct!" The comment is not correct.</div>
-        <p>Because <code>tiltScoop()</code> is defined inside <code>Drive</code>, WPILib's <code>runOnce()</code> automatically requires the drive subsystem. This means tilting the scoop locks out any drive commands — the robot can't drive while the scoop is tilting. Commands must live in the subsystem that owns the hardware they control.</p>
+        <h4>Bug 3 - tiltScoop() requires Drive, not Scoop</h4>
+        <div class="bug-joke">The comment says "requires Drive - correct!" The comment is not correct.</div>
+        <p>Because <code>tiltScoop()</code> is defined inside <code>Drive</code>, WPILib's <code>runOnce()</code> automatically requires the drive subsystem. This means tilting the scoop locks out any drive commands - the robot can't drive while the scoop is tilting. Commands must live in the subsystem that owns the hardware they control.</p>
         <div class="bug-fix-label">Fix</div>
         <div class="bug-fix">Move <code>tiltScoop()</code> to <code>Scoop</code>. It will then correctly require only the scoop, and the drive subsystem stays free.</div>
       </div>
 
       <div class="bug-reveal" data-bug="4">
-        <h4>Bug 4 — emergencyStop() doesn't stop the real problem</h4>
+        <h4>Bug 4 - emergencyStop() doesn't stop the real problem</h4>
         <div class="bug-joke">You stopped the motors for one loop cycle. Then periodic() ran again on line 8 and set them back to 0.5. The emergency stop stopped for approximately 20 milliseconds.</div>
-        <p>Setting motors to 0 in a <code>runOnce()</code> command does nothing if <code>periodic()</code> is setting them to 0.5 every loop. The command runs once and ends — then <code>periodic()</code> immediately overrides it. The fix for an emergency stop is to fix Bug 2 first (remove motor control from periodic), then set a goal state to STOPPED that periodic() reads and applies. This is why motor control in periodic() creates a second-order problem: it makes emergency stops impossible without a full architecture fix.</p>
+        <p>Setting motors to 0 in a <code>runOnce()</code> command does nothing if <code>periodic()</code> is setting them to 0.5 every loop. The command runs once and ends - then <code>periodic()</code> immediately overrides it. The fix for an emergency stop is to fix Bug 2 first (remove motor control from periodic), then set a goal state to STOPPED that periodic() reads and applies. This is why motor control in periodic() creates a second-order problem: it makes emergency stops impossible without a full architecture fix.</p>
         <div class="bug-fix-label">Fix</div>
         <div class="bug-fix">Fix Bug 2 first. Then implement a proper STOPPED goal state that periodic() reads. The emergency stop command sets goal = STOPPED; periodic() applies 0 power when it sees that goal.</div>
       </div>
 
       <div class="success-banner">
-        All 4 bugs found. Wrong subsystem ownership, motor control in periodic(), misattributed command requirements, and the cascading consequence of motor-in-periodic making emergency stops futile. You'll recognize all four on sight now — that's the whole point of this lab.
+        All 4 bugs found. Wrong subsystem ownership, motor control in periodic(), misattributed command requirements, and the cascading consequence of motor-in-periodic making emergency stops futile. You'll recognize all four on sight now - that's the whole point of this lab.
       </div>
 
     </div><!-- /bug-lab -->
@@ -1511,12 +1523,12 @@
 
 
   <nav class="section-nav section-nav--bottom">
-    <button class="section-nav-btn active" data-section="concept">Part 1 — The Concept</button>
-    <button class="section-nav-btn" data-section="arm">Part 2 — Reading a Real Subsystem</button>
-    <button class="section-nav-btn" data-section="build">Part 3 — Build Scoop</button>
-    <button class="section-nav-btn" data-section="io">Part 4 — The IO Pattern</button>
-    <button class="section-nav-btn" data-section="challenge">Part 5 — Try It Yourself</button>
-    <button class="section-nav-btn" data-section="lab">Part 6 — Broken Robot Lab</button>
+    <button class="section-nav-btn active" data-section="concept">Part 1 - The Concept</button>
+    <button class="section-nav-btn" data-section="arm">Part 2 - Reading a Real Subsystem</button>
+    <button class="section-nav-btn" data-section="io">Part 3 - The IO Pattern</button>
+    <button class="section-nav-btn" data-section="build">Part 4 - Build Scoop</button>
+    <button class="section-nav-btn" data-section="challenge">Part 5 - Try It Yourself</button>
+    <button class="section-nav-btn" data-section="lab">Part 6 - Broken Robot Lab</button>
   </nav>
 
 </div><!-- /page-container -->
@@ -1593,7 +1605,7 @@ function schedUpdateNav() {
   if (!schedScript) {
     if (prev) prev.disabled = true;
     if (next) next.disabled = true;
-    if (label) label.textContent = '—';
+    if (label) label.textContent = '-';
     return;
   }
   if (prev) prev.disabled = (schedStep <= 0);
@@ -1611,7 +1623,7 @@ function schedPlay(mode) {
   schedLoopNums = schedScript.map(e => e.loop != null ? e.loop : null);
   const hdr = document.createElement('div');
   hdr.className = 't-line';
-  const labels = { good:'▶ GOOD — motor output in a Command', bad:'▶ BAD — motor output in periodic()', conflict:'▶ CONFLICT — two commands, same subsystem' };
+  const labels = { good:'▶ GOOD - motor output in a Command', bad:'▶ BAD - motor output in periodic()', conflict:'▶ CONFLICT - two commands, same subsystem' };
   const colors = { good:'#4ec9b0', bad:'#f44747', conflict:'#d7ba7d' };
   hdr.innerHTML = `<span class="t-ts"></span><span class="t-tag"></span><span class="t-msg" style="color:${colors[mode]};font-weight:700;">D:\\frc> simulate.exe --scenario ${mode}</span>`;
   if (term) term.appendChild(hdr);
@@ -1686,8 +1698,8 @@ good: [
     { loop:1, fc:'fc-periodic', cls:'active',     tag:'periodic()', type:'periodic',    msg:'Drive.periodic() → io.updateInputs() + Logger.processInputs()' },
     { loop:1, fc:'fc-periodic', cls:'active',     tag:'periodic()', type:'periodic',    msg:'Scoop.periodic() → scoopServo.setAngle(goal==FLAT → 0°)' },
     { loop:1, fc:'fc-triggers', cls:'active',     tag:'triggers',   type:'trigger',     msg:'polling button bindings... joystick left-Y moved' },
-    { loop:1, fc:'fc-triggers', cls:'active',     tag:'reqs check', type:'sched',       msg:'defaultDriveCommand needs Drive — no conflict' },
-    { loop:1, fc:'fc-cancel',   cls:'active',     tag:'→ init',     type:'cmd-init',    msg:'defaultDriveCommand.initialize() called — scheduled' },
+    { loop:1, fc:'fc-triggers', cls:'active',     tag:'reqs check', type:'sched',       msg:'defaultDriveCommand needs Drive - no conflict' },
+    { loop:1, fc:'fc-cancel',   cls:'active',     tag:'→ init',     type:'cmd-init',    msg:'defaultDriveCommand.initialize() called - scheduled' },
     { loop:1, fc:'fc-exec',     cls:'active',     tag:'execute()',   type:'cmd-exec',    msg:'defaultDriveCommand.execute() → io.setVoltage(left, right)' },
     { loop:1, fc:'fc-exec',     cls:'active',     tag:'finished?',  type:'cmd-exec',    msg:'isFinished() → false (runs until interrupted)' },
     { loop:1, fc:'fc-default',  cls:'active',     tag:'defaults',   type:'default-cmd', msg:'Scoop free → ScoopHoldCommand scheduled as default' },
@@ -1702,12 +1714,12 @@ good: [
 bad: [
     { loop:1, fc:'fc-robot',    cls:'active',     tag:'[20ms loop]',  type:'periodic',    msg:'Robot.robotPeriodic() called' },
     { loop:1, fc:'fc-sched',    cls:'active',     tag:'',             type:'sched',       msg:'CommandScheduler.getInstance().run() called' },
-    { loop:1, fc:'fc-periodic', cls:'active-bad', tag:'periodic()', type:'bad-motor',   msg:'Drive.periodic() called at step 1 — unconditionally' },
+    { loop:1, fc:'fc-periodic', cls:'active-bad', tag:'periodic()', type:'bad-motor',   msg:'Drive.periodic() called at step 1 - unconditionally' },
     { loop:1, fc:'fc-periodic', cls:'active-bad', tag:'periodic()', type:'bad-motor',   msg:'controller.getLeftY() read + leftMotor.set(speed) called' },
     { fc:'fc-periodic', cls:'active-bad', tag:'Note:', type:'bad-motor',   msg:'Scheduler has NO mechanism to skip or cancel periodic()' },
     { loop:1, fc:'fc-periodic', cls:'active',     tag:'periodic()', type:'periodic',    msg:'Scoop.periodic() → scoopServo.setAngle(goal==FLAT → 0°)' },
     { loop:1, fc:'fc-triggers', cls:'active',     tag:'triggers',   type:'trigger',     msg:'polling triggers... nothing else scheduled' },
-    { loop:1, fc:'fc-exec',     cls:'active',     tag:'execute()',   type:'cmd-exec',    msg:'no active commands — nothing to execute this loop' },
+    { loop:1, fc:'fc-exec',     cls:'active',     tag:'execute()',   type:'cmd-exec',    msg:'no active commands - nothing to execute this loop' },
     { loop:2, fc:'fc-robot',    cls:'active',     tag:'[20ms loop]',  type:'periodic',    msg:'[next loop] Robot.robotPeriodic() called' },
     { loop:2, fc:'fc-sched',    cls:'active',     tag:'',             type:'sched',       msg:'CommandScheduler.getInstance().run() called' },
     { loop:2, fc:'fc-periodic', cls:'active-bad', tag:'periodic()', type:'bad-motor',   msg:'Drive.periodic() → motors set again. Always.' },
@@ -1723,7 +1735,7 @@ conflict: [
     { loop:1, fc:'fc-sched',    cls:'active',     tag:'',             type:'sched',       msg:'CommandScheduler.getInstance().run() called' },
     { loop:1, fc:'fc-periodic', cls:'active',     tag:'periodic()', type:'periodic',    msg:'Drive.periodic() → sensors logged' },
     { loop:1, fc:'fc-periodic', cls:'active',     tag:'periodic()', type:'periodic',    msg:'Scoop.periodic() → scoop servo angle logged' },
-    { loop:1, fc:'fc-triggers', cls:'active-warn',tag:'triggers',   type:'trigger',     msg:'button B pressed — AutoDriveCommand wants to schedule' },
+    { loop:1, fc:'fc-triggers', cls:'active-warn',tag:'triggers',   type:'trigger',     msg:'button B pressed - AutoDriveCommand wants to schedule' },
     { loop:1, fc:'fc-triggers', cls:'active-warn',tag:'reqs check', type:'conflict',    msg:'CONFLICT: Drive already required by DriveCommand' },
     { loop:1, fc:'fc-triggers', cls:'active-warn',tag:'checking',   type:'conflict',    msg:'calling DriveCommand.getInterruptionBehavior()...' },
     { loop:1, fc:'fc-cancel',   cls:'active',     tag:'→ kCancelSelf', type:'cmd-init',   msg:'kCancelSelf (default): DriveCommand.end(interrupted=true)' },
@@ -1817,7 +1829,7 @@ function ssCheck(round) {
     feedbackEl.textContent = '🎉 Perfect! Every mechanism in the right place.';
   } else {
     feedbackEl.className = 'ss-feedback show partial';
-    feedbackEl.textContent = correct + ' of ' + total + ' buckets correct. Red buckets have wrong tiles — move them.';
+    feedbackEl.textContent = correct + ' of ' + total + ' buckets correct. Red buckets have wrong tiles - move them.';
   }
 }
 
