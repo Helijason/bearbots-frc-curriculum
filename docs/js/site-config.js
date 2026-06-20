@@ -51,7 +51,7 @@ const SITE_CONFIG = {
       tools: "VS Code WPILib, AdvantageKit",
       duration: "3 hours",
       filename: "lesson-03-subsystems.html",
-      status: "review",  // "ready", "current", "review", "soon"
+      status: "ready",  // "ready", "current", "review", "soon"
       prev: "02",
       next: "04"
     },

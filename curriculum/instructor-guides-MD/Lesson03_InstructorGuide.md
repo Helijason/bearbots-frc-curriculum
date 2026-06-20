@@ -2,7 +2,7 @@
 
 # What Is a Subsystem?
 
-*Subsystem structure, WPILib tools, simulator verification, AdvantageScope.*
+*Subsystem anatomy, the CommandScheduler, the IO pattern preview, building Scoop, tiered challenge, Broken Robot Lab.*
 
 > **Instructor Edition — Not for student distribution**
 
@@ -13,22 +13,24 @@
 | Field | Detail |
 |---|---|
 | **Target audience** | Students who completed Lesson 02 |
-| **Hardware** | None — VSCode and simulator only |
+| **Hardware** | None — VS Code and simulator only |
 | **Session length** | 3 hours |
 | **Key tools** | WPILib: Create a new class, Simulator, AdvantageScope |
+| **Reference** | `BearBots_Program_Flow.pdf` — 15-page flowchart + file-card reference. Keep it out during Part 2 and Part 4. |
+
+This guide follows the six parts of `lesson-03-subsystems.html` in order. Don't invent activities outside this structure — the digital handout is the source of truth for what students see.
 
 ---
 
 ## Learning Objectives
 
-- Students can explain what a subsystem is and why robots use them
-- Students can identify subsystem boundaries from a robot description — what deserves its own file and what doesn't
-- Students can create a subsystem file using the WPILib tool and explain what the tool does and does not generate
-- Students can add AdvantageKit structure on top of the WPILib-generated shell (`@AutoLogOutput`, logging loop)
-- Students can register a subsystem in `RobotContainer` and verify it loads in simulation
-- Students can explain why motor control belongs in commands, not `periodic()`
-- Students can explain the relationship between `LoggedRobot`, `TimedRobot`, and the command framework
-- Students can find and fix subsystem ownership bugs in a broken robot project
+- Students can explain why `periodic()` cannot contain motor control, using the CommandScheduler's loop sequence as the reason
+- Students can name the four parts of every subsystem (fields, constructor, `periodic()`, methods/commands)
+- Students can read a real subsystem (`Arm.java`) and explain what each part does
+- Students can explain, at a preview level, why a subsystem doesn't import hardware directly (the IO pattern, fully built in Lesson 04)
+- Students can build a subsystem using the goal pattern: a command sets a goal, `periodic()` reads the goal and applies it
+- Students can register a subsystem in `RobotContainer` and verify it loads in AdvantageScope
+- Students can identify all four Broken Robot Lab bug types in unfamiliar code
 
 ---
 
@@ -36,14 +38,15 @@
 
 ### Setup
 
-- Lesson 02 starter project open in VSCode on projector
+- Lesson 02 project open in VS Code on projector
 - Simulator confirmed working from Lesson 02
 - AdvantageScope confirmed connecting from Lesson 02
 - Digital handout open: `lesson-03-subsystems.html`
+- `BearBots_Program_Flow.pdf` printed or open on a second screen for reference during Part 2 and Part 4
 
-> **The most important hook for this lesson**
->
-> Show two projects side by side: one with 600 lines of `Robot.java` containing everything, one with proper subsystems. Ask which one they'd rather debug at 11pm. Don't explain subsystems yet — let the comparison create the need.
+### Constants pattern note
+
+The curriculum teaches constants as **separate files per subsystem** (`DriveConstants.java`, `ArmConstants.java`, etc.), established in Lesson 02. If the working XRP codebase still uses the inner-class pattern in places, don't surface that mismatch to students — teach the separate-file pattern as correct and resolve the codebase divergence outside of class.
 
 ---
 
@@ -51,34 +54,29 @@
 
 | Time | Phase | You do | Students do |
 |---|---|---|---|
-| 0–10 min | **Hook** | Side-by-side comparison: monolithic vs structured. Count the lines. Ask which they'd rather debug at 11pm. | Look at both. Form opinions. Argue. |
-| 10–25 min | **Concept** | Cafeteria analogy. `periodic()` vs commands table. `CommandScheduler` relationship. | Follow along. Ask questions. |
-| 25–55 min | **"Design the Robot" whiteboard** | Present Orbit Odyssey game. Facilitate the boundary debate — don't settle it too fast. Reveal BearBots robot design at end. | Whiteboard which subsystems they'd create. Justify every boundary decision. Argue about edge cases. |
-| 55–80 min | **Tools demo** | Live demo: create subsystem with WPILib tool. Show what it generates and what it doesn't. Add AdvantageKit structure on top. Register in `RobotContainer`. Run sim. Verify in AdvantageScope. | Replicate on their own laptop. Verify subsystem folder appears. |
-| 80–120 min | **Bronze/Silver/Gold practice** | Circulate. Ask "what do you expect?" before every run. Redirect with questions, not answers. | Bronze: identify + create. Silver: add `@AutoLogOutput` and verify in AdvantageScope. Gold: full architecture design from scratch. |
-| 120–150 min | **Broken robot lab** | Circulate. Don't give answers — give direction. Require sim confirmation for every fix. | Find and fix the three bugs. Must run the sim to confirm each fix, not just read the code. |
-| 150–165 min | **`@AutoLogOutput` race** | Facilitate. Keep energy up. | Add as many logged fields to their subsystem as possible. Race to get the most values showing in AdvantageScope. |
-| 165–175 min | **Peer code review** | Prompt the review questions. Circulate. | Swap laptops. Try to register a partner's subsystem in `RobotContainer`. Find what's missing or wrong. |
-| 175–180 min | **Connect + wrap** | Pull up real `Indexer.java` from team code. Ask three questions. Tease Lesson 04. | Recognize the pattern in competition code. |
-
-> **Activity notes**
->
-> The "Design the Robot" whiteboard is the highest-value new activity — protect it if time gets tight elsewhere. The `@AutoLogOutput` race comes after the hardest cognitive work of the session and should feel like a game, not an assignment. The peer code review is short but high-value — teaching something is the best way to solidify it.
+| 0–10 min | **Hook** | Side-by-side: monolithic `Robot.java` vs. structured subsystems. Ask which they'd rather debug at 11pm. | Look at both. Form opinions. Argue. |
+| 10–35 min | **Part 1 — The Concept** | Cafeteria analogy. Three reasons the structure earns its complexity. Four parts of a subsystem. Why `periodic()` cannot control motors — run the CommandScheduler simulator live (Good / Bad / Conflict). | Follow along. Run the three scenarios themselves. Answer the Part 1 quick check (Q1–Q3). |
+| 35–65 min | **Part 2 — Reading a Real Subsystem** | Walk `Arm.java` top to bottom using the annotated view. Point out the missing `XRPServo` import as the IO pattern teaser. | Read along. Answer "explain this out loud" before moving on. |
+| 65–85 min | **Part 3 — The IO Pattern (preview)** | Show `ArmIO.java`, `ArmIOXRP.java`, `ArmIOSim.java` side by side. Show how `RobotContainer` picks the implementation by mode. Frame this explicitly as a Lesson 04 preview, not a build-it-now skill. | Follow along. No coding yet — this part is conceptual. |
+| 85–145 min | **Part 4 — Build Scoop** | Live demo the 7-step build (file → field → enum → `@AutoLogOutput` → `setGoal()`/`setGoalCommand()` → wire `periodic()` → register + verify). | Replicate each step on their own laptop, in sync with the demo. Build, simulate, verify in AdvantageScope after every step. |
+| 145–165 min | **Part 5 — Tiered Challenge** | Circulate. Ask "what do you expect?" before every run. | Bronze: verify Scoop. Silver: build Elevator with the snippet + goal-pattern diff challenge. Gold: design the full robot architecture. |
+| 165–175 min | **Part 6 — Broken Robot Lab** | Circulate. Don't give answers — give direction. Require sim confirmation isn't needed here (read-the-code lab), but make sure all 4 bugs are correctly explained, not just located. | Click through all 4 bugs. Read the reveal and fix for each. |
+| 175–180 min | **Connect + wrap** | Tie Scoop back to Competition Connection (Drive, Elevator, Scoop, Arm). Tease Lesson 04. | Recognize the pattern in the real robot's four subsystems. |
 
 > **If running short**
-> Cut the `@AutoLogOutput` race first, then peer code review. Never cut the broken robot lab — students must confirm fixes by running the sim, not just reading the code.
+> Part 3 (IO Pattern preview) can compress to 10 minutes — it's intentionally conceptual, full build comes in Lesson 04. Never cut Part 6; the four bugs are the most diagnostic moment in the lesson for whether the `periodic()`-vs-commands distinction actually landed.
 
 ---
 
-## Phase 1 — Hook (0–10 min)
+## Phase 0 — Hook (0–10 min)
 
 ### Side-by-side comparison
 
 Prepare two projects before class:
 
-> **Project 1 — monolithic:** A `Robot.java` with 600+ lines containing drivetrain logic, shooter logic, intake logic, and autonomous all in one file. Real teams have written code like this.
+> **Project 1 — monolithic:** A `Robot.java` with 600+ lines containing drivetrain, shooter, intake, and autonomous all in one file.
 >
-> **Project 2 — structured:** The same robot behavior split into proper subsystems. Each file is under 100 lines. `Robot.java` is nearly empty.
+> **Project 2 — structured:** The same robot behavior split into proper subsystems. Each file is under 100 lines.
 
 Open both on the projector. Scroll slowly through the monolithic version. Count the lines out loud. Then ask:
 
@@ -86,292 +84,170 @@ Open both on the projector. Scroll slowly through the monolithic version. Count 
 >
 > *"It's 11pm. Your autonomous isn't working. Which of these would you rather debug?"*
 
-Don't explain subsystems yet. Let the comparison create the need. Students who argue for the monolithic version are doing you a favor — ask them to defend it. The debate is the lesson.
+Don't explain subsystems yet. Let the comparison create the need.
 
 ---
 
-## Phase 2 — Concept (10–25 min)
+## Part 1 — The Concept (10–35 min)
 
 ### The cafeteria analogy
 
-Use this before showing any code. Students need the mental model first.
-
 > **Script**
 >
-> *"Imagine your school cafeteria. Pizza station, salad bar, dessert section. Each one does its job. If the pizza oven breaks, the ice cream is fine. Your robot works the same way — each subsystem owns one mechanism. If the shooter breaks, the drivetrain keeps driving."*
+> *"Imagine your school cafeteria. Pizza station, salad bar, dessert section. Each one does its job. If the pizza oven breaks, the ice cream is fine. Your robot works the same way — each subsystem owns one mechanism. If the scoop breaks, the drivetrain keeps driving."*
 
-### The `LoggedRobot` and command framework question
+The HTML pairs this with four cards: **Drive, Elevator, Scoop, Arm** — the BearBots robot's actual four subsystems. Point at each card as you say its name; this is the first time students see all four named together.
 
-Students from Lesson 02 will ask about this. Address it directly:
+### Three reasons the structure earns its complexity
 
-> **Inheritance chain:** `Robot` extends `LoggedRobot` extends `TimedRobot`
->
-> **Command framework is NOT a base class.** It runs because of this one line in `robotPeriodic()`:
-> ```java
-> CommandScheduler.getInstance().run()
-> ```
-> Remove that line = no commands ever execute.
->
-> **AdvantageKit and command-based are two separate systems** that work together through that one method call. You could have a `TimedRobot` with no commands at all — command-based is a pattern we choose to use by running the scheduler.
+Walk all three — don't skip to the third one early, even though it's the "WPILib enforces it" reason that feels most concrete:
 
-### `periodic()` vs commands
+1. **One job, one place** — debugging at 2am, you check one file
+2. **Teammates work in parallel** — different files, no merge conflicts
+3. **WPILib enforces it** — the CommandScheduler won't let two commands fight over the same subsystem
 
-This distinction trips up students all season. Make it explicit:
+### The four parts of a subsystem
 
-| `periodic()` | Commands |
-|---|---|
-| Runs every 20ms regardless | Runs when scheduled |
-| Read sensors | Control motors |
-| Log data to AdvantageKit | Respond to button presses |
-| Update alerts / state | Run autonomous actions |
-| Cannot be stopped | Can be interrupted |
+Every subsystem has the same anatomy. Teach this as a checklist students can apply to any subsystem they read for the rest of the program:
 
-### Common student questions
+1. **Fields** — hardware objects, goal state, current state. Private.
+2. **Constructor** — runs once at startup. Configure hardware, set initial state.
+3. **`periodic()`** — runs every 20ms, forever. Sensors and logging only.
+4. **Methods & Commands** — the public API. Often return `Command` objects.
 
-**Q: Can a subsystem control two mechanisms?**
-Technically yes. It's almost always a bad idea. If two mechanisms are so tightly coupled that they must always be controlled together, they might belong in one subsystem. Otherwise separate them.
+### Why periodic() cannot control motors — run the simulator live
 
-**Q: How does a subsystem communicate with another subsystem?**
-Through commands in RobotContainer. Subsystems don't talk to each other directly — that would create dependencies that make debugging much harder. Commands coordinate between subsystems.
+This is the conceptual core of the lesson. Use the CommandScheduler terminal simulator widget on the projector.
 
----
+> **The mechanism, precisely:**
+> Each 20ms loop, the scheduler runs: `periodic()` for every subsystem first → poll triggers/buttons → run active commands. `periodic()` runs **unconditionally** — the scheduler cannot skip, delay, or interrupt it. It has no requirements, so the scheduler's conflict resolution can't touch it. Commands are the opposite: they can be started, stopped, interrupted, coordinated.
 
-## Phase 3 — "Design the Robot" Whiteboard (25–55 min)
+Run all three scenarios on the projector, in order:
 
-*Students decide what deserves to be a subsystem before they write any code. The debate is the lesson. This session uses Orbit Odyssey — the game they will compete in — as the design target.*
+- **Good** — `periodic()` reads sensors only; a drive command runs for several cycles and ends cleanly. Scheduler controls the full lifecycle.
+- **Bad** — motor output lives in `periodic()`. The scheduler calls it at step 1, unconditionally, every loop, forever. A disable has no effect on it.
+- **Conflict** — two commands both require the same subsystem. The scheduler resolves this cleanly; this is **not** the same failure mode as the Bad scenario, and students often conflate the two. Be explicit: *"`periodic()` is invisible to the scheduler. Command-vs-command conflicts are handled cleanly by the scheduler. Those are two different problems."*
 
-### Setup
+> **Common misconception to correct directly**
+> Students may assume motor-in-`periodic()` causes "last one wins" behavior like a command conflict. It does not — it's undefined, hardware-dependent behavior because the scheduler has no visibility into `periodic()` at all. Don't let "last one wins" framing stand uncorrected.
 
-- Orbit Odyssey game manual on projector (field diagram visible)
-- Remind students of the pair brainstorm from Lesson 02: *"Last session you listed what the robot needs to do. Let's use that."*
-- Whiteboard cleared and ready
+### Quick check — before Part 2
 
-### Round 1 — Pairs brainstorm (10 min)
+Three questions, work through as a group or cold-call:
 
-Each pair works independently first. Prompt:
-
-> *"Based on the Orbit Odyssey game, what mechanisms does this robot need? Write down every physical system — not code, not files — just the things that move or sense."*
-
-**Circulate with these prompts if pairs stall:**
-- *"What does the robot need to do in autonomous to score?"* (navigate, park, score rubble)
-- *"How does it pick up or carry the amplifier?"* (some kind of intake or holder)
-- *"How does it deliver rubble to the High Rubble Zone?"* (needs to lift — elevator)
-- *"What's on the back of the robot?"* (arm — for game piece control or endgame)
-
-**Expected outputs from pairs:** drivetrain, some kind of intake/scoop, something that lifts, maybe an arm. Let them arrive at these — don't name them yet.
-
-### Round 2 — Group share-out and subsystem mapping (15 min)
-
-Pairs share. Write every mechanism on the whiteboard without editing. Then facilitate:
-
-> *"We have a list of mechanisms. Now let's group them. Which of these are separate enough to get their own file?"*
-
-**The productive debates to let run:**
-- *"Does the scoop that carries the amplifier need its own subsystem, or is it part of the drivetrain?"* — It's separate. It can fail without affecting driving.
-- *"Does the thing that lifts need its own file separate from the thing that scoops?"* — Yes. One job each.
-- *"Does the drivetrain own the encoders and gyro?"* — Yes. Sensors belong to the subsystem that reads them.
-
-> **The question that cuts through every edge case**
->
-> *"If this mechanism broke completely, what else on the robot would stop working?"*
-> If the answer is "nothing else," it's a good subsystem boundary.
-
-> **What to watch for**
->
-> Students who want one subsystem for everything — push back: *"So if your scoop breaks, you can't drive?"*
-> Students who want a subsystem for every motor — push back: *"The elevator moves one thing. Does it matter how many motors do it?"*
-
-### What the whiteboard should converge toward
-
-Don't force it — but guide the debate until the board shows something close to:
-
-```
-DriveSubsystem      — moves the robot, owns encoders and gyro
-ElevatorSubsystem   — lifts the scoop mechanism up and down
-ScoopSubsystem      — tilts to retain or dump game pieces
-ArmSubsystem        — rear arm for game piece control
-```
-
-If students arrive at this naturally: perfect. If they're close but not quite: *"Look at what you have. Does each of these have exactly one job?"*
+- **Q1** — Which of these belongs in `periodic()`? *(Reading sensors / logging — correct answer. Motor control is the trap answer.)*
+- **Q2** — BearBots has an elevator that lifts a scoop. One subsystem or two? *(Two — each owns one mechanism; coordination lives in commands, not by merging the subsystems.)*
+- **Q3** — What happens if you don't instantiate a subsystem in `RobotContainer`? *(The class exists on disk but the object is never created — `periodic()` never runs, and the subsystem folder won't appear in AdvantageScope. This is a debugging dead end many students will hit later; flag it now so they recognize it.)*
 
 ---
 
-## Phase 4 — Tools Demo (55–80 min)
+## Part 2 — Reading a Real Subsystem (35–65 min)
 
-### What the WPILib tool actually generates
+Walk `Arm.java` using the annotated view, group by group, in this order:
 
-Be honest about this upfront. The tool creates a correct but minimal shell:
+1. **Imports** — point out `Pose3d`/`Rotation3d` (WPILib geometry) and `LoggedMechanism2d` (AdvantageKit visualization). **Then stop and ask:** *"What import is missing here?"* There is no `XRPServo` import. This is the IO pattern teaser — the subsystem doesn't know what hardware it's running on.
+2. **Class declaration + fields** — `extends SubsystemBase` is the one line that registers with the scheduler. `ArmIO io` is the IO pattern in miniature: an interface, not a hardware object. `ArmIOInputsAutoLogged` is compiler-generated from `@AutoLog`.
+3. **Constructor** — three lines, dependency injection. `RobotContainer` decides which `ArmIO` implementation gets passed in; `Arm` itself never changes.
+4. **`periodic()`** — `io.updateInputs(inputs)` + `Logger.processInputs("Arm", inputs)` is the heartbeat every AdvantageKit subsystem shares. Everything else in that loop cycle reads from the same frozen `inputs` snapshot.
+5. **Methods** — `setAngle()` is the gatekeeper for hardware access; commands call it, they never touch `io` directly. `stop()` moves to a safe stowed position — for a servo, "stopped" means holding a safe angle, not going limp.
 
-```java
-package frc.robot.subsystems;  // matches your folder structure
-
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
-public class Indexer extends SubsystemBase {
-
-    public Indexer() {
-        // Constructor — runs once when subsystem is created
-        // Good place to configure hardware (motors, sensors)
-    }
-
-    @Override
-    public void periodic() {
-        // Runs every 20ms (50Hz)
-        // Read sensors, log data, update state
-        // DO NOT put motor control here — use commands
-    }
-}
-```
-
-It gives you: correct package declaration, `SubsystemBase` extension, empty constructor, empty `periodic()`.
-
-It does NOT give you: IO interface, inputs struct, `@AutoLog`, `Logger.processInputs()`, or any AdvantageKit imports.
-
-> **What to say**
->
-> *"The tool gets you started in the right place. Everything AdvantageKit-related — the logging, the IO pattern — we add on top. Think of the tool as 'correct blank page,' not 'finished subsystem.'"*
-
-> **Forward reference — snippets coming**
->
-> Once the global VS Code snippet file is set up, students will use `aksubsystem` + Tab instead of the WPILib tool and get the full AdvantageKit-ready structure in one step. For now, we build it manually so students understand what each piece is for.
-
-### Live demo steps
-
-- Right-click `subsystems/` folder in Explorer → Create a new class/command → `SubsystemBase`
-- Alternatively: `Ctrl+Shift+P` → `WPILib: Create a new class` → `SubsystemBase`
-- Name it `Indexer`. Show the generated file. Point out what's there and what's missing.
-- Add `@AutoLogOutput` to a field. Add `Logger.processInputs()` to `periodic()`. Show the imports needed.
-- Open `RobotContainer`. Add: `private final Indexer indexer = new Indexer();`
-- Build: `Ctrl+Shift+P` → WPILib: Build Robot Code. Must succeed.
-- Simulate. Connect AdvantageScope. Enable in Teleop.
-- Drive with keyboard (W/A/S/D). Watch AdvantageScope for the Indexer folder.
-
-### Simulator verification workflow
-
-Teach this as a standard habit: after every structural change, verify in sim before adding logic.
-
-1. Build succeeds → no compile errors
-2. Sim launches → no runtime errors in System Console
-3. AdvantageScope connects → subsystem folder appears in log tree
-4. Enable and drive → `Drive/LeftPositionMeters` updates in AdvantageScope graphs
-
-> **AdvantageScope verification for subsystems**
->
-> If the subsystem folder doesn't appear in AdvantageScope after enabling: check that `Logger.processInputs()` is called in `periodic()`, AND that the subsystem is instantiated in `RobotContainer` (not just declared).
+> **Before moving on — explain this out loud**
+> Without looking: what are the four sections of `Arm.java`? Why does `periodic()` call `io.updateInputs()` before anything else? What would break if it didn't? Cold-call a student rather than asking for volunteers — this is the moment to confirm the mental model actually landed before Part 3 builds on it.
 
 ---
 
-## Phase 5 — Practice (80–120 min)
+## Part 3 — The IO Pattern, preview only (65–85 min)
 
-### Instructor notes by tier
+> **Framing — say this explicitly before starting**
+> *"This part is a preview. You will build the full IO pattern in Lesson 04. Today, just understand why it exists — you'll build Scoop the simple way on purpose."*
 
-#### Bronze — identify and create
+Show three files side by side on the projector:
 
-Students identify subsystems from a robot description (drivetrain, flywheel shooter + angle servo, ball sensor, LED strip), then create one using the WPILib tool and add it to `RobotContainer`. Watch for: students trying to create files by hand, putting too many mechanisms in one subsystem, or treating sensors as their own subsystem.
+- **`ArmIO.java`** — the interface. Defines `@AutoLog class ArmIOInputs` and the operations (`updateInputs`, `setAngle`) any arm hardware must support, with no hardware specifics.
+- **`ArmIOXRP.java`** — the real implementation. Imports `XRPServo`, knows about XRP hardware specifically.
+- **`ArmIOSim.java`** (optional) — the simulation stub. No hardware imports at all.
 
-> **Key teaching point for Bronze:** a sensor belongs inside whichever subsystem reads it — it doesn't get its own subsystem.
+Then show how `RobotContainer` picks the implementation based on `Constants.currentMode` (`REAL` vs `SIM`). The subsystem itself never decides — that decision lives entirely outside `Arm.java`.
 
-#### Silver — add AdvantageKit structure
-
-Students take their Bronze subsystem and add `@AutoLogOutput` to at least two fields, verify they appear in AdvantageScope, and confirm `Logger.processInputs()` is in `periodic()`. If students get stuck: *"Add `@AutoLogOutput` directly above the field declaration. Rebuild. Then look for it in AdvantageScope."*
-
-Silver also adds: an `IndexerGoal` enum (`IDLE`, `ACTIVE`), a `setGoalCommand()` method, and a controller button binding. Goal should appear in AdvantageScope as `IndexerSubsystem/Goal`.
-
-#### Gold — full architecture design
-
-Students design a complete subsystem architecture for a given robot description — not just one subsystem but all of them, with justified boundary decisions. Key Gold insight: subsystems coordinate through commands, not direct method calls. Don't rush Gold students to implementation. The design document is the deliverable.
+> **Don't over-teach this part.** Students are not implementing IO classes today. The goal is recognition: "a subsystem talks to an interface, not hardware directly" — full implementation skill comes in Lesson 04.
 
 ---
 
-## Phase 6 — Broken Robot Lab (120–150 min)
+## Part 4 — Build Scoop (85–145 min)
 
-*Students find and fix three bugs. Every fix must be confirmed by running the sim — reading the code is not enough.*
+*Live demo, in sync, step by step. This is the longest block of the session — protect the time.*
 
-### Broken robot lab answers
+The goal pattern, taught explicitly before starting:
 
-- **Bug 1:** `indexerMotor` in `DriveSubsystem` — wrong ownership; when an indexer command runs, it requires `DriveSubsystem` and locks out drive commands
-- **Bug 2:** motor control in `periodic()` — runs forever at full power, can't be stopped or interrupted by any command
-- **Bug 3:** `runIndexer()` method in `DriveSubsystem` — method is on the wrong subsystem; any command calling it requires `DriveSubsystem`, preventing driving while indexing
+> **Script**
+> *"Commands set the goal. `periodic()` reads the goal and applies it to hardware. The servo always tracks the current goal — if the goal doesn't change, neither does the servo. This is different from calling `motor.set(0.5)` directly inside `periodic()`, which pushes power regardless of any command state."*
 
-> **Instructor approach**
+### The 7 steps
+
+1. Create the file with the WPILib tool (`SubsystemBase`) — never by hand. Right-click `subsystems/` → Create a new class, or `Ctrl+Shift+P` → `WPILib: Create a new class`.
+2. Add the hardware field — `XRPServo scoopServo = new XRPServo(4)`.
+3. Add a `Goal` enum — `FLAT`, `CARRY`, `DUMP`.
+4. Add `@AutoLogOutput` on the goal field so it shows in AdvantageScope.
+5. Add `setGoal()` and a `setGoalCommand()`.
+6. Wire `periodic()` to read the current goal and apply it to the servo — **this is the step students most often get backwards.** Watch for students putting the servo call inside the command instead of `periodic()`.
+7. Register in `RobotContainer`, bind a button, build → simulate → verify in AdvantageScope.
+
+> **Verification habit — teach this as a standing rule, not just for today**
+> After every structural change: (1) build succeeds, (2) sim launches with no console errors, (3) subsystem folder appears in AdvantageScope's log tree, (4) goal changes when the button is pressed.
 >
-> Don't give answers — give direction. Acceptable hints:
-> - Bug 1: *"Which subsystem owns the indexer motor? Where does it live right now?"*
-> - Bug 2: *"What happens to this motor call when teleop is disabled?"*
-> - Bug 3: *"What subsystem does a command need to call `runIndexer()`? Is that the right one?"*
+> If the folder doesn't appear: check the subsystem is actually instantiated in `RobotContainer`, not just declared (echo of Q3 from Part 1).
 
 ---
 
-## Phase 7 — `@AutoLogOutput` Race (150–165 min)
+## Part 5 — Tiered Challenge (145–165 min)
 
-*Low-stakes, energetic. Comes after the hardest cognitive work of the session — it should feel like a game.*
+Circulate. Ask "what do you expect to happen?" before every sim run — don't let students run-and-check without predicting first.
 
-### What students do
+### Bronze — verify Scoop
 
-- Add as many `@AutoLogOutput` fields to their subsystem as they can in 15 minutes
-- Every field must actually appear in AdvantageScope to count
-- Student with the most verified logged fields wins
+Students confirm their Part 4 build completely: build succeeds, `Scoop/` appears in AdvantageScope, D-pad up/down/right correctly change `Goal` between CARRY/DUMP/FLAT, and a print statement in `periodic()` confirms the loop is actually running.
 
-### What to watch for
+> **If stuck:** check `scoop` is declared *and* assigned in `RobotContainer` (the object must be created, not just the class existing). Check the button binding in `configureButtonBindings()` and that the sim is enabled in Teleop.
 
-- Students logging meaningless values (a field that's always `0`) — push back: *"Would this help you debug anything?"*
-- Students adding fields without rebuilding — remind them `@AutoLogOutput` requires a rebuild to take effect
-- Good moment to introduce naming conventions: fields should be named so a teammate can tell what they mean without reading the code
+### Silver — add Elevator
 
----
+Students use the `aksubsystem` snippet to scaffold `Elevator` (motor + encoder, not a servo). They add an `ElevatorGoal` enum (`STOWED`, `LOW`, `HIGH`), wire `periodic()` to apply a fixed speed per goal, add `@AutoLogOutput`, and register + verify.
 
-## Phase 8 — Peer Code Review (165–175 min)
+**The diff challenge (Option A vs Option B):** Option A runs the motor forever at a fixed 40% regardless of goal — it never stops. Option B switches on the goal and applies the correct speed per state, including 0 for `STOWED`. **Option B is correct** — same goal pattern as the Scoop servo.
 
-*Short but high-value. Teaching something is the best way to solidify it.*
+> **Port assignment gotcha, built into the activity on purpose:** the prompt deliberately says *"wait, is port 1 correct? Check the port assignments"* — this is intentional friction, not a typo. Make students actually check rather than copy-paste blind.
 
-### What students do
+### Gold — design the full robot architecture
 
-- Swap laptops with a partner
-- Try to register the partner's subsystem in `RobotContainer` without asking for help
-- Run the sim and verify it loads in AdvantageScope
-- Report back: what was clear, what was confusing, what was missing
-
-### What you do
-
-- Prompt the review: *"Could you figure out what this subsystem does just by reading it?"*
-- Listen for patterns — if multiple students report the same confusion, address it for the group
+No code yet. Students list every mechanism on the BearBots robot, define hardware/goal-states/commands for each, and identify coordination scenarios (elevator rises → scoop must tilt up). Critical teaching point: **coordination lives in commands that require multiple subsystems, not inside either subsystem's own code.** Don't rush Gold students toward implementation — the design document is the deliverable.
 
 ---
 
-## Phase 9 — BearBots Robot Reveal + Wrap (175–180 min)
+## Part 6 — Broken Robot Lab (165–175 min)
 
-*The payoff for the whiteboard. Students designed a robot. Now they find out what the team actually decided — and why it matches.*
+*Four bugs, all in a `Scoop` class. Students click each highlighted line to reveal the bug.*
 
-### The reveal
+| Bug | What's wrong | Fix |
+|---|---|---|
+| **1** | Scoop servo declared inside `Drive` | Move `scoopServo` to `Scoop.java` |
+| **2** | Motor control in `periodic()` — drives forward unconditionally | Move to a default command; `periodic()` reads sensors/logs only |
+| **3** | `tiltScoop()` defined inside `Drive`, so it requires `Drive` instead of `Scoop` — locks out driving while tilting | Move `tiltScoop()` to `Scoop`, where it correctly requires only the scoop |
+| **4** | `emergencyStop()` sets motors to 0 in a `runOnce()`, but `periodic()` overrides it back to 0.5 on the very next loop (~20ms later) | Fix Bug 2 first, then implement a `STOPPED` goal state that `periodic()` reads and applies |
 
-After the peer code review or `@AutoLogOutput` race wraps up, call the group together.
+> **Bug 4 is the payoff bug.** It's a second-order consequence of Bug 2 — make sure students articulate *why* fixing Bug 2 first is required before Bug 4 can actually be fixed. This is the moment the `periodic()` rule stops being abstract and becomes "this is why your emergency stop didn't work."
 
-> **Script — the reveal**
->
-> *"You spent the last 30 minutes arguing about what this robot needs. Drivetrain, something that lifts, something that scoops, something on the back. Here's what the BearBots team decided."*
+---
 
-Draw or show the BearBots robot diagram:
+## Connect + Wrap (175–180 min)
 
-```
-FRONT:  Scoop (servo-controlled tilt) mounted on Elevator (vertical lift)
-REAR:   Arm (for game piece control)
-BASE:   Drivetrain (tank drive, encoders, gyro)
-```
+### Competition Connection
 
-> *"Notice anything? Your whiteboard and our design aren't that different. That's not a coincidence — the game tells you what the robot needs. You worked it out from first principles. We worked it out the same way, then built it and prototyped different intake concepts before landing on the scoop-on-elevator approach."*
+> **Script**
+> *"The BearBots robot has four subsystems: Drive, Elevator, Scoop, Arm. Each owns exactly one mechanism. If the scoop breaks, the drivetrain keeps driving. If the elevator breaks, the arm still works. That independence is why the robot can compete even when something goes wrong."*
 
-**Ask the class:**
-- *"What's different from what your pair had?"*
-- *"Does anything about this design surprise you?"*
-- *"Which subsystem do you think is the hardest to code?"*
+### Teaser for Lesson 04
 
-Let the discussion run for 3–4 minutes. Don't resolve everything — leave questions open.
-
-### Connect to Lesson 04
-
-> **Teaser for Lesson 04**
->
-> *"Next lesson you'll meet these subsystems in code. The elevator, the scoop, the arm — they'll all be files. And here's the twist: the subsystem file itself won't know what hardware it's running on. You'll find out why that's actually a great idea, and build the whole pattern from scratch. Bring your XRP."*
+> *"Today you built Scoop the simple way — direct hardware field, no IO layer. Next lesson, you'll find out why two files exist for one motor, and build the full IO pattern from scratch: the interface, the real implementation, and the simulation stub. Same goal pattern you used today — just with one more layer underneath it."*
 
 ---
 

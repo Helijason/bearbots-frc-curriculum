@@ -1,14 +1,14 @@
-# Module 1 — Lesson 03: What Is a Subsystem?
+# Module 1, Lesson 03: What Is a Subsystem?
 
 **Stack:** Java | AdvantageKit | XRP
-**Card #:** 03 — *Keep this. Add it to your binder.*
+**Card #:** 03, Keep this. Add it to your binder.
 
 ---
 
 ## The Big Idea
 
 > Each subsystem owns exactly one mechanism and controls it completely.
-> One job, one file. If the shooter breaks, the drivetrain keeps driving.
+> One job, one file. If the scoop breaks, the drivetrain keeps driving.
 
 ---
 
@@ -16,75 +16,83 @@
 
 | Concept | Role | What it does |
 |---|---|---|
-| **One job** | Separation | One mechanism. One subsystem. One file. |
-| **`periodic()`** | Sensors only | Read sensors. Log data. **No motor control.** |
-| **Commands** | Motor control | Control motors. Respond to buttons. Can be interrupted. |
-| **WPILib tool** | Create files | Right-click folder or `Ctrl+Shift+P` → Create new class → `SubsystemBase`. |
-| **Verify in sim** | Always check | Build succeeds. Folder in AdvantageScope. Drive and observe. |
+| **One job** | Separation | One mechanism. One subsystem. One file. WPILib enforces it. |
+| **`periodic()`** | Sensors only | Runs every 20ms, unconditionally. Reads sensors, logs data. No motor control. |
+| **Commands** | Motor control | Start, stop, interrupt. Set a goal. The scheduler controls the lifecycle. |
+| **Goal pattern** | Coordination | Commands set a goal. `periodic()` reads the goal and applies it. |
+| **Superstructure** | Preview | A coordinator above multiple subsystems for multi-mechanism moves. Named today, built later. |
 
 ---
 
-## Creating a Subsystem (the right way)
+## Why periodic() Cannot Control Motors
 
-**Option A — right-click:**
-1. Right-click `subsystems/` in Explorer
-2. Create a new class/command → `SubsystemBase`
-3. Name it (e.g. `Indexer`)
+Every 20ms loop, the CommandScheduler runs the same sequence: subsystem `periodic()` first, then triggers and buttons, then active commands.
 
-**Option B — command palette:**
-1. `Ctrl+Shift+P` → `WPILib: Create a new class`
-2. Select `SubsystemBase`
-3. Name it
+**`periodic()` runs unconditionally.** The scheduler cannot skip it, delay it, or interrupt it. It has no requirements, so the scheduler's conflict resolution cannot touch it.
 
-Then:
-4. Add to `RobotContainer` as a field
-5. Build → Simulate → verify in AdvantageScope
+**Commands are different.** They can be started, stopped, interrupted, and coordinated. A disable stops a command cleanly. A disable has no effect on `periodic()`.
 
-> **NEVER create subsystem files by hand.**
+Motor output in `periodic()` runs forever, ignores robot state, and cannot be emergency-stopped. That is the whole reason the rule exists.
 
 ---
 
-## The Two Rules of Subsystems
+## Reference
 
-**Rule 1 — Motor control goes in commands, NOT in `periodic()`.**
-`periodic()` runs forever; commands can be stopped and interrupted.
-
-**Rule 2 — Each motor lives in ONE subsystem.**
-Indexer motor → `IndexerSubsystem`. Not both.
+> **`BearBots_Program_Flow.pdf`** , the 15-page program execution flow reference (flowcharts + file cards for `Main.java`, `Robot.java`, `RobotContainer.java`, `Drive.java`, `Arm.java`, and IO files). Keep this out during Part 2 and Part 4 for tracing how `periodic()` and the scheduler connect to real files.
 
 ---
 
-## Subsystem Verification Workflow
+## The Four Parts of a Subsystem
 
-After creating and registering any subsystem, verify before adding logic:
+1. **Fields:** hardware objects, goal state, current state. Private.
+2. **Constructor:** runs once at startup. Configure hardware, set initial state.
+3. **`periodic()`:** runs every loop, forever. Sensors and logging only.
+4. **Methods & Commands:** the public API. Often return `Command` objects to schedule.
 
-1. Build succeeds → no compile errors
-2. Sim launches → no runtime errors in System Console
-3. AdvantageScope connects → subsystem folder appears in log tree
-4. Enable in Teleop → `Drive/LeftPositionMeters` updates when driving
+---
 
-If the subsystem folder doesn't appear: check it's instantiated in `RobotContainer` AND that `Logger.processInputs()` is in `periodic()`.
+## Building Scoop (the goal pattern)
+
+1. Create the file with the WPILib tool (`SubsystemBase`), never by hand
+2. Add the hardware field (servo)
+3. Add a `Goal` enum (e.g. `FLAT`, `CARRY`, `DUMP`)
+4. Add `@AutoLogOutput` on the goal field so it shows in AdvantageScope
+5. Add `setGoal()` and a `setGoalCommand()`
+6. Wire `periodic()` to read the goal and apply it to hardware
+7. Register in `RobotContainer`, bind a button
+8. Build, Simulate, verify in AdvantageScope
+
+> Commands set the goal. `periodic()` applies it. The servo always tracks the current goal, this is not motor control in periodic(), it's state application.
 
 ---
 
 ## After This Lesson I Can…
 
-- [ ] Explain what a subsystem is in plain English
-- [ ] Create a subsystem file using the WPILib tool (right-click or command palette)
-- [ ] Register a subsystem in `RobotContainer`
-- [ ] Explain why motor control belongs in commands
-- [ ] Verify a subsystem loads correctly in AdvantageScope
-- [ ] Identify subsystem ownership bugs in broken code
+- [ ] Explain why `periodic()` cannot contain motor control
+- [ ] Name the four parts of every subsystem
+- [ ] Build a subsystem using the goal pattern (command sets goal, periodic applies it)
+- [ ] Use the `aksubsystem` snippet to scaffold a new subsystem
+- [ ] Spot all four Broken Robot Lab bug types in unfamiliar code
+- [ ] Explain what a superstructure is and why it isn't built yet
 
 ---
 
 ## Key Vocabulary
 
-- **SubsystemBase** — WPILib base class — extend this to create a subsystem
-- **`periodic()`** — Method called every 20ms — for sensors and logging, not motor control
-- **Command** — An action that can be scheduled, run, interrupted, and ended cleanly
-- **Default command** — Command that runs when no other command is using the subsystem
-- **`@AutoLogOutput`** — AdvantageKit annotation — automatically logs a field to AdvantageScope
+- **SubsystemBase** , WPILib base class. Extending it registers the subsystem with the CommandScheduler automatically
+- **Goal** , the target state a subsystem should move toward, set by a command and read by `periodic()`
+- **Superstructure** , a coordinator above multiple subsystems for moves that require more than one mechanism at once
+- **`@AutoLogOutput`** , AdvantageKit annotation that automatically logs a field to AdvantageScope
+- **Requirement** , the subsystem(s) a command claims; the scheduler prevents two commands from sharing a requirement at once
+
+---
+
+## Broken Robot Lab: 4 Bugs
+
+1. **Wrong subsystem ownership:** scoop servo declared inside `Drive`
+2. **Motor control in `periodic()`:** drives forward unconditionally, never stops
+3. **Misattributed requirement:** a scoop command defined inside `Drive` locks out driving
+4. **Emergency stop that doesn't stop:** a `runOnce()` setting motors to 0 gets overridden by `periodic()` on the very next loop, 20ms later
 
 ---
 
@@ -94,7 +102,7 @@ If the subsystem folder doesn't appear: check it's instantiated in `RobotContain
 
 ## My Notes
 
-*Write anything here — surprises, connections, things to look up later.*
+*Write anything here, surprises, connections, things to look up later.*
 
 ---
 
@@ -102,12 +110,12 @@ If the subsystem folder doesn't appear: check it's instantiated in `RobotContain
 
 ## Competition Connection
 
-> **The BearBots robot has four subsystems:** `DriveSubsystem`, `ElevatorSubsystem`, `ScoopSubsystem`, `ArmSubsystem`. You designed these — or something very close — on the whiteboard today before seeing the answer.
+> **The BearBots robot has four subsystems:** `Drive`, `Elevator`, `Scoop`, `Arm`. You designed these, or something very close, on the whiteboard today before seeing the answer.
 >
 > Each subsystem owns exactly one mechanism. If the scoop breaks, the drivetrain keeps driving. If the elevator breaks, the arm still works. That independence is why the robot can compete even when something goes wrong.
 
 ---
 
-*FRC Programming Curriculum — Lesson 03*
-*Next: Lesson 04 — Why two files for one motor?*
+*FRC Programming Curriculum, Lesson 03*
+*Next: Lesson 04, Why two files for one motor?*
 *Keep this. Collect all 8.*
