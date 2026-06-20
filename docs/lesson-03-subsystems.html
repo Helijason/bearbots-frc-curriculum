@@ -1776,6 +1776,7 @@ good: [
     { loop:2, fc:'fc-robot',    cls:'active',     tag:'[20ms loop]',  type:'periodic',    msg:'[next loop] Robot.robotPeriodic() called' },
     { loop:2, fc:'fc-sched',    cls:'active',     tag:'',             type:'sched',       msg:'CommandScheduler.getInstance().run() called' },
     { loop:2, fc:'fc-periodic', cls:'active',     tag:'periodic()', type:'periodic',    msg:'Drive.periodic() → sensors logged again' },
+    { loop:2, fc:'fc-periodic', cls:'active',     tag:'periodic()', type:'periodic',    msg:'Scoop.periodic() → scoopServo.setAngle(goal==FLAT → 0°)' },
     { loop:2, fc:'fc-triggers', cls:'active',     tag:'triggers',   type:'trigger',     msg:'button released → defaultDriveCommand interrupted' },
     { loop:2, fc:'fc-exec',     cls:'active',     tag:'end(true)',  type:'cmd-end',     msg:'defaultDriveCommand.end(interrupted=true) → motors stop' },
     { loop:2, fc:'fc-default',  cls:'active',     tag:'defaults',   type:'default-cmd', msg:'Drive free → defaultDriveCommand rescheduled' },
