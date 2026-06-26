@@ -1,14 +1,14 @@
 /* ============================================================
    FRC Programming Curriculum - Site Configuration
    ============================================================ */
- 
+
 const SITE_CONFIG = {
   workInProgress: true,   // ← true - display work in progress banner and badge. flip to false to hide.
   wipBadgeText: "WIP",
   siteName: "BearBots 6964 - FRC Programming Curriculum",
   siteSubtitle: "Project-based learning for FRC student programmers. Java, AdvantageKit, XRP hardware.",
   banner: "🚧 Work in Progress - content may change",
- 
+
   lessons: {
     "01": {
       module: 1,
@@ -58,29 +58,29 @@ const SITE_CONFIG = {
     "04": {
       module: 2,
       lesson: "04",
-      title: "The IO Pattern and AdvantageKit Architecture",
-      subtitle: "The IO pattern and AdvantageKit architecture. The most important concept in the curriculum.",
-      description: "The IO pattern and AdvantageKit architecture. The most important concept in the curriculum.",
+      title: "Setting Up a Basic Subsystem",
+      subtitle: "Convert a bare subsystem to the IO pattern, verify inputs in AdvantageScope, and run your first replay. Build day too.",
+      description: "Convert the Scoop subsystem to the IO pattern using Arm as a reference. Verify logging in AdvantageScope and run replay mode for the first time.",
       hardware: "Laptop/XRP robot",
       prereq: "Lesson 03",
-      tools: "VS Code WPILib, AdvantageKit",
+      tools: "VS Code WPILib, AdvantageKit, AdvantageScope",
       duration: "3 hours",
       filename: "lesson-04-io-pattern.html",
-      status: "soon",  // "ready", "current", "review", "soon"
+      status: "review",  // "ready", "current", "review", "soon"
       prev: "03",
       next: "05"
     },
     "05": {
       module: 2,
       lesson: "05",
-      title: "How do I debug a robot that isn't here?",
-      subtitle: "@AutoLog, AdvantageScope navigation, and replay mode. Turn \"it broke at competition\" into \"I can see exactly what happened.\"",
-      description: "@AutoLog, AdvantageScope navigation, and replay mode. Turn \"it broke at competition\" into \"I can see exactly what happened.\"",
+      title: "Closed-Loop Autonomous",
+      subtitle: "Close the loop with P-control. Tune kP on the real XRP. Build your first reliable autonomous routine.",
+      description: "Close the loop with P-control. Tune kP on the real XRP. Build your first reliable autonomous routine.",
       hardware: "Laptop/XRP robot",
       prereq: "Lesson 04",
-      tools: "VS Code WPILib, AdvantageKit",
+      tools: "VS Code WPILib, AdvantageKit, AdvantageScope",
       duration: "3 hours",
-      filename: "lesson-05-logging.html",
+      filename: "lesson-05-closed-loop.html",
       status: "soon",  // "ready", "current", "review", "soon"
       prev: "04",
       next: "06"
@@ -88,14 +88,14 @@ const SITE_CONFIG = {
     "06": {
       module: 2,
       lesson: "06",
-      title: "How does the robot know when it's done?",
-      subtitle: "Commands, the four lifecycle methods, and the AutoChooser pattern. Build your first competition autonomous routine - park, score rubble, or go for the high zone.",
-      description: "Commands, the four lifecycle methods, and the AutoChooser pattern. Build your first competition autonomous routine - park, score rubble, or go for the high zone.",
+      title: "Competition Prep",
+      subtitle: "Commands, autonomous routines, and strategy. Write and tune everything you need for Orbit Odyssey. Competition is next session.",
+      description: "Commands, the AutoChooser pattern, autonomous routines for Orbit Odyssey. Lock strategy, tune on the real field, commit code.",
       hardware: "Laptop/XRP robot",
       prereq: "Lesson 05",
-      tools: "VS Code WPILib, AdvantageKit",
+      tools: "VS Code WPILib, AdvantageKit, AdvantageScope",
       duration: "3 hours",
-      filename: "lesson-06-autonomous.html",
+      filename: "lesson-06-competition-prep.html",
       status: "soon",  // "ready", "current", "review", "soon"
       prev: "05",
       next: "07"
@@ -103,31 +103,16 @@ const SITE_CONFIG = {
     "07": {
       module: 2,
       lesson: "07",
-      title: "Make it reliable - closed-loop auto and competition prep",
-      subtitle: "Close the loop with P-control. Tune kP on the real field. Lock your strategy. Commit your code. Competition is next session.",
-      description: "Close the loop with P-control. Tune kP on the real field. Lock your strategy. Commit your code. Competition is next session.",
-      hardware: "Laptop/XRP robot",
-      prereq: "Lesson 06",
-      tools: "VS Code WPILib, AdvantageKit",
-      duration: "3 hours",
-      filename: "lesson-07-sensors.html",
-      status: "soon",  // "ready", "current", "review", "soon"
-      prev: "06",
-      next: "08"
-    },
-    "08": {
-      module: 2,
-      lesson: "08",
       title: "Competition Day - Orbit Odyssey",
       subtitle: "Everything you built. One field. Real matches. 1v1 round-robin - every student competes individually.",
       description: "Final tweaks, practice runs, competitive matches, awards, and curriculum close.",
       hardware: "Laptop/XRP robot",
-      prereq: "Lesson 07",
+      prereq: "Lesson 06",
       tools: "XRP robot, Game Field",
       duration: "3 hours",
-      filename: "lesson-08-competition.html",
+      filename: "lesson-07-competition.html",
       status: "soon",  // "ready", "current", "review", "soon"
-      prev: "07",
+      prev: "06",
       next: null
     }
   }
