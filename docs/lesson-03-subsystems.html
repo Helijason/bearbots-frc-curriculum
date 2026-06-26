@@ -914,7 +914,7 @@
 <span class="kw">package</span> frc.robot.subsystems.scoop;
 
 <span class="kw">import</span> edu.wpi.first.wpilibj2.command.SubsystemBase;
-<span class="line-add"><span class="kw">import</span> edu.wpi.first.wpilibj.xrp.XRPServo;  <span class="cm-add">// ← add this import</span></span>
+<span class="line-add"><span class="kw">import</span> edu.wpi.first.wpilibj.xrp.XRPServo;</span>
 
 <span class="kw">public class</span> Scoop <span class="kw">extends</span> SubsystemBase {
 <span class="line-add">    <span class="kw">private final</span> XRPServo scoopServo = <span class="kw">new</span> XRPServo(<span class="num">4</span>); <span class="cm-add">// ← add this field</span></span>
@@ -991,7 +991,7 @@
           <p><code>@AutoLogOutput</code> is an AdvantageKit annotation. Put it above a field and AdvantageKit automatically records that field to the log every loop cycle - no <code>Logger.recordOutput()</code> call needed. One annotation, instant visibility.</p>
           <div class="code-block"><pre>
 import edu.wpi.first.wpilibj.xrp.XRPServo;
-<span class="line-add"><span class="kw">import</span> org.littletonrobotics.junction.AutoLogOutput;  <span class="cm-add">// ← add this import</span></span>
+<span class="line-add"><span class="kw">import</span> org.littletonrobotics.junction.AutoLogOutput;</span>
 
 <span class="cm-add">/** Creates a new scoop. */</span>
 private final XRPServo scoopServo = new XRPServo(4);
@@ -1251,10 +1251,11 @@ private final XRPServo scoopServo = new XRPServo(4);
       <span class="hf-label">Snippets we'll add in future lessons</span>
       <p>As you build each new pattern, you'll add a matching snippet. Here's what's coming:</p>
       <p><code>akio</code> - ArmIO interface shell (Lesson 04)<br>
-      <code>akioimpl</code> - ArmIOXRP implementation shell (Lesson 04)<br>
-      <code>akinputs</code> - @AutoLog inputs class (Lesson 04)<br>
-      <code>akcommand</code> - Full command class shell (Lesson 06)<br>
-      <code>akpcontrol</code> - P-control loop shell (Lesson 07)</p>
+      <code>akioimpl-xrp-servo</code> - XRP servo implementation shell (Lesson 04)<br>
+      <code>akioimpl-xrp-motor</code> - XRP motor implementation shell (Lesson 05)<br>
+      <code>akioimpl-sim</code> - Sim implementation shell (Lesson 04)<br>
+      <code>akcommand</code> - Full command class shell (Lesson 05)<br>
+      <code>akpcontrol</code> - P-control loop shell (Lesson 05)</p>
       <p>By the end of the curriculum, your <code>java.json</code> is a complete BearBots toolkit. Teams share snippet files the same way they share code - commit it to the repo.</p>
     </div>
 
