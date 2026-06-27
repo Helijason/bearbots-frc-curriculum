@@ -938,10 +938,9 @@
       confirm your angle mapping is correct without looking at the robot.
     </p>
 
-    <p>This part makes changes to four files:</p>
+    <p>This part makes changes to three files:</p>
     <ul style="margin:0.5rem 0 1rem 1.5rem;font-size:0.88rem;color:var(--mid);">
       <li><span class="file-badge">Scoop.java</span> — add a <code>LoggedMechanism2d</code> and a <code>getComponentPose()</code> getter</li>
-      <li><span class="file-badge">Arm.java</span> — refactor the <code>FinalComponentPoses</code> block into a stored field and <code>getComponentPose()</code> getter</li>
       <li><span class="file-badge">RobotContainer.java</span> — add a <code>getScoop()</code> getter</li>
       <li><span class="file-badge">Robot.java</span> — aggregate both subsystem poses into one <code>FinalComponentPoses</code> key</li>
     </ul>
@@ -1012,65 +1011,15 @@
     <div class="sb-step" id="vizstep-2">
       <div class="sb-step-header" onclick="sbToggle('vizstep-2')">
         <div class="sb-step-num">2</div>
-        <div class="sb-step-title">Fix Arm.java — remove FinalComponentPoses</div>
-        <div class="sb-step-chevron">▶</div>
-      </div>
-<div class="sb-step-body">
-        <p>Store the arm's 3D pose as a field so <code>periodic()</code> and the new getter share one definition. Lines in <span style="color:#1a7a4c;font-weight:600;">green</span> are new, lines in <span style="color:#a93226;font-weight:600;">red</span> are removed.</p>
-
-        <p><strong>Add field</strong> (after the ligament declaration on line 25):</p>
-        <div class="code-block"><pre>
-<span class="ln">24</span>  <span class="kw">private final</span> LoggedMechanismLigament2d armLigament =
-<span class="ln">25</span>      root.append(<span class="kw">new</span> LoggedMechanismLigament2d(<span class="str">"Arm"</span>, Units.feetToMeters(<span class="num">3</span>), <span class="num">0</span>));
-<span class="ln">26</span>
-<span class="ln">27</span><span class="line-add">  <span class="kw">private</span> Pose3d componentPose = <span class="kw">new</span> Pose3d();</span></pre></div>
-
-        <p><strong>Update the <code>FinalComponentPoses</code> block in <code>periodic()</code>:</strong></p>
-        <div class="code-block"><pre>
-<span class="ln">41</span>    Logger.recordOutput(<span class="str">"Arm/Mechanism2d"</span>, mechanism);
-<span class="ln">42</span><span class="line-del">    Logger.recordOutput(</span>
-<span class="ln">43</span><span class="line-del">      <span class="str">"FinalComponentPoses"</span>,</span>
-<span class="ln">44</span><span class="line-del">      <span class="kw">new</span> Pose3d[] {</span>
-<span class="ln">45</span><span class="line-del">        <span class="kw">new</span> Pose3d(-<span class="num">0.052</span>, <span class="num">0.007</span>, <span class="num">0.0645</span>,</span>
-<span class="ln">46</span><span class="line-del">            <span class="kw">new</span> Rotation3d(<span class="num">0.0</span>, Math.toRadians(inputs.commandedAngleDeg), <span class="num">0.0</span>))</span>
-<span class="ln">47</span><span class="line-del">            <span class="cm">//new Rotation3d(0.0, Math.toRadians(0.0), 0.0))</span></span>
-<span class="ln">48</span><span class="line-del">      });</span>
-<span class="ln">42</span><span class="line-add">    componentPose = <span class="kw">new</span> Pose3d(-<span class="num">0.052</span>, <span class="num">0.007</span>, <span class="num">0.0645</span>,</span>
-<span class="ln">43</span><span class="line-add">        <span class="kw">new</span> Rotation3d(<span class="num">0.0</span>, Math.toRadians(inputs.commandedAngleDeg), <span class="num">0.0</span>));</span>
-<span class="ln">44</span>  }</pre></div>
-
-        <p><strong>Add getter</strong> (after <code>getCommandedAngleDeg()</code>):</p>
-        <div class="code-block"><pre>
-<span class="ln">63</span>  <span class="kw">public double</span> getCommandedAngleDeg() {
-<span class="ln">64</span>    <span class="kw">return</span> inputs.commandedAngleDeg;
-<span class="ln">65</span>  }
-<span class="ln">66</span>
-<span class="ln">67</span><span class="line-add">  <span class="cm">/** Returns the current 3D pose of the arm for AdvantageScope aggregation. */</span></span>
-<span class="ln">68</span><span class="line-add">  <span class="kw">public</span> Pose3d getComponentPose() {</span>
-<span class="ln">69</span><span class="line-add">    <span class="kw">return</span> componentPose;</span>
-<span class="ln">70</span><span class="line-add">  }</span>
-<span class="ln">71</span>}</pre></div>
-
-        <div class="code-annotation">The pose is computed once per loop in <code>periodic()</code> and stored in <code>componentPose</code>. The getter just returns it — no duplicated math.</div>
-      </div>
-    </div><!-- /vizstep-2 -->
-
-    <div class="sb-step" id="vizstep-3">
-      <div class="sb-step-header" onclick="sbToggle('vizstep-3')">
-        <div class="sb-step-num">3</div>
         <div class="sb-step-title">Add getters to RobotContainer.java</div>
         <div class="sb-step-chevron">▶</div>
       </div>
 <div class="sb-step-body">
-        <p>Add two getter methods after <code>getAutonomousCommand()</code>. Lines in <span style="color:#1a7a4c;font-weight:600;">green</span> are new.</p>
+        <p>Add scoop getter method after <code>getAutonomousCommand()</code>. Lines in <span style="color:#1a7a4c;font-weight:600;">green</span> are new.</p>
         <div class="code-block"><pre>
-<span class="ln">127</span>  <span class="kw">public</span> Command getAutonomousCommand() {
-<span class="ln">128</span>    <span class="kw">return</span> autonomousChooser.get();
-<span class="ln">129</span>  }
-<span class="ln">130</span>
-<span class="ln">131</span><span class="line-add">  <span class="kw">public</span> frc.robot.subsystems.arm.Arm getArm() {</span>
-<span class="ln">132</span><span class="line-add">    <span class="kw">return</span> arm;</span>
-<span class="ln">133</span><span class="line-add">  }</span>
+<span class="ln">131</span>  <span class="kw">public</span> frc.robot.subsystems.arm.Arm getArm() {
+<span class="ln">132</span>    <span class="kw">return</span> arm;
+<span class="ln">133</span>  }
 <span class="ln">134</span>
 <span class="ln">135</span><span class="line-add">  <span class="kw">public</span> frc.robot.subsystems.scoop.Scoop getScoop() {</span>
 <span class="ln">136</span><span class="line-add">    <span class="kw">return</span> scoop;</span>
@@ -1079,40 +1028,35 @@
 
         <div class="code-annotation">Using fully qualified type names avoids adding new imports to RobotContainer.java.</div>
       </div>
+    </div><!-- /vizstep-2 -->
+
+    <div class="sb-step" id="vizstep-3">
+      <div class="sb-step-header" onclick="sbToggle('vizstep-3')">
+        <div class="sb-step-num">3</div>
+        <div class="sb-step-title">Aggregate poses in Robot.java</div>
+        <div class="sb-step-chevron">▶</div>
+      </div>
+<div class="sb-step-body">
+        <p>Update <code>robotPeriodic()</code>. Lines in <span style="color:#1a7a4c;font-weight:600;">green</span> are new.</p>
+
+        <p><strong>Update <code>robotPeriodic()</code>:</strong></p>
+        <div class="code-block"><pre>
+<span class="ln">84</span>    CommandScheduler.getInstance().run();
+<span class="ln">85</span>
+<span class="ln">86</span>    <span class="cm">// Aggregate all component poses for AdvantageScope 3D view.</span>
+<span class="ln">87</span>    Logger.recordOutput(<span class="str">"FinalComponentPoses"</span>, <span class="kw">new</span> Pose3d[] {
+<span class="ln">88</span>      robotContainer.getArm().getComponentPose()<span class="line-add">,</span>
+<span class="ln">89</span><span class="line-add">      robotContainer.getScoop().getComponentPose()</span>
+<span class="ln">90</span>    });
+<span class="ln">91</span>  }</pre></div>
+
+        <div class="code-annotation">Each subsystem owns its pose math. Robot.java just collects them into one array each loop so AdvantageScope's 3D view sees all components together.</div>
+      </div>
     </div><!-- /vizstep-3 -->
 
     <div class="sb-step" id="vizstep-4">
       <div class="sb-step-header" onclick="sbToggle('vizstep-4')">
         <div class="sb-step-num">4</div>
-        <div class="sb-step-title">Aggregate poses in Robot.java</div>
-        <div class="sb-step-chevron">▶</div>
-      </div>
-<div class="sb-step-body">
-        <p>Add one import and update <code>robotPeriodic()</code>. Lines in <span style="color:#1a7a4c;font-weight:600;">green</span> are new.</p>
-
-        <p><strong>Add import</strong> (after line 12):</p>
-        <div class="code-block"><pre>
-<span class="ln">18</span><span class="kw">import</span> org.littletonrobotics.junction.wpilog.WPILOGWriter;
-<span class="ln">19</span><span class="line-add"><span class="kw">import</span> edu.wpi.first.math.geometry.Pose3d;</span></pre></div>
-
-        <p><strong>Update <code>robotPeriodic()</code>:</strong></p>
-        <div class="code-block"><pre>
-<span class="ln">88</span>    CommandScheduler.getInstance().run();
-<span class="ln">89</span>
-<span class="ln">90</span><span class="line-add">    <span class="cm">// Aggregate all component poses for AdvantageScope 3D view.</span></span>
-<span class="ln">91</span><span class="line-add">    Logger.recordOutput(<span class="str">"FinalComponentPoses"</span>, <span class="kw">new</span> Pose3d[] {</span>
-<span class="ln">92</span><span class="line-add">      robotContainer.getArm().getComponentPose(),</span>
-<span class="ln">93</span><span class="line-add">      robotContainer.getScoop().getComponentPose()</span>
-<span class="ln">94</span><span class="line-add">    });</span>
-<span class="ln">95</span>  }</pre></div>
-
-        <div class="code-annotation">Each subsystem owns its pose math. Robot.java just collects them into one array each loop so AdvantageScope's 3D view sees all components together.</div>
-      </div>
-    </div><!-- /vizstep-4 -->
-
-    <div class="sb-step" id="vizstep-5">
-      <div class="sb-step-header" onclick="sbToggle('vizstep-5')">
-        <div class="sb-step-num">5</div>
         <div class="sb-step-title">Verify in AdvantageScope</div>
         <div class="sb-step-chevron">▶</div>
       </div>
@@ -1139,7 +1083,7 @@
 
         <div class="code-annotation">The arm pose comes from <code>getComponentPose()</code> — the offsets and rotation math stay in Arm.java. <code>generate3dMechanisms()</code> is a 2026 AKit addition — if you get a compile error, confirm you are on AKit 2026.</div>
       </div>
-    </div><!-- /vizstep-5 -->
+    </div><!-- /vizstep-4 -->
 
     </div><!-- /step-builder -->
 
