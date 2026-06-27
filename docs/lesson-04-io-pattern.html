@@ -1192,7 +1192,7 @@
   <div class="lesson-section" id="section-replay">
 
     <p>
-      You have a log file from Part 3. Replay mode lets you re-run your robot code against that exact log,
+      You have a log file from Part 5. Replay mode lets you re-run your robot code against that exact log,
       getting the same sensor inputs byte for byte, without touching any hardware.
       This is how you debug a match at home at midnight.
     </p>
@@ -1230,6 +1230,39 @@ Logger.processInputs("Scoop", inputs);
 
     <p>Your subsystem code runs normally. It reads from <code>inputs</code>. It computes outputs. It calls <code>Logger.recordOutput()</code>. Those outputs go into a new log file as <code>ReplayOutputs/</code>. You then compare <code>RealOutputs/</code> from the original run against <code>ReplayOutputs/</code> from the replay.</p>
 
+    <h2>Switching modes</h2>
+
+    <p>Two knobs control what the robot code does, and you set both by hand. <code>Constants.currentMode</code> picks the runtime behavior (which IO runs, whether the logger reads or writes). The <code>ROBOT_MODE</code> line in <span class="file-badge">build.gradle</span> picks which simulation extensions Gradle launches. They use slightly different names: the hardware mode is <code>REAL</code> in Constants but <code>XRP</code> in build.gradle.</p>
+
+    <table style="width:100%;border-collapse:collapse;margin:0.5rem 0 1rem;font-size:0.85rem;">
+      <thead>
+        <tr style="background:var(--teal);color:var(--white);">
+          <th style="text-align:left;padding:6px 10px;border:1px solid var(--teal-border);">What you are doing</th>
+          <th style="text-align:left;padding:6px 10px;border:1px solid var(--teal-border);"><code>Constants.currentMode</code></th>
+          <th style="text-align:left;padding:6px 10px;border:1px solid var(--teal-border);">build.gradle <code>ROBOT_MODE</code></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="padding:6px 10px;border:1px solid var(--gray-border);">Simulator on your laptop</td>
+          <td style="padding:6px 10px;border:1px solid var(--gray-border);"><code>Mode.SIM</code></td>
+          <td style="padding:6px 10px;border:1px solid var(--gray-border);"><code>RobotMode.SIM</code></td>
+        </tr>
+        <tr style="background:var(--gray-bg);">
+          <td style="padding:6px 10px;border:1px solid var(--gray-border);">Live XRP hardware (bonus)</td>
+          <td style="padding:6px 10px;border:1px solid var(--gray-border);"><code>Mode.REAL</code></td>
+          <td style="padding:6px 10px;border:1px solid var(--gray-border);"><code>RobotMode.XRP</code></td>
+        </tr>
+        <tr>
+          <td style="padding:6px 10px;border:1px solid var(--gray-border);">Replaying a log</td>
+          <td style="padding:6px 10px;border:1px solid var(--gray-border);"><code>Mode.REPLAY</code></td>
+          <td style="padding:6px 10px;border:1px solid var(--gray-border);"><code>RobotMode.REPLAY</code></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>Whenever you finish, set both back to the SIM row. That is the safe state to commit and the state your next simulate session expects.</p>
+
     <h2>Run your first replay</h2>
 
     <div class="hf-box hf-warning">
@@ -1241,43 +1274,56 @@ Logger.processInputs("Scoop", inputs);
       <div class="scope-step">
         <div class="scope-step-num">1</div>
         <div class="scope-step-body">
-          <strong>Note the full path to your log file</strong> from Part 3.
-        </div>
-      </div>
-      <div class="scope-step">
-        <div class="scope-step-num">2</div>
-        <div class="scope-step-body">
-          <strong>Open <code>Constants.java</code>.</strong> Change <code>currentMode</code> from <code>Mode.SIM</code> to <code>Mode.REPLAY</code>.
+          <strong>Set the runtime mode.</strong> In <span class="file-badge">Constants.java</span>, change <code>currentMode</code> to <code>Mode.REPLAY</code>.
           <div class="code-block"><pre>
 <span class="kw">public static final</span> Mode currentMode = Mode.REPLAY;  <span class="cm-add">// ← changed</span></pre></div>
         </div>
       </div>
       <div class="scope-step">
+        <div class="scope-step-num">2</div>
+        <div class="scope-step-body">
+          <strong>Set the build mode.</strong> In <span class="file-badge">build.gradle</span>, change <code>ROBOT_MODE</code> to <code>RobotMode.REPLAY</code>.
+          <div class="code-block"><pre>
+<span class="kw">def</span> ROBOT_MODE = RobotMode.REPLAY  <span class="cm-add">// ← changed</span></pre></div>
+        </div>
+      </div>
+      <div class="scope-step">
         <div class="scope-step-num">3</div>
         <div class="scope-step-body">
-          <strong>Set the replay log path.</strong> Find the <code>WPILOGReader</code> line in your <code>Robot.java</code> constructor and point it at your log file.
-          <div class="code-block"><pre>
-Logger.addDataReceiver(<span class="kw">new</span> WPILOGReader(<span class="str">"logs/YOUR_LOG_FILE.wpilog"</span>));</pre></div>
+          <strong>List your logs.</strong> In the terminal, run <code>./replay.bat -List</code>. It prints the log files in <code>logs/</code>.
         </div>
       </div>
       <div class="scope-step">
         <div class="scope-step-num">4</div>
         <div class="scope-step-body">
-          <strong>Simulate:</strong> <code>Ctrl+Shift+P</code> → <em>WPILib: Simulate Robot Code</em>. It will run through the log and stop. A new log file is written to <code>logs/</code>.
+          <strong>Run the replay.</strong> Copy the filename from the list and run <code>./replay.bat <em>filename</em></code> with just the name, no path. The script blanks any leftover extension settings, sets the log path, runs your code against the log, and writes a new <code>_sim.wpilog</code> next to the original.
         </div>
       </div>
       <div class="scope-step">
         <div class="scope-step-num">5</div>
         <div class="scope-step-body">
-          <strong>Open the new log in AdvantageScope.</strong> Find <code>ReplayOutputs/Scoop/CommandedAngleDeg</code>. Compare it to <code>AdvantageKit/RealOutputs/Scoop/CommandedAngleDeg</code> from the original log. They should match exactly - same values, same timestamps.
+          <strong>Compare in AdvantageScope.</strong> Open the new <code>_sim.wpilog</code>. Find <code>ReplayOutputs/Scoop/CommandedAngleDeg</code> and compare it to <code>AdvantageKit/RealOutputs/Scoop/CommandedAngleDeg</code> from the original run. They should match exactly: same values, same timestamps.
+        </div>
+      </div>
+      <div class="scope-step">
+        <div class="scope-step-num">6</div>
+        <div class="scope-step-body">
+          <strong>Set both knobs back to SIM</strong> when you are done: <code>Constants.currentMode = Mode.SIM</code> and <code>ROBOT_MODE = RobotMode.SIM</code>.
         </div>
       </div>
     </div>
 
+    <div class="hf-box hf-warning">
+      <span class="hf-label">Gotchas worth knowing</span>
+      <p>In Part 4 you checked Sim GUI in the extension picker. Replay is the opposite: it must load no extensions at all. AdvantageKit refuses to replay if any simulation extension is loaded, which is exactly why replay runs through <code>./replay.bat</code> instead of the picker. Use the script, not <em>Simulate Robot Code</em>.</p>
+      <p>The <code>_sim.wpilog</code> file is the replay output, written next to the source log. <code>replay.bat -List</code> hides <code>*_sim.wpilog</code> on purpose, so you cannot accidentally replay a replay.</p>
+      <p>Commit with both knobs on the SIM row. A committed REPLAY or XRP setting breaks the next person’s simulate session.</p>
+    </div>
+
     <div class="hf-box hf-info">
       <span class="hf-label">If they don't match</span>
-      <p>If <code>RealOutputs/</code> and <code>ReplayOutputs/</code> don't match with unchanged code, replay isn't reading the log correctly. Check the log file path and make sure <code>WPILOGReader</code> is being added before <code>Logger.start()</code>.</p>
-      <p>If they do match, try changing one line — add <code>+ 5.0</code> to the angle in one of the <code>switch</code> cases in <code>Scoop.java</code>. Re-run the replay. <code>ReplayOutputs/</code> should now differ from <code>RealOutputs/</code> by exactly 5 degrees at that moment.</p>
+      <p>If <code>RealOutputs/</code> and <code>ReplayOutputs/</code> don't match with unchanged code, replay isn't reading the log correctly. Confirm both knobs are on the REPLAY row and that you launched with <code>./replay.bat</code> rather than <em>Simulate Robot Code</em>.</p>
+      <p>If they do match, try changing one line: add <code>+ 5.0</code> to the angle in one of the <code>switch</code> cases in <code>Scoop.java</code>. Re-run the replay. <code>ReplayOutputs/</code> should now differ from <code>RealOutputs/</code> by exactly 5 degrees at that moment.</p>
     </div>
 
     <div class="chat-thread">
@@ -1287,7 +1333,7 @@ Logger.addDataReceiver(<span class="kw">new</span> WPILOGReader(<span class="str
       </div>
       <div class="bubble bubble-a">
         <div class="bubble-who">Yes. Every time.</div>
-        Leaving it as REPLAY and deploying means the robot runs with no hardware outputs — no motor commands. Change it back to SIM before your next simulate session, and to REAL before deploying.
+        Leaving it on REPLAY and deploying means the robot runs with no hardware outputs, no motor commands. Set both knobs back to the SIM row before your next simulate session, and to the REAL/XRP row before deploying to hardware.
       </div>
       <div class="bubble bubble-q">
         <div class="bubble-who">Student</div>
@@ -1301,7 +1347,7 @@ Logger.addDataReceiver(<span class="kw">new</span> WPILOGReader(<span class="str
 
     <div class="hf-box hf-brain">
       <span class="hf-label">Before you leave today</span>
-      <p>Change <code>Constants.currentMode</code> back to <code>Mode.SIM</code>. Commit your code. Scoop is now fully IO-pattern with logging and replay working.</p>
+      <p>Set both knobs back to the SIM row: <code>Constants.currentMode = Mode.SIM</code> and build.gradle <code>ROBOT_MODE = RobotMode.SIM</code>. Commit your code. Scoop is now fully IO-pattern with logging and replay working.</p>
     </div>
 
   </div><!-- /section-replay -->
