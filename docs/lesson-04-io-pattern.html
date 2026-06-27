@@ -1308,7 +1308,29 @@ Logger.processInputs("Scoop", inputs);
       <div class="scope-step">
         <div class="scope-step-num">6</div>
         <div class="scope-step-body">
-          <strong>Set both knobs back to SIM</strong> when you are done: <code>Constants.currentMode = Mode.SIM</code> and <code>ROBOT_MODE = RobotMode.SIM</code>.
+          <strong>Add a new output and replay the same log.</strong> This is the part that makes replay useful. In <span class="file-badge">Scoop.java</span>, add a new logged value in <code>periodic()</code> right after line 68:
+          <div class="code-block"><pre>
+<span class="ln">68</span>    Logger.recordOutput(<span class="str">"Scoop/Goal"</span>, goal.toString());
+<span class="ln">69</span><span class="line-add">    Logger.recordOutput(<span class="str">"Scoop/NewAngle"</span>, clamped + <span class="num">5.0</span>);</span></pre></div>
+          Save the file. The watch loop from step 4 is still running: it detects the change and replays the log again on its own, so the new value shows up in AdvantageScope without you running anything. You did not touch the robot or the field. You computed a brand new output from the inputs that were recorded the first time.
+        </div>
+      </div>
+      <div class="scope-step">
+        <div class="scope-step-num">7</div>
+        <div class="scope-step-body">
+          <strong>Find the new output.</strong> There is now a <code>ReplayOutputs/Scoop/NewAngle</code> key that did not exist in the original log. Compare it to <code>ReplayOutputs/Scoop/CommandedAngleDeg</code>: it tracks the same shape, offset by exactly 5 degrees. The original run never logged this value, and you produced it anyway, from recorded data, with no robot in the room.
+        </div>
+      </div>
+      <div class="scope-step">
+        <div class="scope-step-num">8</div>
+        <div class="scope-step-body">
+          <strong>Stop the replay.</strong> The replay runs in a watch loop, so it keeps going until you stop it. In the terminal, press <kbd>Ctrl</kbd>+<kbd>C</kbd>. When it asks <code>Terminate batch job (Y/N)?</code>, type <code>Y</code> and press <kbd>Enter</kbd>.
+        </div>
+      </div>
+      <div class="scope-step">
+        <div class="scope-step-num">9</div>
+        <div class="scope-step-body">
+          <strong>Set both knobs back to SIM</strong> when you are done: <code>Constants.currentMode = Mode.SIM</code> and <code>ROBOT_MODE = RobotMode.SIM</code>. You can keep the <code>NewAngle</code> line or remove it; it does not change how the robot drives.
         </div>
       </div>
     </div>
@@ -1323,7 +1345,6 @@ Logger.processInputs("Scoop", inputs);
     <div class="hf-box hf-info">
       <span class="hf-label">If they don't match</span>
       <p>If <code>RealOutputs/</code> and <code>ReplayOutputs/</code> don't match with unchanged code, replay isn't reading the log correctly. Confirm both knobs are on the REPLAY row and that you launched with <code>./replay.bat</code> rather than <em>Simulate Robot Code</em>.</p>
-      <p>If they do match, try changing one line: add <code>+ 5.0</code> to the angle in one of the <code>switch</code> cases in <code>Scoop.java</code>. Re-run the replay. <code>ReplayOutputs/</code> should now differ from <code>RealOutputs/</code> by exactly 5 degrees at that moment.</p>
     </div>
 
     <div class="chat-thread">
