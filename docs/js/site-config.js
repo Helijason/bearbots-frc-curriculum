@@ -66,7 +66,7 @@ const SITE_CONFIG = {
       tools: "VS Code WPILib, AdvantageKit, AdvantageScope",
       duration: "3 hours",
       filename: "lesson-04-io-pattern.html",
-      status: "review",  // "ready", "current", "review", "soon"
+      status: "ready",  // "ready", "current", "review", "soon"
       prev: "03",
       next: "05"
     },
