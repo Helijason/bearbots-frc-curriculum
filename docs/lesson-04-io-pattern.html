@@ -1060,28 +1060,46 @@
         <div class="sb-step-title">Verify in AdvantageScope</div>
         <div class="sb-step-chevron">▶</div>
       </div>
-<div class="sb-step-body">
-        <p>Add one import and update <code>robotPeriodic()</code>. Lines in <span style="color:#1a7a4c;font-weight:600;">green</span> are new.</p>
+      <div class="sb-step-body">
+        <p>No new code here. This step confirms the visualization pipeline actually works: change the scoop goal, watch the picture move. Sim first, as always.</p>
 
-        <p><strong>Add import</strong> (after line 28):</p>
-        <div class="code-block"><pre>
-<span class="ln">28</span><span class="kw">import</span> org.littletonrobotics.junction.networktables.NT4Publisher;
-<span class="ln">29</span><span class="line-add"><span class="kw">import</span> edu.wpi.first.math.geometry.Pose3d;</span></pre></div>
+        <p><strong>Start the simulator with the Sim GUI:</strong></p>
+        <ol style="margin:0.25rem 0 0.75rem 1.5rem;">
+          <li>Press <code>Ctrl+Shift+P</code>, type <em>Simulate Robot Code</em>, and select <em>WPILib: Simulate Robot Code</em>.</li>
+          <li>An <strong>extension picker</strong> appears, listing the simulation extensions. Check the box for <strong>Sim GUI</strong> (<code>halsim_gui</code>). Leave the others unchecked for a plain simulator run.</li>
+          <li>Click <strong>OK</strong>. The Sim GUI window opens.</li>
+        </ol>
+        <div class="hf-box hf-warning">
+          <span class="hf-label">No picker appeared?</span>
+          <p>If the simulator launched straight to a window with no checklist, the picker is being skipped. Open <span class="file-badge">.vscode/settings.json</span> and set <code>"wpilib.skipSelectSimulateExtension"</code> to <code>false</code>, then run <em>Simulate Robot Code</em> again. The picker is how you make sure the Sim GUI is loaded and nothing else sneaks in.</p>
+        </div>
 
-        <p><strong>Update <code>robotPeriodic()</code>:</strong></p>
-        <div class="code-block"><pre>
-<span class="ln">97</span>  <span class="kw">public void</span> robotPeriodic() {
-<span class="ln">98</span>    CommandScheduler.getInstance().run();
-<span class="ln">99</span>
-<span class="ln">100</span><span class="line-add">    <span class="cm">// Aggregate all component poses for AdvantageScope 3D view.</span></span>
-<span class="ln">101</span><span class="line-add">    Pose3d[] scoopPoses = robotContainer.getScoop().getMechanism().generate3dMechanisms();</span>
-<span class="ln">102</span><span class="line-add">    Pose3d[] allPoses = <span class="kw">new</span> Pose3d[<span class="num">1</span> + scoopPoses.length];</span>
-<span class="ln">103</span><span class="line-add">    allPoses[<span class="num">0</span>] = robotContainer.getArm().getComponentPose();</span>
-<span class="ln">104</span><span class="line-add">    System.arraycopy(scoopPoses, <span class="num">0</span>, allPoses, <span class="num">1</span>, scoopPoses.length);</span>
-<span class="ln">105</span><span class="line-add">    Logger.recordOutput(<span class="str">"FinalComponentPoses"</span>, allPoses);</span>
-<span class="ln">106</span>  }</pre></div>
+        <p><strong>Connect AdvantageScope to the running sim:</strong></p>
+        <ol style="margin:0.25rem 0 0.75rem 1.5rem;">
+          <li>In the Sim GUI, set the robot state to <strong>Teleoperated</strong> so <code>periodic()</code> runs.</li>
+          <li>Open AdvantageScope and choose <em>File &rarr; Connect to Simulator</em>. The left sidebar fills with live keys.</li>
+        </ol>
 
-        <div class="code-annotation">The arm pose comes from <code>getComponentPose()</code> — the offsets and rotation math stay in Arm.java. <code>generate3dMechanisms()</code> is a 2026 AKit addition — if you get a compile error, confirm you are on AKit 2026.</div>
+        <p><strong>Set up the view in AdvantageScope:</strong></p>
+        <ol style="margin:0.25rem 0 0.75rem 1.5rem;">
+          <li>Open a new tab and choose the <strong>3D Field</strong> view.</li>
+          <li>Drag out <code>AdvantageKit/RealOutputs/Drive/Pose</code>. This places the robot on the field.</li>
+          <li>Drag out <code>AdvantageKit/RealOutputs/FinalComponentPoses</code> and drop it onto the <code>Drive/Pose</code> entry you just added. This attaches the arm and scoop components to the robot.</li>
+          <li>Drag out <code>AdvantageKit/RealOutputs/Scoop/Mechanism2d</code>. This gives the 2D angle view alongside the 3D field.</li>
+        </ol>
+
+        <p><strong>Verify 2D and 3D together:</strong></p>
+        <p>Press your scoop buttons to move between FLAT, CARRY, and DUMP. Watch both views at once: the 3D scoop and arm components rotate, and the 2D Mechanism2d ligament swings to match. They should agree on every goal. Repeat with the arm to confirm it reads the same way.</p>
+
+        <div class="hf-box hf-info">
+          <span class="hf-label">Why the 2D view is the one to trust right now</span>
+          <p>The scoop&apos;s 3D chassis offset is still a placeholder of <code>(0.0, 0.0, 0.0)</code> until it is measured on the physical robot, so in the 3D Field view the scoop sits at the chassis origin instead of its real mounting point. The rotation is correct, the position is not. The 2D <code>Mechanism2d</code> view does not depend on that offset, so it is the trustworthy confirmation that your angle mapping is right.</p>
+        </div>
+
+        <div class="hf-box hf-warning">
+          <span class="hf-label">If nothing moves</span>
+          <p>Sidebar is empty: the sim is not running, or AdvantageScope is not connected to it. Pose appears but never changes: the goal is not actually changing, so confirm your button bindings fire <code>setGoalCommand()</code>. Mechanism2d folder is missing: the <code>Logger.recordOutput("Scoop/Mechanism2d", ...)</code> line in <code>periodic()</code> is missing or misspelled.</p>
+        </div>
       </div>
     </div><!-- /vizstep-4 -->
 
@@ -1162,7 +1180,7 @@
 
     <div class="hf-box hf-brain">
       <span class="hf-label">Do this before moving on</span>
-      <p>Find the exact loop tick where the angle changed from FLAT to CARRY. What timestamp is it? Write it down. This is the same resolution you'll use when debugging autonomous routines.</p>
+      <p>Find the exact loop tick where the angle changed from FLAT to CARRY. What timestamp is it? Write it down.</p>
     </div>
 
   </div><!-- /section-scope -->
