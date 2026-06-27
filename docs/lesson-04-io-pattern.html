@@ -88,6 +88,7 @@
     .callout-connect strong { color: var(--purple); }
     .section-rule { border: none; border-top: 1px solid var(--gray-border); margin: 1.5rem 0; }
     #section-convert .code-block pre,
+    #section-visualize .code-block pre,
     #section-scope .code-block pre,
     #section-replay .code-block pre { font-size: 0.7rem; line-height: 1.4; }
   </style>
@@ -110,8 +111,9 @@
     <button class="section-nav-btn active" data-section="concept">Part 1 - The Pattern</button>
     <button class="section-nav-btn" data-section="snippets">Part 2 - Install Snippets</button>
     <button class="section-nav-btn" data-section="convert">Part 3 - Convert Scoop</button>
-    <button class="section-nav-btn" data-section="scope">Part 4 - AdvantageScope</button>
-    <button class="section-nav-btn" data-section="replay">Part 5 - Replay</button>
+    <button class="section-nav-btn" data-section="visualize">Part 4 - Visualization</button>
+    <button class="section-nav-btn" data-section="scope">Part 5 - AdvantageScope</button>
+    <button class="section-nav-btn" data-section="replay">Part 6 - Replay</button>
   </nav>
 
 
@@ -338,7 +340,7 @@
       <div class="step-number">1</div>
       <div class="step-content">
         <strong>Find <code>java.json</code></strong> in the <code>bearbots-xrp-code</code> repo:<br>
-        <code>bearbots-xrp-code/.vscode/java.json</code>
+        <code>bearbots-xrp-code/vscode/java.json</code>
       </div>
     </div>
 
@@ -346,7 +348,7 @@
       <div class="step-number">2</div>
       <div class="step-content">
         <strong>Move the file</strong> to your VS Code user snippets folder:<br>
-        <code>%APPDATA%\Code\User\snippets\java.json</code><br>
+        <code>C:\Users\Public\wpilib\2026\vscode\data\user-data\User\snippets\java.json</code><br>
         <span style="font-size:0.85em;color:var(--txt-med);">
           Paste that path directly into Windows Explorer's address bar. If a <code>java.json</code> already exists there from Lesson 03, replace it — this version includes everything from that one plus the new IO snippets.
         </span>
@@ -529,7 +531,27 @@
         <div class="sb-step-chevron">▶</div>
       </div>
       <div class="sb-step-body">
-        <p>New file in the same <code>scoop/</code> folder, named <code>ScoopIOXRP.java</code>. Delete any content VS Code inserted, then type <code>akioimpl-xrp-servo</code> and press <kbd>Tab</kbd> to expand.</p>
+        <p><strong>First, add the hardware port to <span class="file-badge">Constants.java</span>.</strong> The IO layer you are about to write reads the servo's device number from <code>Constants.ScoopHardware</code>. That inner class does not exist yet — add it now, before creating the file that uses it.</p>
+        <p>Open <span class="file-badge">Constants.java</span>. Find the <code>ArmHardware</code> block. Add the <code>ScoopHardware</code> block directly below it, in the same style:</p>
+        <div class="code-block"><pre>
+<span class="ln">76</span>  <span class="kw">public static final class</span> ArmHardware {
+<span class="ln">77</span>    <span class="kw">private</span> ArmHardware() {}
+<span class="ln">78</span>
+<span class="ln">79</span>    <span class="cm">/** XRP servo device number. Device 4 maps to physical Servo 1 on the XRP. */</span>
+<span class="ln">80</span>    <span class="kw">public static final int</span> kArmServoDeviceNumber = <span class="num">4</span>;
+<span class="ln">81</span>  }
+<span class="ln">82</span><span class="line-add"> </span>
+<span class="ln">83</span><span class="line-add">  <span class="kw">public static final class</span> ScoopHardware {</span>
+<span class="ln">84</span><span class="line-add">    <span class="kw">private</span> ScoopHardware() {}</span>
+<span class="ln">85</span><span class="line-add"> </span>
+<span class="ln">86</span><span class="line-add">    <span class="cm-add">/** XRP servo device number. Device 5 maps to physical Servo 2 on the XRP. */</span></span>
+<span class="ln">87</span><span class="line-add">    <span class="kw">public static final int</span> kScoopServoDeviceNumber = <span class="num">5</span>;</span>
+<span class="ln">88</span><span class="line-add">  }</span>
+<span class="ln">89</span>}
+</pre></div>
+        <div class="code-annotation">Same pattern as <code>kArmServoDeviceNumber</code>: a hardware port number lives in <code>Constants</code>, not in the IO file. The new block sits inside the closing <code>}</code> of the <code>Constants</code> class. Build after adding it — it should compile cleanly on its own.</div>
+
+        <p style="margin-top:1rem;"><strong>Now create the IO file.</strong> New file in the same <code>scoop/</code> folder, named <code>ScoopIOXRP.java</code>. Delete any content VS Code inserted, then type <code>akioimpl-xrp-servo</code> and press <kbd>Tab</kbd> to expand.</p>
         <p>Placeholders to replace are shown in <span style="color:#a93226;font-weight:600;">red</span>. Note that <span class="ts-before">SubsystemName</span> appears in three places — type <code>Scoop</code> once and all three update simultaneously.</p>
 
         <p><strong>Snippet expanded — replace the red placeholders:</strong></p>
@@ -544,7 +566,7 @@
 <span class="ln"> 8</span><span class="kw">import static</span> frc.robot.Constants.<span class="ts-before">SubsystemName</span>Hardware.*;
 <span class="ln"> 9</span>
 <span class="ln">10</span><span class="kw">public class</span> ScoopIOXRP <span class="kw">implements</span> <span class="ts-before">SubsystemName</span>IO {
-<span class="ln">11</span>  <span class="kw">private final</span> XRPServo servo = <span class="kw">new</span> XRPServo(kServoChannel);
+<span class="ln">11</span>  <span class="kw">private final</span> XRPServo servo = <span class="kw">new</span> XRPServo(<span class="ts-before">kServoChannel</span>);
 <span class="ln">12</span>
 <span class="ln">13</span>  <span class="kw">private double</span> <span class="ts-before">fieldName</span> = <span class="ts-before">0.0</span>;
 <span class="ln">14</span>
@@ -560,15 +582,20 @@
 <span class="ln">24</span>  }
 <span class="ln">25</span>}</pre></div>
 
+        <p><strong>Field declaration</strong> (line 13) — two tab stops, fill together:</p>
+        <ul style="margin:0.25rem 0 0.75rem 1.5rem;">
+          <li>Replace <span class="ts-before">fieldName</span> with <code>commandedAngleDeg</code>, press <kbd>Tab</kbd></li>
+          <li>Replace <span class="ts-before">0.0</span> with <code>ScoopConstants.kFlatAngleDeg</code>, press <kbd>Tab</kbd></li>
+        </ul>
+
         <p style="margin-top:0.75rem;"><strong>Subsystem name</strong> (lines 8, 10, 16) — one tab stop that ripples:</p>
         <ul style="margin:0.25rem 0 0.75rem 1.5rem;">
           <li>Replace <span class="ts-before">SubsystemName</span> with <code>Scoop</code>, press <kbd>Tab</kbd></li>
         </ul>
 
-        <p><strong>Field declaration</strong> (line 13) — two tab stops, fill together:</p>
+        <p style="margin-top:0.75rem;"><strong>Servo channel</strong> (line 11) — one tab stop:</p>
         <ul style="margin:0.25rem 0 0.75rem 1.5rem;">
-          <li>Replace <span class="ts-before">fieldName</span> with <code>commandedAngleDeg</code>, press <kbd>Tab</kbd></li>
-          <li>Replace <span class="ts-before">0.0</span> with <code>ScoopConstants.kFlatAngleDeg</code>, press <kbd>Tab</kbd></li>
+          <li>Replace <span class="ts-before">kServoChannel</span> with <code>kScoopServoDeviceNumber</code>, press <kbd>Tab</kbd>. This is the constant you just added to <code>Constants.ScoopHardware</code>; the static import on line 8 brings it into scope.</li>
         </ul>
 
         <p><strong>Method signature</strong> (line 21) — two tab stops, fill together:</p>
@@ -576,8 +603,6 @@
           <li>Replace <span class="ts-before">setAngle</span> with <code>setAngle</code>, press <kbd>Tab</kbd></li>
           <li>Replace <span class="ts-before">angleDeg</span> with <code>angleDeg</code>, press <kbd>Escape</kbd></li>
         </ul>
-
-        <p style="color:var(--txt-med);font-size:0.88em;">Note: <code>kServoChannel</code> on line 11 is already correct — the snippet pre-fills it. Skip it.</p>
 
         <p><strong>After filling tab stops:</strong></p>
         <div class="code-block"><pre>
@@ -591,7 +616,7 @@
 <span class="ln"> 8</span><span class="kw">import static frc.robot.Constants.<span class="ts-after">ScoopHardware</span>.*;</span>
 <span class="ln"> 9</span>
 <span class="ln">10</span><span class="kw">public class ScoopIOXRP <span class="kw">implements</span> <span class="ts-after">Scoop</span>IO {</span>
-<span class="ln">11</span>  <span class="kw">private final</span> XRPServo servo = <span class="kw">new</span> XRPServo(kServoChannel);
+<span class="ln">11</span>  <span class="kw">private final</span> XRPServo servo = <span class="kw">new</span> XRPServo(<span class="ts-after">kScoopServoDeviceNumber</span>);
 <span class="ln">12</span>
 <span class="ln">13</span>  <span class="kw">private double <span class="ts-after">commandedAngleDeg</span> = <span class="ts-after">ScoopConstants.kFlatAngleDeg</span>;</span>
 <span class="ln">14</span>
@@ -609,7 +634,7 @@
 
         <div class="code-annotation">XRPServo lives here and only here. No clamping — the subsystem handles that. <code>commandedAngleDeg</code> is tracked as a field because the servo has no position feedback.</div>
 
-        <p>Build. If you see an error about <code>kServoChannel</code>, check that <code>Constants.ScoopHardware</code> has been added to <span class="file-badge">Constants.java</span>.</p>
+        <p>Build. If you see an error about <code>kScoopServoDeviceNumber</code>, check that the <code>ScoopHardware</code> block was added to <span class="file-badge">Constants.java</span> in the step above.</p>
       </div>
     </div><!-- /step 3 -->
 
@@ -646,14 +671,18 @@
 <span class="ln">18</span>  }
 <span class="ln">19</span>}</pre></div>
 
-        <p style="margin-top:0.75rem;"><strong>Subsystem name</strong> (lines 7, 11) — one tab stop that ripples:</p>
+        <p style="margin-top:0.75rem;"><strong>Field name</strong> (line 8, 12, 17) — first tab stop:</p>
+        <ul style="margin:0.25rem 0 0.75rem 1.5rem;">
+          <li>Replace <span class="ts-before">fieldName</span> with <code>commandedAngleDeg</code>, press <kbd>Tab</kbd></li>
+        </ul>
+
+        <p><strong>Subsystem name</strong> (lines 7, 11) — one tab stop that ripples:</p>
         <ul style="margin:0.25rem 0 0.75rem 1.5rem;">
           <li>Replace <span class="ts-before">SubsystemName</span> with <code>Scoop</code>, press <kbd>Tab</kbd></li>
         </ul>
 
-        <p><strong>Field declaration</strong> (line 8) — two tab stops, fill together:</p>
+        <p><strong>Field default</strong> (line 8) — next tab stop:</p>
         <ul style="margin:0.25rem 0 0.75rem 1.5rem;">
-          <li>Replace <span class="ts-before">fieldName</span> with <code>commandedAngleDeg</code>, press <kbd>Tab</kbd></li>
           <li>Replace <span class="ts-before">0.0</span> with <code>ScoopConstants.kFlatAngleDeg</code>, press <kbd>Tab</kbd></li>
         </ul>
 
@@ -704,11 +733,10 @@
       <div class="sb-step-body">
         <p>This is the main event. The current <span class="file-badge">Scoop.java</span> imports <code>XRPServo</code> and calls hardware directly from <code>periodic()</code>. Both of those go away. Lines in <span style="color:#a93226;font-weight:600;">red</span> are removed. Lines in <span style="color:#b8860b;font-weight:600;">amber</span> are modified. Lines in <span style="color:#1a7a4c;font-weight:600;">green</span> are new.</p>
 
-        <p><strong>Before:</strong></p>
         <div class="code-block"><pre>
-<span class="ln"> 1</span><span class="cm">// Copyright (c) FIRST and other WPILib contributors.</span>
+<span class="ln"> 1</span><span class="cm">// Copyright (c) 2025 BearBots FRC Team 6964</span>
 <span class="ln"> 2</span><span class="cm">// Open Source Software; you can modify and/or share it under the terms of</span>
-<span class="ln"> 3</span><span class="cm">// the WPILib BSD license file in the root directory of this project.</span>
+<span class="ln"> 3</span><span class="cm">// the MIT License available in the root directory of this project.</span>
 <span class="ln"> 4</span>
 <span class="ln"> 5</span><span class="kw">package</span> frc.robot.subsystems.scoop;
 <span class="ln"> 6</span>
@@ -720,89 +748,109 @@
 <span class="ln">12</span>
 <span class="ln">13</span><span class="kw">public class</span> Scoop <span class="kw">extends</span> SubsystemBase {
 <span class="ln">14</span>    <span class="kw">public enum</span> Goal {
-<span class="ln">15</span>        FLAT,   <span class="cm">// servo at 0° - resting position</span>
-<span class="ln">16</span>        CARRY,  <span class="cm">// servo at 45° - holding game piece</span>
-<span class="ln">17</span>        DUMP    <span class="cm">// servo at 90° - releasing game piece</span>
+<span class="ln">15</span>        FLAT,   <span class="cm">// resting position</span>
+<span class="ln">16</span>        CARRY,  <span class="cm">// holding game piece</span>
+<span class="ln">17</span>        DUMP    <span class="cm">// releasing game piece</span>
 <span class="ln">18</span>    }
 <span class="ln">19</span>
 <span class="ln">20</span><span class="line-del">  <span class="kw">private final</span> XRPServo scoopServo = <span class="kw">new</span> XRPServo(<span class="num">4</span>);</span>
 <span class="ln">21</span>
 <span class="ln">22</span><span class="line-del">  <span class="kw">@AutoLogOutput</span></span>
-<span class="ln">23</span>  <span class="kw">private</span> Goal goal = Goal.FLAT;
+<span class="ln">23</span>  <span class="kw">private</span> Goal goal = Goal.FLAT; <span class="cm">// start flat</span>
 <span class="ln">24</span>
 <span class="ln">25</span>  <span class="cm">/** Creates a new Scoop. */</span>
-<span class="ln">26</span><span class="line-mod">  <span class="kw">public</span> Scoop() {  <span class="cm-mod">// ← constructor takes no IO — changes in step 5</span></span>
+<span class="ln">26</span><span class="line-mod">  <span class="kw">public</span> Scoop() {</span>
 <span class="ln">27</span>    <span class="cm">// Constructor - runs once at startup</span>
 <span class="ln">28</span>  }
 <span class="ln">29</span>
-<span class="ln">30</span>  <span class="kw">public void</span> setGoal(Goal newGoal) { goal = newGoal; }
-<span class="ln">31</span>
-<span class="ln">32</span>  <span class="kw">public</span> Command setGoalCommand(Goal newGoal) {
-<span class="ln">33</span>    <span class="kw">return</span> runOnce(() -> setGoal(newGoal));
-<span class="ln">34</span>  }
-<span class="ln">35</span>
-<span class="ln">36</span>  <span class="kw">public void</span> stop() { setGoal(Goal.FLAT); }
-<span class="ln">37</span>
-<span class="ln">38</span>  <span class="kw">@Override</span>
-<span class="ln">39</span>  <span class="kw">public void</span> periodic() {
-<span class="ln">40</span>    <span class="kw">switch</span> (goal) {
-<span class="ln">41</span><span class="line-mod">        <span class="kw">case</span> FLAT  -> scoopServo.setAngle(<span class="num">0.0</span>);   <span class="cm-mod">// ← direct hardware call, goes away</span></span>
-<span class="ln">42</span><span class="line-mod">        <span class="kw">case</span> CARRY -> scoopServo.setAngle(<span class="num">45.0</span>);  <span class="cm-mod">// ← direct hardware call, goes away</span></span>
-<span class="ln">43</span><span class="line-mod">        <span class="kw">case</span> DUMP  -> scoopServo.setAngle(<span class="num">90.0</span>);  <span class="cm-mod">// ← direct hardware call, goes away</span></span>
-<span class="ln">44</span>    }
-<span class="ln">45</span>  }
-<span class="ln">46</span>}</pre></div>
+<span class="ln">30</span>  <span class="cm">// simple setter, changes the goal field</span>
+<span class="ln">31</span>  <span class="kw">public void</span> setGoal(Goal newGoal) {
+<span class="ln">32</span>    goal = newGoal;
+<span class="ln">33</span>  }
+<span class="ln">34</span>
+<span class="ln">35</span>  <span class="cm">// returns a command that sets the goal once, then ends</span>
+<span class="ln">36</span>  <span class="cm">// runOnce() = run the lambda once, then the command is done</span>
+<span class="ln">37</span>  <span class="kw">public</span> Command setGoalCommand(Goal newGoal) {
+<span class="ln">38</span>    <span class="kw">return</span> runOnce(() -> setGoal(newGoal));
+<span class="ln">39</span>  }
+<span class="ln">40</span>
+<span class="ln">41</span>  <span class="cm">// safe state, called when a command is interrupted</span>
+<span class="ln">42</span>  <span class="kw">public void</span> stop() {
+<span class="ln">43</span>    setGoal(Goal.FLAT);  <span class="cm">// return to resting position</span>
+<span class="ln">44</span>  }
+<span class="ln">45</span>
+<span class="ln">46</span>
+<span class="ln">47</span>  <span class="kw">@Override</span>
+<span class="ln">48</span>  <span class="kw">public void</span> periodic() {
+<span class="ln">49</span>    <span class="cm">// Called every 20ms (50Hz)</span>
+<span class="ln">50</span>    <span class="cm">// Sensors and logging only - no motor control</span>
+<span class="ln">51</span><span class="line-mod">    <span class="kw">switch</span> (goal) {</span>
+<span class="ln">52</span><span class="line-del">        <span class="kw">case</span> FLAT  -> scoopServo.setAngle(<span class="num">0.0</span>);</span>
+<span class="ln">53</span><span class="line-del">        <span class="kw">case</span> CARRY -> scoopServo.setAngle(<span class="num">45.0</span>);</span>
+<span class="ln">54</span><span class="line-del">        <span class="kw">case</span> DUMP  -> scoopServo.setAngle(<span class="num">90.0</span>);</span>
+<span class="ln">55</span>    }
+<span class="ln">56</span>  }
+<span class="ln">57</span>}</pre></div>
 
-        <p><strong>After:</strong></p>
         <div class="code-block"><pre>
-<span class="ln"> 1</span><span class="kw">package</span> frc.robot.subsystems.scoop;
-<span class="ln"> 2</span>
-<span class="ln"> 3</span><span class="line-add"><span class="kw">import</span> edu.wpi.first.math.MathUtil;                          <span class="cm-add">// for clamp</span></span>
-<span class="ln"> 4</span><span class="kw">import</span> edu.wpi.first.wpilibj2.command.Command;
-<span class="ln"> 5</span><span class="kw">import</span> edu.wpi.first.wpilibj2.command.SubsystemBase;
-<span class="ln"> 6</span><span class="line-add"><span class="kw">import</span> org.littletonrobotics.junction.Logger;                <span class="cm-add">// for processInputs</span></span>
-<span class="ln"> 7</span>
-<span class="ln"> 8</span><span class="kw">public class</span> Scoop <span class="kw">extends</span> SubsystemBase {
-<span class="ln"> 9</span>
-<span class="ln">10</span>    <span class="kw">public enum</span> Goal { FLAT, CARRY, DUMP }
+<span class="ln"> 1</span><span class="cm">// Copyright (c) 2025 BearBots FRC Team 6964</span>
+<span class="ln"> 2</span><span class="cm">// Open Source Software; you can modify and/or share it under the terms of</span>
+<span class="ln"> 3</span><span class="cm">// the MIT License available in the root directory of this project.</span>
+<span class="ln"> 4</span>
+<span class="ln"> 5</span><span class="kw">package</span> frc.robot.subsystems.scoop;
+<span class="ln"> 6</span>
+<span class="ln"> 7</span><span class="line-add"><span class="kw">import</span> edu.wpi.first.math.MathUtil;</span>
+<span class="ln"> 8</span><span class="kw">import</span> edu.wpi.first.wpilibj2.command.Command;
+<span class="ln"> 9</span><span class="kw">import</span> edu.wpi.first.wpilibj2.command.SubsystemBase;
+<span class="ln">10</span><span class="line-add"><span class="kw">import</span> org.littletonrobotics.junction.Logger;</span>
 <span class="ln">11</span>
-<span class="ln">12</span><span class="line-add">    <span class="kw">private final</span> ScoopIO io;                                 <span class="cm-add">// interface, not hardware</span></span>
-<span class="ln">13</span><span class="line-add">    <span class="kw">private final</span> ScoopIOInputsAutoLogged inputs =           <span class="cm-add">// generated by @AutoLog</span></span>
-<span class="ln">14</span><span class="line-add">        <span class="kw">new</span> ScoopIOInputsAutoLogged();</span>
-<span class="ln">15</span>    <span class="kw">private</span> Goal goal = Goal.FLAT;
-<span class="ln">16</span>
-<span class="ln">17</span><span class="line-add">    <span class="kw">public</span> Scoop(ScoopIO io) {                               <span class="cm-add">// caller decides the hardware</span></span>
-<span class="ln">18</span><span class="line-add">        <span class="kw">this</span>.io = io;</span>
-<span class="ln">19</span><span class="line-add">    }</span>
-<span class="ln">20</span>
-<span class="ln">21</span>    <span class="kw">public void</span> setGoal(Goal newGoal) { goal = newGoal; }
+<span class="ln">12</span><span class="kw">public class</span> Scoop <span class="kw">extends</span> SubsystemBase {
+<span class="ln">13</span>    <span class="kw">public enum</span> Goal {
+<span class="ln">14</span>        FLAT,
+<span class="ln">15</span>        CARRY,
+<span class="ln">16</span>        DUMP
+<span class="ln">17</span>    }
+<span class="ln">18</span>
+<span class="ln">19</span><span class="line-add">    <span class="kw">private final</span> ScoopIO io;</span>
+<span class="ln">20</span><span class="line-add">    <span class="kw">private final</span> ScoopIOInputsAutoLogged inputs = <span class="kw">new</span> ScoopIOInputsAutoLogged();</span>
+<span class="ln">21</span>    <span class="kw">private</span> Goal goal = Goal.FLAT;
 <span class="ln">22</span>
-<span class="ln">23</span>    <span class="kw">public</span> Command setGoalCommand(Goal newGoal) {
-<span class="ln">24</span>        <span class="kw">return</span> runOnce(() -> setGoal(newGoal));
-<span class="ln">25</span>    }
+<span class="ln">23</span><span class="line-mod">  <span class="kw">public</span> Scoop(ScoopIO io) {</span>
+<span class="ln">24</span><span class="line-add">    <span class="kw">this</span>.io = io;</span>
+<span class="ln">25</span>  }
 <span class="ln">26</span>
-<span class="ln">27</span>    <span class="kw">public void</span> stop() { setGoal(Goal.FLAT); }
-<span class="ln">28</span>
-<span class="ln">29</span>    <span class="kw">@Override</span>
-<span class="ln">30</span>    <span class="kw">public void</span> periodic() {
-<span class="ln">31</span><span class="line-add">        io.updateInputs(inputs);                              <span class="cm-add">// read hardware first</span></span>
-<span class="ln">32</span><span class="line-add">        Logger.processInputs(<span class="str">"Scoop"</span>, inputs);              <span class="cm-add">// then log</span></span>
-<span class="ln">33</span>
-<span class="ln">34</span><span class="line-add">        <span class="kw">double</span> targetAngle = <span class="kw">switch</span> (goal) {</span>
-<span class="ln">35</span><span class="line-add">            <span class="kw">case</span> FLAT  -> ScoopConstants.kFlatAngleDeg;</span>
-<span class="ln">36</span><span class="line-add">            <span class="kw">case</span> CARRY -> ScoopConstants.kCarryAngleDeg;</span>
-<span class="ln">37</span><span class="line-add">            <span class="kw">case</span> DUMP  -> ScoopConstants.kDumpAngleDeg;</span>
-<span class="ln">38</span><span class="line-add">        };</span>
-<span class="ln">39</span>
-<span class="ln">40</span><span class="line-add">        <span class="kw">double</span> clamped = MathUtil.clamp(                     <span class="cm-add">// clamp at subsystem boundary</span></span>
-<span class="ln">41</span><span class="line-add">            targetAngle,</span>
-<span class="ln">42</span><span class="line-add">            ScoopConstants.kMinAngleDeg,</span>
-<span class="ln">43</span><span class="line-add">            ScoopConstants.kMaxAngleDeg);</span>
-<span class="ln">44</span>
-<span class="ln">45</span><span class="line-add">        io.setAngle(clamped);                                 <span class="cm-add">// delegate to IO layer</span></span>
-<span class="ln">46</span><span class="line-add">        Logger.recordOutput(<span class="str">"Scoop/Goal"</span>, goal.toString()); <span class="cm-add">// log the goal state</span></span>
-<span class="ln">47</span>    }
-<span class="ln">48</span>}</pre></div>
+<span class="ln">27</span>  <span class="kw">public void</span> setGoal(Goal newGoal) {
+<span class="ln">28</span>    goal = newGoal;
+<span class="ln">29</span>  }
+<span class="ln">30</span>
+<span class="ln">31</span>  <span class="kw">public</span> Command setGoalCommand(Goal newGoal) {
+<span class="ln">32</span>    <span class="kw">return</span> runOnce(() -> setGoal(newGoal));
+<span class="ln">33</span>  }
+<span class="ln">34</span>
+<span class="ln">35</span>  <span class="kw">public void</span> stop() {
+<span class="ln">36</span>    setGoal(Goal.FLAT);
+<span class="ln">37</span>  }
+<span class="ln">38</span>
+<span class="ln">39</span>  <span class="kw">@Override</span>
+<span class="ln">40</span>  <span class="kw">public void</span> periodic() {
+<span class="ln">41</span><span class="line-add">      io.updateInputs(inputs);</span>
+<span class="ln">42</span><span class="line-add">      Logger.processInputs(<span class="str">"Scoop"</span>, inputs);</span>
+<span class="ln">43</span>
+<span class="ln">44</span><span class="line-add">      <span class="kw">double</span> targetAngle = <span class="kw">switch</span> (goal) {</span>
+<span class="ln">45</span><span class="line-add">          <span class="kw">case</span> FLAT  -> ScoopConstants.kFlatAngleDeg;</span>
+<span class="ln">46</span><span class="line-add">          <span class="kw">case</span> CARRY -> ScoopConstants.kCarryAngleDeg;</span>
+<span class="ln">47</span><span class="line-add">          <span class="kw">case</span> DUMP  -> ScoopConstants.kDumpAngleDeg;</span>
+<span class="ln">48</span><span class="line-add">      };</span>
+<span class="ln">49</span>
+<span class="ln">50</span><span class="line-add">      <span class="kw">double</span> clamped = MathUtil.clamp(</span>
+<span class="ln">51</span><span class="line-add">          targetAngle,</span>
+<span class="ln">52</span><span class="line-add">          ScoopConstants.kMinAngleDeg,</span>
+<span class="ln">53</span><span class="line-add">          ScoopConstants.kMaxAngleDeg);</span>
+<span class="ln">54</span>
+<span class="ln">55</span><span class="line-add">      io.setAngle(clamped);</span>
+<span class="ln">56</span><span class="line-add">      Logger.recordOutput(<span class="str">"Scoop/Goal"</span>, goal.toString());</span>
+<span class="ln">57</span>  }
+<span class="ln">58</span>}</pre></div>
 
         <div class="code-annotation">Search this file for XRPServo. Not there. The subsystem talks to ScoopIO — it doesn't know or care what's on the other end. The clamp lives here, at the subsystem boundary, not in the IO layer.</div>
 
@@ -822,21 +870,21 @@
 
         <p><strong>Before</strong> — scoop wired outside the switch with no IO:</p>
         <div class="code-block"><pre>
-<span class="ln">59</span>    <span class="kw">switch</span> (Constants.currentMode) {
-<span class="ln">60</span>      <span class="kw">case</span> REAL:
-<span class="ln">61</span>        drive = <span class="kw">new</span> Drive(<span class="kw">new</span> DriveIOXRP());
-<span class="ln">62</span>        arm = <span class="kw">new</span> Arm(<span class="kw">new</span> ArmIOXRP());
-<span class="ln">63</span>        <span class="kw">break</span>;
-<span class="ln">64</span>      <span class="kw">case</span> SIM:
-<span class="ln">65</span>        drive = <span class="kw">new</span> Drive(<span class="kw">new</span> DriveIOSim());
-<span class="ln">66</span>        arm = <span class="kw">new</span> Arm(<span class="kw">new</span> ArmIOSim());
-<span class="ln">67</span>        <span class="kw">break</span>;
-<span class="ln">68</span>      <span class="kw">default</span>:
-<span class="ln">69</span>        drive = <span class="kw">new</span> Drive(<span class="kw">new</span> DriveIO() {});
-<span class="ln">70</span>        arm = <span class="kw">new</span> Arm(<span class="kw">new</span> ArmIO() {});
-<span class="ln">71</span>        <span class="kw">break</span>;
-<span class="ln">72</span>    }
-<span class="ln">73</span><span class="line-del">    scoop = <span class="kw">new</span> Scoop();</span></pre></div>
+<span class="ln">56</span>    <span class="kw">switch</span> (Constants.currentMode) {
+<span class="ln">57</span>      <span class="kw">case</span> REAL:
+<span class="ln">58</span>        drive = <span class="kw">new</span> Drive(<span class="kw">new</span> DriveIOXRP());
+<span class="ln">59</span>        arm = <span class="kw">new</span> Arm(<span class="kw">new</span> ArmIOXRP());
+<span class="ln">60</span>        <span class="kw">break</span>;
+<span class="ln">61</span>      <span class="kw">case</span> SIM:
+<span class="ln">62</span>        drive = <span class="kw">new</span> Drive(<span class="kw">new</span> DriveIOSim());
+<span class="ln">63</span>        arm = <span class="kw">new</span> Arm(<span class="kw">new</span> ArmIOSim());
+<span class="ln">64</span>        <span class="kw">break</span>;
+<span class="ln">65</span>      <span class="kw">default</span>:
+<span class="ln">66</span>        drive = <span class="kw">new</span> Drive(<span class="kw">new</span> DriveIO() {});
+<span class="ln">67</span>        arm = <span class="kw">new</span> Arm(<span class="kw">new</span> ArmIO() {});
+<span class="ln">68</span>        <span class="kw">break</span>;
+<span class="ln">69</span>    }
+<span class="ln">70</span><span class="line-del">    scoop = <span class="kw">new</span> Scoop();</span></pre></div>
 
         <p><strong>After</strong> — three imports added, scoop moves inside the switch:</p>
         <div class="code-block"><pre>
@@ -878,6 +926,225 @@
   </div>
 
 </div><!-- /section-convert -->
+
+  <!-- ═══════════════════════════════════════════════════════════
+       PART 4 - VISUALIZATION
+       ═══════════════════════════════════════════════════════════ -->
+  <div class="lesson-section" id="section-visualize">
+
+    <p>
+      The scoop moves in the real world, but AdvantageScope can also show a live 2D diagram
+      that updates as you press buttons. This is the <strong>Mechanism2d</strong> view. It lets you
+      confirm your angle mapping is correct without looking at the robot.
+    </p>
+
+    <p>This part makes changes to four files:</p>
+    <ul style="margin:0.5rem 0 1rem 1.5rem;font-size:0.88rem;color:var(--mid);">
+      <li><span class="file-badge">Scoop.java</span> — add a <code>LoggedMechanism2d</code> and a <code>getComponentPose()</code> getter</li>
+      <li><span class="file-badge">Arm.java</span> — refactor the <code>FinalComponentPoses</code> block into a stored field and <code>getComponentPose()</code> getter</li>
+      <li><span class="file-badge">RobotContainer.java</span> — add a <code>getScoop()</code> getter</li>
+      <li><span class="file-badge">Robot.java</span> — aggregate both subsystem poses into one <code>FinalComponentPoses</code> key</li>
+    </ul>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">Why does FinalComponentPoses move to Robot.java?</span>
+      <p>AdvantageScope's 3D view reads a single array under the key <code>FinalComponentPoses</code>. If each subsystem logs its own array to that key, the last one written each loop wins and the others disappear. The fix is to collect all component poses once per loop and log them together. <code>Robot.java</code>'s <code>robotPeriodic()</code> runs after all subsystem <code>periodic()</code> methods, making it the right place for that aggregation.</p>
+    </div>
+
+    <div class="step-builder">
+
+    <div class="sb-step open" id="vizstep-1">
+      <div class="sb-step-header" onclick="sbToggle('vizstep-1')">
+        <div class="sb-step-num">1</div>
+        <div class="sb-step-title">Add Mechanism2d to Scoop.java</div>
+        <div class="sb-step-chevron">▶</div>
+      </div>
+      <div class="sb-step-body">
+        <p>Five imports, four field declarations, three lines in <code>periodic()</code>, and a getter. Lines in <span style="color:#1a7a4c;font-weight:600;">green</span> are new.</p>
+
+        <p><strong>Imports</strong> (after line 10):</p>
+        <div class="code-block"><pre>
+<span class="ln">10</span><span class="kw">import</span> org.littletonrobotics.junction.Logger;
+<span class="ln">11</span><span class="line-add"><span class="kw">import</span> edu.wpi.first.math.geometry.Pose3d;</span>
+<span class="ln">12</span><span class="line-add"><span class="kw">import</span> edu.wpi.first.math.geometry.Rotation3d;</span>
+<span class="ln">13</span><span class="line-add"><span class="kw">import</span> org.littletonrobotics.junction.mechanism.LoggedMechanism2d;</span>
+<span class="ln">14</span><span class="line-add"><span class="kw">import</span> org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;</span>
+<span class="ln">15</span><span class="line-add"><span class="kw">import</span> org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;</span>
+<span class="ln">16</span></pre></div>
+
+        <p><strong>Fields</strong> (after <code>private Goal goal = Goal.FLAT;</code> on line 26):</p>
+        <div class="code-block"><pre>
+<span class="ln">26</span>  <span class="kw">private</span> Goal goal = Goal.FLAT;
+<span class="ln">27</span>
+<span class="ln">28</span><span class="line-add">  <span class="cm">// Mechanism2d: vertical column on the front of the robot</span></span>
+<span class="ln">29</span><span class="line-add">  <span class="kw">private final</span> LoggedMechanism2d mechanism = <span class="kw">new</span> LoggedMechanism2d(<span class="num">2</span>, <span class="num">2</span>);</span>
+<span class="ln">30</span><span class="line-add">  <span class="kw">private final</span> LoggedMechanismRoot2d root = mechanism.getRoot(<span class="str">"ScoopPivot"</span>, <span class="num">1.0</span>, <span class="num">0.1</span>);</span>
+<span class="ln">31</span><span class="line-add">  <span class="kw">private final</span> LoggedMechanismLigament2d scoopLigament =</span>
+<span class="ln">32</span><span class="line-add">      root.append(<span class="kw">new</span> LoggedMechanismLigament2d(<span class="str">"Scoop"</span>, <span class="num">0.15</span>, <span class="num">90</span>));</span>
+<span class="ln">33</span><span class="line-add">  <span class="kw">private</span> Pose3d componentPose = <span class="kw">new</span> Pose3d();</span>
+<span class="ln">34</span></pre></div>
+
+        <p><strong>In <code>periodic()</code></strong> (after <code>Logger.recordOutput(&quot;Scoop/Goal&quot;, ...)</code>):</p>
+        <div class="code-block"><pre>
+<span class="ln">68</span>    Logger.recordOutput(<span class="str">"Scoop/Goal"</span>, goal.toString());
+<span class="ln">69</span>
+<span class="ln">70</span><span class="line-add">    <span class="cm">// 90deg = FLAT (up), 45deg = CARRY, 0deg = DUMP (forward)</span></span>
+<span class="ln">71</span><span class="line-add">    scoopLigament.setAngle(<span class="num">90</span> - inputs.commandedAngleDeg);</span>
+<span class="ln">72</span><span class="line-add">    Logger.recordOutput(<span class="str">"Scoop/Mechanism2d"</span>, mechanism);</span>
+<span class="ln">73</span><span class="line-add">    componentPose = <span class="kw">new</span> Pose3d(<span class="num">0.0</span>, <span class="num">0.0</span>, <span class="num">0.0</span>,</span>
+<span class="ln">74</span><span class="line-add">        <span class="kw">new</span> Rotation3d(<span class="num">0.0</span>, Math.toRadians(inputs.commandedAngleDeg), <span class="num">0.0</span>));</span>
+<span class="ln">75</span>  }</pre></div>
+
+        <p><strong>Getter</strong> (after the closing brace of <code>periodic()</code>):</p>
+        <div class="code-block"><pre>
+<span class="ln">75</span>  }
+<span class="ln">76</span>
+<span class="ln">77</span><span class="line-add">  <span class="cm">/** Returns the current 3D pose of the scoop for AdvantageScope aggregation. */</span></span>
+<span class="ln">78</span><span class="line-add">  <span class="kw">public</span> Pose3d getComponentPose() {</span>
+<span class="ln">79</span><span class="line-add">    <span class="kw">return</span> componentPose;</span>
+<span class="ln">80</span><span class="line-add">  }</span>
+<span class="ln">81</span>}</pre></div>
+
+        <div class="code-annotation">The scoop offsets are <code>(0.0, 0.0, 0.0)</code> — placeholders until the mounting position is measured on the physical robot. The 2D Mechanism2d view will still work correctly in the simulator.</div>
+      </div>
+    </div><!-- /vizstep-1 -->
+
+    <div class="sb-step" id="vizstep-2">
+      <div class="sb-step-header" onclick="sbToggle('vizstep-2')">
+        <div class="sb-step-num">2</div>
+        <div class="sb-step-title">Fix Arm.java — remove FinalComponentPoses</div>
+        <div class="sb-step-chevron">▶</div>
+      </div>
+<div class="sb-step-body">
+        <p>Store the arm's 3D pose as a field so <code>periodic()</code> and the new getter share one definition. Lines in <span style="color:#1a7a4c;font-weight:600;">green</span> are new, lines in <span style="color:#a93226;font-weight:600;">red</span> are removed.</p>
+
+        <p><strong>Add field</strong> (after the ligament declaration on line 25):</p>
+        <div class="code-block"><pre>
+<span class="ln">24</span>  <span class="kw">private final</span> LoggedMechanismLigament2d armLigament =
+<span class="ln">25</span>      root.append(<span class="kw">new</span> LoggedMechanismLigament2d(<span class="str">"Arm"</span>, Units.feetToMeters(<span class="num">3</span>), <span class="num">0</span>));
+<span class="ln">26</span>
+<span class="ln">27</span><span class="line-add">  <span class="kw">private</span> Pose3d componentPose = <span class="kw">new</span> Pose3d();</span></pre></div>
+
+        <p><strong>Update the <code>FinalComponentPoses</code> block in <code>periodic()</code>:</strong></p>
+        <div class="code-block"><pre>
+<span class="ln">41</span>    Logger.recordOutput(<span class="str">"Arm/Mechanism2d"</span>, mechanism);
+<span class="ln">42</span><span class="line-del">    Logger.recordOutput(</span>
+<span class="ln">43</span><span class="line-del">      <span class="str">"FinalComponentPoses"</span>,</span>
+<span class="ln">44</span><span class="line-del">      <span class="kw">new</span> Pose3d[] {</span>
+<span class="ln">45</span><span class="line-del">        <span class="kw">new</span> Pose3d(-<span class="num">0.052</span>, <span class="num">0.007</span>, <span class="num">0.0645</span>,</span>
+<span class="ln">46</span><span class="line-del">            <span class="kw">new</span> Rotation3d(<span class="num">0.0</span>, Math.toRadians(inputs.commandedAngleDeg), <span class="num">0.0</span>))</span>
+<span class="ln">47</span><span class="line-del">            <span class="cm">//new Rotation3d(0.0, Math.toRadians(0.0), 0.0))</span></span>
+<span class="ln">48</span><span class="line-del">      });</span>
+<span class="ln">42</span><span class="line-add">    componentPose = <span class="kw">new</span> Pose3d(-<span class="num">0.052</span>, <span class="num">0.007</span>, <span class="num">0.0645</span>,</span>
+<span class="ln">43</span><span class="line-add">        <span class="kw">new</span> Rotation3d(<span class="num">0.0</span>, Math.toRadians(inputs.commandedAngleDeg), <span class="num">0.0</span>));</span>
+<span class="ln">44</span>  }</pre></div>
+
+        <p><strong>Add getter</strong> (after <code>getCommandedAngleDeg()</code>):</p>
+        <div class="code-block"><pre>
+<span class="ln">63</span>  <span class="kw">public double</span> getCommandedAngleDeg() {
+<span class="ln">64</span>    <span class="kw">return</span> inputs.commandedAngleDeg;
+<span class="ln">65</span>  }
+<span class="ln">66</span>
+<span class="ln">67</span><span class="line-add">  <span class="cm">/** Returns the current 3D pose of the arm for AdvantageScope aggregation. */</span></span>
+<span class="ln">68</span><span class="line-add">  <span class="kw">public</span> Pose3d getComponentPose() {</span>
+<span class="ln">69</span><span class="line-add">    <span class="kw">return</span> componentPose;</span>
+<span class="ln">70</span><span class="line-add">  }</span>
+<span class="ln">71</span>}</pre></div>
+
+        <div class="code-annotation">The pose is computed once per loop in <code>periodic()</code> and stored in <code>componentPose</code>. The getter just returns it — no duplicated math.</div>
+      </div>
+    </div><!-- /vizstep-2 -->
+
+    <div class="sb-step" id="vizstep-3">
+      <div class="sb-step-header" onclick="sbToggle('vizstep-3')">
+        <div class="sb-step-num">3</div>
+        <div class="sb-step-title">Add getters to RobotContainer.java</div>
+        <div class="sb-step-chevron">▶</div>
+      </div>
+<div class="sb-step-body">
+        <p>Add two getter methods after <code>getAutonomousCommand()</code>. Lines in <span style="color:#1a7a4c;font-weight:600;">green</span> are new.</p>
+        <div class="code-block"><pre>
+<span class="ln">127</span>  <span class="kw">public</span> Command getAutonomousCommand() {
+<span class="ln">128</span>    <span class="kw">return</span> autonomousChooser.get();
+<span class="ln">129</span>  }
+<span class="ln">130</span>
+<span class="ln">131</span><span class="line-add">  <span class="kw">public</span> frc.robot.subsystems.arm.Arm getArm() {</span>
+<span class="ln">132</span><span class="line-add">    <span class="kw">return</span> arm;</span>
+<span class="ln">133</span><span class="line-add">  }</span>
+<span class="ln">134</span>
+<span class="ln">135</span><span class="line-add">  <span class="kw">public</span> frc.robot.subsystems.scoop.Scoop getScoop() {</span>
+<span class="ln">136</span><span class="line-add">    <span class="kw">return</span> scoop;</span>
+<span class="ln">137</span><span class="line-add">  }</span>
+<span class="ln">138</span>}</pre></div>
+
+        <div class="code-annotation">Using fully qualified type names avoids adding new imports to RobotContainer.java.</div>
+      </div>
+    </div><!-- /vizstep-3 -->
+
+    <div class="sb-step" id="vizstep-4">
+      <div class="sb-step-header" onclick="sbToggle('vizstep-4')">
+        <div class="sb-step-num">4</div>
+        <div class="sb-step-title">Aggregate poses in Robot.java</div>
+        <div class="sb-step-chevron">▶</div>
+      </div>
+<div class="sb-step-body">
+        <p>Add one import and update <code>robotPeriodic()</code>. Lines in <span style="color:#1a7a4c;font-weight:600;">green</span> are new.</p>
+
+        <p><strong>Add import</strong> (after line 12):</p>
+        <div class="code-block"><pre>
+<span class="ln">18</span><span class="kw">import</span> org.littletonrobotics.junction.wpilog.WPILOGWriter;
+<span class="ln">19</span><span class="line-add"><span class="kw">import</span> edu.wpi.first.math.geometry.Pose3d;</span></pre></div>
+
+        <p><strong>Update <code>robotPeriodic()</code>:</strong></p>
+        <div class="code-block"><pre>
+<span class="ln">88</span>    CommandScheduler.getInstance().run();
+<span class="ln">89</span>
+<span class="ln">90</span><span class="line-add">    <span class="cm">// Aggregate all component poses for AdvantageScope 3D view.</span></span>
+<span class="ln">91</span><span class="line-add">    Logger.recordOutput(<span class="str">"FinalComponentPoses"</span>, <span class="kw">new</span> Pose3d[] {</span>
+<span class="ln">92</span><span class="line-add">      robotContainer.getArm().getComponentPose(),</span>
+<span class="ln">93</span><span class="line-add">      robotContainer.getScoop().getComponentPose()</span>
+<span class="ln">94</span><span class="line-add">    });</span>
+<span class="ln">95</span>  }</pre></div>
+
+        <div class="code-annotation">Each subsystem owns its pose math. Robot.java just collects them into one array each loop so AdvantageScope's 3D view sees all components together.</div>
+      </div>
+    </div><!-- /vizstep-4 -->
+
+    <div class="sb-step" id="vizstep-5">
+      <div class="sb-step-header" onclick="sbToggle('vizstep-5')">
+        <div class="sb-step-num">5</div>
+        <div class="sb-step-title">Verify in AdvantageScope</div>
+        <div class="sb-step-chevron">▶</div>
+      </div>
+<div class="sb-step-body">
+        <p>Add one import and update <code>robotPeriodic()</code>. Lines in <span style="color:#1a7a4c;font-weight:600;">green</span> are new.</p>
+
+        <p><strong>Add import</strong> (after line 28):</p>
+        <div class="code-block"><pre>
+<span class="ln">28</span><span class="kw">import</span> org.littletonrobotics.junction.networktables.NT4Publisher;
+<span class="ln">29</span><span class="line-add"><span class="kw">import</span> edu.wpi.first.math.geometry.Pose3d;</span></pre></div>
+
+        <p><strong>Update <code>robotPeriodic()</code>:</strong></p>
+        <div class="code-block"><pre>
+<span class="ln">97</span>  <span class="kw">public void</span> robotPeriodic() {
+<span class="ln">98</span>    CommandScheduler.getInstance().run();
+<span class="ln">99</span>
+<span class="ln">100</span><span class="line-add">    <span class="cm">// Aggregate all component poses for AdvantageScope 3D view.</span></span>
+<span class="ln">101</span><span class="line-add">    Pose3d[] scoopPoses = robotContainer.getScoop().getMechanism().generate3dMechanisms();</span>
+<span class="ln">102</span><span class="line-add">    Pose3d[] allPoses = <span class="kw">new</span> Pose3d[<span class="num">1</span> + scoopPoses.length];</span>
+<span class="ln">103</span><span class="line-add">    allPoses[<span class="num">0</span>] = robotContainer.getArm().getComponentPose();</span>
+<span class="ln">104</span><span class="line-add">    System.arraycopy(scoopPoses, <span class="num">0</span>, allPoses, <span class="num">1</span>, scoopPoses.length);</span>
+<span class="ln">105</span><span class="line-add">    Logger.recordOutput(<span class="str">"FinalComponentPoses"</span>, allPoses);</span>
+<span class="ln">106</span>  }</pre></div>
+
+        <div class="code-annotation">The arm pose comes from <code>getComponentPose()</code> — the offsets and rotation math stay in Arm.java. <code>generate3dMechanisms()</code> is a 2026 AKit addition — if you get a compile error, confirm you are on AKit 2026.</div>
+      </div>
+    </div><!-- /vizstep-5 -->
+
+    </div><!-- /step-builder -->
+
+  </div><!-- /section-visualize -->
+
 
 
   <!-- ═══════════════════════════════════════════════════════
@@ -1081,8 +1348,9 @@ Logger.addDataReceiver(<span class="kw">new</span> WPILOGReader(<span class="str
     <button class="section-nav-btn active" data-section="concept">Part 1 - The Pattern</button>
     <button class="section-nav-btn" data-section="snippets">Part 2 - Install Snippets</button>
     <button class="section-nav-btn" data-section="convert">Part 3 - Convert Scoop</button>
-    <button class="section-nav-btn" data-section="scope">Part 4 - AdvantageScope</button>
-    <button class="section-nav-btn" data-section="replay">Part 5 - Replay</button>
+    <button class="section-nav-btn" data-section="visualize">Part 4 - Visualization</button>
+    <button class="section-nav-btn" data-section="scope">Part 5 - AdvantageScope</button>
+    <button class="section-nav-btn" data-section="replay">Part 6 - Replay</button>
   </nav>
 
 </div><!-- /page-container -->
