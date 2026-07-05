@@ -1,4 +1,4 @@
-// Copyright (c) 2025 BearBots FRC Team 6964
+// Copyright (c) 2026 BearBots FRC Team 6964
 // Open Source Software; you can modify and/or share it under the terms of
 // the MIT License available in the root directory of this project.
 
@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.xrp.XRPOnBoardIO;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
@@ -29,6 +28,10 @@ import frc.robot.subsystems.drive.DriveIO;
 import frc.robot.subsystems.drive.DriveIOSim;
 import frc.robot.subsystems.drive.DriveIOXRP;
 import frc.robot.subsystems.scoop.Scoop;
+import frc.robot.subsystems.scoop.ScoopConstants;
+import frc.robot.subsystems.scoop.ScoopIO;
+import frc.robot.subsystems.scoop.ScoopIOXRP;
+import frc.robot.subsystems.scoop.ScoopIOSim;
  
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -57,17 +60,19 @@ private final LoggedDashboardChooser<Command> autonomousChooser = new LoggedDash
       case REAL: // Real hardware
         drive = new Drive(new DriveIOXRP());
         arm = new Arm(new ArmIOXRP());
+        scoop = new Scoop(new ScoopIOXRP());
         break;
       case SIM: // Simulated code
         drive = new Drive(new DriveIOSim());
         arm = new Arm(new ArmIOSim());
+        scoop = new Scoop(new ScoopIOSim());
         break;
       default: // Log replay
         drive = new Drive(new DriveIO() {});
         arm = new Arm(new ArmIO() {});
+        scoop = new Scoop(new ScoopIO() {});
         break;
     }
-    scoop = new Scoop();
     
     configureButtonBindings();
     configureAutonomous();
@@ -90,21 +95,19 @@ private final LoggedDashboardChooser<Command> autonomousChooser = new LoggedDash
  
     // A button — arm low position.
     new JoystickButton(controller, XboxController.Button.kA.value)
-        .onTrue(Commands.runOnce(() -> arm.setAngle(ArmConstants.kLowAngleDeg), arm))
-        .onFalse(Commands.runOnce(() -> arm.stop(), arm));
+        .onTrue(arm.setAngleDegCommand(ArmConstants.kRaisedAngleDeg));
         
     // B button — arm high position, stow on release.
     new JoystickButton(controller, XboxController.Button.kB.value)
-        .onTrue(Commands.runOnce(() -> arm.setAngle(ArmConstants.kHighAngleDeg), arm))
-        .onFalse(Commands.runOnce(() -> arm.stop(), arm));
+        .onTrue(arm.setAngleDegCommand(ArmConstants.kStowedAngleDeg));
     
     // add this - D-pad controls the scoop
     new POVButton(controller, 90)  // 6
-        .onTrue(scoop.setGoalCommand(Scoop.Goal.FLAT));
+        .onTrue(scoop.setAngleDegCommand(ScoopConstants.kFlatAngleDeg));
     new POVButton(controller, 0)   // 8
-        .onTrue(scoop.setGoalCommand(Scoop.Goal.CARRY));
+        .onTrue(scoop.setAngleDegCommand(ScoopConstants.kCarryAngleDeg));
     new POVButton(controller, 180) // 2
-        .onTrue(scoop.setGoalCommand(Scoop.Goal.DUMP));
+        .onTrue(scoop.setAngleDegCommand(ScoopConstants.kDumpAngleDeg));
 
   }
  
@@ -125,5 +128,9 @@ private final LoggedDashboardChooser<Command> autonomousChooser = new LoggedDash
 
   public frc.robot.subsystems.arm.Arm getArm() {
     return arm;
+  }
+
+  public frc.robot.subsystems.scoop.Scoop getScoop() {
+    return scoop;
   }
 }

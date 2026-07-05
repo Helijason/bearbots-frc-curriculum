@@ -1,4 +1,4 @@
-// Copyright (c) 2025 BearBots FRC Team 6964
+// Copyright (c) 2026 BearBots FRC Team 6964
 // Open Source Software; you can modify and/or share it under the terms of
 // the MIT License available in the root directory of this project.
 
@@ -28,7 +28,14 @@ import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveIO;
 import frc.robot.subsystems.drive.DriveIOSim;
 import frc.robot.subsystems.drive.DriveIOXRP;
+import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.elevator.ElevatorIO;
+import frc.robot.subsystems.elevator.ElevatorIOSim;
+import frc.robot.subsystems.elevator.ElevatorIOXRP;
 import frc.robot.subsystems.scoop.Scoop;
+import frc.robot.subsystems.scoop.ScoopIO;
+import frc.robot.subsystems.scoop.ScoopIOSim;
+import frc.robot.subsystems.scoop.ScoopIOXRP;
  
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -42,6 +49,7 @@ public class RobotContainer {
   private final Drive drive;
   private final Arm arm;
   private final Scoop scoop;
+  private final Elevator elevator;
   private final XRPOnBoardIO onboardIO = new XRPOnBoardIO();
  
   // Controller
@@ -57,17 +65,22 @@ private final LoggedDashboardChooser<Command> autonomousChooser = new LoggedDash
       case REAL: // Real hardware
         drive = new Drive(new DriveIOXRP());
         arm = new Arm(new ArmIOXRP());
+        scoop = new Scoop(new ScoopIOXRP());
+        elevator = new Elevator(new ElevatorIOXRP());
         break;
       case SIM: // Simulated code
         drive = new Drive(new DriveIOSim());
         arm = new Arm(new ArmIOSim());
+        scoop = new Scoop(new ScoopIOSim());
+        elevator = new Elevator(new ElevatorIOSim());
         break;
       default: // Log replay
         drive = new Drive(new DriveIO() {});
         arm = new Arm(new ArmIO() {});
+        scoop = new Scoop(new ScoopIO() {});
+        elevator = new Elevator(new ElevatorIO() {});
         break;
     }
-    scoop = new Scoop();
     
     configureButtonBindings();
     configureAutonomous();

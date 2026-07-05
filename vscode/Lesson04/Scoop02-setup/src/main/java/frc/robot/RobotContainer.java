@@ -29,6 +29,9 @@ import frc.robot.subsystems.drive.DriveIO;
 import frc.robot.subsystems.drive.DriveIOSim;
 import frc.robot.subsystems.drive.DriveIOXRP;
 import frc.robot.subsystems.scoop.Scoop;
+import frc.robot.subsystems.scoop.ScoopIO;
+import frc.robot.subsystems.scoop.ScoopIOXRP;
+import frc.robot.subsystems.scoop.ScoopIOSim;
  
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -57,17 +60,19 @@ private final LoggedDashboardChooser<Command> autonomousChooser = new LoggedDash
       case REAL: // Real hardware
         drive = new Drive(new DriveIOXRP());
         arm = new Arm(new ArmIOXRP());
+        scoop = new Scoop(new ScoopIOXRP());
         break;
       case SIM: // Simulated code
         drive = new Drive(new DriveIOSim());
         arm = new Arm(new ArmIOSim());
+        scoop = new Scoop(new ScoopIOSim());
         break;
       default: // Log replay
         drive = new Drive(new DriveIO() {});
         arm = new Arm(new ArmIO() {});
+        scoop = new Scoop(new ScoopIO() {});
         break;
     }
-    scoop = new Scoop();
     
     configureButtonBindings();
     configureAutonomous();
