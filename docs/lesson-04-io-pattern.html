@@ -1038,52 +1038,107 @@ import frc.robot.subsystems.scoop.ScoopIOSim;">
         <div class="sb-step-chevron">▶</div>
       </div>
       <div class="sb-step-body">
-        <p>Five imports, four field declarations, three lines in <code>periodic()</code>, and a getter. Lines in <span style="color:#1a7a4c;font-weight:600;">green</span> are new.</p>
+<div class="hf-box hf-info">
+  <span class="hf-label">Reading the code blocks</span>
+  <p>Red is old, amber is new, green is added. Line numbers match your finished file. See the full guide in the first part.</p>
+</div>
+<p><strong>Imports</strong> (top of file):</p>
+<div class="code-window" data-code="import org.littletonrobotics.junction.Logger;
+import frc.robot.Constants;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 
-        <p><strong>Imports</strong> (after line 10):</p>
-        <div class="code-block"><pre>
-<span class="ln">10</span><span class="kw">import</span> org.littletonrobotics.junction.Logger;
-<span class="ln">11</span><span class="line-add"><span class="kw">import</span> edu.wpi.first.math.geometry.Pose3d;</span>
-<span class="ln">12</span><span class="line-add"><span class="kw">import</span> edu.wpi.first.math.geometry.Rotation3d;</span>
-<span class="ln">13</span><span class="line-add"><span class="kw">import</span> org.littletonrobotics.junction.mechanism.LoggedMechanism2d;</span>
-<span class="ln">14</span><span class="line-add"><span class="kw">import</span> org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;</span>
-<span class="ln">15</span><span class="line-add"><span class="kw">import</span> org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;</span>
-<span class="ln">16</span></pre></div>
+import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
+import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
+import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 
-        <p><strong>Fields</strong> (after <code>private Goal goal = Goal.FLAT;</code> on line 26):</p>
-        <div class="code-block"><pre>
-<span class="ln">26</span>  <span class="kw">private</span> Goal goal = Goal.FLAT;
-<span class="ln">27</span>
-<span class="ln">28</span><span class="line-add">  <span class="cm">// Mechanism2d: vertical column on the front of the robot</span></span>
-<span class="ln">29</span><span class="line-add">  <span class="kw">private final</span> LoggedMechanism2d mechanism = <span class="kw">new</span> LoggedMechanism2d(<span class="num">2</span>, <span class="num">2</span>);</span>
-<span class="ln">30</span><span class="line-add">  <span class="kw">private final</span> LoggedMechanismRoot2d root = mechanism.getRoot(<span class="str">"ScoopPivot"</span>, <span class="num">1.0</span>, <span class="num">0.1</span>);</span>
-<span class="ln">31</span><span class="line-add">  <span class="kw">private final</span> LoggedMechanismLigament2d scoopLigament =</span>
-<span class="ln">32</span><span class="line-add">      root.append(<span class="kw">new</span> LoggedMechanismLigament2d(<span class="str">"Scoop"</span>, <span class="num">0.15</span>, <span class="num">90</span>));</span>
-<span class="ln">33</span><span class="line-add">  <span class="kw">private</span> Pose3d componentPose = <span class="kw">new</span> Pose3d();</span>
-<span class="ln">34</span></pre></div>
+public class Scoop extends SubsystemBase {">
+<div class="cw-head"><span class="cw-title">Scoop.java — imports</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<div class="code-region" style="counter-reset: ln 9;">
+<pre class="cb">
+<span class="line">import org.littletonrobotics.junction.Logger;</span>
+<span class="line">import frc.robot.Constants;</span>
+<span class="line-add">import edu.wpi.first.math.geometry.Pose3d;</span>
+<span class="line-add">import edu.wpi.first.math.geometry.Rotation3d;</span>
+<span class="line-add">import edu.wpi.first.wpilibj.util.Color;</span>
+<span class="line-add">import edu.wpi.first.wpilibj.util.Color8Bit;</span>
+<span class="line-add"></span>
+<span class="line-add">import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;</span>
+<span class="line-add">import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;</span>
+<span class="line-add">import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;</span>
+<span class="line"></span>
+<span class="line">public class Scoop extends SubsystemBase {</span>
+</pre></div></div>
 
-        <p><strong>In <code>periodic()</code></strong> (after <code>Logger.recordOutput(&quot;Scoop/Goal&quot;, ...)</code>):</p>
-        <div class="code-block"><pre>
-<span class="ln">68</span>    Logger.recordOutput(<span class="str">"Scoop/Goal"</span>, goal.toString());
-<span class="ln">69</span>
-<span class="ln">70</span><span class="line-add">    <span class="cm">// 90deg = FLAT (up), 45deg = CARRY, 0deg = DUMP (forward)</span></span>
-<span class="ln">71</span><span class="line-add">    scoopLigament.setAngle(<span class="num">90</span> - inputs.commandedAngleDeg);</span>
-<span class="ln">72</span><span class="line-add">    Logger.recordOutput(<span class="str">"Scoop/Mechanism2d"</span>, mechanism);</span>
-<span class="ln">73</span><span class="line-add">    componentPose = <span class="kw">new</span> Pose3d(<span class="num">0.0</span>, <span class="num">0.0</span>, <span class="num">0.0</span>,</span>
-<span class="ln">74</span><span class="line-add">        <span class="kw">new</span> Rotation3d(<span class="num">0.0</span>, Math.toRadians(inputs.commandedAngleDeg), <span class="num">0.0</span>));</span>
-<span class="ln">75</span>  }</pre></div>
+        <p><strong>Fields</strong> (after <code>targetAngleDeg</code>):</p>
+<div class="code-window" data-code="  private double targetAngleDeg = ScoopConstants.kDefaultAngleDeg;
+  
+  // Mechanism2d: vertical column on the front of the robot
+  private final LoggedMechanism2d mechanism = new LoggedMechanism2d(2, 1);
+  private final LoggedMechanismRoot2d root = mechanism.getRoot(&quot;ScoopPivot&quot;, 1.125, 0.016);
+  private final LoggedMechanismLigament2d scoopLigament =
+      root.append(new LoggedMechanismLigament2d(&quot;Scoop&quot;, 0.05, 0, 3.25, new Color8Bit(Color.kDarkGray)));
+  private Pose3d componentPose = new Pose3d();
 
-        <p><strong>Getter</strong> (after the closing brace of <code>periodic()</code>):</p>
-        <div class="code-block"><pre>
-<span class="ln">75</span>  }
-<span class="ln">76</span>
-<span class="ln">77</span><span class="line-add">  <span class="cm">/** Returns the current 3D pose of the scoop for AdvantageScope aggregation. */</span></span>
-<span class="ln">78</span><span class="line-add">  <span class="kw">public</span> Pose3d getComponentPose() {</span>
-<span class="ln">79</span><span class="line-add">    <span class="kw">return</span> componentPose;</span>
-<span class="ln">80</span><span class="line-add">  }</span>
-<span class="ln">81</span>}</pre></div>
+  public Scoop(ScoopIO io) {
+    this.io = io;">
+<div class="cw-head"><span class="cw-title">Scoop.java — fields</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<div class="code-region" style="counter-reset: ln 24;">
+<pre class="cb">
+<span class="line">  private double targetAngleDeg = ScoopConstants.kDefaultAngleDeg;</span>
+<span class="line"></span>
+<span class="line-add"><span class="cm">  // Mechanism2d: vertical column on the front of the robot</span></span>
+<span class="line-add">  private final LoggedMechanism2d mechanism = new LoggedMechanism2d(2, 1);</span>
+<span class="line-add">  private final LoggedMechanismRoot2d root = mechanism.getRoot("ScoopPivot", 1.125, 0.016);</span>
+<span class="line-add">  private final LoggedMechanismLigament2d scoopLigament =</span>
+<span class="line-add">      root.append(new LoggedMechanismLigament2d("Scoop", 0.05, 0, 3.25, new Color8Bit(Color.kDarkGray)));</span>
+<span class="line-add">  private Pose3d componentPose = new Pose3d();</span>
+<span class="line-add"></span>
+<span class="line">  public Scoop(ScoopIO io) {</span>
+<span class="line">    this.io = io;</span>
+</pre></div></div>
 
-        <div class="code-annotation">The scoop offsets are <code>(0.0, 0.0, 0.0)</code> — placeholders until the mounting position is measured on the physical robot. The 2D Mechanism2d view will still work correctly in the simulator.</div>
+        <p><strong>In <code>periodic()</code></strong> and the getter:</p>
+<div class="code-window" data-code="    Logger.recordOutput(&quot;Scoop/TargetAngleDeg&quot;, targetAngleDeg);
+
+    // FLAT, CARRY, DUMP
+    scoopLigament.setAngle(inputs.commandedAngleDeg - 45);
+    Logger.recordOutput(&quot;Scoop/Mechanism2d&quot;, mechanism);
+    componentPose = new Pose3d(0.0, 0.0, 0.0,
+        new Rotation3d(0.0, Math.toRadians(scoopLigament.getAngle()), 0.0));
+
+    io.setAngleDeg(targetAngleDeg);
+  }
+
+  /** Returns the current 3D pose of the scoop for AdvantageScope aggregation. */
+  public Pose3d getComponentPose() {
+    return componentPose;
+  }
+}  ">
+<div class="cw-head"><span class="cw-title">Scoop.java — periodic() and getter</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<div class="code-region" style="counter-reset: ln 69;">
+<pre class="cb">
+<span class="line">    Logger.recordOutput("Scoop/TargetAngleDeg", targetAngleDeg);</span>
+<span class="line"></span>
+<span class="line-add"><span class="cm">    // FLAT, CARRY, DUMP</span></span>
+<span class="line-add">    scoopLigament.setAngle(inputs.commandedAngleDeg - 45);</span>
+<span class="line-add">    Logger.recordOutput("Scoop/Mechanism2d", mechanism);</span>
+<span class="line-add">    componentPose = new Pose3d(0.0, 0.0, 0.0,</span>
+<span class="line-add">        new Rotation3d(0.0, Math.toRadians(scoopLigament.getAngle()), 0.0));</span>
+<span class="line-add"></span>
+<span class="line">    io.setAngleDeg(targetAngleDeg);</span>
+<span class="line">  }</span>
+<span class="line-add"></span>
+<span class="line-add"><span class="cm">  /** Returns the current 3D pose of the scoop for AdvantageScope aggregation. */</span></span>
+<span class="line-add">  public Pose3d getComponentPose() {</span>
+<span class="line-add">    return componentPose;</span>
+<span class="line-add">  }</span>
+<span class="line">}</span>
+</pre></div></div>
+
+        <div class="code-annotation">The scoop offsets are <code>(0.0, 0.0, 0.0)</code> - 3D placeholders until the mounting position is measured on the physical robot. The 2D Mechanism2d view will still work correctly in the simulator.</div>
       </div>
     </div><!-- /vizstep-1 -->
 
@@ -1094,16 +1149,25 @@ import frc.robot.subsystems.scoop.ScoopIOSim;">
         <div class="sb-step-chevron">▶</div>
       </div>
 <div class="sb-step-body">
-        <p>Add scoop getter method after <code>getAutonomousCommand()</code>. Lines in <span style="color:#1a7a4c;font-weight:600;">green</span> are new.</p>
-        <div class="code-block"><pre>
-<span class="ln">131</span>  <span class="kw">public</span> frc.robot.subsystems.arm.Arm getArm() {
-<span class="ln">132</span>    <span class="kw">return</span> arm;
-<span class="ln">133</span>  }
-<span class="ln">134</span>
-<span class="ln">135</span><span class="line-add">  <span class="kw">public</span> frc.robot.subsystems.scoop.Scoop getScoop() {</span>
-<span class="ln">136</span><span class="line-add">    <span class="kw">return</span> scoop;</span>
-<span class="ln">137</span><span class="line-add">  }</span>
-<span class="ln">138</span>}</pre></div>
+<p>Add a scoop getter after <code>getArm()</code>. Lines in <span style="color:#1a7a4c;font-weight:600;">green</span> are new.</p>
+<div class="code-window" data-code="    return arm;
+  }
+
+  public frc.robot.subsystems.scoop.Scoop getScoop() {
+    return scoop;
+  }
+}">
+<div class="cw-head"><span class="cw-title">RobotContainer.java — getScoop()</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<div class="code-region" style="counter-reset: ln 129;">
+<pre class="cb">
+<span class="line">    return arm;</span>
+<span class="line">  }</span>
+<span class="line-add"></span>
+<span class="line-add">  public frc.robot.subsystems.scoop.Scoop getScoop() {</span>
+<span class="line-add">    return scoop;</span>
+<span class="line-add">  }</span>
+<span class="line">}</span>
+</pre></div></div>
 
         <div class="code-annotation">Using fully qualified type names avoids adding new imports to RobotContainer.java.</div>
       </div>
@@ -1116,18 +1180,24 @@ import frc.robot.subsystems.scoop.ScoopIOSim;">
         <div class="sb-step-chevron">▶</div>
       </div>
 <div class="sb-step-body">
-        <p>Update <code>robotPeriodic()</code>. Lines in <span style="color:#1a7a4c;font-weight:600;">green</span> are new.</p>
-
-        <p><strong>Update <code>robotPeriodic()</code>:</strong></p>
-        <div class="code-block"><pre>
-<span class="ln">84</span>    CommandScheduler.getInstance().run();
-<span class="ln">85</span>
-<span class="ln">86</span>    <span class="cm">// Aggregate all component poses for AdvantageScope 3D view.</span>
-<span class="ln">87</span>    Logger.recordOutput(<span class="str">"FinalComponentPoses"</span>, <span class="kw">new</span> Pose3d[] {
-<span class="ln">88</span>      robotContainer.getArm().getComponentPose()<span class="line-add">,</span>
-<span class="ln">89</span><span class="line-add">      robotContainer.getScoop().getComponentPose()</span>
-<span class="ln">90</span>    });
-<span class="ln">91</span>  }</pre></div>
+<p>Update <code>robotPeriodic()</code> to add the scoop pose to the array. Lines in <span style="color:#1a7a4c;font-weight:600;">green</span> are new, <span style="color:#b8860b;font-weight:600;">amber</span> is modified.</p>
+<div class="code-window" data-code="    // Aggregate all component poses for AdvantageScope 3D view.
+    Logger.recordOutput(&quot;FinalComponentPoses&quot;, new Pose3d[] {
+      robotContainer.getArm().getComponentPose(),
+      robotContainer.getScoop().getComponentPose()
+    });
+  }">
+<div class="cw-head"><span class="cw-title">Robot.java — robotPeriodic()</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<div class="code-region" style="counter-reset: ln 85;">
+<pre class="cb">
+<span class="line"><span class="cm">    // Aggregate all component poses for AdvantageScope 3D view.</span></span>
+<span class="line">    Logger.recordOutput("FinalComponentPoses", new Pose3d[] {</span>
+<span class="line-old">      robotContainer.getArm().getComponentPose()</span>
+<span class="line-new">      robotContainer.getArm().getComponentPose()<span class="ts-after">,</span></span>
+<span class="line-add">      robotContainer.getScoop().getComponentPose()</span>
+<span class="line">    });</span>
+<span class="line">  }</span>
+</pre></div></div>
 
         <div class="code-annotation">Each subsystem owns its pose math. Robot.java just collects them into one array each loop so AdvantageScope's 3D view sees all components together.</div>
       </div>
