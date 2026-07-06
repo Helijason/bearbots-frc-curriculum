@@ -1,0 +1,108 @@
+/* diff.css - styled code-diff windows for lesson HTML.
+   Line numbers are CSS generated content (counter), so they are never part of
+   the selectable or copyable text. Swap the colours for your lesson palette. */
+
+.code-window {
+  border: 1px solid #CCCCCC;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #EAF1F8;
+  font-family: "Cascadia Code", "Consolas", monospace;
+  margin: 1em 0;
+}
+
+.cw-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  background: #2D6B6B;
+  color: #FFFFFF;
+  font-size: 12px;
+}
+.cw-title { font-weight: bold; letter-spacing: .02em; }
+
+.copy-btn {
+  font: inherit;
+  font-size: 11px;
+  color: #2D6B6B;
+  background: #FFFFFF;
+  border: 0;
+  border-radius: 4px;
+  padding: 3px 10px;
+  cursor: pointer;
+}
+.copy-btn:hover { background: #EAF4F4; }
+.copy-btn.copied { background: #4DAF82; color: #FFFFFF; }
+
+.code-region { counter-reset: ln; }
+
+.code-region pre.cb {
+  margin: 0;
+  padding: 6px 0;
+  font-size: 12.5px;
+  line-height: 1.55;
+  font-variant-ligatures: none;   /* keep != from forming a ligature */
+  white-space: pre;
+  overflow-x: auto;
+}
+
+/* every code line is a span; the gutter is its ::before counter */
+.line, .line-add, .line-del, .line-old, .line-new {
+  display: inline-block;          /* full-width rows, no phantom blank lines */
+  width: 100%;
+  padding-left: 3.5em;
+  text-indent: 0;
+  position: relative;
+  color: #222222;
+}
+.line::before, .line-add::before, .line-del::before,
+.line-old::before, .line-new::before {
+  position: absolute;
+  left: 0;
+  width: 3em;
+  text-align: right;
+  padding-right: .5em;
+  color: #999999;
+  user-select: none;              /* numbers never selectable */
+  -webkit-user-select: none;
+}
+
+/* context, additions, and modified-result lines advance the final-file counter */
+.line       { counter-increment: ln; }
+.line::before       { content: counter(ln); }
+.line-add   { counter-increment: ln; background: #E4F4E8; }   /* brand-new line: green */
+.line-add::before   { content: counter(ln); }
+.line-new   { counter-increment: ln; }                         /* modified line: no tint */
+.line-new::before   { content: counter(ln); }
+
+/* removed and modified-old lines: blank gutter, no counter, not selectable */
+.line-del   { background: #FBE7E7; user-select: none; -webkit-user-select: none; }
+.line-del::before   { content: ""; }
+.line-old   { user-select: none; -webkit-user-select: none; }  /* modified-old: no tint */
+.line-old::before   { content: ""; }
+
+/* intra-line word diff */
+.ts-before { background: #F6C9C9; border-radius: 2px; }   /* removed fragment (red)   */
+.ts-after  { background: #FBE6C0; border-radius: 2px; }   /* added fragment  (amber)  */
+
+/* Javadoc / comment colour */
+.cm { color: #1D7044; }
+.cm .ts-before, .cm .ts-after { color: inherit; }
+
+.region-gap {
+  text-align: center;
+  color: #999999;
+  font-size: 12px;
+  letter-spacing: .3em;
+  padding: 2px 0;
+  user-select: none;
+}
+
+strong { color: inherit; }
+
+/* empty code lines must still occupy a row so the gutter counter advances visibly */
+.line:empty, .line-add:empty, .line-del:empty,
+.line-old:empty, .line-new:empty { min-height: 1.55em; }
+.line:empty::after, .line-add:empty::after, .line-del:empty::after,
+.line-old:empty::after, .line-new:empty::after { content: "\00a0"; }

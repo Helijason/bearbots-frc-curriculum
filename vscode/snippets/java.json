@@ -25,6 +25,7 @@
       "  //   button.onTrue(xxx.setAngleDegCommand(${TM_FILENAME_BASE}.${2:kStowedAngleDeg}));",
       "  public static final double ${2:kStowedAngleDeg} = ${3:0.0};",
       "  public static final double ${4:kRaisedAngleDeg} = ${5:90.0};",
+      "  ${10:// add more named setpoints here, one per line}",
       "",
       "  // Startup target. periodic drives here until told otherwise.",
       "  public static final double kDefaultAngleDeg = ${6:kStowedAngleDeg};",
@@ -88,7 +89,7 @@
       "  @Override",
       "  public void setAngleDeg(double angleDeg) {",
       "    commandedAngleDeg = angleDeg;",
-      "    servo.setAngleDeg(commandedAngleDeg);$0",
+      "    servo.setAngle(commandedAngleDeg);$0",
       "  }",
       "}"
     ]
