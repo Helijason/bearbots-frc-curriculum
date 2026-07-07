@@ -28,14 +28,32 @@ public class ElevatorConstants {
 
     public static final double kEncoderDistancePerPulseMeters =
         kOutputDistancePerRev / kCountsPerOutputRev;
+
+    public static final double kHomingVolts = -1.0;              // gentle, toward bottom
+    public static final double kHomingStallMetersPerSec = 0.002; // "stopped" threshold
+    public static final double kHomingTimeoutSecs = 3.0;
     
     /* ********************************************************************* */
     /* *** CONTROL CONSTANTS                                                 */
 
-    /** Proportional gain: volts per meter of position error. */
+    /** Real Proportional gain: volts per meter of position error. */
     public static final double kPReal = 40.0;
-    public static final double kPSim = 25.0;
+    public static final double kIReal = 0.0;
+    public static final double kDReal = 0.0;
+    /** Real Feedforward, start at 0 and tune up. */
+    public static final double kSVoltsReal = 0.0;            // static friction
+    public static final double kGVoltsReal = 0.0;            // gravity hold
+    public static final double kVVoltSecPerMeterReal = 0.0;  // velocity
 
+    /** SIM Proportional gain: volts per meter of position error. */
+    public static final double kPSim = 25.0;
+    public static final double kISim = 0.0;
+    public static final double kDSim = 0.0;
+    /** SIM Feedforward, start at 0 and tune up. */
+    public static final double kSVoltsSim = 0.0;            // static friction
+    public static final double kGVoltsSim = 0.0;            // gravity hold
+    public static final double kVVoltSecPerMeterSim = 0.0;  // velocity
+    
     
     /* ********************************************************************* */
     /* *** POSITIONAL CONSTANTS                                              */
@@ -54,6 +72,9 @@ public class ElevatorConstants {
 
     /** Maximum allowed Height in meters. */
     public static final double kMaxHeightMeters   = 0.135;
+
+    /** Default/startup height in meters. */
+    public static final double kDefaultHeightMeters = kBottomHeightMeters;
 
     /** Height tolerance in meters. */
     public static final double kHeightToleranceMeters   = 0.005;

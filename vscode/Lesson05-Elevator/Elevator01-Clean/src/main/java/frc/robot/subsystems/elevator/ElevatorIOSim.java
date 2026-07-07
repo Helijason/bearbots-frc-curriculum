@@ -28,11 +28,15 @@ public void updateInputs(ElevatorIOInputs inputs) {
         velocityMetersPerSec * kLoopPeriodSecs;
 
     // Stop at the physical limits; carriage can't sink through the bottom or fly off the top.
-    positionMeters =
+    double clamped =
         MathUtil.clamp(
             positionMeters,
             ElevatorConstants.kMinHeightMeters,
             ElevatorConstants.kMaxHeightMeters);
+    if (clamped != positionMeters) {
+      velocityMetersPerSec = 0.0;
+    }
+    positionMeters = clamped;
 
     inputs.appliedVolts = appliedVolts;
     inputs.positionMeters = positionMeters;

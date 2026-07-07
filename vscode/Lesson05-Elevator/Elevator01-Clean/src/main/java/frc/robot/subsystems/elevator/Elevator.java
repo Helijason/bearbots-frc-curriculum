@@ -5,8 +5,8 @@
 package frc.robot.subsystems.elevator;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -17,12 +17,6 @@ import static frc.robot.Constants.kMaxBatteryVoltage;
 import frc.robot.Constants;
 
 public class Elevator extends SubsystemBase {
-  public enum Goal {
-    BOTTOM,
-    MIDDLE,
-    TOP
-  }
-
   private final ElevatorIO io;
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
 
@@ -64,28 +58,43 @@ public class Elevator extends SubsystemBase {
   private final LoggedNetworkNumber kV =
       new LoggedNetworkNumber("/Tuning/Elevator/kV", feedforward.getKv());
 
-  @AutoLogOutput(key = "Elevator/Goal")
-  private Goal goal = Goal.BOTTOM;
+  private double targetMeters = ElevatorConstants.kDefaultHeightMeters;
 
   public Elevator(ElevatorIO io) {
     this.io = io;
     controller.setTolerance(ElevatorConstants.kHeightToleranceMeters);
   }
 
-  public void setGoal(Goal newGoal) {
-    goal = newGoal;
+  // Single source of truth. Every setpoint, named or raw, lands here.
+  public void setHeightMeters(double meters) {
+    targetMeters = MathUtil.clamp(
+        meters,
+        ElevatorConstants.kMinHeightMeters,
+        ElevatorConstants.kMaxHeightMeters);
   }
 
-  // Jump to a goal and forget it. Bind to a button.
-  public Command setGoalCommand(Goal newGoal) {
-    return runOnce(() -> setGoal(newGoal));
+  // Jump to a height immediately. Bind to a button:
+  //   button.onTrue(elevator.setHeightMetersCommand(ElevatorConstants.kTopHeightMeters));
+  public Command setHeightMetersCommand(double meters) {
+    return runOnce(() -> setHeightMeters(meters));
   }
 
-  // Go to a goal and finish once we're within tolerance. Use this inside sequences.
-  // run() requires this subsystem, so nothing else can fight it while it settles.
-  public Command goToGoalCommand(Goal newGoal) {
-    return run(() -> setGoal(newGoal)).until(this::atGoal);
+  // Go to a height and finish once within tolerance. Use this inside sequences.
+  public Command goToHeightMetersCommand(double meters) {
+    return run(() -> setHeightMeters(meters)).until(this::atGoal);
   }
+
+  public Command homeCommand() {
+    return run(() -> io.setVoltage(ElevatorConstants.kHomingVolts))   // small down voltage
+      .until(() -> Math.abs(inputs.velocityMetersPerSec) < ElevatorConstants.kHomingStallMetersPerSec)
+      .withTimeout(ElevatorConstants.kHomingTimeoutSecs)             // safety
+      .andThen(runOnce(() -> {
+            io.stop();
+            io.resetEncoder();
+            setHeightMeters(ElevatorConstants.kDefaultHeightMeters);
+          }))
+      .ignoringDisable(false);   // moving motor -> must be enabled
+}
 
   @AutoLogOutput(key = "Elevator/AtGoal")
   public boolean atGoal() {
@@ -101,25 +110,14 @@ public class Elevator extends SubsystemBase {
     io.updateInputs(inputs);
     Logger.processInputs("Elevator", inputs);
 
-    double targetMeters = switch (goal) {
-      case BOTTOM -> ElevatorConstants.kBottomHeightMeters;
-      case MIDDLE -> ElevatorConstants.kMiddleHeightMeters;
-      case TOP -> ElevatorConstants.kTopHeightMeters;
-    };
-
-    double clampedTarget = MathUtil.clamp(
-        targetMeters,
-        ElevatorConstants.kMinHeightMeters,
-        ElevatorConstants.kMaxHeightMeters);
-
-    Logger.recordOutput("Elevator/TargetMeters", clampedTarget);
+    Logger.recordOutput("Elevator/TargetMeters", targetMeters);
 
     // TUNE: apply live gains each loop. Delete when you bake.
     controller.setPID(kP.get(), kI.get(), kD.get());
     feedforward = new ElevatorFeedforward(kS.get(), kG.get(), kV.get());
- 
+
     // Feedback (PID) + feedforward (gravity/static hold). velocity setpoint 0 = hold.
-    double volts = controller.calculate(inputs.positionMeters, clampedTarget)
+    double volts = controller.calculate(inputs.positionMeters, targetMeters)
         + feedforward.calculate(0.0);
     volts = MathUtil.clamp(volts, -kMaxBatteryVoltage, kMaxBatteryVoltage);
 
