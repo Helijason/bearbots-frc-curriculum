@@ -55,6 +55,9 @@ public class ElevatorConstants {
     /** Maximum allowed Height in meters. */
     public static final double kMaxHeightMeters   = 0.135;
 
+    /** Height tolerance in meters. */
+    public static final double kHeightToleranceMeters   = 0.005;
+
     /* ********************************************************************* */
     /* *** SIMULATOR CONSTANTS                                               */
     /** Output speed at full voltage. Measure or estimate from motor free speed + gearing. */
