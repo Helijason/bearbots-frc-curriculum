@@ -11,6 +11,7 @@ import org.littletonrobotics.junction.Logger;
 import frc.robot.Constants;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 
@@ -24,10 +25,15 @@ public class Scoop extends SubsystemBase {
 
   private double targetAngleDeg = ScoopConstants.kDefaultAngleDeg;
 
-  // Mechanism2d: vertical column on the front of the robot
-  private static final double kRootBaseX = 1.125;
-  private static final double kRootBaseY = 0.016;
-  private final LoggedMechanism2d mechanism = new LoggedMechanism2d(2, 1);
+  // Mechanism2d: height matches Elevator's canvas (0.2) so the elevator height it rides on
+  // (added in setBaseHeightMeters) reads at the correct proportion. Kept wider than tall
+  // since the scoop ligament sweeps side to side, unlike the elevator's straight vertical rail.
+  // Root is shifted 4 inches forward (+X) to match the scoop's real mounting position.
+  private static final double kForwardOffsetMeters = Units.inchesToMeters(11.0);
+  private static final double kRootBaseX = 0.1 + kForwardOffsetMeters;
+  private static final double kRootBaseY = 0.02;
+  private final LoggedMechanism2d mechanism =
+      new LoggedMechanism2d(0.2 + kForwardOffsetMeters, 0.2);
   private final LoggedMechanismRoot2d root = mechanism.getRoot("ScoopPivot", kRootBaseX, kRootBaseY);
   private final LoggedMechanismLigament2d scoopLigament =
       root.append(new LoggedMechanismLigament2d("Scoop", 0.05, 0, 3.25, new Color8Bit(Color.kDarkGray)));

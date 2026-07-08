@@ -9,6 +9,9 @@ import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.function.BooleanSupplier;
@@ -67,11 +70,17 @@ public class Elevator extends SubsystemBase {
   private double targetMeters = ElevatorConstants.kDefaultHeightMeters;
   private boolean homing = false;
 
-  // Mechanism2d canvas: carriage rides straight up from the base.
-  private final LoggedMechanism2d mechanism = new LoggedMechanism2d(0.3, 0.3);
-  private final LoggedMechanismRoot2d root = mechanism.getRoot("ElevatorBase", 0.15, 0.02);
+  // Mechanism2d canvas: narrow vertical rail, not a square block. Height (0.2) still gives
+  // the 0.135m max travel plenty of room; width is just enough to draw the carriage.
+  // Root is shifted 4 inches forward (+X) to match the elevator's real mounting position.
+  private static final double kForwardOffsetMeters = Units.inchesToMeters(9.5);
+  private final LoggedMechanism2d mechanism =
+      new LoggedMechanism2d(0.1 + kForwardOffsetMeters, 0.2);
+  private final LoggedMechanismRoot2d root =
+      mechanism.getRoot("ElevatorBase", 0.05 + kForwardOffsetMeters, 0.02);
   private final LoggedMechanismLigament2d carriageLigament =
-      root.append(new LoggedMechanismLigament2d("Carriage", 0.01, 90));
+      root.append(new LoggedMechanismLigament2d(
+          "Carriage", 0.01, 90, 4, new Color8Bit(Color.kOrange)));
 
   private Pose3d componentPose = new Pose3d();
 
@@ -157,10 +166,11 @@ public class Elevator extends SubsystemBase {
     carriageLigament.setLength(Math.max(inputs.positionMeters, 0.01));
     Logger.recordOutput("Elevator/Mechanism2d", mechanism);
 
-    // Update 3D component pose. Elevator mounts to the XRP frame (scoop will mount to the
-    // elevator, not the frame, once it gets its own componentPose).
-    // PLACEHOLDER offset: (0, 0, 0). Tune X/Y/base-Z by eye in AdvantageScope's 3D tab.
-    componentPose = new Pose3d(0.0, 0.0, inputs.positionMeters, new Rotation3d());
+    // Update 3D component pose. Elevator mounts to the XRP frame, shifted 4 inches forward
+    // (+X). Scoop mounts to the elevator, not the frame, and inherits this offset via the
+    // pose composition in Robot.java. PLACEHOLDER Y/base-Z: tune by eye in AdvantageScope.
+    componentPose = new Pose3d(
+        Units.inchesToMeters(4.0), 0.0, inputs.positionMeters, new Rotation3d());
 
     if (homing) return;   // homing owns the motor; skip PID this loop
 
