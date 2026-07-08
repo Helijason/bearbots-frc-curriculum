@@ -34,6 +34,7 @@ import frc.robot.subsystems.elevator.ElevatorIO;
 import frc.robot.subsystems.elevator.ElevatorIOSim;
 import frc.robot.subsystems.elevator.ElevatorIOXRP;
 import frc.robot.subsystems.scoop.Scoop;
+import frc.robot.subsystems.scoop.ScoopConstants;
 import frc.robot.subsystems.scoop.ScoopIO;
 import frc.robot.subsystems.scoop.ScoopIOSim;
 import frc.robot.subsystems.scoop.ScoopIOXRP;
@@ -114,11 +115,11 @@ private final LoggedDashboardChooser<Command> autonomousChooser = new LoggedDash
     
     // add this - D-pad controls the scoop
     new POVButton(controller, 90)  // 6
-        .onTrue(scoop.setGoalCommand(Scoop.Goal.FLAT));
+        .onTrue(scoop.setAngleDegCommand(ScoopConstants.kFlatAngleDeg));
     new POVButton(controller, 0)   // 8
-        .onTrue(scoop.setGoalCommand(Scoop.Goal.CARRY));
+        .onTrue(scoop.setAngleDegCommand(ScoopConstants.kCarryAngleDeg));
     new POVButton(controller, 180) // 2
-        .onTrue(scoop.setGoalCommand(Scoop.Goal.DUMP));
+        .onTrue(scoop.setAngleDegCommand(ScoopConstants.kDumpAngleDeg));
     
     // Bumpers — elevator heights.
     new JoystickButton(controller, XboxController.Button.kRightBumper.value)
@@ -149,5 +150,13 @@ private final LoggedDashboardChooser<Command> autonomousChooser = new LoggedDash
 
   public frc.robot.subsystems.arm.Arm getArm() {
     return arm;
+  }
+
+  public Elevator getElevator() {
+    return elevator;
+  }
+
+  public Scoop getScoop() {
+    return scoop;
   }
 }

@@ -5,7 +5,7 @@
 package frc.robot.subsystems.scoop;
 
 public class ScoopIOSim implements ScoopIO {
-  private double commandedAngleDeg = ScoopConstants.kFlatAngleDeg;
+  private double commandedAngleDeg = ScoopConstants.kDefaultAngleDeg;
 
   @Override
   public void updateInputs(ScoopIOInputs inputs) {
@@ -13,7 +13,7 @@ public class ScoopIOSim implements ScoopIO {
   }
 
   @Override
-  public void setAngle(double angleDeg) {
+  public void setAngleDeg(double angleDeg) {
     commandedAngleDeg = angleDeg;
   }
 }

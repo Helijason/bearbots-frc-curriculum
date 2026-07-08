@@ -7,57 +7,79 @@ package frc.robot.subsystems.scoop;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
+import frc.robot.Constants;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
+
+import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
+import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
+import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 
 public class Scoop extends SubsystemBase {
-  public enum Goal {
-    FLAT,
-    CARRY,
-    DUMP
-  }
-
   private final ScoopIO io;
   private final ScoopIOInputsAutoLogged inputs = new ScoopIOInputsAutoLogged();
 
-  @AutoLogOutput(key = "Scoop/Goal")
-  private Goal goal = Goal.FLAT;
+  private double targetAngleDeg = ScoopConstants.kDefaultAngleDeg;
+
+  // Mechanism2d: vertical column on the front of the robot
+  private final LoggedMechanism2d mechanism = new LoggedMechanism2d(2, 1);
+  private final LoggedMechanismRoot2d root = mechanism.getRoot("ScoopPivot", 1.125, 0.016);
+  private final LoggedMechanismLigament2d scoopLigament =
+      root.append(new LoggedMechanismLigament2d("Scoop", 0.05, 0, 3.25, new Color8Bit(Color.kDarkGray)));
+  private Pose3d componentPose = new Pose3d();
 
   public Scoop(ScoopIO io) {
     this.io = io;
   }
 
-  public void setGoal(Goal newGoal) {
-    goal = newGoal;
+  // Single source of truth. Every setpoint, named or raw, lands here.
+  public void setAngleDeg(double angleDeg) {
+    targetAngleDeg = MathUtil.clamp(
+        angleDeg,
+        ScoopConstants.kMinAngleDeg,
+        ScoopConstants.kMaxAngleDeg);
   }
 
-  public Command setGoalCommand(Goal newGoal) {
-    return runOnce(() -> setGoal(newGoal));
+  // Jump to a setpoint immediately. Bind to a button:
+  //   button.onTrue(xxx.setAngleDegCommand(XxxConstants.kDeployedAngleDeg));
+  public Command setAngleDegCommand(double angleDeg) {
+    return runOnce(() -> setAngleDeg(angleDeg));
   }
 
-  public void stop() {
-    setGoal(Goal.FLAT);
+  // Slew to a setpoint at a capped rate, finish within tolerance.
+  public Command setAngleDegSteppedCommand(double angleDeg, double degPerSec) {
+    double target = MathUtil.clamp(
+        angleDeg,
+        ScoopConstants.kMinAngleDeg,
+        ScoopConstants.kMaxAngleDeg);
+    return run(() -> {
+      double step = degPerSec * Constants.kLoopPeriodSecs;
+      double delta = MathUtil.clamp(target - targetAngleDeg, -step, step);
+      setAngleDeg(targetAngleDeg + delta);
+    }).until(() -> Math.abs(target - targetAngleDeg)
+        < ScoopConstants.kAngleToleranceDeg);
   }
 
   @Override
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("Scoop", inputs);
+    Logger.recordOutput("Scoop/TargetAngleDeg", targetAngleDeg);
 
-    double targetAngleDeg = switch (goal) {
-      case FLAT -> ScoopConstants.kFlatAngleDeg;
-      case CARRY -> ScoopConstants.kCarryAngleDeg;
-      case DUMP -> ScoopConstants.kDumpAngleDeg;
-    };
+    // FLAT, CARRY, DUMP
+    scoopLigament.setAngle(inputs.commandedAngleDeg - 45);
+    Logger.recordOutput("Scoop/Mechanism2d", mechanism);
+    componentPose = new Pose3d(0.0, 0.0, 0.0,
+        new Rotation3d(0.0, Math.toRadians(scoopLigament.getAngle()), 0.0));
 
-    double clamped = MathUtil.clamp(
-        targetAngleDeg,
-        ScoopConstants.kMinAngleDeg,
-        ScoopConstants.kMaxAngleDeg);
+    io.setAngleDeg(targetAngleDeg);
+  }
 
-    // io.setAngle assumes a matching IO setter of that name.
-    // If the IO method is named differently (e.g. setAngle, setPosition,
-    // setSpeed), rename the call below instead of the mirrored tabstop.
-    io.setAngle(clamped);
+  /** Returns the current 3D pose of the scoop for AdvantageScope aggregation. */
+  public Pose3d getComponentPose() {
+    return componentPose;
   }
 }
