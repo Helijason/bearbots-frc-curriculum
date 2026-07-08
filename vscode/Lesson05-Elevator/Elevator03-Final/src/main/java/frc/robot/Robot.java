@@ -17,6 +17,7 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Transform3d;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
@@ -83,11 +84,22 @@ public class Robot extends LoggedRobot {
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
 
+    // Scoop mounts to the elevator carriage — shift its Mechanism2d root to match, so the
+    // 2D scoop ligament visually rises and lowers with the elevator.
+    robotContainer.getScoop().setBaseHeightMeters(robotContainer.getElevator().getPositionMeters());
+
     // Aggregate all component poses for AdvantageScope 3D view.
+    // Elevator mounts to the frame; scoop mounts to the elevator carriage, so its pose
+    // rides on top of the elevator's (composition happens here, not inside either subsystem).
+    Pose3d elevatorPose = robotContainer.getElevator().getComponentPose();
+    Pose3d scoopLocalPose = robotContainer.getScoop().getComponentPose();
+    Pose3d scoopPose = elevatorPose.transformBy(
+        new Transform3d(scoopLocalPose.getTranslation(), scoopLocalPose.getRotation()));
+
     Logger.recordOutput("FinalComponentPoses", new Pose3d[] {
       robotContainer.getArm().getComponentPose(),
-      robotContainer.getElevator().getComponentPose(),
-      robotContainer.getScoop().getComponentPose()
+      elevatorPose,
+      scoopPose
     });
   }
 

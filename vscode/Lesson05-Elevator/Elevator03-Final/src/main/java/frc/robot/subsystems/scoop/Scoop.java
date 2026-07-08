@@ -25,8 +25,10 @@ public class Scoop extends SubsystemBase {
   private double targetAngleDeg = ScoopConstants.kDefaultAngleDeg;
 
   // Mechanism2d: vertical column on the front of the robot
+  private static final double kRootBaseX = 1.125;
+  private static final double kRootBaseY = 0.016;
   private final LoggedMechanism2d mechanism = new LoggedMechanism2d(2, 1);
-  private final LoggedMechanismRoot2d root = mechanism.getRoot("ScoopPivot", 1.125, 0.016);
+  private final LoggedMechanismRoot2d root = mechanism.getRoot("ScoopPivot", kRootBaseX, kRootBaseY);
   private final LoggedMechanismLigament2d scoopLigament =
       root.append(new LoggedMechanismLigament2d("Scoop", 0.05, 0, 3.25, new Color8Bit(Color.kDarkGray)));
   private Pose3d componentPose = new Pose3d();
@@ -81,5 +83,14 @@ public class Scoop extends SubsystemBase {
   /** Returns the current 3D pose of the scoop for AdvantageScope aggregation. */
   public Pose3d getComponentPose() {
     return componentPose;
+  }
+
+  /**
+   * Shifts the scoop's Mechanism2d root to track the elevator carriage it rides on, so the
+   * 2D scoop ligament visually rises and lowers with the elevator. Called from Robot.java,
+   * which is the only place that knows about both subsystems.
+   */
+  public void setBaseHeightMeters(double heightMeters) {
+    root.setPosition(kRootBaseX, kRootBaseY + heightMeters);
   }
 }

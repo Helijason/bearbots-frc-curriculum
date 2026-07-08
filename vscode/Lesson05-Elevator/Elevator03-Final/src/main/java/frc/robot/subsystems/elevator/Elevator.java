@@ -143,6 +143,11 @@ public class Elevator extends SubsystemBase {
     return componentPose;
   }
 
+  /** Returns the current carriage height in meters, for subsystems mounted on the elevator. */
+  public double getPositionMeters() {
+    return inputs.positionMeters;
+  }
+
   @Override
   public void periodic() {
     io.updateInputs(inputs);
