@@ -14,7 +14,7 @@ public class ElevatorIOSim implements ElevatorIO {
   private double velocityMetersPerSec = 0.0;
 
   @Override
-public void updateInputs(ElevatorIOInputs inputs) {
+  public void updateInputs(ElevatorIOInputs inputs) {
     // Gravity pulls the carriage down: it takes voltage just to hold position.
     double effectiveVolts = appliedVolts - ElevatorConstants.kGravityVolts;
 
@@ -53,6 +53,7 @@ public void updateInputs(ElevatorIOInputs inputs) {
   @Override
   public void resetEncoder() {
     positionMeters = 0.0;
+    velocityMetersPerSec = 0.0;
   }
 
   @Override

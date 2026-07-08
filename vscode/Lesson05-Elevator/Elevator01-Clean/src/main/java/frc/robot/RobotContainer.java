@@ -29,6 +29,7 @@ import frc.robot.subsystems.drive.DriveIO;
 import frc.robot.subsystems.drive.DriveIOSim;
 import frc.robot.subsystems.drive.DriveIOXRP;
 import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevator.ElevatorIO;
 import frc.robot.subsystems.elevator.ElevatorIOSim;
 import frc.robot.subsystems.elevator.ElevatorIOXRP;
@@ -118,6 +119,16 @@ private final LoggedDashboardChooser<Command> autonomousChooser = new LoggedDash
         .onTrue(scoop.setGoalCommand(Scoop.Goal.CARRY));
     new POVButton(controller, 180) // 2
         .onTrue(scoop.setGoalCommand(Scoop.Goal.DUMP));
+    
+    // Bumpers — elevator heights.
+    new JoystickButton(controller, XboxController.Button.kRightBumper.value)
+        .onTrue(elevator.setHeightMetersCommand(ElevatorConstants.kTopHeightMeters));
+    new JoystickButton(controller, XboxController.Button.kLeftBumper.value)
+        .onTrue(elevator.setHeightMetersCommand(ElevatorConstants.kBottomHeightMeters));
+
+    // Start — home the elevator.
+    new JoystickButton(controller, XboxController.Button.kStart.value)
+        .onTrue(elevator.homeCommand());
 
   }
  

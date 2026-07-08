@@ -31,6 +31,7 @@ public class ElevatorConstants {
 
     public static final double kHomingVolts = -1.0;              // gentle, toward bottom
     public static final double kHomingStallMetersPerSec = 0.002; // "stopped" threshold
+    public static final double kHomingMovingMetersPerSec = 0.010; // "clearly moving" threshold
     public static final double kHomingTimeoutSecs = 3.0;
     
     /* ********************************************************************* */

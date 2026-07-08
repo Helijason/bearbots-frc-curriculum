@@ -9,6 +9,7 @@ import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
@@ -59,6 +60,7 @@ public class Elevator extends SubsystemBase {
       new LoggedNetworkNumber("/Tuning/Elevator/kV", feedforward.getKv());
 
   private double targetMeters = ElevatorConstants.kDefaultHeightMeters;
+  private boolean homing = false;
 
   public Elevator(ElevatorIO io) {
     this.io = io;
@@ -79,22 +81,40 @@ public class Elevator extends SubsystemBase {
     return runOnce(() -> setHeightMeters(meters));
   }
 
-  // Go to a height and finish once within tolerance. Use this inside sequences.
+// Go to a height and finish once within tolerance. Use this inside sequences.
   public Command goToHeightMetersCommand(double meters) {
-    return run(() -> setHeightMeters(meters)).until(this::atGoal);
+    return run(() -> setHeightMeters(meters))
+        .until(this::atGoal)
+        .finallyDo(interrupted -> {
+          // Cancelled early: hold where we are instead of chasing the old target.
+          if (interrupted) setHeightMeters(inputs.positionMeters);
+        });
   }
 
+  // Stall-stop homing. Drives toward the hard stop, zeros the encoder there.
   public Command homeCommand() {
-    return run(() -> io.setVoltage(ElevatorConstants.kHomingVolts))   // small down voltage
-      .until(() -> Math.abs(inputs.velocityMetersPerSec) < ElevatorConstants.kHomingStallMetersPerSec)
-      .withTimeout(ElevatorConstants.kHomingTimeoutSecs)             // safety
-      .andThen(runOnce(() -> {
-            io.stop();
-            io.resetEncoder();
-            setHeightMeters(ElevatorConstants.kDefaultHeightMeters);
-          }))
-      .ignoringDisable(false);   // moving motor -> must be enabled
-}
+    // Stall-stop, but only after the carriage has actually started moving,
+    // otherwise the initial velocity of 0 ends it on the first loop.
+    BooleanSupplier stalled = new BooleanSupplier() {
+      boolean moved = false;
+      public boolean getAsBoolean() {
+        double v = Math.abs(inputs.velocityMetersPerSec);
+        if (v > ElevatorConstants.kHomingMovingMetersPerSec) moved = true;
+        return moved && v < ElevatorConstants.kHomingStallMetersPerSec;
+      }
+    };
+    return startRun(
+            () -> homing = true,
+            () -> io.setVoltage(ElevatorConstants.kHomingVolts))
+        .until(stalled)
+        .withTimeout(ElevatorConstants.kHomingTimeoutSecs)
+        .finallyDo(() -> {
+              io.stop();
+              io.resetEncoder();
+              setHeightMeters(ElevatorConstants.kDefaultHeightMeters);
+              homing = false;
+            });
+  }
 
   @AutoLogOutput(key = "Elevator/AtGoal")
   public boolean atGoal() {
@@ -109,6 +129,8 @@ public class Elevator extends SubsystemBase {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("Elevator", inputs);
+
+    if (homing) return;   // homing owns the motor; skip PID this loop
 
     Logger.recordOutput("Elevator/TargetMeters", targetMeters);
 
