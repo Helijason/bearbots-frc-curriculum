@@ -42,7 +42,7 @@
     <button class="section-nav-btn active" data-section="concept">Part 1 - The Concept</button>
     <button class="section-nav-btn" data-section="build">Part 2 - Build the Elevator</button>
     <button class="section-nav-btn" data-section="visualize">Part 3 - Visualization</button>
-    <button class="section-nav-btn" data-section="challenge">Part 4 - Try it Yourself</button>
+    <button class="section-nav-btn" data-section="challenge">Part 4 - AdvantageScope</button>
   </nav>
 
   <!-- ═══════════════════════════════════════════════════════
@@ -50,7 +50,7 @@
        ═══════════════════════════════════════════════════════ -->
   <div class="lesson-section active" id="section-concept">
 
-    <p>Every subsystem you've built so far - Arm, Scoop - moves the same way: you pick a setpoint, and code either jumps straight there or slews toward it at a fixed rate per program loop. That is what a hobby servo does. The controls for angle setpoints are built into the servo.  There is no flexibility in the control.</p>
+    <p>Every subsystem you've built so far - Arm, Scoop - moves the same way: you pick a setpoint, and code either jumps straight there or slews toward it at a fixed rate per program loop. That is what a <a href="https://www.solomotorcontrollers.com/blog/servo-motor/" target="_blank" rel="noopener">hobby servo</a> does - see the SG90 section for how the PWM signal itself sets the position. The controls for angle setpoints are built into the servo.  There is no flexibility in the control.</p>
 
     <div class="hf-box hf-brain">
       <span class="hf-label">Your brain is probably thinking this right now</span>
@@ -1584,11 +1584,64 @@ import edu.wpi.first.math.geometry.Transform3d;">
 
 
   <!-- ═══════════════════════════════════════════════════════
-       PART 4 — TRY IT YOURSELF
+       Part 4 - AdvantageScope
        ═══════════════════════════════════════════════════════ -->
   <div class="lesson-section" id="section-challenge">
 
-    <p>Three tiers, one elevator. Bronze tunes by feel. Silver adds a new named setpoint. Gold tunes feedforward and can explain what each term is doing. Pick where you are; Gold subsumes the others.</p>
+    <p>Before you tune anything, get your view set up. Three quick checks: confirm the 3D assembly renders correctly, plot the PID loop on a graph, and pull up Tuning Mode alongside it.</p>
+
+    <div class="step-builder">
+
+    <!-- ── Step 1: confirm the 3D assembly ──────────────────────────────── -->
+    <div class="sb-step open" id="sbstep-c1">
+      <div class="sb-step-header" onclick="sbToggle('sbstep-c1')">
+        <div class="sb-step-num">1</div>
+        <div class="sb-step-title">Confirm the assembly renders correctly</div>
+        <div class="sb-step-chevron">▶</div>
+      </div>
+      <div class="sb-step-body">
+        <p>Open a <a href="https://docs.advantagescope.org/tab-reference/3d-field/" target="_blank" rel="noopener">3D Field tab</a> and add these four sources, in this order:</p>
+        <ul class="task-list">
+          <li><strong>Robot</strong> - <code>AdvantageKit/RealOutputs/Drive/Pose</code></li>
+          <li><strong>Component</strong> - <code>AdvantageKit/RealOutputs/FinalComponentPoses</code> (3 values - arm, elevator, scoop)</li>
+          <li><strong>Mechanism</strong> - <code>AdvantageKit/RealOutputs/Scoop/Mechanism2d</code></li>
+          <li><strong>Mechanism</strong> - <code>AdvantageKit/RealOutputs/Elevator/Mechanism2d</code></li>
+        </ul>
+        <p>Command a height change with the bumpers. If the scoop rides up and down with the elevator carriage instead of sitting at a fixed height, Part 3's pose composition is working correctly.</p>
+      </div>
+    </div><!-- /step c1 -->
+
+    <!-- ── Step 2: line graph ───────────────────────────────────────────── -->
+    <div class="sb-step" id="sbstep-c2">
+      <div class="sb-step-header" onclick="sbToggle('sbstep-c2')">
+        <div class="sb-step-num">2</div>
+        <div class="sb-step-title">Set up a Line Graph for the PID response</div>
+        <div class="sb-step-chevron">▶</div>
+      </div>
+      <div class="sb-step-body">
+        <p>Open a <a href="https://docs.advantagescope.org/tab-reference/line-graph/" target="_blank" rel="noopener">Line Graph tab</a> and drag in:</p>
+        <ul class="task-list">
+          <li><strong>Left axis</strong> - <code>AdvantageKit/RealOutputs/Elevator/AppliedVolts</code></li>
+          <li><strong>Right axis</strong> - <code>AdvantageKit/RealOutputs/Elevator/PositionMeters</code></li>
+          <li><strong>Right axis</strong> - <code>AdvantageKit/RealOutputs/Elevator/TargetMeters</code>, both on the same axis so they overlay directly</li>
+        </ul>
+        <p>Command a height change with the bumpers. The target line jumps instantly; the position line is what actually chases it. The gap between them, and how it closes, is the PID response you'll be reading all through the tiers below.</p>
+      </div>
+    </div><!-- /step c2 -->
+
+    <!-- ── Step 3: tuning mode alongside the graph ─────────────────────── -->
+    <div class="sb-step" id="sbstep-c3">
+      <div class="sb-step-header" onclick="sbToggle('sbstep-c3')">
+        <div class="sb-step-num">3</div>
+        <div class="sb-step-title">Open Tuning Mode alongside the graph</div>
+        <div class="sb-step-chevron">▶</div>
+      </div>
+      <div class="sb-step-body">
+        <p>Open <a href="https://docs.advantagescope.org/overview/live-sources/tuning-mode/" target="_blank" rel="noopener">Tuning Mode</a> in a tab next to your Line Graph. Toggle it on using the switch next to the search bar, then open the <code>Tuning/Elevator</code> branch in the field list - each gain (kP, kI, kD, kS, kG, kV) shows as an editable number box, not a slider. This is the loop you'll repeat for every tier below: type a new value into <code>kP</code>, then command a height change. You should see the AppliedVolts trace and the gap between TargetMeters/PositionMeters change shape as the value changes.</p>
+      </div>
+    </div><!-- /step c3 -->
+
+    </div><!-- /step-builder -->
 
     <div class="tier-tabs">
       <button class="tier-tab bronze active" data-tier="bronze">Bronze - I can tune kP by feel</button>
@@ -1600,7 +1653,7 @@ import edu.wpi.first.math.geometry.Transform3d;">
 
       <div class="tier-panel bronze active">
         <span class="tier-label">Bronze - tune kP by feel</span>
-        <p>Connect AdvantageScope's <a href="https://docs.advantagescope.org/overview/live-sources/tuning-mode/" target="_blank" rel="noopener">Tuning Mode</a> to your simulator. Find <code>/Tuning/Elevator/kP</code> and drag its slider while commanding the elevator between top and bottom with the bumpers.</p>
+        <p>Toggle on AdvantageScope's <a href="https://docs.advantagescope.org/overview/live-sources/tuning-mode/" target="_blank" rel="noopener">Tuning Mode</a>, then open <code>Tuning/Elevator/kP</code> in the field list and type in new values while commanding the elevator between top and bottom with the bumpers.</p>
         <ul class="task-list">
           <li>Drop kP to something clearly too low (e.g. <code>5.0</code>). Command a height change. Describe what you see - does it get there? How fast?</li>
           <li>Raise kP well above the default (e.g. <code>150.0</code>). Command a height change again. What's different? Listen for the motor - does it sound different?</li>
@@ -1646,7 +1699,7 @@ new JoystickButton(controller, XboxController.Button.kY.value)
         <p>PID alone can hold a height, but watch what it costs. Isolate feedforward's contribution, then tune it properly.</p>
         <ul class="task-list">
           <li>With the elevator at rest at a mid-height, set <code>/Tuning/Elevator/kG</code> to <code>0.0</code> in AdvantageScope's Tuning Mode. Does the carriage sag or drift? What is PID doing to compensate?</li>
-          <li>Slowly raise kG from zero while watching the carriage hold a fixed height. Find the value where the carriage holds steady with minimal correction effort - watch <code>Elevator/TargetMeters</code> vs. the actual measured position for how hard PID is working.</li>
+          <li>Raise kG from zero in small steps, watching the carriage hold a fixed height after each change. Find the value where the carriage holds steady with minimal correction effort - watch <code>Elevator/TargetMeters</code> vs. the actual measured position for how hard PID is working.</li>
           <li>Once kG is dialed in, try raising kS slightly. Command very small height changes near the current position - does the carriage respond more crisply to tiny commands?</li>
           <li>Bake your final kP, kG, and kS values into <code>ElevatorConstants.java</code>, then delete the six <code>LoggedNetworkNumber</code> tune-handle fields and the two lines in <code>periodic()</code> that read them.</li>
           <li><strong>Explain out loud:</strong> what would happen if you deployed to the real robot with kG still at 0.0? Why does an elevator need this term when Lesson 04's Arm and Scoop never did?</li>
@@ -1667,7 +1720,7 @@ new JoystickButton(controller, XboxController.Button.kY.value)
     <button class="section-nav-btn active" data-section="concept">Part 1 - The Concept</button>
     <button class="section-nav-btn" data-section="build">Part 2 - Build the Elevator</button>
     <button class="section-nav-btn" data-section="visualize">Part 3 - Visualization</button>
-    <button class="section-nav-btn" data-section="challenge">Part 4 - Try it Yourself</button>
+    <button class="section-nav-btn" data-section="challenge">Part 4 - AdvantageScopee</button>
   </nav>
 
 </div><!-- /page-container -->
