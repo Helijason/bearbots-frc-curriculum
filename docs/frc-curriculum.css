@@ -757,9 +757,15 @@ code {
   gap: 1rem;
   max-width: 860px;
   margin: 0 auto;
+  padding: 0 1.5rem 2rem;
+}
+
+.resource-cta {
+  max-width: 860px;
+  margin: 0 auto;
   padding: 0 1.5rem 4rem;
 }
- 
+
 .module-card {
   background: var(--white);
   border: 1px solid var(--gray-border);

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title></title>
+  <link rel="stylesheet" href="frc-curriculum.css">
+  <style>
+    /* ── External Links page layout ───────────────────────────── */
+    .links-layout {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 2rem;
+      align-items: start;
+    }
+    .links-sidebar { position: sticky; top: 1.5rem; }
+    @media (max-width: 700px) {
+      .links-layout { grid-template-columns: 1fr; }
+      .links-sidebar { position: static; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="wip-banner"></div>
+<header class="site-header"></header>
+
+<div class="page-container">
+
+  <div class="lesson-header">
+    <h1 class="lesson-title">External Links</h1>
+    <div class="lesson-subtitle">Every outside resource cited in Lessons 01-05, gathered in one place - organized by lesson, in the order each one comes up.</div>
+  </div>
+
+  <div class="links-layout">
+
+    <div class="links-main lesson-section active">
+
+      <h2>Lesson 01 - Setup + First Drive</h2>
+      <ul class="task-list">
+        <li><div><a href="https://docs.wpilib.org/en/stable/docs/zero-to-robot/step-2/wpilib-setup.html" target="_blank" rel="noopener">WPILib Installation Guide</a> - official step-by-step for installing VS Code and WPILib.</div></li>
+        <li><div><a href="https://github.com/Helijason/bearbots-xrp-code/tree/main/Lesson01/First%20Drive" target="_blank" rel="noopener">BearBots XRP Code - First Drive</a> - the starter project used to verify your environment is set up correctly.</div></li>
+      </ul>
+
+      <h2>Lesson 02 - Template Structure + File Roles</h2>
+      <ul class="task-list">
+        <li><div><a href="https://git-scm.com/download/win" target="_blank" rel="noopener">Git for Windows</a> - installer used before setting up version control on the project.</div></li>
+        <li><div><a href="https://docs.advantagekit.org/getting-started/installation" target="_blank" rel="noopener">AdvantageKit Installation Docs</a> - official setup guide for adding AdvantageKit to a WPILib project.</div></li>
+        <li><div><a href="https://docs.advantagekit.org/getting-started/template-projects/talonfx-swerve-template/" target="_blank" rel="noopener">TalonFX(S) Swerve Template</a> - the official AdvantageKit starting point that BearBots' competition robot is built on.</div></li>
+        <li><div><a href="https://docs.wpilib.org/en/stable/docs/xrp-robot/getting-to-know-xrp.html" target="_blank" rel="noopener">WPILib XRP Hardware Reference</a> - port-to-subsystem mapping for the XRP board.</div></li>
+        <li><div><a href="https://docs.sparkfun.com/SparkFun_XRP_Controller/introduction/" target="_blank" rel="noopener">SparkFun XRP Controller Hardware Overview</a> - deeper hardware reference for the XRP controller board itself.</div></li>
+      </ul>
+
+      <h2>Lesson 03 - What is a Subsystem?</h2>
+      <ul class="task-list">
+        <li><div><a href="https://docs.wpilib.org/en/stable/docs/software/commandbased/command-scheduler.html" target="_blank" rel="noopener">WPILib Command Scheduler Docs</a> - the exact loop order the scheduler follows every 20ms; referenced twice in this lesson's periodic()/scheduler discussion.</div></li>
+        <li><div><a href="https://code.visualstudio.com/docs/editor/userdefinedsnippets" target="_blank" rel="noopener">VS Code User-Defined Snippets Reference</a> - syntax reference for writing your own snippets.</div></li>
+        <li><div><a href="https://docs.wpilib.org/en/stable/docs/software/vscode-overview/creating-robot-program.html" target="_blank" rel="noopener">WPILib "Create a New Class" Docs</a> - the built-in template tool, which is itself a snippet system.</div></li>
+        <li><div><a href="https://github.com/Mechanical-Advantage/AdvantageKit/tree/main/template_projects" target="_blank" rel="noopener">6328's AdvantageKit Template Projects</a> - shows how a top FRC team structures a codebase from day one.</div></li>
+      </ul>
+
+      <h2>Lesson 04 - Setting Up a Basic Subsystem</h2>
+      <p><em>No external links referenced directly in this lesson - it builds entirely on the IO pattern and AdvantageScope skills from earlier lessons.</em></p>
+
+      <h2>Lesson 05 - Motor Closed-Loop Control</h2>
+      <ul class="task-list">
+        <li><div><a href="https://www.solomotorcontrollers.com/blog/servo-motor/" target="_blank" rel="noopener">Servo Motor Basics - Solo Motor Controllers</a> - how a hobby servo's internal controller works, including the SG90 section showing how the PWM signal itself sets position.</div></li>
+        <li><div><a href="https://docs.advantagescope.org/overview/live-sources/tuning-mode/" target="_blank" rel="noopener">AdvantageScope Tuning Mode</a> - live-editing PID/feedforward gains while connected to the sim or robot.</div></li>
+        <li><div><a href="https://docs.advantagescope.org/tab-reference/mechanism/" target="_blank" rel="noopener">AdvantageScope Mechanism Tab</a> - the 2D mechanism view used to watch the elevator and scoop move.</div></li>
+        <li><div><a href="https://docs.advantagescope.org/tab-reference/3d-field/" target="_blank" rel="noopener">AdvantageScope 3D Field Tab</a> - composing Robot/Component/Mechanism poses into one field view.</div></li>
+        <li><div><a href="https://docs.advantagescope.org/tab-reference/line-graph/" target="_blank" rel="noopener">AdvantageScope Line Graph Tab</a> - plotting setpoint vs. measured position to read a PID response.</div></li>
+      </ul>
+
+    </div><!-- /links-main -->
+
+    <aside class="links-sidebar">
+      <div class="hf-box hf-info">
+        <span class="hf-label">XRP Robot</span>
+        <ul class="task-list">
+          <li><div><a href="https://docs.wpilib.org/en/stable/docs/xrp-robot/index.html" target="_blank" rel="noopener">Getting Started with XRP</a> - WPILib's overview page for the XRP platform.</div></li>
+          <li><div><a href="https://docs.wpilib.org/en/stable/docs/xrp-robot/hardware-and-imaging.html" target="_blank" rel="noopener">XRP Hardware, Assembly, and Imaging</a> - official build and firmware-imaging guide.</div></li>
+          <li><div><a href="https://docs.wpilib.org/en/stable/docs/xrp-robot/getting-to-know-xrp.html" target="_blank" rel="noopener">WPILib XRP Hardware Reference</a> - port-to-subsystem mapping for the board.</div></li>
+          <li><div><a href="https://docs.sparkfun.com/SparkFun_XRP_Controller/introduction/" target="_blank" rel="noopener">SparkFun XRP Controller Hardware Overview</a> - deeper hardware reference for the controller board itself.</div></li>
+        </ul>
+      </div>
+    </aside>
+
+  </div><!-- /links-layout -->
+
+</div><!-- /page-container -->
+
+<footer class="site-footer"></footer>
+
+<script src="js/site-config.js"></script>
+<script src="js/frc-curriculum.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  document.title = "External Links | " + SITE_CONFIG.siteName;
+  document.querySelectorAll('.site-nav').forEach(nav => {
+    nav.innerHTML = '<a href="index.html">All lessons</a>';
+  });
+});
+</script>
+</body>
+</html>
