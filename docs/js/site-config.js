@@ -73,15 +73,15 @@ const SITE_CONFIG = {
     "05": {
       module: 2,
       lesson: "05",
-      title: "Closed-Loop Autonomous",
-      subtitle: "Close the loop with P-control. Tune kP on the real XRP. Build your first reliable autonomous routine.",
-      description: "Close the loop with P-control. Tune kP on the real XRP. Build your first reliable autonomous routine.",
+      title: "Motor Closed-Loop Control",
+      subtitle: "Close the loop with P-control. Tune kP on the real XRP. Build your first PID controller.",
+      description: "Close the loop with P-control. Tune kP on the real XRP and in simulation.",
       hardware: "Laptop/XRP robot",
       prereq: "Lesson 04",
       tools: "VS Code WPILib, AdvantageKit, AdvantageScope",
       duration: "3 hours",
       filename: "lesson-05-closed-loop.html",
-      status: "soon",  // "ready", "current", "review", "soon"
+      status: "review",  // "ready", "current", "review", "soon"
       prev: "04",
       next: "06"
     },

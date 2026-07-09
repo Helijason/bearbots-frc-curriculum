@@ -50,16 +50,16 @@
        ═══════════════════════════════════════════════════════ -->
   <div class="lesson-section active" id="section-concept">
 
-    <p>Every subsystem you've built so far - Arm, Scoop - moves the same way: you pick a setpoint, and code either jumps straight there or slews toward it at a fixed rate per loop. That works for a servo. It does not work for an elevator, and today you'll find out why.</p>
+    <p>Every subsystem you've built so far - Arm, Scoop - moves the same way: you pick a setpoint, and code either jumps straight there or slews toward it at a fixed rate per program loop. That is what a hobby servo does. The controls for angle setpoints are built into the servo.  There is no flexibility in the control.</p>
 
     <div class="hf-box hf-brain">
       <span class="hf-label">Your brain is probably thinking this right now</span>
       <p>"Can't I just do the same thing - set a target height, ramp toward it?"</p>
-      <p>Try it and the carriage either crawls up too slowly to be useful, or slams into the top of its travel and stalls the motor against the hard stop. A servo has its own internal controller doing this work for you. A bare DC motor on a spool does not - there's nothing between "voltage in" and "however fast the motor decides to spin" except gravity, friction, and whatever your code chooses to send. You need to close the loop yourself.</p>
+      <p>Try it and the carriage either crawls up too slowly to be useful, or slams into the top of its travel and stalls the motor against the hard stop. A servo has its own internal controller doing this work for you. A bare DC motor on a spool does not - there's nothing between "voltage in" and "however fast the motor decides to spin" except gravity, friction, and whatever your code chooses to send. You need to close the loop yourself giving the subsystem a lot of flexibility.</p>
     </div>
 
     <h2>Open-loop vs. closed-loop</h2>
-    <p>An open-loop setter tells the motor "spin at this voltage" and never checks whether that produced the right result. A closed-loop controller measures the actual position, compares it to the target, and continuously corrects the error. That correction loop - measure, compare, correct, repeat every 20ms - is what "closed-loop control" means.</p>
+    <p>The motor is made up of two main components. first the DC motor and an encoder. When using an open-loop setter it tells the motor "spin at this voltage" and never checks whether that produced the right result. A closed-loop controller measures the actual position, compares it to the target, and continuously corrects the error. That correction loop - measure, compare, correct, repeat every 20ms - is what "closed-loop control" means.</p>
 
     <div class="info-grid">
       <div class="info-card">
@@ -76,8 +76,8 @@
       </div>
     </div>
 
-    <h2>PIDController - the error-correction half</h2>
-    <p>WPILib's <code>PIDController</code> takes a measurement and a setpoint, and returns a correction. The three gains name what they respond to:</p>
+    <h2>PIDController - "Error Correction" half</h2>
+    <p>WPILib's <code>PIDController</code> takes a measurement and a setpoint, and returns an output correction:</p>
 
     <div class="info-grid">
       <div class="info-card">
@@ -94,7 +94,7 @@
       </div>
     </div>
 
-    <h2>ElevatorFeedforward - the "expected voltage" half</h2>
+    <h2>Feed forward - "Expected voltage" half</h2>
     <p>PID alone reacts to error after it happens. Feedforward adds the voltage you already know you'll need, before there's any error to react to - so PID only has to correct the leftover mistake, not do all the work.</p>
 
     <div class="hf-box hf-info">
@@ -117,17 +117,17 @@
     </div>
 
     <h2>Live tuning - and why you delete the tune code when you're done</h2>
-    <p>Guessing four to six gains cold is miserable. The <code>aksubsystem-motor</code> snippet wires each gain to a <code>LoggedNetworkNumber</code> under <code>/Tuning/Elevator/</code>, so you can drag sliders in AdvantageScope while the robot runs and watch the response change in real time.</p>
+    <p>Guessing four to six gains cold is miserable. The <code>aksubsystem-motor</code> snippet wires each gain to a <code>LoggedNetworkNumber</code> under <code>/Tuning/Elevator/</code>, so you can updaate gains in AdvantageScope, graph apropriate values while the robot runs and watch the response change in real time.</p>
 
     <div class="hf-box hf-warning">
       <span class="hf-label">Tune handles are scaffolding, not the final product</span>
-      <p>The snippet's <code>periodic()</code> re-reads all six <code>LoggedNetworkNumber</code>s and rebuilds the controller and feedforward <em>every single loop</em> - that's deliberately wasteful so you can retune live without redeploying. Once you land on gains you like, copy the values into <code>ElevatorConstants</code>, then delete the <code>LoggedNetworkNumber</code> fields and the two lines in <code>periodic()</code> that read them. Competition code doesn't rebuild a controller 50 times a second for no reason.</p>
+      <p>The snippet's <code>periodic()</code> re-reads all six <code>LoggedNetworkNumber</code>s and rebuilds the controller and feedforward <em>every single loop</em> - that's deliberately wasteful so you can retune live without redeploying. Once you land on gains you like, copy the values into <code>ElevatorConstants</code>, then coment out or delete the <code>LoggedNetworkNumber</code> fields and the two lines in <code>periodic()</code> that read them. Competition code doesn't rebuild a controller 50 times a second for no reason.</p>
     </div>
 
     <p>See <a href="https://docs.advantagescope.org/overview/live-sources/tuning-mode/" target="_blank" rel="noopener">AdvantageScope's Tuning Mode documentation</a> for exactly how to toggle tuning mode and edit values live once connected to your simulator or robot.</p>
 
     <h2>Homing - why an encoder alone isn't enough</h2>
-    <p>An encoder counts <em>relative</em> motion from wherever it was powered on. It has no idea where "zero" actually is unless you tell it. <code>homeCommand()</code> solves this by driving gently toward the bottom hard stop, watching for the motor to stall (moving, then suddenly not), and calling that position zero.</p>
+    <p>An motor's encoder counts <em>relative</em> motion from wherever it was powered on. It has no idea where "zero" actually is unless you tell it. <code>homeCommand()</code> solves this by driving gently toward the bottom hard stop, watching for the motor to stall (moving, then suddenly not), and calling that position zero.</p>
 
     <div class="hf-box hf-sidebar">
       <span class="hf-label">Reading the stall detector</span>
@@ -1179,37 +1179,6 @@ import frc.robot.subsystems.scoop.Scoop;">
       </div>
     </div><!-- /step 7 -->
 
-    <!-- ── Step 8: Robot.java — drop scoop from aggregation ─────────────── -->
-    <div class="sb-step" id="sbstep-8">
-      <div class="sb-step-header" onclick="sbToggle('sbstep-8')">
-        <div class="sb-step-num">8</div>
-        <div class="sb-step-title">Fix Robot.java (temporary)</div>
-        <div class="sb-step-chevron">▶</div>
-      </div>
-      <div class="sb-step-body">
-        <p><span class="file-badge">Scoop.java</span> lost its <code>getComponentPose()</code> method along with its old Mechanism2d code when it moved to the Goal-enum API - that's coming back reworked in Part 3. Until then, <span class="file-badge">Robot.java</span> can't call it. Remove the scoop line from the pose aggregation array so the project compiles.</p>
-
-<div class="code-window" data-code="    // Aggregate all component poses for AdvantageScope 3D view.
-    Logger.recordOutput(&quot;FinalComponentPoses&quot;, new Pose3d[] {
-      robotContainer.getArm().getComponentPose()
-    });">
-<div class="cw-head"><span class="cw-title">Robot.java — drop scoop pose (temporary)</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-<div class="code-region" style="counter-reset: ln 85;">
-<pre class="cb">
-<span class="line">    // Aggregate all component poses for AdvantageScope 3D view.</span>
-<span class="line">    Logger.recordOutput("FinalComponentPoses", new Pose3d[] {</span>
-<span class="line-old">      robotContainer.getArm().getComponentPose(),</span>
-<span class="line-new">      robotContainer.getArm().getComponentPose()</span>
-<span class="line-del">      robotContainer.getScoop().getComponentPose()</span>
-<span class="line">    });</span>
-</pre></div></div>
-
-        <div class="code-annotation">This is a real, temporary regression - normal for incremental development. Scoop's 3D pose comes back better than before in Part 3, composed on top of the elevator's own pose instead of standing alone.</div>
-
-        <p>Build. Everything should compile and simulate cleanly: Arm and Scoop behave exactly as they did at the end of Lesson 04, and the new Elevator holds height under PID + feedforward control when you bump it with the bumpers.</p>
-      </div>
-    </div><!-- /step 8 -->
-
     </div><!-- /step-builder -->
 
   </div><!-- /section-build -->
@@ -1220,7 +1189,7 @@ import frc.robot.subsystems.scoop.Scoop;">
        ═══════════════════════════════════════════════════════ -->
   <div class="lesson-section" id="section-visualize">
 
-    <p>The elevator works, but it's invisible - no 2D mechanism, no 3D pose, nothing in AdvantageScope's field view. Worse, Scoop's old visualization got stripped out in Part 2 along with its enum rework. This part brings both back, and does something Lesson 04 never had to: makes the scoop's pose ride on top of the elevator's, because that's how it's actually mounted.</p>
+    <p>The elevator works, but it's invisible - no 2D mechanism, no 3D pose, nothing in AdvantageScope's field view. This part brings it to life, and does something Lesson 04 never had to: makes the scoop's pose ride on top of the elevator's, because that's how it's actually mounted.</p>
 
     <div class="hf-box hf-info">
       <span class="hf-label">See it for yourself</span>
@@ -1436,355 +1405,10 @@ import static frc.robot.Constants.kMaxBatteryVoltage;">
       </div>
     </div><!-- /step v2 -->
 
-    <!-- ── Step 3: Scoop rework ─────────────────────────────────────────── -->
+    <!-- ── Step 3: Robot.java — compose poses ───────────────────────────── -->
     <div class="sb-step" id="sbstep-v3">
       <div class="sb-step-header" onclick="sbToggle('sbstep-v3')">
         <div class="sb-step-num">3</div>
-        <div class="sb-step-title">Rework Scoop back to the angle API, with visualization</div>
-        <div class="sb-step-chevron">▶</div>
-      </div>
-      <div class="sb-step-body">
-        <p>Part 2's <code>Scoop.java</code> switched to a <code>Goal</code> enum (<code>FLAT</code>/<code>CARRY</code>/<code>DUMP</code>) and dropped its visualization to keep that step focused on the elevator. Two things happen here at once: the Goal enum reverts to the named-angle API from Lesson 04 (<code>setAngleDeg</code>/<code>kFlatAngleDeg</code>/etc.), and 2D + 3D visualization comes back - this time riding on the elevator's height via <code>setBaseHeightMeters()</code>.</p>
-
-        <div class="hf-box hf-info">
-          <span class="hf-label">Why revert the enum at all?</span>
-          <p>The Goal enum is a perfectly reasonable pattern - it's just a different lesson than the one this file is teaching. Keeping <code>setAngleDeg</code> here matches Arm's API exactly, so the visualization code (which is the actual point of this step) reads as a clean diff instead of being tangled up with an unrelated API change.</p>
-        </div>
-
-        <p><strong>ScoopConstants.java</strong> — back to named setpoints with a default and tolerance:</p>
-<div class="code-window" data-code="// Copyright (c) 2026 BearBots FRC Team 6964
-// Open Source Software; you can modify and/or share it under the terms of
-// the MIT License available in the root directory of this project.
-
-package frc.robot.subsystems.scoop;
-
-public final class ScoopConstants {
-  private ScoopConstants() {}
-
-  // Named setpoints. Bind these directly:
-  //   button.onTrue(xxx.setAngleDegCommand(ScoopConstants.kFlatAngleDeg));
-  public static final double kFlatAngleDeg = 45.0;
-  public static final double kCarryAngleDeg = 90.0;
-  public static final double kDumpAngleDeg = 0.0;
-
-  // Startup target. periodic drives here until told otherwise.
-  public static final double kDefaultAngleDeg = kFlatAngleDeg;
-
-  // Travel limits. setAngle clamps to this band.
-  public static final double kMinAngleDeg = 0.0;
-  public static final double kMaxAngleDeg = 90.0;
-
-  // Stepped-move finish window.
-  public static final double kAngleToleranceDeg = 0.5;
-}">
-<div class="cw-head"><span class="cw-title">REPLACE - ScoopConstants.java</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-<div class="code-region" style="counter-reset: ln 0;">
-<pre class="cb">
-<span class="line">// Copyright (c) 2026 BearBots FRC Team 6964</span>
-<span class="line">// Open Source Software; you can modify and/or share it under the terms of</span>
-<span class="line">// the MIT License available in the root directory of this project.</span>
-<span class="line"></span>
-<span class="line">package frc.robot.subsystems.scoop;</span>
-<span class="line"></span>
-<span class="line">public final class ScoopConstants {</span>
-<span class="line">  private ScoopConstants() {}</span>
-<span class="line"></span>
-<span class="line">  // Named setpoints. Bind these directly:</span>
-<span class="line">  //   button.onTrue(xxx.setAngleDegCommand(ScoopConstants.kFlatAngleDeg));</span>
-<span class="line-old">  public static final double <span class="ts-before">kFlatAngleDeg</span>  = <span class="ts-before">0.0</span>;</span>
-<span class="line-new">  public static final double <span class="ts-after">kFlatAngleDeg</span> = <span class="ts-after">45.0</span>;</span>
-<span class="line-old">  public static final double <span class="ts-before">kCarryAngleDeg</span> = <span class="ts-before">45.0</span>;</span>
-<span class="line-new">  public static final double <span class="ts-after">kCarryAngleDeg</span> = <span class="ts-after">90.0</span>;</span>
-<span class="line-old">  public static final double <span class="ts-before">kDumpAngleDeg</span>  = <span class="ts-before">-45.0</span>;</span>
-<span class="line-new">  public static final double <span class="ts-after">kDumpAngleDeg</span> = <span class="ts-after">0.0</span>;</span>
-<span class="line"></span>
-<span class="line-add">  // Startup target. periodic drives here until told otherwise.</span>
-<span class="line-add">  public static final double kDefaultAngleDeg = kFlatAngleDeg;</span>
-<span class="line-add"></span>
-<span class="line">  // Travel limits. setAngle clamps to this band.</span>
-<span class="line-old">  public static final double <span class="ts-before">kMinAngleDeg</span>   = <span class="ts-before">0.0</span>;</span>
-<span class="line-new">  public static final double <span class="ts-after">kMinAngleDeg</span> = <span class="ts-after">0.0</span>;</span>
-<span class="line-old">  public static final double <span class="ts-before">kMaxAngleDeg</span>   = <span class="ts-before">90.0</span>;</span>
-<span class="line-new">  public static final double <span class="ts-after">kMaxAngleDeg</span> = <span class="ts-after">90.0</span>;</span>
-<span class="line-add"></span>
-<span class="line-add">  // Stepped-move finish window.</span>
-<span class="line-add">  public static final double kAngleToleranceDeg = 0.5;</span>
-<span class="line">}</span>
-</pre></div></div>
-
-        <p><strong>ScoopIO.java</strong> — back to <code>setAngleDeg</code>:</p>
-<div class="code-window" data-code="  default void updateInputs(ScoopIOInputs inputs) {}
-
-  default void setAngleDeg(double angleDeg) { }
-}">
-<div class="cw-head"><span class="cw-title">ScoopIO.java — rename setter back</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-<div class="code-region" style="counter-reset: ln 14;">
-<pre class="cb">
-<span class="line">  default void updateInputs(ScoopIOInputs inputs) {}</span>
-<span class="line"></span>
-<span class="line-old">  default void <span class="ts-before">setAngle</span>(double angleDeg) {}</span>
-<span class="line-new">  default void <span class="ts-after">setAngleDeg</span>(double angleDeg) { }</span>
-<span class="line">}</span>
-</pre></div></div>
-
-        <p><strong>ScoopIOSim.java</strong> and <strong>ScoopIOXRP.java</strong> — same rename, <code>setAngle</code> → <code>setAngleDeg</code>, in both files' <code>@Override</code> method.</p>
-
-        <p><strong>Scoop.java</strong> — the full rework: drop the Goal enum, restore the slew-capable angle API, add the Mechanism2d canvas and <code>setBaseHeightMeters()</code>:</p>
-<div class="code-window" data-code="// Copyright (c) 2026 BearBots FRC Team 6964
-// Open Source Software; you can modify and/or share it under the terms of
-// the MIT License available in the root directory of this project.
-
-package frc.robot.subsystems.scoop;
-
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import org.littletonrobotics.junction.Logger;
-import frc.robot.Constants;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.util.Color;
-import edu.wpi.first.wpilibj.util.Color8Bit;
-
-import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
-import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
-import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
-
-public class Scoop extends SubsystemBase {
-  private final ScoopIO io;
-  private final ScoopIOInputsAutoLogged inputs = new ScoopIOInputsAutoLogged();
-
-  private double targetAngleDeg = ScoopConstants.kDefaultAngleDeg;
-
-  // Mechanism2d: height matches Elevator's canvas (0.2) so the elevator height it rides on
-  // (added in setBaseHeightMeters) reads at the correct proportion. Kept wider than tall
-  // since the scoop ligament sweeps side to side, unlike the elevator's straight vertical rail.
-  // Root is shifted 4 inches forward (+X) to match the scoop's real mounting position.
-  private static final double kForwardOffsetMeters = Units.inchesToMeters(11.0);
-  private static final double kRootBaseX = 0.1 + kForwardOffsetMeters;
-  private static final double kRootBaseY = 0.02;
-  private final LoggedMechanism2d mechanism =
-      new LoggedMechanism2d(0.2 + kForwardOffsetMeters, 0.2);
-  private final LoggedMechanismRoot2d root = mechanism.getRoot(&quot;ScoopPivot&quot;, kRootBaseX, kRootBaseY);
-  private final LoggedMechanismLigament2d scoopLigament =
-      root.append(new LoggedMechanismLigament2d(&quot;Scoop&quot;, 0.05, 0, 3.25, new Color8Bit(Color.kDarkGray)));
-  private Pose3d componentPose = new Pose3d();
-
-  public Scoop(ScoopIO io) {
-    this.io = io;
-  }
-
-  // Single source of truth. Every setpoint, named or raw, lands here.
-  public void setAngleDeg(double angleDeg) {
-    targetAngleDeg = MathUtil.clamp(
-        angleDeg,
-        ScoopConstants.kMinAngleDeg,
-        ScoopConstants.kMaxAngleDeg);
-  }
-
-  // Jump to a setpoint immediately. Bind to a button:
-  //   button.onTrue(xxx.setAngleDegCommand(XxxConstants.kDeployedAngleDeg));
-  public Command setAngleDegCommand(double angleDeg) {
-    return runOnce(() -&gt; setAngleDeg(angleDeg));
-  }
-
-  // Slew to a setpoint at a capped rate, finish within tolerance.
-  public Command setAngleDegSteppedCommand(double angleDeg, double degPerSec) {
-    double target = MathUtil.clamp(
-        angleDeg,
-        ScoopConstants.kMinAngleDeg,
-        ScoopConstants.kMaxAngleDeg);
-    return run(() -&gt; {
-      double step = degPerSec * Constants.kLoopPeriodSecs;
-      double delta = MathUtil.clamp(target - targetAngleDeg, -step, step);
-      setAngleDeg(targetAngleDeg + delta);
-    }).until(() -&gt; Math.abs(target - targetAngleDeg)
-        &lt; ScoopConstants.kAngleToleranceDeg);
-  }
-
-  @Override
-  public void periodic() {
-    io.updateInputs(inputs);
-    Logger.processInputs(&quot;Scoop&quot;, inputs);
-    Logger.recordOutput(&quot;Scoop/TargetAngleDeg&quot;, targetAngleDeg);
-
-    // FLAT, CARRY, DUMP
-    scoopLigament.setAngle(inputs.commandedAngleDeg - 45);
-    Logger.recordOutput(&quot;Scoop/Mechanism2d&quot;, mechanism);
-    componentPose = new Pose3d(0.0, 0.0, 0.0,
-        new Rotation3d(0.0, Math.toRadians(scoopLigament.getAngle()), 0.0));
-
-    io.setAngleDeg(targetAngleDeg);
-  }
-
-  /** Returns the current 3D pose of the scoop for AdvantageScope aggregation. */
-  public Pose3d getComponentPose() {
-    return componentPose;
-  }
-
-  /**
-   * Shifts the scoop's Mechanism2d root to track the elevator carriage it rides on, so the
-   * 2D scoop ligament visually rises and lowers with the elevator. Called from Robot.java,
-   * which is the only place that knows about both subsystems.
-   */
-  public void setBaseHeightMeters(double heightMeters) {
-    root.setPosition(kRootBaseX, kRootBaseY + heightMeters);
-  }
-}">
-<div class="cw-head"><span class="cw-title">REPLACE - Scoop.java</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-<div class="code-region" style="counter-reset: ln 0;">
-<pre class="cb">
-<span class="line">// Copyright (c) 2026 BearBots FRC Team 6964</span>
-<span class="line">// Open Source Software; you can modify and/or share it under the terms of</span>
-<span class="line">// the MIT License available in the root directory of this project.</span>
-<span class="line"></span>
-<span class="line">package frc.robot.subsystems.scoop;</span>
-<span class="line"></span>
-<span class="line">import edu.wpi.first.math.MathUtil;</span>
-<span class="line">import edu.wpi.first.wpilibj2.command.Command;</span>
-<span class="line">import edu.wpi.first.wpilibj2.command.SubsystemBase;</span>
-<span class="line-del">import org.littletonrobotics.junction.AutoLogOutput;</span>
-<span class="line">import org.littletonrobotics.junction.Logger;</span>
-<span class="line-add">import frc.robot.Constants;</span>
-<span class="line-add">import edu.wpi.first.math.geometry.Pose3d;</span>
-<span class="line-add">import edu.wpi.first.math.geometry.Rotation3d;</span>
-<span class="line-add">import edu.wpi.first.math.util.Units;</span>
-<span class="line-add">import edu.wpi.first.wpilibj.util.Color;</span>
-<span class="line-add">import edu.wpi.first.wpilibj.util.Color8Bit;</span>
-<span class="line-add"></span>
-<span class="line-add">import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;</span>
-<span class="line-add">import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;</span>
-<span class="line-add">import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;</span>
-<span class="line"></span>
-<span class="line">public class Scoop extends SubsystemBase {</span>
-<span class="line-del">  public enum Goal {</span>
-<span class="line-del">    FLAT,</span>
-<span class="line-del">    CARRY,</span>
-<span class="line-del">    DUMP</span>
-<span class="line-del">  }</span>
-<span class="line-del"></span>
-<span class="line">  private final ScoopIO io;</span>
-<span class="line">  private final ScoopIOInputsAutoLogged inputs = new ScoopIOInputsAutoLogged();</span>
-<span class="line"></span>
-<span class="line-del">  @AutoLogOutput(key = "Scoop/Goal")</span>
-<span class="line-del">  private Goal goal = Goal.FLAT;</span>
-<span class="line-add">  private double targetAngleDeg = ScoopConstants.kDefaultAngleDeg;</span>
-<span class="line-add"></span>
-<span class="line-add">  // Mechanism2d: height matches Elevator's canvas (0.2) so the elevator height it rides on</span>
-<span class="line-add">  // (added in setBaseHeightMeters) reads at the correct proportion. Kept wider than tall</span>
-<span class="line-add">  // since the scoop ligament sweeps side to side, unlike the elevator's straight vertical rail.</span>
-<span class="line-add">  // Root is shifted 4 inches forward (+X) to match the scoop's real mounting position.</span>
-<span class="line-add">  private static final double kForwardOffsetMeters = Units.inchesToMeters(11.0);</span>
-<span class="line-add">  private static final double kRootBaseX = 0.1 + kForwardOffsetMeters;</span>
-<span class="line-add">  private static final double kRootBaseY = 0.02;</span>
-<span class="line-add">  private final LoggedMechanism2d mechanism =</span>
-<span class="line-add">      new LoggedMechanism2d(0.2 + kForwardOffsetMeters, 0.2);</span>
-<span class="line-add">  private final LoggedMechanismRoot2d root = mechanism.getRoot("ScoopPivot", kRootBaseX, kRootBaseY);</span>
-<span class="line-add">  private final LoggedMechanismLigament2d scoopLigament =</span>
-<span class="line-add">      root.append(new LoggedMechanismLigament2d("Scoop", 0.05, 0, 3.25, new Color8Bit(Color.kDarkGray)));</span>
-<span class="line-add">  private Pose3d componentPose = new Pose3d();</span>
-<span class="line"></span>
-<span class="line">  public Scoop(ScoopIO io) {</span>
-<span class="line">    this.io = io;</span>
-<span class="line">  }</span>
-<span class="line"></span>
-<span class="line-del">  public void setGoal(Goal newGoal) {</span>
-<span class="line-del">    goal = newGoal;</span>
-<span class="line-del">  }</span>
-<span class="line-del"></span>
-<span class="line-del">  public Command setGoalCommand(Goal newGoal) {</span>
-<span class="line-del">    return runOnce(() -&gt; setGoal(newGoal));</span>
-<span class="line-del">  }</span>
-<span class="line-del"></span>
-<span class="line-del">  public void stop() {</span>
-<span class="line-del">    setGoal(Goal.FLAT);</span>
-<span class="line-del">  }</span>
-<span class="line-add">  // Single source of truth. Every setpoint, named or raw, lands here.</span>
-<span class="line-add">  public void setAngleDeg(double angleDeg) {</span>
-<span class="line-add">    targetAngleDeg = MathUtil.clamp(</span>
-<span class="line-add">        angleDeg,</span>
-<span class="line-add">        ScoopConstants.kMinAngleDeg,</span>
-<span class="line-add">        ScoopConstants.kMaxAngleDeg);</span>
-<span class="line-add">  }</span>
-<span class="line-add"></span>
-<span class="line-add">  // Jump to a setpoint immediately. Bind to a button:</span>
-<span class="line-add">  //   button.onTrue(xxx.setAngleDegCommand(XxxConstants.kDeployedAngleDeg));</span>
-<span class="line-add">  public Command setAngleDegCommand(double angleDeg) {</span>
-<span class="line-add">    return runOnce(() -&gt; setAngleDeg(angleDeg));</span>
-<span class="line-add">  }</span>
-<span class="line-add"></span>
-<span class="line-add">  // Slew to a setpoint at a capped rate, finish within tolerance.</span>
-<span class="line-add">  public Command setAngleDegSteppedCommand(double angleDeg, double degPerSec) {</span>
-<span class="line-add">    double target = MathUtil.clamp(</span>
-<span class="line-add">        angleDeg,</span>
-<span class="line-add">        ScoopConstants.kMinAngleDeg,</span>
-<span class="line-add">        ScoopConstants.kMaxAngleDeg);</span>
-<span class="line-add">    return run(() -&gt; {</span>
-<span class="line-add">      double step = degPerSec * Constants.kLoopPeriodSecs;</span>
-<span class="line-add">      double delta = MathUtil.clamp(target - targetAngleDeg, -step, step);</span>
-<span class="line-add">      setAngleDeg(targetAngleDeg + delta);</span>
-<span class="line-add">    }).until(() -&gt; Math.abs(target - targetAngleDeg)</span>
-<span class="line-add">        &lt; ScoopConstants.kAngleToleranceDeg);</span>
-<span class="line-add">  }</span>
-<span class="line"></span>
-<span class="line">  @Override</span>
-<span class="line">  public void periodic() {</span>
-<span class="line">    io.updateInputs(inputs);</span>
-<span class="line">    Logger.processInputs("Scoop", inputs);</span>
-<span class="line-del">    </span>
-<span class="line-del">    double targetAngleDeg = switch (goal) {</span>
-<span class="line-del">      case FLAT -&gt; ScoopConstants.kFlatAngleDeg;</span>
-<span class="line-del">      case CARRY -&gt; ScoopConstants.kCarryAngleDeg;</span>
-<span class="line-del">      case DUMP -&gt; ScoopConstants.kDumpAngleDeg;</span>
-<span class="line-del">    };</span>
-<span class="line-del"></span>
-<span class="line-del">    double clamped = MathUtil.clamp(</span>
-<span class="line-del">        targetAngleDeg,</span>
-<span class="line-del">        ScoopConstants.kMinAngleDeg,</span>
-<span class="line-del">        ScoopConstants.kMaxAngleDeg);</span>
-<span class="line-del"></span>
-<span class="line-del">    // io.setAngle assumes a matching IO setter of that name.</span>
-<span class="line-del">    // If the IO method is named differently (e.g. setAngle, setPosition,</span>
-<span class="line-del">    // setSpeed), rename the call below instead of the mirrored tabstop.</span>
-<span class="line-del">    io.setAngle(clamped);</span>
-<span class="line-add">    Logger.recordOutput("Scoop/TargetAngleDeg", targetAngleDeg);</span>
-<span class="line-add"></span>
-<span class="line-add">    // FLAT, CARRY, DUMP</span>
-<span class="line-add">    scoopLigament.setAngle(inputs.commandedAngleDeg - 45);</span>
-<span class="line-add">    Logger.recordOutput("Scoop/Mechanism2d", mechanism);</span>
-<span class="line-add">    componentPose = new Pose3d(0.0, 0.0, 0.0,</span>
-<span class="line-add">        new Rotation3d(0.0, Math.toRadians(scoopLigament.getAngle()), 0.0));</span>
-<span class="line-add"></span>
-<span class="line-add">    io.setAngleDeg(targetAngleDeg);</span>
-<span class="line">  }</span>
-<span class="line-add"></span>
-<span class="line-add">  /** Returns the current 3D pose of the scoop for AdvantageScope aggregation. */</span>
-<span class="line-add">  public Pose3d getComponentPose() {</span>
-<span class="line-add">    return componentPose;</span>
-<span class="line-add">  }</span>
-<span class="line-add"></span>
-<span class="line-add">  /**</span>
-<span class="line-add">   * Shifts the scoop's Mechanism2d root to track the elevator carriage it rides on, so the</span>
-<span class="line-add">   * 2D scoop ligament visually rises and lowers with the elevator. Called from Robot.java,</span>
-<span class="line-add">   * which is the only place that knows about both subsystems.</span>
-<span class="line-add">   */</span>
-<span class="line-add">  public void setBaseHeightMeters(double heightMeters) {</span>
-<span class="line-add">    root.setPosition(kRootBaseX, kRootBaseY + heightMeters);</span>
-<span class="line-add">  }</span>
-<span class="line">}</span>
-</pre></div></div>
-
-        <div class="code-annotation">Two things happened at once here, on purpose: the Goal enum is gone (back to the direct angle API Arm already uses), and the visualization returns with one new piece - <code>setBaseHeightMeters()</code>, which shifts the scoop's Mechanism2d root vertically. Nothing inside Scoop.java computes that height itself; it's handed in from outside, because only <span class="file-badge">Robot.java</span> can see both the elevator and the scoop at once.</div>
-
-        <p>Build. Should compile - both subsystems have their getters back and Scoop.java speaks the same angle API as Arm again.</p>
-      </div>
-    </div><!-- /step v3 -->
-
-    <!-- ── Step 4: Robot.java — compose poses ───────────────────────────── -->
-    <div class="sb-step" id="sbstep-v4">
-      <div class="sb-step-header" onclick="sbToggle('sbstep-v4')">
-        <div class="sb-step-num">4</div>
         <div class="sb-step-title">Compose the poses in Robot.java</div>
         <div class="sb-step-chevron">▶</div>
       </div>
@@ -1850,7 +1474,7 @@ import edu.wpi.first.math.geometry.Transform3d;">
 
         <p>Build and simulate. Open AdvantageScope's <a href="https://docs.advantagescope.org/tab-reference/mechanism/" target="_blank" rel="noopener">Mechanism tab</a> and drag on <code>Elevator/Mechanism2d</code> and <code>Scoop/Mechanism2d</code> - the scoop ligament should visibly rise and fall as the elevator moves. Then open a <a href="https://docs.advantagescope.org/tab-reference/3d-field/" target="_blank" rel="noopener">3D Field tab</a> and add <code>FinalComponentPoses</code> - all three components (arm, elevator, scoop) should track correctly, with the scoop riding the elevator carriage.</p>
       </div>
-    </div><!-- /step v4 -->
+    </div><!-- /step v3 -->
 
     </div><!-- /step-builder -->
 
