@@ -9,10 +9,10 @@ import org.littletonrobotics.junction.AutoLog;
 public interface ScoopIO {
   @AutoLog
   static class ScoopIOInputs {
-    public double commandedAngleDeg = ScoopConstants.kFlatAngleDeg;
+    public double commandedAngleDeg = ScoopConstants.kDefaultAngleDeg;
   }
 
   default void updateInputs(ScoopIOInputs inputs) {}
 
-  default void setAngle(double angleDeg) {}
+  default void setAngleDeg(double angleDeg) {}
 }

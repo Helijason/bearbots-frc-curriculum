@@ -10,7 +10,7 @@ import static frc.robot.Constants.ScoopHardware.*;
 public class ScoopIOXRP implements ScoopIO {
   private final XRPServo servo = new XRPServo(kScoopServoDeviceNumber);
 
-  private double commandedAngleDeg = ScoopConstants.kFlatAngleDeg;
+  private double commandedAngleDeg = ScoopConstants.kDefaultAngleDeg;
 
   @Override
   public void updateInputs(ScoopIOInputs inputs) {
@@ -18,7 +18,7 @@ public class ScoopIOXRP implements ScoopIO {
   }
 
   @Override
-  public void setAngle(double angleDeg) {
+  public void setAngleDeg(double angleDeg) {
     commandedAngleDeg = angleDeg;
     servo.setAngle(commandedAngleDeg);
   }

@@ -85,7 +85,8 @@ public class Robot extends LoggedRobot {
 
     // Aggregate all component poses for AdvantageScope 3D view.
     Logger.recordOutput("FinalComponentPoses", new Pose3d[] {
-      robotContainer.getArm().getComponentPose()
+      robotContainer.getArm().getComponentPose(),
+      robotContainer.getScoop().getComponentPose()
     });
   }
 
