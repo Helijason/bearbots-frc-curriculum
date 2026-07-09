@@ -1364,15 +1364,115 @@ import static frc.robot.Constants.kMaxBatteryVoltage;">
       </div>
     </div><!-- /step v1 -->
 
-    <!-- ── Step 2: RobotContainer getters ───────────────────────────────── -->
+    <!-- ── Step 2: Scoop.java — add visualization ───────────────────────── -->
     <div class="sb-step" id="sbstep-v2">
       <div class="sb-step-header" onclick="sbToggle('sbstep-v2')">
         <div class="sb-step-num">2</div>
-        <div class="sb-step-title">Add getElevator() and getScoop()</div>
+        <div class="sb-step-title">Add visualization to Scoop.java</div>
         <div class="sb-step-chevron">▶</div>
       </div>
       <div class="sb-step-body">
-        <p><span class="file-badge">Robot.java</span> needs to reach both subsystems to aggregate poses and to feed the elevator's height into the scoop. Add both getters back to <span class="file-badge">RobotContainer.java</span>.</p>
+        <p>The scoop already draws a 2D ligament and reports a 3D pose - that part came from Lesson 04. What it's missing is a way to know <em>where it's mounted</em>. Add one import, swap the hardcoded canvas numbers for offset-aware constants, and add a method the elevator's height can drive.</p>
+
+<div class="code-window" data-code="import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;">
+<div class="cw-head"><span class="cw-title">Scoop.java — import</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<div class="code-region" style="counter-reset: ln 11;">
+<pre class="cb">
+<span class="line">import edu.wpi.first.math.geometry.Pose3d;</span>
+<span class="line">import edu.wpi.first.math.geometry.Rotation3d;</span>
+<span class="line-add">import edu.wpi.first.math.util.Units;</span>
+<span class="line">import edu.wpi.first.wpilibj.util.Color;</span>
+<span class="line">import edu.wpi.first.wpilibj.util.Color8Bit;</span>
+</pre></div></div>
+
+<div class="code-window" data-code="  private double targetAngleDeg = ScoopConstants.kDefaultAngleDeg;
+
+  // Mechanism2d: height matches Elevator's canvas (0.2) so the elevator height it rides on
+  // (added in setBaseHeightMeters) reads at the correct proportion. Kept wider than tall
+  // since the scoop ligament sweeps side to side, unlike the elevator's straight vertical rail.
+  // Root is shifted 4 inches forward (+X) to match the scoop's real mounting position.
+  private static final double kForwardOffsetMeters = Units.inchesToMeters(11.0);
+  private static final double kRootBaseX = 0.1 + kForwardOffsetMeters;
+  private static final double kRootBaseY = 0.02;
+  private final LoggedMechanism2d mechanism =
+      new LoggedMechanism2d(0.2 + kForwardOffsetMeters, 0.2);
+  private final LoggedMechanismRoot2d root = mechanism.getRoot(&quot;ScoopPivot&quot;, kRootBaseX, kRootBaseY);
+  private final LoggedMechanismLigament2d scoopLigament =
+      root.append(new LoggedMechanismLigament2d(&quot;Scoop&quot;, 0.05, 0, 3.25, new Color8Bit(Color.kDarkGray)));
+  private Pose3d componentPose = new Pose3d();">
+<div class="cw-head"><span class="cw-title">Scoop.java — Mechanism2d canvas + root</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<div class="code-region" style="counter-reset: ln 24;">
+<pre class="cb">
+<span class="line">  private double targetAngleDeg = ScoopConstants.kDefaultAngleDeg;</span>
+<span class="line"></span>
+<span class="line-del">  // Mechanism2d: vertical column on the front of the robot</span>
+<span class="line-del">  private final LoggedMechanism2d mechanism = new LoggedMechanism2d(2, 1);</span>
+<span class="line-del">  private final LoggedMechanismRoot2d root = mechanism.getRoot("ScoopPivot", 1.125, 0.016);</span>
+<span class="line-add">  // Mechanism2d: height matches Elevator's canvas (0.2) so the elevator height it rides on</span>
+<span class="line-add">  // (added in setBaseHeightMeters) reads at the correct proportion. Kept wider than tall</span>
+<span class="line-add">  // since the scoop ligament sweeps side to side, unlike the elevator's straight vertical rail.</span>
+<span class="line-add">  // Root is shifted 4 inches forward (+X) to match the scoop's real mounting position.</span>
+<span class="line-add">  private static final double kForwardOffsetMeters = Units.inchesToMeters(11.0);</span>
+<span class="line-add">  private static final double kRootBaseX = 0.1 + kForwardOffsetMeters;</span>
+<span class="line-add">  private static final double kRootBaseY = 0.02;</span>
+<span class="line-add">  private final LoggedMechanism2d mechanism =</span>
+<span class="line-add">      new LoggedMechanism2d(0.2 + kForwardOffsetMeters, 0.2);</span>
+<span class="line-add">  private final LoggedMechanismRoot2d root = mechanism.getRoot("ScoopPivot", kRootBaseX, kRootBaseY);</span>
+<span class="line">  private final LoggedMechanismLigament2d scoopLigament =</span>
+<span class="line">      root.append(new LoggedMechanismLigament2d("Scoop", 0.05, 0, 3.25, new Color8Bit(Color.kDarkGray)));</span>
+<span class="line">  private Pose3d componentPose = new Pose3d();</span>
+</pre></div></div>
+
+<div class="code-window" data-code="  /** Returns the current 3D pose of the scoop for AdvantageScope aggregation. */
+  public Pose3d getComponentPose() {
+    return componentPose;
+  }
+
+  /**
+   * Shifts the scoop's Mechanism2d root to track the elevator carriage it rides on, so the
+   * 2D scoop ligament visually rises and lowers with the elevator. Called from Robot.java,
+   * which is the only place that knows about both subsystems.
+   */
+  public void setBaseHeightMeters(double heightMeters) {
+    root.setPosition(kRootBaseX, kRootBaseY + heightMeters);
+  }
+}">
+<div class="cw-head"><span class="cw-title">Scoop.java — new method</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<div class="code-region" style="counter-reset: ln 79;">
+<pre class="cb">
+<span class="line">  /** Returns the current 3D pose of the scoop for AdvantageScope aggregation. */</span>
+<span class="line">  public Pose3d getComponentPose() {</span>
+<span class="line">    return componentPose;</span>
+<span class="line">  }</span>
+<span class="line"></span>
+<span class="line-add">  /**</span>
+<span class="line-add">   * Shifts the scoop's Mechanism2d root to track the elevator carriage it rides on, so the</span>
+<span class="line-add">   * 2D scoop ligament visually rises and lowers with the elevator. Called from Robot.java,</span>
+<span class="line-add">   * which is the only place that knows about both subsystems.</span>
+<span class="line-add">   */</span>
+<span class="line-add">  public void setBaseHeightMeters(double heightMeters) {</span>
+<span class="line-add">    root.setPosition(kRootBaseX, kRootBaseY + heightMeters);</span>
+<span class="line-add">  }</span>
+<span class="line">}</span>
+</pre></div></div>
+
+        <div class="code-annotation">The canvas resize and offset constants exist so this Mechanism2d lines up visually with the elevator's - same forward-shift idea as <code>Elevator.java</code>, just measured to the scoop's own mounting point. <code>setBaseHeightMeters</code> doesn't do anything yet - nothing calls it. That's the next step.</div>
+      </div>
+    </div><!-- /step v2 -->
+
+    <!-- ── Step 3: RobotContainer getter ────────────────────────────────── -->
+    <div class="sb-step" id="sbstep-v3">
+      <div class="sb-step-header" onclick="sbToggle('sbstep-v3')">
+        <div class="sb-step-num">3</div>
+        <div class="sb-step-title">Add getElevator()</div>
+        <div class="sb-step-chevron">▶</div>
+      </div>
+      <div class="sb-step-body">
+        <p><span class="file-badge">Robot.java</span> needs to reach both subsystems to aggregate poses and to feed the elevator's height into the scoop. <span class="file-badge">RobotContainer.java</span> already exposes <code>getScoop()</code> - add the matching getter for the elevator (and drop the redundant fully-qualified return type on <code>getScoop()</code> while you're in here).</p>
 
 <div class="code-window" data-code="  public frc.robot.subsystems.arm.Arm getArm() {
     return arm;
@@ -1386,7 +1486,7 @@ import static frc.robot.Constants.kMaxBatteryVoltage;">
     return scoop;
   }
 }">
-<div class="cw-head"><span class="cw-title">RobotContainer.java — add getters</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<div class="cw-head"><span class="cw-title">RobotContainer.java — add getter</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
 <div class="code-region" style="counter-reset: ln 150;">
 <pre class="cb">
 <span class="line">  public frc.robot.subsystems.arm.Arm getArm() {</span>
@@ -1397,18 +1497,19 @@ import static frc.robot.Constants.kMaxBatteryVoltage;">
 <span class="line-add">    return elevator;</span>
 <span class="line-add">  }</span>
 <span class="line-add"></span>
-<span class="line-add">  public Scoop getScoop() {</span>
-<span class="line-add">    return scoop;</span>
-<span class="line-add">  }</span>
+<span class="line-old">  public frc.robot.subsystems.scoop.Scoop getScoop() {</span>
+<span class="line-new">  public Scoop getScoop() {</span>
+<span class="line">    return scoop;</span>
+<span class="line">  }</span>
 <span class="line">}</span>
 </pre></div></div>
       </div>
-    </div><!-- /step v2 -->
+    </div><!-- /step v3 -->
 
-    <!-- ── Step 3: Robot.java — compose poses ───────────────────────────── -->
-    <div class="sb-step" id="sbstep-v3">
-      <div class="sb-step-header" onclick="sbToggle('sbstep-v3')">
-        <div class="sb-step-num">3</div>
+    <!-- ── Step 4: Robot.java — compose poses ───────────────────────────── -->
+    <div class="sb-step" id="sbstep-v4">
+      <div class="sb-step-header" onclick="sbToggle('sbstep-v4')">
+        <div class="sb-step-num">4</div>
         <div class="sb-step-title">Compose the poses in Robot.java</div>
         <div class="sb-step-chevron">▶</div>
       </div>
@@ -1464,8 +1565,9 @@ import edu.wpi.first.math.geometry.Transform3d;">
 <span class="line-add"></span>
 <span class="line-new">    Logger.recordOutput("FinalComponentPoses", new Pose3d[] {</span>
 <span class="line">      robotContainer.getArm().getComponentPose(),</span>
+<span class="line-del">      robotContainer.getScoop().getComponentPose()</span>
 <span class="line-add">      elevatorPose,</span>
-<span class="line-add">      scoopPose</span>
+<span class="line-new" style="background:#FBE6C0;">      scoopPose</span>
 <span class="line">    });</span>
 <span class="line">  }</span>
 </pre></div></div>
@@ -1474,7 +1576,7 @@ import edu.wpi.first.math.geometry.Transform3d;">
 
         <p>Build and simulate. Open AdvantageScope's <a href="https://docs.advantagescope.org/tab-reference/mechanism/" target="_blank" rel="noopener">Mechanism tab</a> and drag on <code>Elevator/Mechanism2d</code> and <code>Scoop/Mechanism2d</code> - the scoop ligament should visibly rise and fall as the elevator moves. Then open a <a href="https://docs.advantagescope.org/tab-reference/3d-field/" target="_blank" rel="noopener">3D Field tab</a> and add <code>FinalComponentPoses</code> - all three components (arm, elevator, scoop) should track correctly, with the scoop riding the elevator carriage.</p>
       </div>
-    </div><!-- /step v3 -->
+    </div><!-- /step v4 -->
 
     </div><!-- /step-builder -->
 
