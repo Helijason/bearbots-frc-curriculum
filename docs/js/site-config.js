@@ -81,7 +81,7 @@ const SITE_CONFIG = {
       tools: "VS Code WPILib, AdvantageKit, AdvantageScope",
       duration: "3 hours",
       filename: "lesson-05-closed-loop.html",
-      status: "review",  // "ready", "current", "review", "soon"
+      status: "ready",  // "ready", "current", "review", "soon"
       prev: "04",
       next: "06"
     },
