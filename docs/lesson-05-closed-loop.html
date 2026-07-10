@@ -520,6 +520,7 @@ public class ElevatorIOSim implements ElevatorIO {
             positionMeters,
             ElevatorConstants.kMinHeightMeters,
             ElevatorConstants.kMaxHeightMeters);
+    // Hit a hard stop: zero velocity so stall-based homing can detect it.
     if (clamped != positionMeters) {
       velocityMetersPerSec = 0.0;
     }
@@ -586,6 +587,7 @@ public class ElevatorIOSim implements ElevatorIO {
 <span class="line">            positionMeters,</span>
 <span class="line">            ElevatorConstants.kMinHeightMeters,</span>
 <span class="line">            ElevatorConstants.kMaxHeightMeters);</span>
+<span class="line">    <span class="cm">// Hit a hard stop: zero velocity so stall-based homing can detect it.</span></span>
 <span class="line">    if (clamped != positionMeters) {</span>
 <span class="line">      velocityMetersPerSec = 0.0;</span>
 <span class="line">    }</span>
@@ -631,9 +633,9 @@ public class ElevatorIOSim implements ElevatorIO {
         <p style="padding-left:0.6rem;">New file, type <code>akioimpl-motor-xrp</code>, press <kbd>Tab</kbd>. This one has three real tab stops - the motor and encoder channel numbers.</p>
 
         <ol style="margin:0.75rem 0;padding-left:1.9rem;">
-          <li style="margin-bottom:0.4rem;padding-left:0.6rem;">Motor channel: <code>kMotorChannel</code> → <code>Constants.ElevatorHardware.kElevatorMotorChannel</code></li>
-          <li style="margin-bottom:0.4rem;padding-left:0.6rem;">Encoder channel A: <code>kEncoderChannelA</code> → <code>Constants.ElevatorHardware.kElevatorEncoderChannelA</code></li>
-          <li style="padding-left:0.6rem;">Encoder channel B: <code>kEncoderChannelB</code> → <code>Constants.ElevatorHardware.kElevatorEncoderChannelB</code></li>
+          <li style="margin-bottom:0.4rem;padding-left:0.6rem;">Motor channel: <code>kMotorChannel</code> → <code>kElevatorMotorChannel</code></li>
+          <li style="margin-bottom:0.4rem;padding-left:0.6rem;">Encoder channel A: <code>kEncoderChannelA</code> → <code>kElevatorEncoderChannelA</code></li>
+          <li style="padding-left:0.6rem;">Encoder channel B: <code>kEncoderChannelB</code> → <code>kElevatorEncoderChannelB</code></li>
         </ol>
 
         <p style="padding-left:0.6rem;">The result should match this exactly:</p>
@@ -1156,7 +1158,7 @@ import frc.robot.subsystems.scoop.Scoop;">
         .onTrue(elevator.homeCommand());
   }">
 <div class="cw-head"><span class="cw-title">RobotContainer.java — bumper + Start bindings</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-<div class="code-region" style="counter-reset: ln 108;">
+<div class="code-region" style="counter-reset: ln 117;">
 <pre class="cb">
 <span class="line">    new POVButton(controller, 180) // 2</span>
 <span class="line">        .onTrue(scoop.setAngleDegCommand(ScoopConstants.kDumpAngleDeg));</span>
