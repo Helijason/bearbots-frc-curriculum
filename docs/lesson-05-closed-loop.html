@@ -1270,7 +1270,7 @@ import static frc.robot.Constants.kMaxBatteryVoltage;">
 
   public Elevator(ElevatorIO io) {">
 <div class="cw-head"><span class="cw-title">Elevator.java — Mechanism2d + pose fields</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-<div class="code-region" style="counter-reset: ln 68;">
+<div class="code-region" style="counter-reset: ln 69;">
 <pre class="cb">
 <span class="line">  private double targetMeters = ElevatorConstants.kDefaultHeightMeters;</span>
 <span class="line">  private boolean homing = false;</span>
@@ -1309,7 +1309,7 @@ import static frc.robot.Constants.kMaxBatteryVoltage;">
   @Override
   public void periodic() {">
 <div class="cw-head"><span class="cw-title">Elevator.java — new getters</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-<div class="code-region" style="counter-reset: ln 146;">
+<div class="code-region" style="counter-reset: ln 143;">
 <pre class="cb">
 <span class="line">  public void stop() {</span>
 <span class="line">    io.stop();</span>
@@ -1329,7 +1329,8 @@ import static frc.robot.Constants.kMaxBatteryVoltage;">
 <span class="line">  public void periodic() {</span>
 </pre></div></div>
 
-<div class="code-window" data-code="    io.updateInputs(inputs);
+<div class="code-window" data-code="  public void periodic() {
+    io.updateInputs(inputs);
     Logger.processInputs(&quot;Elevator&quot;, inputs);
 
     // Update 2D visualization. Floor the length so the carriage stays visible at height 0.
@@ -1344,8 +1345,9 @@ import static frc.robot.Constants.kMaxBatteryVoltage;">
 
     if (homing) return;   // homing owns the motor; skip PID this loop">
 <div class="cw-head"><span class="cw-title">Elevator.java — periodic() additions</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-<div class="code-region" style="counter-reset: ln 162;">
+<div class="code-region" style="counter-reset: ln 158;">
 <pre class="cb">
+<span class="line">  public void periodic() {</span>
 <span class="line">    io.updateInputs(inputs);</span>
 <span class="line">    Logger.processInputs("Elevator", inputs);</span>
 <span class="line"></span>
@@ -1407,7 +1409,7 @@ import edu.wpi.first.wpilibj.util.Color8Bit;">
       root.append(new LoggedMechanismLigament2d(&quot;Scoop&quot;, 0.05, 0, 3.25, new Color8Bit(Color.kDarkGray)));
   private Pose3d componentPose = new Pose3d();">
 <div class="cw-head"><span class="cw-title">Scoop.java — Mechanism2d canvas + root</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-<div class="code-region" style="counter-reset: ln 24;">
+<div class="code-region" style="counter-reset: ln 25;">
 <pre class="cb">
 <span class="line">  private double targetAngleDeg = ScoopConstants.kDefaultAngleDeg;</span>
 <span class="line"></span>
@@ -1444,7 +1446,7 @@ import edu.wpi.first.wpilibj.util.Color8Bit;">
   }
 }">
 <div class="cw-head"><span class="cw-title">Scoop.java — new method</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-<div class="code-region" style="counter-reset: ln 79;">
+<div class="code-region" style="counter-reset: ln 88;">
 <pre class="cb">
 <span class="line">  /** Returns the current 3D pose of the scoop for AdvantageScope aggregation. */</span>
 <span class="line">  public Pose3d getComponentPose() {</span>
@@ -1489,7 +1491,7 @@ import edu.wpi.first.wpilibj.util.Color8Bit;">
   }
 }">
 <div class="cw-head"><span class="cw-title">RobotContainer.java — add getter</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-<div class="code-region" style="counter-reset: ln 150;">
+<div class="code-region" style="counter-reset: ln 146;">
 <pre class="cb">
 <span class="line">  public frc.robot.subsystems.arm.Arm getArm() {</span>
 <span class="line">    return arm;</span>
@@ -1548,7 +1550,7 @@ import edu.wpi.first.math.geometry.Transform3d;">
     });
   }">
 <div class="cw-head"><span class="cw-title">Robot.java — robotPeriodic()</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-<div class="code-region" style="counter-reset: ln 85;">
+<div class="code-region" style="counter-reset: ln 84;">
 <pre class="cb">
 <span class="line">    CommandScheduler.getInstance().run();</span>
 <span class="line"></span>
@@ -1623,8 +1625,8 @@ import edu.wpi.first.math.geometry.Transform3d;">
       <div class="sb-step-body">
         <p>Open a <a href="https://docs.advantagescope.org/tab-reference/line-graph/" target="_blank" rel="noopener">Line Graph tab</a> and drag in:</p>
         <ul class="task-list">
-          <li><strong>Left axis</strong> - <code>AdvantageKit/RealOutputs/Elevator/AppliedVolts</code></li>
-          <li><strong>Right axis</strong> - <code>AdvantageKit/RealOutputs/Elevator/PositionMeters</code></li>
+          <li><strong>Left axis</strong> - <code>AdvantageKit/Elevator/AppliedVolts</code></li>
+          <li><strong>Right axis</strong> - <code>AdvantageKit/Elevator/PositionMeters</code></li>
           <li><strong>Right axis</strong> - <code>AdvantageKit/RealOutputs/Elevator/TargetMeters</code>, both on the same axis so they overlay directly</li>
         </ul>
         <p>Command a height change with the bumpers. The target line jumps instantly; the position line is what actually chases it. The gap between them, and how it closes, is the PID response you'll be reading all through the tiers below.</p>
