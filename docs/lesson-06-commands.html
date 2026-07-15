@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title></title>
+  <link rel="stylesheet" href="frc-curriculum.css">
+  <style>
+    /* ── Lesson 06 local styles ─────────────────────────────── */
+
+    /* Trigger binding table */
+    .ref-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+      font-size: 0.88rem;
+    }
+    .ref-table th {
+      background: var(--teal);
+      color: var(--white);
+      text-align: left;
+      padding: 0.5rem 0.75rem;
+      font-weight: 600;
+    }
+    .ref-table td {
+      padding: 0.45rem 0.75rem;
+      border-bottom: 1px solid var(--gray-border);
+      color: var(--mid);
+      vertical-align: top;
+    }
+    .ref-table tr:last-child td { border-bottom: none; }
+    .ref-table td:first-child { color: var(--dark); font-family: var(--mono); font-size: 0.82rem; white-space: nowrap; }
+    .ref-table tr:nth-child(even) td { background: var(--gray-bg); }
+
+    /* Quick-reference table */
+    .qr-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+      font-size: 0.88rem;
+    }
+    .qr-table th {
+      background: var(--dark);
+      color: var(--white);
+      text-align: left;
+      padding: 0.5rem 0.75rem;
+      font-weight: 600;
+    }
+    .qr-table td {
+      padding: 0.45rem 0.75rem;
+      border-bottom: 1px solid var(--gray-border);
+      color: var(--mid);
+      vertical-align: top;
+    }
+    .qr-table tr:last-child td { border-bottom: none; }
+    .qr-table td:first-child { color: var(--mid); }
+    .qr-table td:last-child { color: var(--dark); font-family: var(--mono); font-size: 0.82rem; white-space: nowrap; }
+    .qr-table tr:nth-child(even) td { background: var(--gray-bg); }
+
+    /* Go deeper links */
+    .go-deeper h3 { margin-top: 1.5rem; }
+    .go-deeper ul { margin: 0.5rem 0 1rem 1.5rem; }
+    .go-deeper li { margin-bottom: 0.4rem; color: var(--mid); font-size: 0.9rem; }
+    .go-deeper li a { color: var(--teal); }
+    .go-deeper li a:hover { text-decoration: underline; }
+
+    /* Section separators inside a part */
+    .section-divider { border: none; border-top: 1px solid var(--gray-border); margin: 2rem 0; }
+  </style>
+</head>
+<body data-lesson="06">
+
+<div class="wip-banner"></div>
+
+<header class="site-header"></header>
+
+<div class="page-container">
+
+  <div class="lesson-header">
+    <div class="lesson-meta"></div>
+    <h1 class="lesson-title"></h1>
+    <div class="lesson-subtitle"></div>
+    <div class="lesson-info-bar"></div>
+  </div>
+
+  <nav class="section-nav">
+    <button class="section-nav-btn active" data-section="framework">Part 1 — The framework</button>
+    <button class="section-nav-btn" data-section="robot">Part 2 — Your robot</button>
+    <button class="section-nav-btn" data-section="reference">Part 3 — Reference</button>
+  </nav>
+
+
+  <!-- ═══════════════════════════════════════════════════════
+       PART 1 — THE FRAMEWORK
+       Sections 1–5: what commands are, factories, composition,
+       decorators, triggers
+       ═══════════════════════════════════════════════════════ -->
+  <div class="lesson-section active" id="section-framework">
+
+    <p>Read this once. Then start coding. Come back to it when you get stuck.</p>
+
+    <div class="hf-box hf-warning">
+      <span class="hf-label">About the code in here</span>
+      <p>Most of it is made up. Method names like <code>carryCommand</code> or <code>driveDistanceCommand</code> are examples, not things sitting in your project waiting to be called. This reference teaches you the <strong>patterns</strong>. What your robot does, and what you name it, is your decision. Copying these examples line for line will not get you a working robot. Understanding them will.</p>
+    </div>
+
+
+    <!-- ── 1. What a command is ──────────────────────────── -->
+    <h2>1. What a command is</h2>
+
+    <p>A subsystem is a piece of the robot: the Elevator, the Scoop, the Drive. A command is a <strong>job</strong> you give to a subsystem.</p>
+
+    <p>Every command answers four questions:</p>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <h4><code>initialize()</code></h4>
+        <p>What do I do when I start?</p>
+        <p>Runs once, right when the job begins.</p>
+      </div>
+      <div class="info-card">
+        <h4><code>execute()</code></h4>
+        <p>What do I do while I run?</p>
+        <p>Runs 50 times a second while the job is going.</p>
+      </div>
+      <div class="info-card">
+        <h4><code>isFinished()</code></h4>
+        <p>Am I done?</p>
+        <p>Returns <code>true</code> when the job is over.</p>
+      </div>
+      <div class="info-card">
+        <h4><code>end()</code></h4>
+        <p>What do I do when I stop?</p>
+        <p>Runs once, when the job finishes or gets canceled.</p>
+      </div>
+    </div>
+
+    <p>Some commands finish on their own. "Drive to 0.3 meters" finishes when the elevator gets there. Some commands never finish on their own. "Keep reading the joystick" runs until something stops it.</p>
+
+    <h3>Requirements</h3>
+
+    <p>When you write a command, you say which subsystems it <strong>requires</strong>. This is the most important rule in the whole system:</p>
+
+    <div class="hf-box hf-warning">
+      <span class="hf-label">The one rule you cannot break</span>
+      <p><strong>Only one command can require a subsystem at a time.</strong></p>
+      <p>If a command is using the Elevator and you start a new command that also wants the Elevator, the scheduler <strong>cancels the old one</strong> and runs the new one. It never runs both. That means two pieces of code can never fight over the same motor.</p>
+    </div>
+
+    <p>The thing that keeps track of all of this is called the <strong>CommandScheduler</strong>. It runs every 20 milliseconds and asks each running command: are you done yet? It handles the canceling for you. You never call it yourself.</p>
+
+    <hr class="section-divider">
+
+
+    <!-- ── 2. Making commands: the four factories ─────────── -->
+    <h2>2. Making commands: the four factories</h2>
+
+    <p>You do not need to write a whole class every time you want a job. Your subsystem has four built-in <strong>factories</strong>. A factory is a method that builds a command for you. These four automatically require the subsystem they were called on.</p>
+
+    <div class="code-block"><pre>
+<span class="cm">// Do one thing, then finish immediately.</span>
+<span class="kw">this</span>.runOnce(() -&gt; setAngle(<span class="num">90</span>));
+
+<span class="cm">// Do a thing over and over, forever, until something cancels you.</span>
+<span class="kw">this</span>.run(() -&gt; nudgeTargetHeight(<span class="num">0.001</span>));
+
+<span class="cm">// Do one thing at the start, another thing at the end. Runs forever in between.</span>
+<span class="kw">this</span>.startEnd(() -&gt; setVoltage(<span class="num">3</span>), () -&gt; setVoltage(<span class="num">0</span>));
+
+<span class="cm">// Same as run, but also does something when you stop.</span>
+<span class="kw">this</span>.runEnd(() -&gt; setVoltage(<span class="num">3</span>), () -&gt; setVoltage(<span class="num">0</span>));
+</pre></div>
+
+    <p>The <code>() -&gt;</code> part is a <strong>lambda</strong>. It means "here is some code, but do not run it yet. Run it later when you need it." You are handing the command a set of instructions, not the answer.</p>
+
+    <h3>Why factories instead of methods</h3>
+
+    <p>You could write <code>elevator.setHeight(0.3)</code> as a plain method and call it. But then nothing owns the Elevator, and nothing stops two parts of your code from calling it at the same time. When you return a command instead, the scheduler knows who owns what and can cancel cleanly. That is the whole trade.</p>
+
+    <hr class="section-divider">
+
+
+    <!-- ── 3. Putting commands together ──────────────────── -->
+    <h2>3. Putting commands together</h2>
+
+    <p>Commands are Lego bricks. You snap them together and the thing you get back is <strong>also a command</strong>. That means you can snap that together with something else. It goes as deep as you want.</p>
+
+    <h3>At the same time</h3>
+
+    <div class="code-block"><pre>
+elevator.goToHeightMetersCommand(<span class="num">0.3</span>)
+    .alongWith(scoop.setAngleCommand(<span class="num">90</span>));
+</pre></div>
+    <div class="code-annotation">Both start now. The whole thing finishes when <strong>both</strong> are done.</div>
+
+    <h3>One after the other</h3>
+
+    <div class="code-block"><pre>
+elevator.goToHeightMetersCommand(<span class="num">0.3</span>)
+    .andThen(scoop.setAngleCommand(<span class="num">0</span>));
+</pre></div>
+    <div class="code-annotation">The elevator goes up. Only when it gets there does the scoop move.</div>
+
+    <h3>With a pause in between</h3>
+
+    <div class="code-block"><pre>
+elevator.goToHeightMetersCommand(<span class="num">0.3</span>)
+    .andThen(Commands.waitSeconds(<span class="num">0.3</span>))
+    .andThen(scoop.setAngleCommand(<span class="num">0</span>));
+</pre></div>
+    <div class="code-annotation">Elevator up, wait a third of a second for it to settle, then dump.</div>
+
+    <h3>Race: first one done wins</h3>
+
+    <div class="code-block"><pre>
+Commands.race(driveForward(), waitForSensor());
+</pre></div>
+    <div class="code-annotation">Whichever finishes first ends the whole thing and cancels the other. Useful when you want "do this until that happens."</div>
+
+    <div class="hf-box hf-warning">
+      <span class="hf-label">The rule that bites people</span>
+      <p>Once you put a command <strong>inside</strong> a group, it belongs to that group. You cannot also schedule it on its own somewhere else. If you try, the code crashes with an error. Build a fresh one instead. This is why factories are nice: calling <code>scoop.setAngleCommand(90)</code> twice gives you two separate commands.</p>
+    </div>
+
+    <hr class="section-divider">
+
+
+    <!-- ── 4. Decorators ─────────────────────────────────── -->
+    <h2>4. Decorators</h2>
+
+    <p>A decorator is a method you tack onto a command to change it. You get a new, modified command back.</p>
+
+    <div class="code-block"><pre>
+<span class="cm">// Give up after 2 seconds no matter what.</span>
+homeCommand().withTimeout(<span class="num">2</span>);
+
+<span class="cm">// Stop as soon as this becomes true.</span>
+driveForward().until(() -&gt; getDistance() &gt; <span class="num">1.0</span>);
+
+<span class="cm">// Always run this when you stop, even if you got canceled.</span>
+goToHeightCommand(<span class="num">0.3</span>).finallyDo(() -&gt; holdCurrentHeight());
+</pre></div>
+
+    <p><code>finallyDo</code> is the safety net. If a command gets canceled halfway through, <code>finallyDo</code> still runs. Use it to make sure the robot ends in a safe state instead of whatever weird spot it got interrupted in.</p>
+
+    <hr class="section-divider">
+
+
+    <!-- ── 5. Triggers: buttons to commands ──────────────── -->
+    <h2>5. Triggers: buttons to commands</h2>
+
+    <p>A <strong>Trigger</strong> is a thing that is either true or false right now. A button being held is a trigger. So is "the elevator is above 0.2 meters."</p>
+
+    <p>You connect a trigger to a command with one of these:</p>
+
+    <table class="ref-table">
+      <thead>
+        <tr><th>Binding</th><th>What happens</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>.onTrue(cmd)</td>
+          <td>Fires <strong>once</strong> when the button is pressed. The command keeps going after you let go.</td>
+        </tr>
+        <tr>
+          <td>.whileTrue(cmd)</td>
+          <td>Runs the command <strong>only while held</strong>. Cancels it the moment you release.</td>
+        </tr>
+        <tr>
+          <td>.onFalse(cmd)</td>
+          <td>Fires once when you release.</td>
+        </tr>
+        <tr>
+          <td>.toggleOnTrue(cmd)</td>
+          <td>Press to start. Press again to stop.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="code-block"><pre>
+controller.a().onTrue(scoop.setAngleCommand(<span class="num">45</span>));
+controller.rightBumper().onTrue(superstructure.carryCommand());
+</pre></div>
+
+    <div class="hf-box hf-brain">
+      <span class="hf-label">The single most common bug in this lesson</span>
+      <p><strong><code>onTrue</code> vs <code>whileTrue</code> is the difference between a light switch and a doorbell.</strong> Pick the wrong one and the robot does the wrong thing even though the code compiles fine.</p>
+      <p><code>onTrue</code> starts a job and walks away. <code>whileTrue</code> holds the job for as long as you hold the button. If you want a jog button that stops when you release, use <code>whileTrue</code>. If you want a button that sets a position and stays there, use <code>onTrue</code>.</p>
+    </div>
+
+    <h3>Combining triggers</h3>
+
+    <p>A trigger is just a true/false question, so you can mix them like you mix questions in real life.</p>
+
+    <div class="code-block"><pre>
+<span class="cm">// Only score if the bumper is held AND the elevator is high enough.</span>
+controller.rightBumper().and(elevator.isAboveScoringHeight())
+    .onTrue(superstructure.scoreCommand());
+
+<span class="cm">// Ignore accidental taps. Button must be held 0.2 seconds to count.</span>
+controller.a().debounce(<span class="num">0.2</span>).onTrue(scoop.setAngleCommand(<span class="num">45</span>));
+</pre></div>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">These don't exist yet</span>
+      <p><code>isAboveScoringHeight()</code> does not exist. Neither does <code>scoreCommand()</code>. They are examples of things <strong>you</strong> might decide your robot needs, and then write. That is true of most method names in this section. The pattern is what you are learning. The names are yours to pick.</p>
+    </div>
+
+    <p><code>.and()</code>, <code>.or()</code>, and <code>.negate()</code> build new triggers out of old ones. You can also build a trigger out of anything at all:</p>
+
+    <div class="code-block"><pre>
+<span class="kw">new</span> Trigger(() -&gt; elevator.getHeightMeters() &gt; <span class="num">0.25</span>)
+    .onTrue(Commands.print(<span class="str">"Elevator is high!"</span>));
+</pre></div>
+
+  </div><!-- /section-framework -->
+
+
+  <!-- ═══════════════════════════════════════════════════════
+       PART 2 — YOUR ROBOT
+       Sections 6–9: default commands, jog pattern,
+       superstructure, autonomous
+       ═══════════════════════════════════════════════════════ -->
+  <div class="lesson-section" id="section-robot">
+
+
+    <!-- ── 6. Default commands ───────────────────────────── -->
+    <h2>6. Default commands</h2>
+
+    <p>There is one more way a command can start. A subsystem can have a <strong>default command</strong>: the job it does whenever nothing else is asking for it.</p>
+
+    <div class="code-block"><pre>
+drive.setDefaultCommand(
+    drive.run(() -&gt; drive.arcadeDrive(
+        -controller.getLeftY(), -controller.getRightX())));
+</pre></div>
+
+    <p>That is how driving works. No button, no trigger. The Drive subsystem is idle, so the scheduler starts its default command, which reads the sticks forever.</p>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">The magic part</span>
+      <p>If you schedule an auto-drive command, it requires the Drive, so the default gets canceled. When the auto-drive finishes, the Drive is idle again, so the scheduler <strong>restarts the default automatically</strong>. Stick control comes right back. You wrote zero lines of code to switch between them.</p>
+    </div>
+
+    <p>Rules for default commands:</p>
+    <ul>
+      <li>It must require that subsystem and nothing else.</li>
+      <li>It should never finish on its own. If it does, the scheduler just restarts it, which is usually not what you meant.</li>
+      <li>Not every subsystem needs one. The Elevator holds its setpoint in <code>periodic()</code> already, and the Scoop is a servo that holds its angle by itself. Neither needs a default.</li>
+    </ul>
+
+    <hr class="section-divider">
+
+
+    <!-- ── 7. The jog pattern ────────────────────────────── -->
+    <h2>7. The jog pattern</h2>
+
+    <p>You want to hold a button and have the elevator creep up. Let go and have it stay put.</p>
+
+    <div class="code-block"><pre>
+controller.povUp().whileTrue(
+    elevator.run(() -&gt; elevator.nudgeTargetHeight(kJogRateMetersPerLoop)));
+
+controller.povDown().whileTrue(
+    elevator.run(() -&gt; elevator.nudgeTargetHeight(-kJogRateMetersPerLoop)));
+</pre></div>
+
+    <p>Read it out loud: <strong>while the up button is held, run this over and over: bump the target a little higher.</strong></p>
+
+    <p>Here is the part worth slowing down for. You are <strong>not</strong> moving the elevator. You are moving the elevator's <strong>target</strong>. The PID controller in <code>periodic()</code> is always chasing the target, whether or not any command is running. So:</p>
+
+    <ul>
+      <li>Hold the button, target climbs, PID chases it, elevator rises.</li>
+      <li>Let go, command ends, target stops moving, PID parks the elevator right there and holds it against gravity.</li>
+    </ul>
+
+    <p>If you had sent voltage directly instead, letting go would mean zero volts, and the elevator would sag down. Moving the target gets you a free hold. That is why we do it this way.</p>
+
+    <div class="hf-box hf-sidebar">
+      <span class="hf-label">Why "per loop," not "per second"</span>
+      <p><code>kJogRateMetersPerLoop</code> is per <strong>loop</strong>, not per second. The robot loops 50 times a second, so a rate of 0.002 meters per loop is 0.1 meters per second. The name says "per loop" so nobody accidentally multiplies by time twice.</p>
+    </div>
+
+    <h3>Clamp inside the subsystem</h3>
+
+    <div class="code-block"><pre>
+<span class="kw">public void</span> nudgeTargetHeight(<span class="kw">double</span> deltaMeters) {
+  targetHeightMeters = MathUtil.clamp(
+      targetHeightMeters + deltaMeters, kMinHeight, kMaxHeight);
+}
+</pre></div>
+
+    <div class="code-annotation">This is real. <code>nudgeTargetHeight</code> exists on <span class="file-badge">Elevator.java</span>.</div>
+
+    <p>The clamp lives in the subsystem, not in the button binding. Hold the button at the top and the target just pins against the max. It cannot run away past the top of the elevator and leave the real elevator behind, which would mean a long ugly wait when you finally jog back down.</p>
+
+    <hr class="section-divider">
+
+
+    <!-- ── 8. The Superstructure ─────────────────────────── -->
+    <h2>8. The Superstructure</h2>
+
+    <p>The Elevator knows about the elevator. The Scoop knows about the scoop. Neither of them knows about the other, and it should stay that way.</p>
+
+    <p>But "carry a ball" is not an elevator job or a scoop job. It is a <strong>robot</strong> job that uses both. That job needs a home, and that home is the <strong>Superstructure</strong>.</p>
+
+    <p>The Superstructure holds both subsystems and hands out named actions:</p>
+
+    <div class="code-block"><pre>
+<span class="kw">public class</span> Superstructure {
+  <span class="kw">private final</span> Elevator elevator;
+  <span class="kw">private final</span> Scoop scoop;
+
+  <span class="kw">public</span> Superstructure(Elevator elevator, Scoop scoop) {
+    <span class="kw">this</span>.elevator = elevator;
+    <span class="kw">this</span>.scoop = scoop;
+  }
+
+  <span class="kw">public</span> Command carryCommand() {
+    <span class="kw">return</span> elevator.goToHeightMetersCommand(kCarryHeight)
+        .alongWith(scoop.setAngleCommand(kCarryAngle));
+  }
+
+  <span class="kw">public</span> Command scoreCommand() {
+    <span class="kw">return</span> elevator.goToHeightMetersCommand(kScoreHeight)
+        .andThen(Commands.waitSeconds(<span class="num">0.3</span>))
+        .andThen(scoop.setAngleCommand(kDumpAngle));
+  }
+
+  <span class="kw">public</span> Command stowCommand() {
+    <span class="kw">return</span> elevator.goToHeightMetersCommand(kStowHeight)
+        .alongWith(scoop.setAngleCommand(kFlatAngle));
+  }
+}
+</pre></div>
+
+    <div class="hf-box hf-warning">
+      <span class="hf-label">Illustrative — this doesn't exist yet</span>
+      <p><code>carryCommand</code>, <code>scoreCommand</code>, and <code>stowCommand</code> are made-up names. <code>Superstructure.java</code> does not exist in your project. This shows the pattern. The actual commands your robot needs, and what you call them, are your decisions.</p>
+    </div>
+
+    <p>That is the whole idea. The Superstructure does not touch motors. It does not have an IO layer. It just knows the <strong>recipes</strong>: which subsystem commands to combine, in what order, with what timing.</p>
+
+    <p>Notice <code>carryCommand</code> uses <code>alongWith</code> and <code>scoreCommand</code> uses <code>andThen</code>. That is a real engineering decision, not a style choice. Carry can happen all at once because nothing collides. Scoring has to wait for the elevator to settle before dumping, or the ball goes to the wrong place.</p>
+
+    <h3>How this plays with your jog buttons</h3>
+
+    <p>This is the payoff. Watch:</p>
+
+    <ol>
+      <li>You are jogging the elevator up with the D-pad.</li>
+      <li>You press the bumper for <code>carryCommand</code>.</li>
+      <li><code>carryCommand</code> requires the Elevator. The scheduler sees the jog command also requires the Elevator, so it <strong>cancels the jog</strong>.</li>
+      <li><code>carryCommand</code> drives to the carry setpoint and finishes.</li>
+      <li>You press the D-pad again. The jog command starts fresh, nudging from wherever the elevator is now.</li>
+    </ol>
+
+    <div class="hf-box hf-brain">
+      <span class="hf-label">Why we built all of this</span>
+      <p>You did not write a single line of code to make that work. No mode flag, no <code>isManualMode</code> boolean, no if-statement asking whether it is okay to move. The requirement system did all of it. <strong>This is why we bothered with subsystems and requirements in the first place.</strong> Everything you have built for five lessons was setting up this moment.</p>
+    </div>
+
+    <hr class="section-divider">
+
+
+    <!-- ── 9. Autonomous is just a command ──────────────── -->
+    <h2>9. Autonomous is just a command</h2>
+
+    <p>Autonomous is not a special mode with special rules. It is one command that gets scheduled when the match starts.</p>
+
+    <p>Because compositions are commands, your whole auto routine is one expression:</p>
+
+    <div class="code-block"><pre>
+<span class="kw">public</span> Command scoreAndParkAuto() {
+  <span class="kw">return</span> drive.driveDistanceCommand(<span class="num">0.5</span>)
+      .andThen(superstructure.scoreCommand())
+      .andThen(drive.driveDistanceCommand(-<span class="num">0.3</span>));
+}
+</pre></div>
+
+    <div class="hf-box hf-warning">
+      <span class="hf-label">Nothing in that block exists yet</span>
+      <p><code>driveDistanceCommand</code>, <code>scoreCommand</code>, <code>scoreAndParkAuto</code>: those are all methods someone decided to write. Your Drive subsystem does not have a drive-a-distance command until you add one. Look at what Orbit Odyssey actually scores, decide what your robot needs to do, then build the pieces and snap them together. The shape above is the shape yours will have. The parts are your call.</p>
+    </div>
+
+    <p>Every routine you write is a <code>Command</code>, so you can put several in a chooser and pick one from the dashboard before the match:</p>
+
+    <div class="code-block"><pre>
+autoChooser.addDefaultOption(<span class="str">"Score and Park"</span>, scoreAndParkAuto());
+autoChooser.addOption(<span class="str">"Just Park"</span>, drive.driveDistanceCommand(<span class="num">0.5</span>));
+</pre></div>
+
+    <p>Give every auto step a timeout. If a mechanism jams, <code>.withTimeout(2)</code> moves you on instead of freezing the rest of the routine for the whole match.</p>
+
+    <div class="code-block"><pre>
+superstructure.scoreCommand().withTimeout(<span class="num">2</span>)
+</pre></div>
+
+  </div><!-- /section-robot -->
+
+
+  <!-- ═══════════════════════════════════════════════════════
+       PART 3 — REFERENCE
+       Sections 10–12, Go deeper, Quick reference
+       ═══════════════════════════════════════════════════════ -->
+  <div class="lesson-section" id="section-reference">
+
+
+    <!-- ── 10. Seeing what your commands are doing ────────── -->
+    <h2>10. Seeing what your commands are doing</h2>
+
+    <p>You cannot fix what you cannot see. AdvantageScope shows you which commands are running, right now, in a list. When the robot does something weird, look there first. Nine times out of ten you will see a command you thought was finished still sitting there, or a command that got canceled the instant it started because something else grabbed the subsystem.</p>
+
+    <p>Give your commands names so that list is readable:</p>
+
+    <div class="code-block"><pre>
+superstructure.carryCommand().withName(<span class="str">"Carry"</span>);
+</pre></div>
+
+    <p>Without a name you get something like <code>ParallelCommandGroup</code>, which tells you nothing when there are four of them.</p>
+
+    <hr class="section-divider">
+
+
+    <!-- ── 11. Mistakes everyone makes ──────────────────── -->
+    <h2>11. Mistakes everyone makes</h2>
+
+    <p><strong>Using <code>onTrue</code> when you meant <code>whileTrue</code>.</strong> Press the jog button, elevator runs to the ceiling, never stops. <code>onTrue</code> starts a job and walks away.</p>
+
+    <p><strong>Reusing a command object.</strong> Save a command in a variable, put it in two groups, and the code crashes. Call the factory each time instead. <code>scoop.setAngleCommand(90)</code> builds a fresh one every call.</p>
+
+    <p><strong>A default command that finishes.</strong> It restarts instantly, forever, and <code>initialize()</code> fires 50 times a second. If your subsystem twitches, check this.</p>
+
+    <p><strong>Forgetting requirements.</strong> If you use <code>Commands.run()</code> (the static one) instead of <code>this.run()</code> (your subsystem's), you have to pass the subsystem in yourself or nothing owns it and two commands will fight.</p>
+
+    <p><strong>Doing math in the button binding.</strong> Clamps, limits, and unit conversions belong inside the subsystem. The binding should say what you want, not how to do it safely.</p>
+
+    <hr class="section-divider">
+
+
+    <!-- ── 12. Where this goes on a real FRC robot ────────── -->
+    <h2>12. Where this goes on a real FRC robot (preview only)</h2>
+
+    <p>Some robots have parts that will smash into each other if you move them in the wrong order. On those robots, the Superstructure gets bigger. It holds an enum of every legal state (<code>STOW</code>, <code>INTAKE</code>, <code>SCORE_HIGH</code>), and a <code>periodic()</code> method that only allows moves between states that are safe. Big teams like 6328 and 254 build them this way.</p>
+
+    <p>The XRP does not have that problem. The elevator and scoop cannot hit each other. So we use command composition, which does the same job with a fraction of the code.</p>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">When to reach for the state machine</span>
+      <p>Reach for the state machine when the robot forces you to. Not before.</p>
+    </div>
+
+    <hr class="section-divider">
+
+
+    <!-- ── Go deeper ─────────────────────────────────────── -->
+    <h2>Go deeper on your own</h2>
+
+    <p>These are the actual docs the pros use. Read them in this order.</p>
+
+    <div class="go-deeper">
+
+      <h3>Start here</h3>
+      <ul>
+        <li><a href="https://docs.wpilib.org/en/stable/docs/software/commandbased/index.html" target="_blank" rel="noopener">What Is Command-Based Programming?</a> The big picture, in WPILib's own words.</li>
+        <li><a href="https://docs.wpilib.org/en/stable/docs/software/commandbased/commands.html" target="_blank" rel="noopener">Commands</a> The four lifecycle methods, all the factories, and requirements.</li>
+        <li><a href="https://docs.wpilib.org/en/stable/docs/software/commandbased/subsystems.html" target="_blank" rel="noopener">Subsystems</a> Why subsystems hide their hardware, and why factories beat plain methods.</li>
+      </ul>
+
+      <h3>Once that clicks</h3>
+      <ul>
+        <li><a href="https://docs.wpilib.org/en/stable/docs/software/commandbased/command-compositions.html" target="_blank" rel="noopener">Command Compositions</a> Sequence, parallel, race, deadline, and the "you cannot reuse a composed command" rule.</li>
+        <li><a href="https://docs.wpilib.org/en/stable/docs/software/commandbased/binding-commands-to-triggers.html" target="_blank" rel="noopener">Binding Commands to Triggers</a> Every binding type with examples. Read this if <code>onTrue</code> vs <code>whileTrue</code> still feels fuzzy.</li>
+        <li><a href="https://docs.wpilib.org/en/stable/docs/software/commandbased/structuring-command-based-project.html" target="_blank" rel="noopener">Structuring a Command-Based Robot Project</a> Why subsystems are private fields in RobotContainer and why that matters.</li>
+      </ul>
+
+      <h3>When you want to know how it really works</h3>
+      <ul>
+        <li><a href="https://docs.wpilib.org/en/stable/docs/software/commandbased/command-scheduler.html" target="_blank" rel="noopener">The Command Scheduler</a> Walks through a single 20 ms loop, step by step. This is the article that makes everything else make sense.</li>
+      </ul>
+
+      <h3>Look things up</h3>
+      <ul>
+        <li><a href="https://github.wpilib.org/allwpilib/docs/release/java/edu/wpi/first/wpilibj2/command/Commands.html" target="_blank" rel="noopener">Commands class</a> All static factories.</li>
+        <li><a href="https://github.wpilib.org/allwpilib/docs/release/java/edu/wpi/first/wpilibj2/command/Command.html" target="_blank" rel="noopener">Command class</a> All decorators.</li>
+        <li><a href="https://github.wpilib.org/allwpilib/docs/release/java/edu/wpi/first/wpilibj2/command/button/Trigger.html" target="_blank" rel="noopener">Trigger class</a> All bindings, plus <code>debounce</code>.</li>
+      </ul>
+
+      <h3>Real robot code</h3>
+      <ul>
+        <li><a href="https://docs.wpilib.org/en/stable/docs/software/examples-tutorials/wpilib-examples.html" target="_blank" rel="noopener">WPILib command-based examples</a> Look at HatchBotInlined first. It is small and it is the pattern we use.</li>
+        <li><a href="https://docs.advantagekit.org/" target="_blank" rel="noopener">AdvantageKit docs</a> The logging and replay framework in your project.</li>
+        <li><a href="https://github.com/Mechanical-Advantage" target="_blank" rel="noopener">Team 6328 open-source robot code</a> The team that wrote AdvantageKit. Read a Superstructure file and see how far this idea goes.</li>
+      </ul>
+
+    </div><!-- /go-deeper -->
+
+    <hr class="section-divider">
+
+
+    <!-- ── Quick reference ───────────────────────────────── -->
+    <h2>Quick reference</h2>
+
+    <table class="qr-table">
+      <thead>
+        <tr><th>I want to&hellip;</th><th>Use</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Do one thing and finish</td><td>runOnce()</td></tr>
+        <tr><td>Do a thing over and over</td><td>run()</td></tr>
+        <tr><td>Do two things at once</td><td>.alongWith()</td></tr>
+        <tr><td>Do two things in order</td><td>.andThen()</td></tr>
+        <tr><td>Pause between steps</td><td>Commands.waitSeconds()</td></tr>
+        <tr><td>Give up after a while</td><td>.withTimeout()</td></tr>
+        <tr><td>Stop when something happens</td><td>.until()</td></tr>
+        <tr><td>Clean up even if canceled</td><td>.finallyDo()</td></tr>
+        <tr><td>Fire once on a press</td><td>.onTrue()</td></tr>
+        <tr><td>Run only while held</td><td>.whileTrue()</td></tr>
+        <tr><td>Run whenever nothing else does</td><td>setDefaultCommand()</td></tr>
+        <tr><td>Require two conditions</td><td>.and()</td></tr>
+        <tr><td>Ignore accidental taps</td><td>.debounce()</td></tr>
+        <tr><td>Name it for AdvantageScope</td><td>.withName()</td></tr>
+      </tbody>
+    </table>
+
+  </div><!-- /section-reference -->
+
+
+  <nav class="section-nav section-nav--bottom">
+    <button class="section-nav-btn active" data-section="framework">Part 1 — The framework</button>
+    <button class="section-nav-btn" data-section="robot">Part 2 — Your robot</button>
+    <button class="section-nav-btn" data-section="reference">Part 3 — Reference</button>
+  </nav>
+
+</div><!-- /page-container -->
+<footer class="site-footer"></footer>
+
+<script src="js/site-config.js"></script>
+<script src="js/frc-curriculum.js"></script>
+</body>
+</html>
