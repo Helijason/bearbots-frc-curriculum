@@ -88,21 +88,21 @@ const SITE_CONFIG = {
     "06": {
       module: 2,
       lesson: "06",
-      title: "Competition Prep",
-      subtitle: "Commands, autonomous routines, and strategy. Write and tune everything you need for Orbit Odyssey. Competition is next session.",
+      title: "Commmands",
+      subtitle: "Commands overview and independent work on your code for Orbit Odyssey. Competition is in two weeks.",
       description: "Commands, the AutoChooser pattern, autonomous routines for Orbit Odyssey. Lock strategy, tune on the real field, commit code.",
       hardware: "Laptop/XRP robot",
       prereq: "Lesson 05",
       tools: "VS Code WPILib, AdvantageKit, AdvantageScope",
       duration: "3 hours",
       filename: "lesson-06-competition-prep.html",
-      status: "soon",  // "ready", "current", "review", "soon"
+      status: "review",  // "ready", "current", "review", "soon"
       prev: "05",
       next: "07"
     },
     "07": {
       module: 2,
-      lesson: "07",
+      lesson: "08",
       title: "Competition Day - Orbit Odyssey",
       subtitle: "Everything you built. One field. Real matches. 1v1 round-robin - every student competes individually.",
       description: "Final tweaks, practice runs, competitive matches, awards, and curriculum close.",
