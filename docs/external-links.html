@@ -29,7 +29,7 @@
 
   <div class="lesson-header">
     <h1 class="lesson-title">External Links</h1>
-    <div class="lesson-subtitle">Every outside resource cited in Lessons 01-05, gathered in one place - organized by lesson, in the order each one comes up.</div>
+    <div class="lesson-subtitle">Every outside resource cited in Lessons 01-06, gathered in one place - organized by lesson, in the order each one comes up.</div>
   </div>
 
   <div class="links-layout">
@@ -69,6 +69,23 @@
         <li><div><a href="https://docs.advantagescope.org/tab-reference/mechanism/" target="_blank" rel="noopener">AdvantageScope Mechanism Tab</a> - the 2D mechanism view used to watch the elevator and scoop move.</div></li>
         <li><div><a href="https://docs.advantagescope.org/tab-reference/3d-field/" target="_blank" rel="noopener">AdvantageScope 3D Field Tab</a> - composing Robot/Component/Mechanism poses into one field view.</div></li>
         <li><div><a href="https://docs.advantagescope.org/tab-reference/line-graph/" target="_blank" rel="noopener">AdvantageScope Line Graph Tab</a> - plotting setpoint vs. measured position to read a PID response.</div></li>
+      </ul>
+
+      <h2>Lesson 06 - Commands</h2>
+      <ul class="task-list">
+        <li><div><a href="https://docs.wpilib.org/en/stable/docs/software/commandbased/index.html" target="_blank" rel="noopener">What Is Command-Based Programming?</a> - the big picture, in WPILib's own words.</div></li>
+        <li><div><a href="https://docs.wpilib.org/en/stable/docs/software/commandbased/commands.html" target="_blank" rel="noopener">Commands</a> - the four lifecycle methods, all the factories, and requirements.</div></li>
+        <li><div><a href="https://docs.wpilib.org/en/stable/docs/software/commandbased/subsystems.html" target="_blank" rel="noopener">Subsystems</a> - why subsystems hide their hardware, and why factories beat plain methods.</div></li>
+        <li><div><a href="https://docs.wpilib.org/en/stable/docs/software/commandbased/command-compositions.html" target="_blank" rel="noopener">Command Compositions</a> - sequence, parallel, race, deadline, and the "you cannot reuse a composed command" rule.</div></li>
+        <li><div><a href="https://docs.wpilib.org/en/stable/docs/software/commandbased/binding-commands-to-triggers.html" target="_blank" rel="noopener">Binding Commands to Triggers</a> - every binding type with examples; read this if <code>onTrue</code> vs <code>whileTrue</code> still feels fuzzy.</div></li>
+        <li><div><a href="https://docs.wpilib.org/en/stable/docs/software/commandbased/structuring-command-based-project.html" target="_blank" rel="noopener">Structuring a Command-Based Robot Project</a> - why subsystems are private fields in RobotContainer and why that matters.</div></li>
+        <li><div><a href="https://docs.wpilib.org/en/stable/docs/software/commandbased/command-scheduler.html" target="_blank" rel="noopener">The Command Scheduler</a> - walks through a single 20 ms loop, step by step.</div></li>
+        <li><div><a href="https://github.wpilib.org/allwpilib/docs/release/java/edu/wpi/first/wpilibj2/command/Commands.html" target="_blank" rel="noopener">Commands class Javadoc</a> - all static factories.</div></li>
+        <li><div><a href="https://github.wpilib.org/allwpilib/docs/release/java/edu/wpi/first/wpilibj2/command/Command.html" target="_blank" rel="noopener">Command class Javadoc</a> - all decorators.</div></li>
+        <li><div><a href="https://github.wpilib.org/allwpilib/docs/release/java/edu/wpi/first/wpilibj2/command/button/Trigger.html" target="_blank" rel="noopener">Trigger class Javadoc</a> - all bindings, plus <code>debounce</code>.</div></li>
+        <li><div><a href="https://docs.wpilib.org/en/stable/docs/software/examples-tutorials/wpilib-examples.html" target="_blank" rel="noopener">WPILib Command-Based Examples</a> - HatchBotInlined is the one to read first; small and matches the pattern used in this course.</div></li>
+        <li><div><a href="https://docs.advantagekit.org/" target="_blank" rel="noopener">AdvantageKit Docs</a> - the logging and replay framework in your project.</div></li>
+        <li><div><a href="https://github.com/Mechanical-Advantage" target="_blank" rel="noopener">Team 6328 Open-Source Robot Code</a> - the team that wrote AdvantageKit; read a Superstructure file to see how far the command pattern goes.</div></li>
       </ul>
 
     </div><!-- /links-main -->
