@@ -90,7 +90,7 @@ const SITE_CONFIG = {
       lesson: "06",
       title: "Commmands",
       subtitle: "Commands overview and independent work on your code for Orbit Odyssey. Competition is in two weeks.",
-      description: "Commands, the AutoChooser pattern, autonomous routines for Orbit Odyssey. Lock strategy, tune on the real field, commit code.",
+      description: "Overview of building commands. Individual development of code for Orbit Odyssey game.",
       hardware: "Laptop/XRP robot",
       prereq: "Lesson 05",
       tools: "VS Code WPILib, AdvantageKit, AdvantageScope",
