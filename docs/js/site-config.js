@@ -95,7 +95,7 @@ const SITE_CONFIG = {
       prereq: "Lesson 05",
       tools: "VS Code WPILib, AdvantageKit, AdvantageScope",
       duration: "3 hours",
-      filename: "lesson-06-competition-prep.html",
+      filename: "lesson-06-commands.html",
       status: "review",  // "ready", "current", "review", "soon"
       prev: "05",
       next: "07"
