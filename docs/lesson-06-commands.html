@@ -86,7 +86,8 @@
   <nav class="section-nav">
     <button class="section-nav-btn active" data-section="framework">Part 1 — The framework</button>
     <button class="section-nav-btn" data-section="robot">Part 2 — Your robot</button>
-    <button class="section-nav-btn" data-section="reference">Part 3 — Reference</button>
+    <button class="section-nav-btn" data-section="auto">Part 3 — Autonomous</button>
+    <button class="section-nav-btn" data-section="reference">Part 4 — Reference</button>
   </nav>
 
 
@@ -217,6 +218,34 @@ Commands.race(driveForward(), waitForSensor());
 </pre></div>
     <div class="code-annotation">Whichever finishes first ends the whole thing and cancels the other. Useful when you want "do this until that happens."</div>
 
+    <h3>These have names: sequence and parallel</h3>
+
+    <p>The two moves above are the whole game. Commands run one after another are a <strong>sequence</strong>. Commands run at the same time are <strong>parallel</strong>. <code>.andThen()</code> and <code>.alongWith()</code> are the quick way to write them when you only have a couple. When the list gets long, the block forms read cleaner and do the exact same thing:</p>
+
+    <div class="code-block"><pre>
+<span class="cm">// Sequence: one, then the next, then the next.</span>
+Commands.sequence(
+    drive.driveDistanceCommand(<span class="num">0.5</span>),
+    superstructure.scoreCommand(),
+    drive.driveDistanceCommand(-<span class="num">0.3</span>));
+
+<span class="cm">// Parallel: all start together, done when the slowest finishes.</span>
+Commands.parallel(
+    elevator.goToHeightMetersCommand(<span class="num">0.3</span>),
+    scoop.setAngleCommand(<span class="num">90</span>));
+</pre></div>
+    <div class="code-annotation">Same result as chaining <code>.andThen</code> or <code>.alongWith</code>. Pick whichever is easier to read.</div>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">Three flavors of parallel</span>
+      <p>"At the same time" comes in three versions. They differ only in <strong>when the group ends</strong>.</p>
+      <ul>
+        <li><strong>Parallel</strong> (<code>Commands.parallel</code> / <code>.alongWith</code>) ends when <strong>all</strong> of them finish.</li>
+        <li><strong>Race</strong> (<code>Commands.race</code> / <code>.raceWith</code>) ends when the <strong>first</strong> one finishes, and cancels the rest.</li>
+        <li><strong>Deadline</strong> (<code>Commands.deadline</code>) ends when the <strong>one you name first</strong> finishes, and cancels the rest. Good for "run the intake while we drive for 2 seconds."</li>
+      </ul>
+    </div>
+
     <div class="hf-box hf-warning">
       <span class="hf-label">The rule that bites people</span>
       <p>Once you put a command <strong>inside</strong> a group, it belongs to that group. You cannot also schedule it on its own somewhere else. If you try, the code crashes with an error. Build a fresh one instead. This is why factories are nice: calling <code>scoop.setAngleCommand(90)</code> twice gives you two separate commands.</p>
@@ -242,6 +271,42 @@ goToHeightCommand(<span class="num">0.3</span>).finallyDo(() -&gt; holdCurrentHe
 </pre></div>
 
     <p><code>finallyDo</code> is the safety net. If a command gets canceled halfway through, <code>finallyDo</code> still runs. Use it to make sure the robot ends in a safe state instead of whatever weird spot it got interrupted in.</p>
+
+    <h3>Stringing decorators together</h3>
+
+    <p>A decorator hands you back a command, and a command is exactly what a decorator takes. So you can tack another one on. And another. Each one wraps everything to its left.</p>
+
+    <div class="code-block"><pre>
+homeCommand()
+    .withTimeout(<span class="num">2</span>)
+    .andThen(elevator.goToHeightMetersCommand(<span class="num">0.3</span>))
+    .withName(<span class="str">"Home then raise"</span>);
+</pre></div>
+    <div class="code-annotation">Home the elevator, but give up after 2 seconds. Then raise it. Then give the whole thing a name for AdvantageScope.</div>
+
+    <p>Read it top to bottom, left to right. <code>withTimeout(2)</code> only wraps <code>homeCommand()</code>, so the timeout covers the homing and nothing else. The <code>andThen</code> comes after that, so the raise starts once homing ends or times out. Change the order and you change what the robot does.</p>
+
+    <div class="hf-box hf-brain">
+      <span class="hf-label">Order changes the meaning</span>
+      <p>These two are not the same:</p>
+      <p><code>a().andThen(b()).withTimeout(2)</code> gives the whole sequence 2 seconds. If <code>a</code> eats all of it, <code>b</code> never runs.</p>
+      <p><code>a().withTimeout(2).andThen(b())</code> gives only <code>a</code> the 2 seconds, then always runs <code>b</code>.</p>
+      <p>When you are not sure what wraps what, add parentheses and make it obvious.</p>
+    </div>
+
+    <h3>Rules for decorators and compositions</h3>
+
+    <div class="hf-box hf-warning">
+      <span class="hf-label">Four rules that keep this from biting you</span>
+      <ul>
+        <li><strong>A decorated command is a new command. The original is spent.</strong> Once you tack a decorator on a command, or drop it into a group, that inner command belongs to the result. You cannot also schedule it on its own. Try it and the code crashes. Build a fresh one from the factory instead.</li>
+        <li><strong>Order matters. Decorators wrap left to right.</strong> Each decorator wraps everything before it, not just the nearest piece. When the grouping is not obvious, parenthesize.</li>
+        <li><strong>Requirements carry through.</strong> The result requires every subsystem its parts require. That is what lets the scheduler still cancel cleanly. You do not have to re-declare anything.</li>
+        <li><strong>Put a timeout on anything that could hang.</strong> A command that waits on a sensor or a setpoint can freeze the whole routine if the mechanism jams. <code>.withTimeout()</code> is your escape hatch, and it matters most in autonomous where no driver is there to bail you out.</li>
+      </ul>
+    </div>
+
+    <p><code>.withTimeout(2)</code> is just <code>.until(...)</code> with the clock as the end condition. Same idea: bolt an extra "I'm done" onto a command that would otherwise run longer.</p>
 
     <hr class="section-divider">
 
@@ -318,14 +383,14 @@ controller.a().debounce(<span class="num">0.2</span>).onTrue(scoop.setAngleComma
 
   <!-- ═══════════════════════════════════════════════════════
        PART 2 — YOUR ROBOT
-       Sections 6–9: default commands, jog pattern,
-       superstructure, autonomous
+       Sections 6–8: default commands, jog pattern,
+       superstructure
        ═══════════════════════════════════════════════════════ -->
   <div class="lesson-section" id="section-robot">
 
 
-    <!-- ── 6. Default commands ───────────────────────────── -->
-    <h2>6. Default commands</h2>
+    <!-- ── 1. Default commands ───────────────────────────── -->
+    <h2>1. Default commands</h2>
 
     <p>There is one more way a command can start. A subsystem can have a <strong>default command</strong>: the job it does whenever nothing else is asking for it.</p>
 
@@ -352,8 +417,8 @@ drive.setDefaultCommand(
     <hr class="section-divider">
 
 
-    <!-- ── 7. The jog pattern ────────────────────────────── -->
-    <h2>7. The jog pattern</h2>
+    <!-- ── 2. The jog pattern ────────────────────────────── -->
+    <h2>2. The jog pattern</h2>
 
     <p>You want to hold a button and have the elevator creep up. Let go and have it stay put.</p>
 
@@ -397,8 +462,8 @@ controller.povDown().whileTrue(
     <hr class="section-divider">
 
 
-    <!-- ── 8. The Superstructure ─────────────────────────── -->
-    <h2>8. The Superstructure</h2>
+    <!-- ── 3. The Superstructure ─────────────────────────── -->
+    <h2>3. The Superstructure</h2>
 
     <p>The Elevator knows about the elevator. The Scoop knows about the scoop. Neither of them knows about the other, and it should stay that way.</p>
 
@@ -460,11 +525,19 @@ controller.povDown().whileTrue(
       <p>You did not write a single line of code to make that work. No mode flag, no <code>isManualMode</code> boolean, no if-statement asking whether it is okay to move. The requirement system did all of it. <strong>This is why we bothered with subsystems and requirements in the first place.</strong> Everything you have built for five lessons was setting up this moment.</p>
     </div>
 
-    <hr class="section-divider">
+  </div><!-- /section-robot -->
 
 
-    <!-- ── 9. Autonomous is just a command ──────────────── -->
-    <h2>9. Autonomous is just a command</h2>
+  <!-- ═══════════════════════════════════════════════════════
+       PART 3 — AUTONOMOUS
+       Section 1: autonomous routines, where they live,
+       and how they get scheduled
+       ═══════════════════════════════════════════════════════ -->
+  <div class="lesson-section" id="section-auto">
+
+
+    <!-- ── 1. Autonomous is just a command ──────────────── -->
+    <h2>1. Autonomous is just a command</h2>
 
     <p>Autonomous is not a special mode with special rules. It is one command that gets scheduled when the match starts.</p>
 
@@ -496,18 +569,61 @@ autoChooser.addOption(<span class="str">"Just Park"</span>, drive.driveDistanceC
 superstructure.scoreCommand().withTimeout(<span class="num">2</span>)
 </pre></div>
 
-  </div><!-- /section-robot -->
+    <h3>Where it lives and how it gets called</h3>
+
+    <p>You have run auto routines before. Here is the wiring that actually launches one. It is two spots, and the template already wrote both.</p>
+
+    <p>The chooser you filled in above lives in <code>RobotContainer</code>, next to one small method that hands back whatever you picked:</p>
+
+    <div class="code-block"><pre>
+<span class="cm">// RobotContainer.java</span>
+<span class="kw">private final</span> LoggedDashboardChooser&lt;Command&gt; autoChooser =
+    <span class="kw">new</span> LoggedDashboardChooser&lt;&gt;(<span class="str">"Auto Choice"</span>);
+
+<span class="kw">public</span> Command getAutonomousCommand() {
+  <span class="kw">return</span> autoChooser.get();
+}
+</pre></div>
+
+    <p><code>Robot.java</code> calls that method once when auto starts and schedules whatever it returns:</p>
+
+    <div class="code-block"><pre>
+<span class="cm">// Robot.java</span>
+<span class="kw">@Override</span>
+<span class="kw">public void</span> autonomousInit() {
+  autonomousCommand = robotContainer.getAutonomousCommand();
+  <span class="kw">if</span> (autonomousCommand != <span class="kw">null</span>) {
+    autonomousCommand.schedule();
+  }
+}
+
+<span class="kw">@Override</span>
+<span class="kw">public void</span> autonomousExit() {
+  <span class="kw">if</span> (autonomousCommand != <span class="kw">null</span>) {
+    autonomousCommand.cancel();
+  }
+}
+</pre></div>
+
+    <p><code>autonomousInit</code> runs once at the start of auto. It asks the chooser what you picked, schedules that single command, and the CommandScheduler runs it exactly like it runs everything else. When teleop starts, <code>autonomousExit</code> cancels it so it does not run into your driving.</p>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">This wiring is real</span>
+      <p>Unlike the made-up routine names, <code>getAutonomousCommand()</code>, <code>autonomousInit()</code>, and <code>autonomousExit()</code> already exist in your project. The template generated them. You do not build this plumbing. You fill the chooser with your routines and pick one on the dashboard before the match.</p>
+    </div>
+
+  </div><!-- /section-auto -->
 
 
   <!-- ═══════════════════════════════════════════════════════
-       PART 3 — REFERENCE
+       PART 4 — REFERENCE
        Sections 10–12, Go deeper, Quick reference
        ═══════════════════════════════════════════════════════ -->
   <div class="lesson-section" id="section-reference">
 
 
-    <!-- ── 10. Seeing what your commands are doing ────────── -->
-    <h2>10. Seeing what your commands are doing</h2>
+    <!-- ── 1. Seeing what your commands are doing ────────── -->
+    <h2>1. Seeing what your commands are doing</h2>
 
     <p>You cannot fix what you cannot see. AdvantageScope shows you which commands are running, right now, in a list. When the robot does something weird, look there first. Nine times out of ten you will see a command you thought was finished still sitting there, or a command that got canceled the instant it started because something else grabbed the subsystem.</p>
 
@@ -522,8 +638,8 @@ superstructure.carryCommand().withName(<span class="str">"Carry"</span>);
     <hr class="section-divider">
 
 
-    <!-- ── 11. Mistakes everyone makes ──────────────────── -->
-    <h2>11. Mistakes everyone makes</h2>
+    <!-- ── 2. Mistakes everyone makes ──────────────────── -->
+    <h2>2. Mistakes everyone makes</h2>
 
     <p><strong>Using <code>onTrue</code> when you meant <code>whileTrue</code>.</strong> Press the jog button, elevator runs to the ceiling, never stops. <code>onTrue</code> starts a job and walks away.</p>
 
@@ -538,8 +654,8 @@ superstructure.carryCommand().withName(<span class="str">"Carry"</span>);
     <hr class="section-divider">
 
 
-    <!-- ── 12. Where this goes on a real FRC robot ────────── -->
-    <h2>12. Where this goes on a real FRC robot (preview only)</h2>
+    <!-- ── 3. Where this goes on a real FRC robot ────────── -->
+    <h2>3. Where this goes on a real FRC robot (preview only)</h2>
 
     <p>Some robots have parts that will smash into each other if you move them in the wrong order. On those robots, the Superstructure gets bigger. It holds an enum of every legal state (<code>STOW</code>, <code>INTAKE</code>, <code>SCORE_HIGH</code>), and a <code>periodic()</code> method that only allows moves between states that are safe. Big teams like 6328 and 254 build them this way.</p>
 
@@ -572,6 +688,7 @@ superstructure.carryCommand().withName(<span class="str">"Carry"</span>);
         <li><a href="https://docs.wpilib.org/en/stable/docs/software/commandbased/command-compositions.html" target="_blank" rel="noopener">Command Compositions</a> Sequence, parallel, race, deadline, and the "you cannot reuse a composed command" rule.</li>
         <li><a href="https://docs.wpilib.org/en/stable/docs/software/commandbased/binding-commands-to-triggers.html" target="_blank" rel="noopener">Binding Commands to Triggers</a> Every binding type with examples. Read this if <code>onTrue</code> vs <code>whileTrue</code> still feels fuzzy.</li>
         <li><a href="https://docs.wpilib.org/en/stable/docs/software/commandbased/structuring-command-based-project.html" target="_blank" rel="noopener">Structuring a Command-Based Robot Project</a> Why subsystems are private fields in RobotContainer and why that matters.</li>
+        <li><a href="https://docs.wpilib.org/en/stable/docs/software/dashboards/smartdashboard/choosing-an-autonomous-program-from-smartdashboard.html" target="_blank" rel="noopener">Choosing an Autonomous Program</a> The chooser, <code>getAutonomousCommand()</code>, and scheduling it in <code>autonomousInit()</code>. The wiring behind the Autonomous part.</li>
       </ul>
 
       <h3>When you want to know how it really works</h3>
@@ -590,6 +707,7 @@ superstructure.carryCommand().withName(<span class="str">"Carry"</span>);
       <ul>
         <li><a href="https://docs.wpilib.org/en/stable/docs/software/examples-tutorials/wpilib-examples.html" target="_blank" rel="noopener">WPILib command-based examples</a> Look at HatchBotInlined first. It is small and it is the pattern we use.</li>
         <li><a href="https://docs.advantagekit.org/" target="_blank" rel="noopener">AdvantageKit docs</a> The logging and replay framework in your project.</li>
+        <li><a href="https://docs.advantagekit.org/data-flow/recording-inputs/dashboard-inputs/" target="_blank" rel="noopener">AdvantageKit Dashboard Inputs</a> Why we use <code>LoggedDashboardChooser</code> instead of <code>SendableChooser</code> for the auto picker: it logs and replays correctly.</li>
         <li><a href="https://github.com/Mechanical-Advantage" target="_blank" rel="noopener">Team 6328 open-source robot code</a> The team that wrote AdvantageKit. Read a Superstructure file and see how far this idea goes.</li>
       </ul>
 
@@ -610,6 +728,10 @@ superstructure.carryCommand().withName(<span class="str">"Carry"</span>);
         <tr><td>Do a thing over and over</td><td>run()</td></tr>
         <tr><td>Do two things at once</td><td>.alongWith()</td></tr>
         <tr><td>Do two things in order</td><td>.andThen()</td></tr>
+        <tr><td>Run a whole list in order</td><td>Commands.sequence()</td></tr>
+        <tr><td>Run a whole list at once</td><td>Commands.parallel()</td></tr>
+        <tr><td>Run until the first one finishes</td><td>Commands.race()</td></tr>
+        <tr><td>Run others until a leader finishes</td><td>Commands.deadline()</td></tr>
         <tr><td>Pause between steps</td><td>Commands.waitSeconds()</td></tr>
         <tr><td>Give up after a while</td><td>.withTimeout()</td></tr>
         <tr><td>Stop when something happens</td><td>.until()</td></tr>
@@ -629,7 +751,8 @@ superstructure.carryCommand().withName(<span class="str">"Carry"</span>);
   <nav class="section-nav section-nav--bottom">
     <button class="section-nav-btn active" data-section="framework">Part 1 — The framework</button>
     <button class="section-nav-btn" data-section="robot">Part 2 — Your robot</button>
-    <button class="section-nav-btn" data-section="reference">Part 3 — Reference</button>
+    <button class="section-nav-btn" data-section="auto">Part 3 — Autonomous</button>
+    <button class="section-nav-btn" data-section="reference">Part 4 — Reference</button>
   </nav>
 
 </div><!-- /page-container -->
