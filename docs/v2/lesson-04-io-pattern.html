@@ -1,0 +1,1568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title></title>
+  <link rel="stylesheet" href="frc-curriculum.css">
+  <link rel="stylesheet" href="diff.css">
+  <style>
+    /* ── Lesson 04 local styles ─────────────────────────────── */
+
+    /* Step builder (same as L03) */
+    .step-builder { margin: 1rem 0; }
+    .sb-step { border: 1px solid var(--gray-border); border-radius: var(--radius-lg); margin-bottom: 0.75rem; overflow: hidden; }
+    .sb-step-header { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; background: var(--gray-bg); cursor: pointer; user-select: none; }
+    .sb-step-header:hover { background: var(--teal-light); }
+    .sb-step-num { width: 28px; height: 28px; border-radius: 50%; background: var(--teal); color: var(--white); font-size: 0.82rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .sb-step-title { font-size: 0.9rem; font-weight: 600; color: var(--dark); flex: 1; }
+    .sb-step-chevron { font-size: 0.8rem; color: var(--muted); transition: transform 0.2s; }
+    .sb-step.open .sb-step-chevron { transform: rotate(90deg); }
+    .sb-step-body { display: none; padding: 0.75rem 1rem 1rem; border-top: 1px solid var(--gray-border); }
+    .sb-step.open .sb-step-body { display: block; }
+    .sb-step-body p { font-size: 0.88rem; color: var(--mid); margin-bottom: 0.6rem; }
+
+    /* Annotated code (same as L03) */
+    .ann-block { margin: 1rem 0; border: 1px solid var(--code-border); border-radius: var(--radius-lg); overflow: hidden; }
+    .ann-line { display: flex; align-items: stretch; cursor: pointer; transition: background 0.12s; }
+    .ann-line:hover { background: var(--teal-light); }
+    .ann-line.has-note.open { background: var(--teal-light); }
+    .ann-line-num { min-width: 2.5rem; padding: 0.3rem 0.5rem; text-align: right; font-size: 0.75rem; font-family: var(--font-mono); color: var(--muted); background: var(--code-bg); border-right: 1px solid var(--code-border); user-select: none; display: flex; align-items: center; justify-content: flex-end; }
+    .ann-line-code { flex: 1; padding: 0.3rem 0.75rem; font-size: 0.82rem; font-family: var(--font-mono); color: var(--dark); white-space: pre; overflow-x: auto; display: flex; align-items: center; }
+    .ann-line-icon { width: 1.6rem; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; color: var(--teal); flex-shrink: 0; }
+    .ann-note { display: none; background: var(--teal-light); border-top: 1px solid var(--teal-border); padding: 0.6rem 1rem; font-size: 0.83rem; color: var(--teal); line-height: 1.5; }
+    .ann-note.open { display: block; }
+    .ann-note code { background: rgba(29,106,114,0.12); padding: 0.1rem 0.3rem; border-radius: 3px; font-family: var(--font-mono); }
+    .ann-separator { height: 1px; background: var(--code-border); }
+    .ann-group-label { cursor: pointer; user-select: none; padding: 0.5rem 0.75rem; font-size: 0.8rem; font-weight: 700; color: var(--dark); background: var(--code-bg); border-bottom: 1px solid var(--code-border); }
+    .ann-group-label::before { content: '▸'; font-size: 1.1em; color: var(--muted); margin-right: 0.5em; display: inline-block; transition: transform 0.12s; }
+    .ann-group-label.open::before { content: '▾'; }
+    .ann-group-desc { display: none; font-size: 0.75rem; color: var(--dark); padding: 0.4rem 0.75rem; background: #EAF1F8; border-bottom: 1px solid var(--code-border); font-style: italic; }
+    .ann-group-desc.open { display: block; }
+
+    /* IO compare panes */
+    .io-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin: 1rem 0; }
+    @media (max-width: 700px) { .io-compare { grid-template-columns: 1fr; } }
+    .io-pane { border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--code-border); display: flex; flex-direction: column; }
+    .io-pane-label { padding: 0.4rem 0.75rem; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
+    .io-pane.interface .io-pane-label { background: var(--purple); color: var(--white); }
+    .io-pane.impl .io-pane-label { background: var(--amber); color: var(--white); }
+    .io-pane.subsystem .io-pane-label { background: var(--teal); color: var(--white); }
+    .io-pane .code-block { margin: 0; border-radius: 0; border: none; border-top: 1px solid var(--code-border); flex: 1; background: #EAF1F8; }
+    .io-pane .code-block pre { font-size: 0.7rem; line-height: 1.4; }
+
+    /* Green line-add */
+    .code-block .cm { color: #2d6b2d; font-style: italic; }
+    .code-block .cm-add { color: #1a7a4c; font-style: italic; font-weight: 600; }
+    .code-block .line-add { display: inline-block; width: 100%; background: rgba(26, 122, 76, 0.08); color: #1a7a4c; }
+    /* Red line-del */
+    .code-block .cm-del { color: #a93226; font-style: italic; font-weight: 600; }
+    .code-block .line-del { display: inline-block; width: 100%; background: rgba(180, 40, 40, 0.08); color: #a93226; text-decoration: line-through; }
+    /* Amber line-mod (full line) */
+    .code-block .cm-mod { color: #8a6200; font-style: italic; font-weight: 600; }
+    .code-block .line-mod { display: inline-block; width: 100%; background: rgba(180, 130, 0, 0.08); }
+    /* Tab stop inline highlights */
+    .code-block .ts-before { color: #a93226; background: rgba(180, 40, 40, 0.12); border-radius: 3px; padding: 0 2px; font-weight: 600; }
+    .code-block .ts-after  { color: #8a6200; background: rgba(180, 130, 0, 0.12); border-radius: 3px; padding: 0 2px; font-weight: 600; }
+    /* Line number gutter */
+    .code-block .ln { display: inline-block; min-width: 2.5rem; padding-right: 0.75rem; text-align: right; color: var(--muted); user-select: none; font-size: 0.75rem; }
+
+    /* File badge */
+    .file-badge { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 700; font-family: var(--font-mono); background: var(--code-bg); border: 1px solid var(--code-border); color: var(--dark); margin: 0 0.1rem; vertical-align: middle; }
+
+    /* Scope steps */
+    .scope-steps { margin: 1rem 0; counter-reset: scope-step; }
+    .scope-step { display: flex; gap: 0.75rem; align-items: flex-start; margin-bottom: 0.75rem; }
+    .scope-step-num { width: 24px; height: 24px; border-radius: 50%; background: var(--teal); color: var(--white); font-size: 0.78rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 0.1rem; }
+    .scope-step-body { font-size: 0.88rem; color: var(--mid); flex: 1; }
+    .scope-step-body code { font-family: var(--font-mono); font-size: 0.83rem; background: var(--code-bg); padding: 0.1rem 0.3rem; border-radius: 3px; }
+    .scope-step-body strong { color: var(--dark); }
+
+    /* Inline quiz */
+    .inline-quiz { margin: 1.2rem 0; background: var(--gray-bg); border: 1px solid var(--gray-border); border-radius: var(--radius-lg); padding: 1rem; }
+    .inline-quiz h4 { font-size: 0.82rem; font-weight: 700; color: var(--dark); margin-bottom: 0.75rem; }
+    .quiz-options { display: flex; flex-direction: column; gap: 0.4rem; }
+    .quiz-feedback-line { font-size: 0.82rem; margin-top: 0.6rem; min-height: 1.3em; }
+
+    /* General utility */
+    .callout-connect { background: var(--purple-light); border: 1px solid var(--purple-border); border-left: 4px solid var(--purple); border-radius: var(--radius); padding: 0.75rem 1rem; margin: 1rem 0; font-size: 0.85rem; color: var(--purple); }
+    .callout-connect strong { color: var(--purple); }
+    .section-rule { border: none; border-top: 1px solid var(--gray-border); margin: 1.5rem 0; }
+    #section-convert .code-block pre,
+    #section-visualize .code-block pre,
+    #section-scope .code-block pre,
+    #section-replay .code-block pre { font-size: 0.7rem; line-height: 1.4; }
+  </style>
+</head>
+<body data-lesson="04">
+
+<div class="wip-banner"></div>
+<header class="site-header"></header>
+
+<div class="page-container">
+
+  <div class="lesson-header">
+    <div class="lesson-meta"></div>
+    <h1 class="lesson-title"></h1>
+    <div class="lesson-subtitle"></div>
+    <div class="lesson-info-bar"></div>
+  </div>
+
+  <nav class="section-nav">
+    <button class="section-nav-btn active" data-section="concept">Part 1 - The Pattern</button>
+    <button class="section-nav-btn" data-section="snippets">Part 2 - Install Snippets</button>
+    <button class="section-nav-btn" data-section="convert">Part 3 - Convert Scoop</button>
+    <button class="section-nav-btn" data-section="visualize">Part 4 - Visualization</button>
+    <button class="section-nav-btn" data-section="scope">Part 5 - AdvantageScope</button>
+    <button class="section-nav-btn" data-section="replay">Part 6 - Replay</button>
+  </nav>
+
+
+  <!-- ═══════════════════════════════════════════════════════
+       PART 1 - THE PATTERN
+       ═══════════════════════════════════════════════════════ -->
+  <div class="lesson-section active" id="section-concept">
+
+    <p>
+      In Lesson 03 you built <span class="file-badge">Scoop.java</span> the simple way:
+      one file, <code>XRPServo</code> imported directly, servo called straight from <code>periodic()</code>.
+      It works. Run it today and the scoop moves.
+    </p>
+    <p>
+      The problem shows up when you try to test at home with no XRP, or when you need to replay a match log to find a bug.
+      The simple version can't do either. The IO pattern can.
+    </p>
+
+    <div class="hf-box hf-brain">
+      <span class="hf-label">Your brain is probably thinking this right now</span>
+      <p>"The scoop already works. Why are we changing it?"</p>
+      <p>Because "works when plugged in" and "works at competition when something breaks at 9pm" are two different things. The IO pattern is how serious FRC teams get to the second one.</p>
+    </div>
+
+    <h2>Four files, four jobs</h2>
+
+    <p>Every subsystem using the IO pattern has at minimum four files. You already saw this in the <span class="file-badge">Arm</span> subsystem from Lesson 03:</p>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <h4>ScoopIO.java</h4>
+        <p>The contract. Defines what a scoop can do. Has no idea what hardware exists.</p>
+        <p class="aside">Think: job posting</p>
+      </div>
+      <div class="info-card">
+        <h4>ScoopIOInputs</h4>
+        <p>A struct of sensor values the IO layer reads each loop cycle. Annotated with <code>@AutoLog</code> so AdvantageKit logs everything automatically.</p>
+        <p class="aside">Think: the form the hardware fills out</p>
+      </div>
+      <div class="info-card">
+        <h4>ScoopIOXRP.java</h4>
+        <p>The XRP version. Talks to the real servo. Implements the contract.</p>
+        <p class="aside">Think: person doing the job on XRP</p>
+      </div>
+      <div class="info-card">
+        <h4>ScoopIOSim.java</h4>
+        <p>The simulation version. Tracks commanded state in memory. No hardware needed.</p>
+        <p class="aside">Think: person doing the job in sim</p>
+      </div>
+    </div>
+
+    <p>Then <span class="file-badge">Scoop.java</span> itself: the subsystem. It only knows about <code>ScoopIO</code>, never about the servo. Same structure you saw in <span class="file-badge">Arm.java</span> in Lesson 03.</p>
+
+    <h2>Read the Arm files first</h2>
+
+    <p>Read the Arm files before making any new files. The Scoop files are nearly identical. Click any annotated line to open the explanation.</p>
+
+    <div class="ann-block" id="armio-annotated">
+
+      <div class="ann-group-label" onclick="annGroupToggle('armio-def')">ArmIO.java - the interface</div>
+      <div class="ann-group-desc" id="ann-group-armio-def">The contract. Every method here is a capability the arm hardware must support, regardless of which hardware that is.</div>
+
+      <div class="ann-line has-note" onclick="annToggle('armio-autolog')">
+        <span class="ann-line-num">1</span>
+        <span class="ann-line-code"><span class="kw">@AutoLog</span></span>
+        <span class="ann-line-icon">⬤</span>
+      </div>
+      <div class="ann-note" id="ann-armio-autolog">
+        <code>@AutoLog</code> is an AdvantageKit annotation. At compile time it generates a sibling class called <code>ArmIOInputsAutoLogged</code> that adds <code>toLog()</code> and <code>fromLog()</code> methods automatically. You never write those methods and never see the generated file. Without this annotation, none of your inputs get logged.
+      </div>
+
+      <div class="ann-line has-note" onclick="annToggle('armio-inputs-class')">
+        <span class="ann-line-num">2</span>
+        <span class="ann-line-code"><span class="kw">public static class</span> ArmIOInputs {</span>
+        <span class="ann-line-icon">⬤</span>
+      </div>
+      <div class="ann-note" id="ann-armio-inputs-class">
+        A plain Java class with public fields. The IO implementation writes to these fields inside <code>updateInputs()</code> every loop cycle. Because of the <code>@AutoLog</code> annotation above, every field here is logged automatically. Add a field and it shows up in AdvantageScope on the next build with no extra logging code.
+      </div>
+
+      <div class="ann-line" onclick="">
+        <span class="ann-line-num">3</span>
+        <span class="ann-line-code">&nbsp;&nbsp;<span class="kw">public double</span> commandedAngleDeg = <span class="num">0.0</span>;</span>
+        <span class="ann-line-icon" style="color:var(--muted)">-</span>
+      </div>
+
+      <div class="ann-line has-note" onclick="annToggle('armio-interface')">
+        <span class="ann-line-num">6</span>
+        <span class="ann-line-code"><span class="kw">public interface</span> ArmIO {</span>
+        <span class="ann-line-icon">⬤</span>
+      </div>
+      <div class="ann-note" id="ann-armio-interface">
+        A Java <code>interface</code> defines method signatures without implementations. Any class that says <code>implements ArmIO</code> must provide a body for every method listed here — if it doesn't, the compiler stops immediately. The interface has no hardware imports at all: no XRPServo, no TalonFX, nothing.
+      </div>
+
+      <div class="ann-line has-note" onclick="annToggle('armio-updateinputs')">
+        <span class="ann-line-num">7</span>
+        <span class="ann-line-code">&nbsp;&nbsp;<span class="kw">default void</span> updateInputs(ArmIOInputs inputs) {}</span>
+        <span class="ann-line-icon">⬤</span>
+      </div>
+      <div class="ann-note" id="ann-armio-updateinputs">
+        <code>updateInputs()</code> is called by the subsystem every loop cycle to pull fresh sensor data. The <code>default</code> keyword means implementing classes can skip overriding it — the default body is empty. That's what makes the replay no-op stub work: pass in <code>new ArmIO() {}</code> and <code>updateInputs()</code> does nothing, because replay mode reads from the log directly.
+      </div>
+
+      <div class="ann-line has-note" onclick="annToggle('armio-setangle')">
+        <span class="ann-line-num">8</span>
+        <span class="ann-line-code">&nbsp;&nbsp;<span class="kw">default void</span> setAngle(<span class="kw">double</span> angleDeg) {}</span>
+        <span class="ann-line-icon">⬤</span>
+      </div>
+      <div class="ann-note" id="ann-armio-setangle">
+        Every action the hardware supports gets a method here. <code>setAngle()</code> takes an angle in degrees. The interface says nothing about how that angle gets applied - whether it's divided by a servo range, clamped, or converted to encoder ticks. That decision lives entirely in the implementation. The interface only cares about <em>what</em>, never <em>how</em>.
+      </div>
+
+      <div class="ann-separator"></div>
+      <div class="ann-group-label" onclick="annGroupToggle('armioxrp')">ArmIOXRP.java - the XRP implementation</div>
+      <div class="ann-group-desc" id="ann-group-armioxrp">The only file that knows what hardware the arm uses. Everything hardware-specific lives here and only here.</div>
+
+      <div class="ann-line has-note" onclick="annToggle('armioxrp-implements')">
+        <span class="ann-line-num">1</span>
+        <span class="ann-line-code"><span class="kw">public class</span> ArmIOXRP <span class="kw">implements</span> ArmIO {</span>
+        <span class="ann-line-icon">⬤</span>
+      </div>
+      <div class="ann-note" id="ann-armioxrp-implements">
+        <code>implements ArmIO</code> is the promise that this class will provide a body for every method in the interface. Leave out <code>setAngle()</code> and the compiler stops you. No runtime surprises.
+      </div>
+
+      <div class="ann-line has-note" onclick="annToggle('armioxrp-servo')">
+        <span class="ann-line-num">2</span>
+        <span class="ann-line-code">&nbsp;&nbsp;<span class="kw">private final</span> XRPServo servo = <span class="kw">new</span> XRPServo(<span class="num">4</span>);</span>
+        <span class="ann-line-icon">⬤</span>
+      </div>
+      <div class="ann-note" id="ann-armioxrp-servo">
+        <code>XRPServo</code> is declared here and only here. Search every other file in the subsystem folder: <code>ArmIO.java</code>, <code>ArmIOSim.java</code>, <code>Arm.java</code>. None of them import <code>XRPServo</code>. This is the pattern working correctly. If you ever see <code>XRPServo</code> imported in <code>Arm.java</code>, the pattern is broken.
+      </div>
+
+      <div class="ann-line has-note" onclick="annToggle('armioxrp-setangle')">
+        <span class="ann-line-num">5–10</span>
+        <span class="ann-line-code">&nbsp;&nbsp;<span class="kw">@Override</span>&nbsp;<span class="kw">public void</span> setAngle(<span class="kw">double</span> angleDeg) { <span class="cm">// ...</span></span>
+        <span class="ann-line-icon">⬤</span>
+      </div>
+      <div class="ann-note" id="ann-armioxrp-setangle">
+        <code>@Override</code> tells Java this method is fulfilling a contract from the interface. Notice there is no clamping here. The IO layer just assigns the value and calls the servo. Clamping happens in <code>Arm.java</code>, at the subsystem boundary, before the angle reaches this method. <code>kMinAngleDeg</code> and <code>kMaxAngleDeg</code> from <code>ArmConstants.java</code> are used there, not here.
+      </div>
+
+      <div class="ann-separator"></div>
+      <div class="ann-group-label" onclick="annGroupToggle('armiosim')">ArmIOSim.java - the simulation implementation</div>
+      <div class="ann-group-desc" id="ann-group-armiosim">No hardware. Tracks state in memory so the subsystem can run and log in simulation.</div>
+
+      <div class="ann-line has-note" onclick="annToggle('armiosim-field')">
+        <span class="ann-line-num">3</span>
+        <span class="ann-line-code">&nbsp;&nbsp;<span class="kw">private double</span> commandedAngleDeg = ArmConstants.kStowedAngleDeg;</span>
+        <span class="ann-line-icon">⬤</span>
+      </div>
+      <div class="ann-note" id="ann-armiosim-field">
+        In sim there's no servo to read back from, so the implementation just remembers the last angle it was told to set. <code>updateInputs()</code> copies that value into the inputs struct so it gets logged. AdvantageScope shows the commanded angle changing when you press buttons, even with no hardware connected.
+      </div>
+
+      <div class="ann-line has-note" onclick="annToggle('armiosim-updateinputs')">
+        <span class="ann-line-num">6–8</span>
+        <span class="ann-line-code">&nbsp;&nbsp;<span class="kw">@Override</span>&nbsp;<span class="kw">public void</span> updateInputs(ArmIOInputs inputs) { <span class="cm">// ...</span></span>
+        <span class="ann-line-icon">⬤</span>
+      </div>
+      <div class="ann-note" id="ann-armiosim-updateinputs">
+        <code>inputs.commandedAngleDeg = commandedAngleDeg;</code> — that's the entire body. It copies the remembered value into the struct. The subsystem just calls <code>updateInputs()</code> and reads whatever comes back; it has no way to distinguish this from a real servo.
+      </div>
+
+    </div><!-- /ann-block -->
+
+    <div class="callout-connect">
+      <strong>Lesson 03 connection:</strong> In Part 3 you walked through this structure in the Arm files. Scoop was built the simple way on purpose. This is the refactor.
+    </div>
+
+    <h2>Quick check</h2>
+
+    <div class="inline-quiz">
+      <h4>Which file is allowed to import XRPServo?</h4>
+      <div class="quiz-options">
+        <button class="quiz-btn" data-quiz="q1" data-correct="false"
+          data-feedback-wrong="ScoopIO.java is the interface - it has zero hardware imports. That's the whole point."
+          data-feedback-correct="">ScoopIO.java</button>
+        <button class="quiz-btn" data-quiz="q1" data-correct="true"
+          data-feedback-correct="Correct. ScoopIOXRP.java is the only file in the subsystem folder that gets to know what hardware exists."
+          data-feedback-wrong="">ScoopIOXRP.java</button>
+        <button class="quiz-btn" data-quiz="q1" data-correct="false"
+          data-feedback-wrong="Scoop.java is the subsystem. It only imports ScoopIO - the interface. If it imports XRPServo, the pattern is broken."
+          data-feedback-correct="">Scoop.java</button>
+        <button class="quiz-btn" data-quiz="q1" data-correct="false"
+          data-feedback-wrong="ScoopIOSim.java has no hardware at all - no XRPServo import, no servo object."
+          data-feedback-correct="">ScoopIOSim.java</button>
+      </div>
+      <div class="quiz-feedback-line" id="quiz-feedback-q1"></div>
+    </div>
+
+    <div class="inline-quiz">
+      <h4>What does @AutoLog do?</h4>
+      <div class="quiz-options">
+        <button class="quiz-btn" data-quiz="q2" data-correct="false"
+          data-feedback-wrong="You still call Logger.processInputs() in periodic(). @AutoLog generates the serialization code, not the call."
+          data-feedback-correct="">Automatically calls Logger.processInputs() for you</button>
+        <button class="quiz-btn" data-quiz="q2" data-correct="true"
+          data-feedback-correct="Correct. @AutoLog triggers code generation at compile time. The generated AutoLogged class adds toLog() and fromLog() methods so processInputs() knows how to serialize your struct."
+          data-feedback-wrong="">Generates a sibling class with toLog() and fromLog() methods at compile time</button>
+        <button class="quiz-btn" data-quiz="q2" data-correct="false"
+          data-feedback-wrong="@AutoLog is on the inputs class, not on the subsystem. The subsystem handles its own periodic() logging separately."
+          data-feedback-correct="">Marks a subsystem so AdvantageKit logs it each loop</button>
+      </div>
+      <div class="quiz-feedback-line" id="quiz-feedback-q2"></div>
+    </div>
+
+  </div><!-- /section-concept -->
+
+
+  <!-- ═══════════════════════════════════════════════════════
+       SNIPPET INSTALL INTERSTITIAL
+       ═══════════════════════════════════════════════════════ -->
+  <div class="lesson-section" id="section-snippets">
+    <h2>Part 2: Install the Snippet File</h2>
+    <p>
+      Part 2 has you creating several new files from scratch. Instead of typing all that boilerplate by hand,
+      you'll use VS Code snippets. The BearBots snippet file adds triggers for every IO pattern file you'll write today.
+    </p>
+
+    <div class="step-block">
+      <div class="step-number">1</div>
+      <div class="step-content">
+        <strong>Find <code>java.json</code></strong> in the <code>bearbots-xrp-code</code> repo:<br>
+        <code>bearbots-xrp-code/vscode/java.json</code>
+      </div>
+    </div>
+
+    <div class="step-block">
+      <div class="step-number">2</div>
+      <div class="step-content">
+        <strong>Move the file</strong> to your VS Code user snippets folder:<br>
+        <code>C:\Users\Public\wpilib\2026\vscode\data\user-data\User\snippets\java.json</code><br>
+        <span style="font-size:0.85em;color:var(--txt-med);">
+          Paste that path directly into Windows Explorer's address bar. If a <code>java.json</code> already exists there from Lesson 03, replace it — this version includes everything from that one plus the new IO snippets.
+        </span>
+      </div>
+    </div>
+
+    <div class="step-block">
+      <div class="step-number">3</div>
+      <div class="step-content">
+        <strong>Restart VS Code</strong> (WPILib purple icon), then open any <code>.java</code> file and type <code>akio</code>.
+        You should see the snippet suggestion appear. If it does, you're ready for Part 2.
+      </div>
+    </div>
+
+    <div class="hf-box hf-sidebar">
+      <span class="hf-label">Snippets in this file</span>
+      <p>
+        <code>aksubsystem</code> — SubsystemBase shell with goal enum (from Lesson 03)<br>
+        <code>akio</code> — IO interface with <code>@AutoLog</code> inputs<br>
+        <code>akioimpl-xrp-servo</code> — XRP servo implementation<br>
+        <code>akioimpl-xrp-motor</code> — XRP motor implementation<br>
+        <code>akioimpl-sim</code> — Sim implementation
+      </p>
+    </div>
+  </div><!-- /section-snippets -->
+
+
+  <!-- ═══════════════════════════════════════════════════════
+       PART 2 - CONVERT SCOOP
+       ═══════════════════════════════════════════════════════ -->
+<div class="lesson-section" id="section-convert">
+
+  <p>
+    You have a working <span class="file-badge">Scoop.java</span> from Lesson 03.
+    It imports <code>XRPServo</code> directly and calls <code>setAngle()</code> straight from <code>periodic()</code>.
+    By the end of this part, that's gone. Four new files replace it, and <span class="file-badge">Scoop.java</span>
+    itself never mentions a servo again.
+  </p>
+  <p>Before touching code, know what the scoop does. It has three states: <strong>Flat</strong> (45&deg;, resting/intake), <strong>Carry</strong> (90&deg;, holding a ball while driving), and <strong>Dump</strong> (0&deg;, tipping forward to score). Every button you wire maps to one of these. Keep them in mind - the constants, setpoints, and D-pad bindings all trace back to these three angles.</p>
+  <p>Use the Arm files as your reference throughout - the pattern is identical and the hardware type is the same. If you get stuck, check <code>arm/</code> first.</p>
+
+  <div class="hf-box hf-info">
+    <span class="hf-label">Download the updated starter project first</span>
+    <p>The starter project for this lesson has an updated <span class="file-badge">Scoop.java</span> and some changes to the drive subsystem. Download it from the class GitHub before making any changes.</p>
+  </div>
+
+  <div class="step-builder">
+
+<div class="hf-box hf-info">
+  <span class="hf-label">How to read the code blocks in this lesson</span>
+  <p>Most code below is shown as a before and after. Here is how to read it:</p>
+  <ul>
+    <li><strong>Red</strong> is the old or placeholder version. An old line has no number in the left margin, because you are replacing it.</li>
+    <li><strong>Amber</strong> is the new version. A new line has a number: that is the line as it will appear in your finished file.</li>
+    <li>Only the part that changes is highlighted. The rest of the line stays the same.</li>
+    <li><strong>Green</strong> lines are brand new lines you are adding.</li>
+    <li>Line numbers always match your finished file, so "line 12" is line 12 on your screen.</li>
+    <li>Use the <strong>Copy</strong> button to grab clean code. It leaves out the line numbers and the old red lines.</li>
+    <li>When a block comes from a snippet, the list under it tells you what to type in each spot and whether to press Tab or Escape.</li>
+  </ul>
+</div>
+    <!-- ── Step 1: ScoopConstants.java ───────────────────────────────── -->
+    <div class="sb-step open" id="sbstep-1">
+      <div class="sb-step-header" onclick="sbToggle('sbstep-1')">
+        <div class="sb-step-num">1</div>
+        <div class="sb-step-title">Create ScoopConstants.java</div>
+        <div class="sb-step-chevron">▶</div>
+      </div>
+      <div class="sb-step-body">
+        <p>Use the WPILib tool: <code>Ctrl+Shift+P</code> → <em>WPILib: Create a new class/command</em>, choose <em>Class</em>, name it <code>ScoopConstants</code>. The package line fills in automatically. Then add the constants inside the class body.</p>
+
+<p style="padding-left:0.6rem;">This file has the most placeholders. The snippet ships with generic <code>Stowed</code>/<code>Raised</code> names; retune them for Scoop. Fill each tab stop:</p>
+
+        <ol style="margin:0.75rem 0;padding-left:1.9rem;">
+          <li style="margin-bottom:0.4rem;padding-left:0.6rem;">Comment example setpoint: <code>kStowedAngleDeg</code> → <code>kFlatAngleDeg</code></li>
+          <li style="margin-bottom:0.4rem;padding-left:0.6rem;">First constant name: <code>kStowedAngleDeg</code> → <code>kFlatAngleDeg</code></li>
+          <li style="margin-bottom:0.4rem;padding-left:0.6rem;">Its value: <code>0.0</code> → <code>45.0</code></li>
+          <li style="margin-bottom:0.4rem;padding-left:0.6rem;">Second constant name: <code>kRaisedAngleDeg</code> → <code>kCarryAngleDeg</code></li>
+          <li style="margin-bottom:0.4rem;padding-left:0.6rem;">Its value: <code>90.0</code> stays the same</li>
+          <li style="margin-bottom:0.4rem;padding-left:0.6rem;">Default target: <code>kStowedAngleDeg</code> → <code>kFlatAngleDeg</code></li>
+          <li style="margin-bottom:0.4rem;padding-left:0.6rem;"><code>kMinAngleDeg</code> value: <code>0.0</code> stays the same</li>
+          <li style="margin-bottom:0.4rem;padding-left:0.6rem;"><code>kMaxAngleDeg</code> value: <code>90.0</code> stays the same</li>
+          <li style="margin-bottom:0.4rem;padding-left:0.6rem;"><code>kAngleToleranceDeg</code> value: <code>0.5</code> stays the same</li>
+          <li style="padding-left:0.6rem;">Extra-setpoint line: <code>// add more named setpoints here, one per line</code> → <code>public static final double kDumpAngleDeg = 0.0;</code></li>
+        </ol>
+
+        <p style="padding-left:0.6rem;">The result should match this exactly:</p>
+
+<div class="code-window" data-code="// Copyright (c) 2026 BearBots FRC Team 6964
+// Open Source Software; you can modify and/or share it under the terms of
+// the MIT License available in the root directory of this project.
+
+package frc.robot.subsystems.scoop;
+
+public final class ScoopConstants {
+  private ScoopConstants() {}
+
+  // Named setpoints. Bind these directly:
+  //   button.onTrue(xxx.setAngleDegCommand(ScoopConstants.kFlatAngleDeg));
+  public static final double kFlatAngleDeg = 45.0;
+  public static final double kCarryAngleDeg = 90.0;
+  public static final double kDumpAngleDeg = 0.0;
+
+  // Startup target. periodic drives here until told otherwise.
+  public static final double kDefaultAngleDeg = kFlatAngleDeg;
+
+  // Travel limits. setAngle clamps to this band.
+  public static final double kMinAngleDeg = 0.0;
+  public static final double kMaxAngleDeg = 90.0;
+
+  // Stepped-move finish window.
+  public static final double kAngleToleranceDeg = 0.5;
+}">
+
+
+<div class="cw-head"><span class="cw-title">NEW FILE - ScoopConstants.java (akconstants-servo)</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<div class="code-region" style="counter-reset: ln 0;">
+<pre class="cb">
+<span class="line">// Copyright (c) 2026 BearBots FRC Team 6964</span>
+<span class="line">// Open Source Software; you can modify and/or share it under the terms of</span>
+<span class="line">// the MIT License available in the root directory of this project.</span>
+<span class="line"></span>
+<span class="line">package frc.robot.subsystems.scoop;</span>
+<span class="line"></span>
+<span class="line">public final class ScoopConstants {</span>
+<span class="line">  private ScoopConstants() {}</span>
+<span class="line"></span>
+<span class="line">  // Named setpoints. Bind these directly:</span>
+<span class="line-old">  //   button.onTrue(xxx.setAngleDegCommand(ScoopConstants.<span class="ts-before">kStowedAngleDeg</span>));</span>
+<span class="line-new">  //   button.onTrue(xxx.setAngleDegCommand(ScoopConstants.<span class="ts-after">kFlatAngleDeg</span>));</span>
+<span class="line-old">  public static final double <span class="ts-before">kStowedAngleDeg</span> = <span class="ts-before">0.0</span>;</span>
+<span class="line-new">  public static final double <span class="ts-after">kFlatAngleDeg</span> = <span class="ts-after">45.0</span>;</span>
+<span class="line-old">  public static final double <span class="ts-before">kRaisedAngleDeg</span> = 90.0;</span>
+<span class="line-new">  public static final double <span class="ts-after">kCarryAngleDeg</span> = 90.0;</span>
+<span class="line-old">  <span class="ts-before">// add more named setpoints here, one per line</span></span>
+<span class="line-new">  <span class="ts-after">public static final double kDumpAngleDeg = 0.0;</span></span>
+<span class="line"></span>
+<span class="line">  // Startup target. periodic drives here until told otherwise.</span>
+<span class="line-old">  public static final double kDefaultAngleDeg = <span class="ts-before">kStowedAngleDeg</span>;</span>
+<span class="line-new">  public static final double kDefaultAngleDeg = <span class="ts-after">kFlatAngleDeg</span>;</span>
+<span class="line"></span>
+<span class="line">  // Travel limits. setAngle clamps to this band.</span>
+<span class="line">  public static final double kMinAngleDeg = 0.0;</span>
+<span class="line">  public static final double kMaxAngleDeg = 90.0;</span>
+<span class="line"></span>
+<span class="line">  // Stepped-move finish window.</span>
+<span class="line">  public static final double kAngleToleranceDeg = 0.5;</span>
+<span class="line">}</span>
+</pre></div></div>
+
+        <div class="code-annotation">Angle constants go here. Hardware port numbers go in <code>Constants.ScoopHardware</code> in <span class="file-badge">Constants.java</span> — not here. This file is behavior: what angles mean what, and what the safe range is.</div>
+
+        <p>Build: <code>Ctrl+Shift+P</code> → <em>WPILib: Build Robot Code</em>. Should compile cleanly before moving on.</p>
+      </div>
+    </div><!-- /step 1 -->
+
+    <!-- ── Step 2: ScoopIO.java ───────────────────────────────────────── -->
+    <div class="sb-step" id="sbstep-2">
+      <div class="sb-step-header" onclick="sbToggle('sbstep-2')">
+        <div class="sb-step-num">2</div>
+        <div class="sb-step-title">Create ScoopIO.java</div>
+        <div class="sb-step-chevron">▶</div>
+      </div>
+      <div class="sb-step-body">
+        <p style="padding-left:0.6rem;"><span class="file-badge">ScoopIO.java</span> is the interface — the contract every implementation must satisfy. Create it from the snippet:</p>
+
+        <ol style="margin:0.75rem 0;padding-left:1.9rem;">
+          <li style="margin-bottom:0.4rem;padding-left:0.6rem;">Right-click the <code>scoop/</code> folder, choose <em>New File</em>, name it <code>ScoopIO.java</code>. Delete any content VS Code inserted.</li>
+          <li style="margin-bottom:0.4rem;padding-left:0.6rem;">Type <code>akio-servo</code> and press <kbd>Tab</kbd> to expand the snippet.</li>
+          <li style="padding-left:0.6rem;">Tab through the placeholders. Because the file lives in the <code>scoop</code> folder, the class and IO names fill in automatically. Leave <code>kDefaultAngleDeg</code> as is.</li>
+        </ol>
+
+        <p style="padding-left:0.6rem;">The result should match this exactly:</p>
+<div class="code-window" data-code="// Copyright (c) 2026 BearBots FRC Team 6964
+// Open Source Software; you can modify and/or share it under the terms of
+// the MIT License available in the root directory of this project.
+
+package frc.robot.subsystems.scoop;
+
+import org.littletonrobotics.junction.AutoLog;
+
+public interface ScoopIO {
+  @AutoLog
+  static class ScoopIOInputs {
+    public double commandedAngleDeg = ScoopConstants.kDefaultAngleDeg;
+  }
+
+  default void updateInputs(ScoopIOInputs inputs) {}
+
+  default void setAngleDeg(double angleDeg) {}
+}">
+<div class="cw-head"><span class="cw-title">NEW FILE - ScoopIO.java (akio-servo)</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<div class="code-region" style="counter-reset: ln 0;">
+<pre class="cb">
+<span class="line">// Copyright (c) 2026 BearBots FRC Team 6964</span>
+<span class="line">// Open Source Software; you can modify and/or share it under the terms of</span>
+<span class="line">// the MIT License available in the root directory of this project.</span>
+<span class="line"></span>
+<span class="line">package frc.robot.subsystems.scoop;</span>
+<span class="line"></span>
+<span class="line">import org.littletonrobotics.junction.AutoLog;</span>
+<span class="line"></span>
+<span class="line">public interface ScoopIO {</span>
+<span class="line">  @AutoLog</span>
+<span class="line">  static class ScoopIOInputs {</span>
+<span class="line">    public double commandedAngleDeg = ScoopConstants.kDefaultAngleDeg;</span>
+<span class="line">  }</span>
+<span class="line"></span>
+<span class="line">  default void updateInputs(ScoopIOInputs inputs) {}</span>
+<span class="line"></span>
+<span class="line">  default void setAngleDeg(double angleDeg) {}</span>
+<span class="line">}</span>
+</pre></div></div>
+
+        <div class="code-annotation">No XRPServo. No hardware imports of any kind. This file defines the contract — what the subsystem can ask for. How it gets done is someone else's problem.</div>
+
+        <p>Build: <code>Ctrl+Shift+P</code> → <em>WPILib: Build Robot Code</em>. Should compile cleanly.</p>
+      </div>
+    </div><!-- /step 2 -->
+
+    <!-- ── Step 3: ScoopIOXRP.java ───────────────────────────────────── -->
+    <div class="sb-step" id="sbstep-3">
+      <div class="sb-step-header" onclick="sbToggle('sbstep-3')">
+        <div class="sb-step-num">3</div>
+        <div class="sb-step-title">Create ScoopIOXRP.java</div>
+        <div class="sb-step-chevron">▶</div>
+      </div>
+      <div class="sb-step-body">
+        <p><strong>First, add the hardware port to <span class="file-badge">Constants.java</span>.</strong> The IO layer you are about to write reads the servo's device number from <code>Constants.ScoopHardware</code>. That inner class does not exist yet — add it now, before creating the file that uses it.</p>
+        <p>Open <span class="file-badge">Constants.java</span>. Find the <code>ArmHardware</code> block. Add the <code>ScoopHardware</code> block directly below it, in the same style:</p>
+<div class="code-window" data-code="    public static final int kArmServoDeviceNumber = 4;
+  }
+
+  public static final class ScoopHardware {
+    private ScoopHardware() {}
+
+    /** XRP servo device number. Device 5 maps to physical Servo 2 on the XRP. */
+    public static final int kScoopServoDeviceNumber = 5;
+  }
+}">
+<div class="cw-head"><span class="cw-title">Constants.java — add ScoopHardware</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<div class="code-region" style="counter-reset: ln 82;">
+<pre class="cb">
+<span class="line">    public static final int kArmServoDeviceNumber = 4;</span>
+<span class="line">  }</span>
+<span class="line-add"></span>
+<span class="line-add">  public static final class ScoopHardware {</span>
+<span class="line-add">    private ScoopHardware() {}</span>
+<span class="line-add"> </span>
+<span class="line-add"><span class="cm">    /** XRP servo device number. Device 5 maps to physical Servo 2 on the XRP. */</span></span>
+<span class="line-add">    public static final int kScoopServoDeviceNumber = 5;</span>
+<span class="line-add">  }</span>
+<span class="line">}</span>
+</pre></div></div>
+        <div class="code-annotation">Same pattern as <code>kArmServoDeviceNumber</code>: a hardware port number lives in <code>Constants</code>, not in the IO file. The new block sits inside the closing <code>}</code> of the <code>Constants</code> class. Build after adding it — it should compile cleanly on its own.</div>
+
+<p style="margin-top:1rem;"><strong>Now create the IO file.</strong> <span class="file-badge">ScoopIOXRP.java</span> is the real-hardware implementation. Create it from the snippet:</p>
+
+        <ol style="margin:0.75rem 0;padding-left:1.6rem;">
+          <li style="margin-bottom:0.4rem;padding-left:0.3rem;">Right-click the <code>scoop/</code> folder, choose <em>New File</em>, name it <code>ScoopIOXRP.java</code>. Delete any content VS Code inserted.</li>
+          <li style="margin-bottom:0.4rem;padding-left:0.3rem;">Type <code>akioimpl-xrp-servo</code> and press <kbd>Tab</kbd> to expand the snippet.</li>
+          <li style="margin-bottom:0.4rem;padding-left:0.3rem;">The class and IO names fill in automatically from the <code>scoop</code> folder. Two placeholders remain: change <code>kServoChannel</code> to <code>kScoopServoDeviceNumber</code>, and leave <code>kDefaultAngleDeg</code> as is.</li>
+        </ol>
+
+        <p>The result should match this exactly:</p>
+<div class="code-window" data-code="// Copyright (c) 2026 BearBots FRC Team 6964
+// Open Source Software; you can modify and/or share it under the terms of
+// the MIT License available in the root directory of this project.
+
+package frc.robot.subsystems.scoop;
+
+import edu.wpi.first.wpilibj.xrp.XRPServo;
+import static frc.robot.Constants.ScoopHardware.*;
+
+public class ScoopIOXRP implements ScoopIO {
+  private final XRPServo servo = new XRPServo(kScoopServoDeviceNumber);
+
+  private double commandedAngleDeg = ScoopConstants.kDefaultAngleDeg;
+
+  @Override
+  public void updateInputs(ScoopIOInputs inputs) {
+    inputs.commandedAngleDeg = commandedAngleDeg;
+  }
+
+  @Override
+  public void setAngleDeg(double angleDeg) {
+    commandedAngleDeg = angleDeg;
+    servo.setAngle(commandedAngleDeg);
+  }
+}">
+<div class="cw-head"><span class="cw-title">NEW FILE - ScoopIOXRP.java (akioimpl-servo-xrp)</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<div class="code-region" style="counter-reset: ln 0;">
+<pre class="cb">
+<span class="line">// Copyright (c) 2026 BearBots FRC Team 6964</span>
+<span class="line">// Open Source Software; you can modify and/or share it under the terms of</span>
+<span class="line">// the MIT License available in the root directory of this project.</span>
+<span class="line"></span>
+<span class="line">package frc.robot.subsystems.scoop;</span>
+<span class="line"></span>
+<span class="line">import edu.wpi.first.wpilibj.xrp.XRPServo;</span>
+<span class="line">import static frc.robot.Constants.ScoopHardware.*;</span>
+<span class="line"></span>
+<span class="line">public class ScoopIOXRP implements ScoopIO {</span>
+<span class="line-old">  private final XRPServo servo = new XRPServo(<span class="ts-before">kServoChannel</span>);</span>
+<span class="line-new">  private final XRPServo servo = new XRPServo(<span class="ts-after">kScoopServoDeviceNumber</span>);</span>
+<span class="line"></span>
+<span class="line">  private double commandedAngleDeg = ScoopConstants.kDefaultAngleDeg;</span>
+<span class="line"></span>
+<span class="line">  @Override</span>
+<span class="line">  public void updateInputs(ScoopIOInputs inputs) {</span>
+<span class="line">    inputs.commandedAngleDeg = commandedAngleDeg;</span>
+<span class="line">  }</span>
+<span class="line"></span>
+<span class="line">  @Override</span>
+<span class="line">  public void setAngleDeg(double angleDeg) {</span>
+<span class="line">    commandedAngleDeg = angleDeg;</span>
+<span class="line">    servo.setAngle(commandedAngleDeg);</span>
+<span class="line">  }</span>
+<span class="line">}</span>
+</pre></div></div>
+
+        <div class="code-annotation">XRPServo lives here and only here. No clamping — the subsystem handles that. <code>commandedAngleDeg</code> is tracked as a field because the servo has no position feedback.</div>
+
+        <p>Build. If you see an error about <code>kScoopServoDeviceNumber</code>, check that the <code>ScoopHardware</code> block was added to <span class="file-badge">Constants.java</span> in the step above.</p>
+      </div>
+    </div><!-- /step 3 -->
+
+    <!-- ── Step 4: ScoopIOSim.java ───────────────────────────────────── -->
+    <div class="sb-step" id="sbstep-4">
+      <div class="sb-step-header" onclick="sbToggle('sbstep-4')">
+        <div class="sb-step-num">4</div>
+        <div class="sb-step-title">Create ScoopIOSim.java</div>
+        <div class="sb-step-chevron">▶</div>
+      </div>
+      <div class="sb-step-body">
+<p>The last IO file. <span class="file-badge">ScoopIOSim.java</span> is the simulation implementation — no hardware, just a double in memory. Create it from the snippet:</p>
+
+        <ol style="margin:0.75rem 0;padding-left:1.6rem;">
+          <li style="margin-bottom:0.4rem;padding-left:0.3rem;">Right-click the <code>scoop/</code> folder, choose <em>New File</em>, name it <code>ScoopIOSim.java</code>. Delete any content VS Code inserted.</li>
+          <li style="margin-bottom:0.4rem;padding-left:0.3rem;">Type <code>akioimpl-sim</code> and press <kbd>Tab</kbd> to expand the snippet.</li>
+          <li style="padding-left:0.3rem;">Tab through the placeholders. Because the file lives in the <code>scoop</code> folder, the class and IO names fill in automatically. Leave <code>kDefaultAngleDeg</code> as is.</li>
+        </ol>
+
+        <p>The result should match this exactly:</p>
+<div class="code-window" data-code="// Copyright (c) 2026 BearBots FRC Team 6964
+// Open Source Software; you can modify and/or share it under the terms of
+// the MIT License available in the root directory of this project.
+
+package frc.robot.subsystems.scoop;
+
+public class ScoopIOSim implements ScoopIO {
+  private double commandedAngleDeg = ScoopConstants.kDefaultAngleDeg;
+
+  @Override
+  public void updateInputs(ScoopIOInputs inputs) {
+    inputs.commandedAngleDeg = commandedAngleDeg;
+  }
+
+  @Override
+  public void setAngleDeg(double angleDeg) {
+    commandedAngleDeg = angleDeg;
+  }
+}">
+<div class="cw-head"><span class="cw-title">NEW FILE - ScoopIOSim.java (akioimpl-servo-sim)</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<div class="code-region" style="counter-reset: ln 0;">
+<pre class="cb">
+<span class="line">// Copyright (c) 2026 BearBots FRC Team 6964</span>
+<span class="line">// Open Source Software; you can modify and/or share it under the terms of</span>
+<span class="line">// the MIT License available in the root directory of this project.</span>
+<span class="line"></span>
+<span class="line">package frc.robot.subsystems.scoop;</span>
+<span class="line"></span>
+<span class="line">public class ScoopIOSim implements ScoopIO {</span>
+<span class="line">  private double commandedAngleDeg = ScoopConstants.kDefaultAngleDeg;</span>
+<span class="line"></span>
+<span class="line">  @Override</span>
+<span class="line">  public void updateInputs(ScoopIOInputs inputs) {</span>
+<span class="line">    inputs.commandedAngleDeg = commandedAngleDeg;</span>
+<span class="line">  }</span>
+<span class="line"></span>
+<span class="line">  @Override</span>
+<span class="line">  public void setAngleDeg(double angleDeg) {</span>
+<span class="line">    commandedAngleDeg = angleDeg;</span>
+<span class="line">  }</span>
+<span class="line">}</span>
+</pre></div></div>
+
+        <div class="code-annotation">No XRPServo import anywhere in this file. In sim, the "hardware" is just a double in memory. That's all the subsystem needs to log and run.</div>
+
+        <p>Build before moving to Step 5.</p>
+      </div>
+    </div><!-- /step 4 -->
+
+
+
+
+<!-- ── Step 5: Recreate Scoop.java ─────────────────────────────────── -->
+    <div class="sb-step" id="sbstep-5">
+      <div class="sb-step-header" onclick="sbToggle('sbstep-5')">
+        <div class="sb-step-num">5</div>
+        <div class="sb-step-title">Recreate Scoop.java</div>
+        <div class="sb-step-chevron">▶</div>
+      </div>
+      <div class="sb-step-body">
+        <p>This is the main event. The current <span class="file-badge">Scoop.java</span> imports <code>XRPServo</code> and calls hardware directly from <code>periodic()</code>. Too many lines change to walk through one at a time, so recreate the file from the snippet instead:</p>
+
+        <ol style="margin:0.75rem 0;padding-left:1.6rem;">
+          <li style="margin-bottom:0.4rem;padding-left:0.3rem;">Open <span class="file-badge">Scoop.java</span> and select all (<kbd>Ctrl</kbd>+<kbd>A</kbd>), then delete. The file is now empty.</li>
+          <li style="margin-bottom:0.4rem;padding-left:0.3rem;">Type <code>aksubsystem-servo</code> and press <kbd>Tab</kbd> to expand the snippet.</li>
+          <li style="padding-left:0.3rem;">Tab through the placeholders. Because the file lives in the <code>scoop</code> folder, the class name, IO type, and constants class fill in automatically. Leave them as is.</li>
+        </ol>
+
+        <p>The result should match this exactly:</p>
+
+<div class="code-window" data-code="// Copyright (c) 2026 BearBots FRC Team 6964
+// Open Source Software; you can modify and/or share it under the terms of
+// the MIT License available in the root directory of this project.
+
+package frc.robot.subsystems.scoop;
+
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.littletonrobotics.junction.Logger;
+import frc.robot.Constants;
+
+public class Scoop extends SubsystemBase {
+  private final ScoopIO io;
+  private final ScoopIOInputsAutoLogged inputs = new ScoopIOInputsAutoLogged();
+
+  private double targetAngleDeg = ScoopConstants.kDefaultAngleDeg;
+
+  public Scoop(ScoopIO io) {
+    this.io = io;
+  }
+
+  // Single source of truth. Every setpoint, named or raw, lands here.
+  public void setAngleDeg(double angleDeg) {
+    targetAngleDeg = MathUtil.clamp(
+        angleDeg,
+        ScoopConstants.kMinAngleDeg,
+        ScoopConstants.kMaxAngleDeg);
+  }
+
+  // Jump to a setpoint immediately. Bind to a button:
+  //   button.onTrue(xxx.setAngleDegCommand(XxxConstants.kDeployedAngleDeg));
+  public Command setAngleDegCommand(double angleDeg) {
+    return runOnce(() -&gt; setAngleDeg(angleDeg));
+  }
+
+  // Slew to a setpoint at a capped rate, finish within tolerance.
+  public Command setAngleDegSteppedCommand(double angleDeg, double degPerSec) {
+    double target = MathUtil.clamp(
+        angleDeg,
+        ScoopConstants.kMinAngleDeg,
+        ScoopConstants.kMaxAngleDeg);
+    return run(() -&gt; {
+      double step = degPerSec * Constants.kLoopPeriodSecs;
+      double delta = MathUtil.clamp(target - targetAngleDeg, -step, step);
+      setAngleDeg(targetAngleDeg + delta);
+    }).until(() -&gt; Math.abs(target - targetAngleDeg)
+        &lt; ScoopConstants.kAngleToleranceDeg);
+  }
+
+  @Override
+  public void periodic() {
+    io.updateInputs(inputs);
+    Logger.processInputs(&quot;Scoop&quot;, inputs);
+    Logger.recordOutput(&quot;Scoop/TargetAngleDeg&quot;, targetAngleDeg);
+
+    io.setAngleDeg(targetAngleDeg);
+  }
+}">
+<div class="cw-head"><span class="cw-title">REPLACE - Scoop.java (aksubsystem-servo)</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<div class="code-region" style="counter-reset: ln 0;">
+<pre class="cb">
+<span class="line">// Copyright (c) 2026 BearBots FRC Team 6964</span>
+<span class="line">// Open Source Software; you can modify and/or share it under the terms of</span>
+<span class="line">// the MIT License available in the root directory of this project.</span>
+<span class="line"></span>
+<span class="line">package frc.robot.subsystems.scoop;</span>
+<span class="line"></span>
+<span class="line">import edu.wpi.first.math.MathUtil;</span>
+<span class="line">import edu.wpi.first.wpilibj2.command.Command;</span>
+<span class="line">import edu.wpi.first.wpilibj2.command.SubsystemBase;</span>
+<span class="line">import org.littletonrobotics.junction.Logger;</span>
+<span class="line">import frc.robot.Constants;</span>
+<span class="line"></span>
+<span class="line">public class Scoop extends SubsystemBase {</span>
+<span class="line">  private final ScoopIO io;</span>
+<span class="line">  private final ScoopIOInputsAutoLogged inputs = new ScoopIOInputsAutoLogged();</span>
+<span class="line"></span>
+<span class="line">  private double targetAngleDeg = ScoopConstants.kDefaultAngleDeg;</span>
+<span class="line"></span>
+<span class="line">  public Scoop(ScoopIO io) {</span>
+<span class="line">    this.io = io;</span>
+<span class="line">  }</span>
+<span class="line"></span>
+<span class="line">  // Single source of truth. Every setpoint, named or raw, lands here.</span>
+<span class="line">  public void setAngleDeg(double angleDeg) {</span>
+<span class="line">    targetAngleDeg = MathUtil.clamp(</span>
+<span class="line">        angleDeg,</span>
+<span class="line">        ScoopConstants.kMinAngleDeg,</span>
+<span class="line">        ScoopConstants.kMaxAngleDeg);</span>
+<span class="line">  }</span>
+<span class="line"></span>
+<span class="line">  // Jump to a setpoint immediately. Bind to a button:</span>
+<span class="line">  //   button.onTrue(xxx.setAngleDegCommand(XxxConstants.kDeployedAngleDeg));</span>
+<span class="line">  public Command setAngleDegCommand(double angleDeg) {</span>
+<span class="line">    return runOnce(() -&gt; setAngleDeg(angleDeg));</span>
+<span class="line">  }</span>
+<span class="line"></span>
+<span class="line">  // Slew to a setpoint at a capped rate, finish within tolerance.</span>
+<span class="line">  public Command setAngleDegSteppedCommand(double angleDeg, double degPerSec) {</span>
+<span class="line">    double target = MathUtil.clamp(</span>
+<span class="line">        angleDeg,</span>
+<span class="line">        ScoopConstants.kMinAngleDeg,</span>
+<span class="line">        ScoopConstants.kMaxAngleDeg);</span>
+<span class="line">    return run(() -&gt; {</span>
+<span class="line">      double step = degPerSec * Constants.kLoopPeriodSecs;</span>
+<span class="line">      double delta = MathUtil.clamp(target - targetAngleDeg, -step, step);</span>
+<span class="line">      setAngleDeg(targetAngleDeg + delta);</span>
+<span class="line">    }).until(() -&gt; Math.abs(target - targetAngleDeg)</span>
+<span class="line">        &lt; ScoopConstants.kAngleToleranceDeg);</span>
+<span class="line">  }</span>
+<span class="line"></span>
+<span class="line">  @Override</span>
+<span class="line">  public void periodic() {</span>
+<span class="line">    io.updateInputs(inputs);</span>
+<span class="line">    Logger.processInputs("Scoop", inputs);</span>
+<span class="line">    Logger.recordOutput("Scoop/TargetAngleDeg", targetAngleDeg);</span>
+<span class="line"></span>
+<span class="line">    io.setAngleDeg(targetAngleDeg);</span>
+<span class="line">  }</span>
+<span class="line">}</span>
+</pre></div></div>
+
+        <div class="code-annotation">Search this file for XRPServo. Not there. The subsystem talks to ScoopIO — it doesn't know or care what's on the other end. The clamp lives here, at the subsystem boundary, not in the IO layer.</div>
+
+        <p>Build and simulate. Press the D-pad buttons wired to Scoop in <span class="file-badge">RobotContainer.java</span> — they should still work. If anything is broken, check imports before anything else.</p>
+      </div>
+    </div><!-- /step 5 -->
+
+    <!-- ── Step 6: Wire RobotContainer ───────────────────────────────── -->
+    <div class="sb-step" id="sbstep-6">
+      <div class="sb-step-header" onclick="sbToggle('sbstep-6')">
+        <div class="sb-step-num">6</div>
+        <div class="sb-step-title">Wire up RobotContainer</div>
+        <div class="sb-step-chevron">▶</div>
+      </div>
+      <div class="sb-step-body">
+        <p><code>Scoop</code> now requires a <code>ScoopIO</code> in its constructor. Open <span class="file-badge">RobotContainer.java</span> and make two changes: add three Scoop IO imports, then move <code>scoop</code> inside the switch.</p>
+
+<p>The result should match this exactly:</p>
+
+        <p><strong>Imports</strong> (top of file):</p>
+<div class="code-window" data-code="import frc.robot.subsystems.drive.DriveIOXRP;
+import frc.robot.subsystems.scoop.Scoop;
+import frc.robot.subsystems.scoop.ScoopConstants;
+import frc.robot.subsystems.scoop.ScoopIO;
+import frc.robot.subsystems.scoop.ScoopIOXRP;
+import frc.robot.subsystems.scoop.ScoopIOSim;">
+<div class="cw-head"><span class="cw-title">RobotContainer.java — imports</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<div class="code-region" style="counter-reset: ln 28;">
+<pre class="cb">
+<span class="line">import frc.robot.subsystems.drive.DriveIOXRP;</span>
+<span class="line">import frc.robot.subsystems.scoop.Scoop;</span>
+<span class="line-add">import frc.robot.subsystems.scoop.ScoopConstants;</span>
+<span class="line-add">import frc.robot.subsystems.scoop.ScoopIO;</span>
+<span class="line-add">import frc.robot.subsystems.scoop.ScoopIOXRP;</span>
+<span class="line-add">import frc.robot.subsystems.scoop.ScoopIOSim;</span>
+</pre></div></div>
+
+        <p><strong>Switch</strong> — one scoop line per case, and delete the old <code>scoop = new Scoop();</code>:</p>
+<div class="code-window" data-code="        drive = new Drive(new DriveIOXRP());
+        arm = new Arm(new ArmIOXRP());
+        scoop = new Scoop(new ScoopIOXRP());
+        break;
+      case SIM: // Simulated code
+        drive = new Drive(new DriveIOSim());
+        arm = new Arm(new ArmIOSim());
+        scoop = new Scoop(new ScoopIOSim());
+        break;
+      default: // Log replay
+        drive = new Drive(new DriveIO() {});
+        arm = new Arm(new ArmIO() {});
+        scoop = new Scoop(new ScoopIO() {});
+        break;
+    }
+
+    configureButtonBindings();">
+<div class="cw-head"><span class="cw-title">RobotContainer.java — switch</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<div class="code-region" style="counter-reset: ln 60;">
+<pre class="cb">
+<span class="line">        drive = new Drive(new DriveIOXRP());</span>
+<span class="line">        arm = new Arm(new ArmIOXRP());</span>
+<span class="line-add">        scoop = new Scoop(new ScoopIOXRP());</span>
+<span class="line">        break;</span>
+<span class="line">      case SIM: // Simulated code</span>
+<span class="line">        drive = new Drive(new DriveIOSim());</span>
+<span class="line">        arm = new Arm(new ArmIOSim());</span>
+<span class="line-add">        scoop = new Scoop(new ScoopIOSim());</span>
+<span class="line">        break;</span>
+<span class="line">      default: // Log replay</span>
+<span class="line">        drive = new Drive(new DriveIO() {});</span>
+<span class="line">        arm = new Arm(new ArmIO() {});</span>
+<span class="line-add">        scoop = new Scoop(new ScoopIO() {});</span>
+<span class="line">        break;</span>
+<span class="line">    }</span>
+<span class="line-del">    scoop = new Scoop();</span>
+<span class="line">    </span>
+<span class="line">    configureButtonBindings();</span>
+</pre></div></div>
+
+        <p><strong>D-pad bindings</strong> — swap raw angles for named constants:</p>
+<div class="code-window" data-code="    // add this - D-pad controls the scoop
+    new POVButton(controller, 90)  // 6
+        .onTrue(scoop.setAngleDegCommand(ScoopConstants.kFlatAngleDeg));
+    new POVButton(controller, 0)   // 8
+        .onTrue(scoop.setAngleDegCommand(ScoopConstants.kCarryAngleDeg));
+    new POVButton(controller, 180) // 2
+        .onTrue(scoop.setAngleDegCommand(ScoopConstants.kDumpAngleDeg));
+
+  }">
+<div class="cw-head"><span class="cw-title">RobotContainer.java — D-pad bindings</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<div class="code-region" style="counter-reset: ln 103;">
+<pre class="cb">
+<span class="line"><span class="cm">    // add this - D-pad controls the scoop</span></span>
+<span class="line">    new POVButton(controller, 90)  // 6</span>
+<span class="line-old">        .onTrue(scoop.setAngleDegCommand(<span class="ts-before">Scoop.Goal.FLAT</span>));</span>
+<span class="line-new">        .onTrue(scoop.setAngleDegCommand(<span class="ts-after">ScoopConstants.kFlatAngleDeg</span>));</span>
+<span class="line">    new POVButton(controller, 0)   // 8</span>
+<span class="line-old">        .onTrue(scoop.setAngleDegCommand(<span class="ts-before">Scoop.Goal.CARRY</span>));</span>
+<span class="line-new">        .onTrue(scoop.setAngleDegCommand(<span class="ts-after">ScoopConstants.kCarryAngleDeg</span>));</span>
+<span class="line">    new POVButton(controller, 180) // 2</span>
+<span class="line-old">        .onTrue(scoop.setAngleDegCommand(<span class="ts-before">Scoop.Goal.DUMP));</span></span>
+<span class="line-new">        .onTrue(scoop.setAngleDegCommand(<span class="ts-after">ScoopConstants.kDumpAngleDeg</span>));</span>
+<span class="line-add"></span>
+<span class="line">  }</span>
+</pre></div></div>
+
+        <div class="code-annotation">The Scoop subsystem never changes between environments. The switch is the only place mode-specific decisions live. One line per case — that's the entire hardware abstraction from RobotContainer's perspective.</div>
+
+        <p>Build and simulate. Press the D-pad buttons — FLAT, CARRY, DUMP should all still work. In AdvantageScope, watch the angle change under <code>AdvantageKit/Scoop/CommandedAngleDeg</code> to verify the logging is running.</p>
+      </div>
+    </div><!-- /step 6 -->
+
+  </div><!-- /step-builder -->
+
+  <div class="hf-box hf-brain">
+    <span class="hf-label">Write before you move on</span>
+    <p>In your own words: why does <span class="file-badge">Scoop.java</span> no longer import <code>XRPServo</code>? What file does instead, and why does that split matter? Explain it to the person next to you before opening Part 4.</p>
+  </div>
+
+</div><!-- /section-convert -->
+
+  <!-- ═══════════════════════════════════════════════════════════
+       PART 4 - VISUALIZATION
+       ═══════════════════════════════════════════════════════════ -->
+  <div class="lesson-section" id="section-visualize">
+
+    <p>
+      The scoop moves in the real world, but AdvantageScope can also show a live 2D diagram
+      that updates as you press buttons. This is the <strong>Mechanism2d</strong> view. It lets you
+      confirm your angle mapping is correct without looking at the robot.
+    </p>
+
+    <p>This part makes changes to three files:</p>
+    <ul style="margin:0.5rem 0 1rem 1.5rem;font-size:0.88rem;color:var(--mid);">
+      <li><span class="file-badge">Scoop.java</span> — add a <code>LoggedMechanism2d</code> and a <code>getComponentPose()</code> getter</li>
+      <li><span class="file-badge">RobotContainer.java</span> — add a <code>getScoop()</code> getter</li>
+      <li><span class="file-badge">Robot.java</span> — aggregate both subsystem poses into one <code>FinalComponentPoses</code> key</li>
+    </ul>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">Why does FinalComponentPoses move to Robot.java?</span>
+      <p>AdvantageScope's 3D view reads a single array under the key <code>FinalComponentPoses</code>. If each subsystem logs its own array to that key, the last one written each loop wins and the others disappear. The fix is to collect all component poses once per loop and log them together. <code>Robot.java</code>'s <code>robotPeriodic()</code> runs after all subsystem <code>periodic()</code> methods, making it the right place for that aggregation.</p>
+    </div>
+
+    <div class="step-builder">
+
+    <div class="sb-step open" id="vizstep-1">
+      <div class="sb-step-header" onclick="sbToggle('vizstep-1')">
+        <div class="sb-step-num">1</div>
+        <div class="sb-step-title">Add Mechanism2d to Scoop.java</div>
+        <div class="sb-step-chevron">▶</div>
+      </div>
+      <div class="sb-step-body">
+<div class="hf-box hf-info">
+  <span class="hf-label">Reading the code blocks</span>
+  <p>Red is old, amber is new, green is added. Line numbers match your finished file. See the full guide in the first part.</p>
+</div>
+<p><strong>Imports</strong> (top of file):</p>
+<div class="code-window" data-code="import org.littletonrobotics.junction.Logger;
+import frc.robot.Constants;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
+
+import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
+import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
+import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
+
+public class Scoop extends SubsystemBase {">
+<div class="cw-head"><span class="cw-title">Scoop.java — imports</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<div class="code-region" style="counter-reset: ln 9;">
+<pre class="cb">
+<span class="line">import org.littletonrobotics.junction.Logger;</span>
+<span class="line">import frc.robot.Constants;</span>
+<span class="line-add">import edu.wpi.first.math.geometry.Pose3d;</span>
+<span class="line-add">import edu.wpi.first.math.geometry.Rotation3d;</span>
+<span class="line-add">import edu.wpi.first.wpilibj.util.Color;</span>
+<span class="line-add">import edu.wpi.first.wpilibj.util.Color8Bit;</span>
+<span class="line-add"></span>
+<span class="line-add">import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;</span>
+<span class="line-add">import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;</span>
+<span class="line-add">import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;</span>
+<span class="line"></span>
+<span class="line">public class Scoop extends SubsystemBase {</span>
+</pre></div></div>
+
+        <p><strong>Fields</strong> (after <code>targetAngleDeg</code>):</p>
+<div class="code-window" data-code="  private double targetAngleDeg = ScoopConstants.kDefaultAngleDeg;
+  
+  // Mechanism2d: vertical column on the front of the robot
+  private final LoggedMechanism2d mechanism = new LoggedMechanism2d(2, 1);
+  private final LoggedMechanismRoot2d root = mechanism.getRoot(&quot;ScoopPivot&quot;, 1.125, 0.016);
+  private final LoggedMechanismLigament2d scoopLigament =
+      root.append(new LoggedMechanismLigament2d(&quot;Scoop&quot;, 0.05, 0, 3.25, new Color8Bit(Color.kDarkGray)));
+  private Pose3d componentPose = new Pose3d();
+
+  public Scoop(ScoopIO io) {
+    this.io = io;">
+<div class="cw-head"><span class="cw-title">Scoop.java — fields</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<div class="code-region" style="counter-reset: ln 24;">
+<pre class="cb">
+<span class="line">  private double targetAngleDeg = ScoopConstants.kDefaultAngleDeg;</span>
+<span class="line"></span>
+<span class="line-add"><span class="cm">  // Mechanism2d: vertical column on the front of the robot</span></span>
+<span class="line-add">  private final LoggedMechanism2d mechanism = new LoggedMechanism2d(2, 1);</span>
+<span class="line-add">  private final LoggedMechanismRoot2d root = mechanism.getRoot("ScoopPivot", 1.125, 0.016);</span>
+<span class="line-add">  private final LoggedMechanismLigament2d scoopLigament =</span>
+<span class="line-add">      root.append(new LoggedMechanismLigament2d("Scoop", 0.05, 0, 3.25, new Color8Bit(Color.kDarkGray)));</span>
+<span class="line-add">  private Pose3d componentPose = new Pose3d();</span>
+<span class="line-add"></span>
+<span class="line">  public Scoop(ScoopIO io) {</span>
+<span class="line">    this.io = io;</span>
+</pre></div></div>
+
+        <p><strong>In <code>periodic()</code></strong> and the getter:</p>
+<div class="code-window" data-code="    Logger.recordOutput(&quot;Scoop/TargetAngleDeg&quot;, targetAngleDeg);
+
+    // FLAT, CARRY, DUMP
+    scoopLigament.setAngle(inputs.commandedAngleDeg - 45);
+    Logger.recordOutput(&quot;Scoop/Mechanism2d&quot;, mechanism);
+    componentPose = new Pose3d(0.0, 0.0, 0.0,
+        new Rotation3d(0.0, Math.toRadians(scoopLigament.getAngle()), 0.0));
+
+    io.setAngleDeg(targetAngleDeg);
+  }
+
+  /** Returns the current 3D pose of the scoop for AdvantageScope aggregation. */
+  public Pose3d getComponentPose() {
+    return componentPose;
+  }
+}  ">
+<div class="cw-head"><span class="cw-title">Scoop.java — periodic() and getter</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<div class="code-region" style="counter-reset: ln 69;">
+<pre class="cb">
+<span class="line">    Logger.recordOutput("Scoop/TargetAngleDeg", targetAngleDeg);</span>
+<span class="line"></span>
+<span class="line-add"><span class="cm">    // FLAT, CARRY, DUMP</span></span>
+<span class="line-add">    scoopLigament.setAngle(inputs.commandedAngleDeg - 45);</span>
+<span class="line-add">    Logger.recordOutput("Scoop/Mechanism2d", mechanism);</span>
+<span class="line-add">    componentPose = new Pose3d(0.0, 0.0, 0.0,</span>
+<span class="line-add">        new Rotation3d(0.0, Math.toRadians(scoopLigament.getAngle()), 0.0));</span>
+<span class="line-add"></span>
+<span class="line">    io.setAngleDeg(targetAngleDeg);</span>
+<span class="line">  }</span>
+<span class="line-add"></span>
+<span class="line-add"><span class="cm">  /** Returns the current 3D pose of the scoop for AdvantageScope aggregation. */</span></span>
+<span class="line-add">  public Pose3d getComponentPose() {</span>
+<span class="line-add">    return componentPose;</span>
+<span class="line-add">  }</span>
+<span class="line">}</span>
+</pre></div></div>
+
+        <div class="code-annotation">The scoop offsets are <code>(0.0, 0.0, 0.0)</code> - 3D placeholders until the mounting position is measured on the physical robot. The 2D Mechanism2d view will still work correctly in the simulator.</div>
+      </div>
+    </div><!-- /vizstep-1 -->
+
+    <div class="sb-step" id="vizstep-2">
+      <div class="sb-step-header" onclick="sbToggle('vizstep-2')">
+        <div class="sb-step-num">2</div>
+        <div class="sb-step-title">Add getters to RobotContainer.java</div>
+        <div class="sb-step-chevron">▶</div>
+      </div>
+<div class="sb-step-body">
+<p>Add a scoop getter after <code>getArm()</code>. Lines in <span style="color:#1a7a4c;font-weight:600;">green</span> are new.</p>
+<div class="code-window" data-code="    return arm;
+  }
+
+  public frc.robot.subsystems.scoop.Scoop getScoop() {
+    return scoop;
+  }
+}">
+<div class="cw-head"><span class="cw-title">RobotContainer.java — getScoop()</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<div class="code-region" style="counter-reset: ln 129;">
+<pre class="cb">
+<span class="line">    return arm;</span>
+<span class="line">  }</span>
+<span class="line-add"></span>
+<span class="line-add">  public frc.robot.subsystems.scoop.Scoop getScoop() {</span>
+<span class="line-add">    return scoop;</span>
+<span class="line-add">  }</span>
+<span class="line">}</span>
+</pre></div></div>
+
+        <div class="code-annotation">Using fully qualified type names avoids adding new imports to RobotContainer.java.</div>
+      </div>
+    </div><!-- /vizstep-2 -->
+
+    <div class="sb-step" id="vizstep-3">
+      <div class="sb-step-header" onclick="sbToggle('vizstep-3')">
+        <div class="sb-step-num">3</div>
+        <div class="sb-step-title">Aggregate poses in Robot.java</div>
+        <div class="sb-step-chevron">▶</div>
+      </div>
+<div class="sb-step-body">
+<p>Update <code>robotPeriodic()</code> to add the scoop pose to the array. Lines in <span style="color:#1a7a4c;font-weight:600;">green</span> are new, <span style="color:#b8860b;font-weight:600;">amber</span> is modified.</p>
+<div class="code-window" data-code="    // Aggregate all component poses for AdvantageScope 3D view.
+    Logger.recordOutput(&quot;FinalComponentPoses&quot;, new Pose3d[] {
+      robotContainer.getArm().getComponentPose(),
+      robotContainer.getScoop().getComponentPose()
+    });
+  }">
+<div class="cw-head"><span class="cw-title">Robot.java — robotPeriodic()</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<div class="code-region" style="counter-reset: ln 85;">
+<pre class="cb">
+<span class="line"><span class="cm">    // Aggregate all component poses for AdvantageScope 3D view.</span></span>
+<span class="line">    Logger.recordOutput("FinalComponentPoses", new Pose3d[] {</span>
+<span class="line-old">      robotContainer.getArm().getComponentPose()</span>
+<span class="line-new">      robotContainer.getArm().getComponentPose()<span class="ts-after">,</span></span>
+<span class="line-add">      robotContainer.getScoop().getComponentPose()</span>
+<span class="line">    });</span>
+<span class="line">  }</span>
+</pre></div></div>
+
+        <div class="code-annotation">Each subsystem owns its pose math. Robot.java just collects them into one array each loop so AdvantageScope's 3D view sees all components together.</div>
+      </div>
+    </div><!-- /vizstep-3 -->
+
+    <div class="sb-step" id="vizstep-4">
+      <div class="sb-step-header" onclick="sbToggle('vizstep-4')">
+        <div class="sb-step-num">4</div>
+        <div class="sb-step-title">Verify in AdvantageScope</div>
+        <div class="sb-step-chevron">▶</div>
+      </div>
+      <div class="sb-step-body">
+        <p>No new code here. This step confirms the visualization pipeline actually works: change the scoop goal, watch the picture move. Sim first, as always.</p>
+
+        <p><strong>Start the simulator with the Sim GUI:</strong></p>
+        <ol style="margin:0.25rem 0 0.75rem 1.5rem;">
+          <li>Press <code>Ctrl+Shift+P</code>, type <em>Simulate Robot Code</em>, and select <em>WPILib: Simulate Robot Code</em>.</li>
+          <li>An <strong>extension picker</strong> appears, listing the simulation extensions. Check the box for <strong>Sim GUI</strong> (<code>halsim_gui</code>). Leave the others unchecked for a plain simulator run.</li>
+          <li>Click <strong>OK</strong>. The Sim GUI window opens.</li>
+        </ol>
+        <div class="hf-box hf-warning">
+          <span class="hf-label">No picker appeared?</span>
+          <p>If the simulator launched straight to a window with no checklist, the picker is being skipped. Open <span class="file-badge">.vscode/settings.json</span> and set <code>"wpilib.skipSelectSimulateExtension"</code> to <code>false</code>, then run <em>Simulate Robot Code</em> again. The picker is how you make sure the Sim GUI is loaded and nothing else sneaks in.</p>
+        </div>
+
+        <p><strong>Connect AdvantageScope to the running sim:</strong></p>
+        <ol style="margin:0.25rem 0 0.75rem 1.5rem;">
+          <li>In the Sim GUI, set the robot state to <strong>Teleoperated</strong> so <code>periodic()</code> runs.</li>
+          <li>Open AdvantageScope and choose <em>File &rarr; Connect to Simulator</em>. The left sidebar fills with live keys.</li>
+        </ol>
+
+        <p><strong>Set up the view in AdvantageScope:</strong></p>
+        <ol style="margin:0.25rem 0 0.75rem 1.5rem;">
+          <li>Open a new tab and choose the <strong>3D Field</strong> view.</li>
+          <li>Drag out <code>AdvantageKit/RealOutputs/Drive/Pose</code>. This places the robot on the field.</li>
+          <li>Drag out <code>AdvantageKit/RealOutputs/FinalComponentPoses</code> and drop it onto the <code>Drive/Pose</code> entry you just added. This attaches the arm and scoop components to the robot.</li>
+          <li>Drag out <code>AdvantageKit/RealOutputs/Scoop/Mechanism2d</code>. This gives the 2D angle view alongside the 3D field.</li>
+        </ol>
+
+        <p><strong>Verify 2D and 3D together:</strong></p>
+        <p>Press your scoop buttons to move between FLAT, CARRY, and DUMP. Watch both views at once: the 3D scoop and arm components rotate, and the 2D Mechanism2d ligament swings to match. They should agree on every goal. Repeat with the arm to confirm it reads the same way.</p>
+
+        <div class="hf-box hf-info">
+          <span class="hf-label">Why the 2D view is the one to trust right now</span>
+          <p>The scoop&apos;s 3D chassis offset is still a placeholder of <code>(0.0, 0.0, 0.0)</code> until it is measured on the physical robot, so in the 3D Field view the scoop sits at the chassis origin instead of its real mounting point. The rotation is correct, the position is not. The 2D <code>Mechanism2d</code> view does not depend on that offset, so it is the trustworthy confirmation that your angle mapping is right.</p>
+        </div>
+
+        <div class="hf-box hf-warning">
+          <span class="hf-label">If nothing moves</span>
+          <p>Sidebar is empty: the sim is not running, or AdvantageScope is not connected to it. Pose appears but never changes: the goal is not actually changing, so confirm your button bindings fire <code>setGoalCommand()</code>. Mechanism2d folder is missing: the <code>Logger.recordOutput("Scoop/Mechanism2d", ...)</code> line in <code>periodic()</code> is missing or misspelled.</p>
+        </div>
+      </div>
+    </div><!-- /vizstep-4 -->
+
+    </div><!-- /step-builder -->
+
+  </div><!-- /section-visualize -->
+
+
+
+  <!-- ═══════════════════════════════════════════════════════
+       PART 3 - ADVANTAGESCOPE
+       ═══════════════════════════════════════════════════════ -->
+  <div class="lesson-section" id="section-scope">
+
+    <p>
+      Your Scoop subsystem is now logging every loop cycle. <code>Logger.processInputs("Scoop", inputs)</code>
+      writes <code>commandedAngleDeg</code> to a log file every 20ms.
+      In this part you'll create that log, open it, and see it.
+    </p>
+
+    <h2>Step 1: Create a log</h2>
+
+    <div class="scope-steps">
+      <div class="scope-step">
+        <div class="scope-step-num">1</div>
+        <div class="scope-step-body"><strong>Run the simulator.</strong> <code>Ctrl+Shift+P</code> → <em>WPILib: Simulate Robot Code</em>. Wait for it to connect.</div>
+      </div>
+      <div class="scope-step">
+        <div class="scope-step-num">2</div>
+        <div class="scope-step-body"><strong>Press your scoop buttons</strong> a few times. Hold one down for a second. Release it. Move between FLAT, CARRY, and DUMP.</div>
+      </div>
+      <div class="scope-step">
+        <div class="scope-step-num">3</div>
+        <div class="scope-step-body"><strong>Stop the simulator.</strong> A <code>.wpilog</code> file was written to the <code>logs/</code> folder next to your project. If you don't see a <code>logs/</code> folder, check that <code>Logger.addDataReceiver(new WPILOGWriter())</code> is in your <code>Robot.java</code> constructor.</div>
+      </div>
+    </div>
+
+    <h2>Step 2: Open the log in AdvantageScope</h2>
+
+    <div class="scope-steps">
+      <div class="scope-step">
+        <div class="scope-step-num">1</div>
+        <div class="scope-step-body"><strong>Open AdvantageScope.</strong> File → <em>Open Log...</em> → navigate to your <code>logs/</code> folder → select the most recent <code>.wpilog</code> file.</div>
+      </div>
+      <div class="scope-step">
+        <div class="scope-step-num">2</div>
+        <div class="scope-step-body"><strong>Find the Scoop folder</strong> in the left sidebar. It's under <code>AdvantageKit/RealOutputs/Scoop/</code>. If the folder isn't there, your <code>processInputs()</code> call is missing or misspelled.</div>
+      </div>
+      <div class="scope-step">
+        <div class="scope-step-num">3</div>
+        <div class="scope-step-body"><strong>Drag <code>CommandedAngleDeg</code></strong> onto the Line Graph tab. You should see a flat line that jumps when you pressed the buttons.</div>
+      </div>
+    </div>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">Reading the sidebar</span>
+      <p><code>AdvantageKit/RealOutputs/</code> contains your subsystem inputs logged via <code>processInputs()</code>. This is where <code>Scoop/CommandedAngleDeg</code> lives.</p>
+      <p><code>RealOutputs/</code> (without the AdvantageKit prefix) contains values logged via <code>Logger.recordOutput()</code> directly - things your code computed, not things the hardware reported.</p>
+      <p>Inputs and outputs are in separate folders intentionally. Once you know the layout, finding any value is fast.</p>
+    </div>
+
+    <h2>Step 3: Scrub the timeline</h2>
+
+    <div class="scope-steps">
+      <div class="scope-step">
+        <div class="scope-step-num">1</div>
+        <div class="scope-step-body"><strong>Click somewhere in the timeline</strong> at the bottom of the window. Every visualization jumps to that moment.</div>
+      </div>
+      <div class="scope-step">
+        <div class="scope-step-num">2</div>
+        <div class="scope-step-body"><strong>Press the right arrow key.</strong> The cursor moves one robot loop (20ms) forward. Press it several times.</div>
+      </div>
+      <div class="scope-step">
+        <div class="scope-step-num">3</div>
+        <div class="scope-step-body"><strong>Click a moment where the angle changed.</strong> What was the value one tick before? One tick after? That's the resolution you have for debugging at competition.</div>
+      </div>
+    </div>
+
+    <div class="hf-box hf-brain">
+      <span class="hf-label">Do this before moving on</span>
+      <p>Find the exact loop tick where the angle changed from FLAT to CARRY. What timestamp is it? Write it down.</p>
+    </div>
+
+  </div><!-- /section-scope -->
+
+
+  <!-- ═══════════════════════════════════════════════════════
+       PART 4 - REPLAY
+       ═══════════════════════════════════════════════════════ -->
+  <div class="lesson-section" id="section-replay">
+
+    <p>
+      You have a log file from Part 5. Replay mode lets you re-run your robot code against that exact log,
+      getting the same sensor inputs byte for byte, without touching any hardware.
+      This is how you debug a match at home at midnight.
+    </p>
+
+    <div class="hf-box hf-brain">
+      <span class="hf-label">Why replay matters</span>
+      <p>Normal debugging: something breaks at competition, you try to reproduce it at practice, it doesn't happen, and you're guessing.</p>
+      <p>With replay: load the log from the match where it broke, run your code against it, and watch it happen again on your laptop with no robot and no field. The order of those two lines in <code>periodic()</code> is what makes that possible.</p>
+    </div>
+
+    <h2>How replay works</h2>
+
+    <p>In REPLAY mode, <code>processInputs()</code> doesn't write to a log. It reads from one, overwriting the inputs struct with values from the original run. Your IO implementation (<code>ScoopIOXRP</code>, <code>ScoopIOSim</code>) is replaced with a no-op stub. The hardware doesn't run. The log does.</p>
+
+    <div class="io-compare">
+      <div class="io-pane interface">
+        <div class="io-pane-label">Normal run (REAL or SIM)</div>
+        <div class="code-block"><pre>
+io.updateInputs(inputs);
+<span class="cm">// reads from hardware or sim</span>
+
+Logger.processInputs("Scoop", inputs);
+<span class="cm">// writes inputs to log file</span></pre></div>
+      </div>
+      <div class="io-pane subsystem">
+        <div class="io-pane-label">Replay run (REPLAY)</div>
+        <div class="code-block"><pre>
+io.updateInputs(inputs);
+<span class="cm">// no-op: does nothing</span>
+
+Logger.processInputs("Scoop", inputs);
+<span class="cm">// reads from log INTO inputs struct</span></pre></div>
+      </div>
+    </div>
+
+    <p>Your subsystem code runs normally. It reads from <code>inputs</code>. It computes outputs. It calls <code>Logger.recordOutput()</code>. Those outputs go into a new log file as <code>ReplayOutputs/</code>. You then compare <code>RealOutputs/</code> from the original run against <code>ReplayOutputs/</code> from the replay.</p>
+
+    <h2>Switching modes</h2>
+
+    <p>Two knobs control what the robot code does, and you set both by hand. <code>Constants.currentMode</code> picks the runtime behavior (which IO runs, whether the logger reads or writes). The <code>ROBOT_MODE</code> line in <span class="file-badge">build.gradle</span> picks which simulation extensions Gradle launches. They use slightly different names: the hardware mode is <code>REAL</code> in Constants but <code>XRP</code> in build.gradle.</p>
+
+    <table style="width:100%;border-collapse:collapse;margin:0.5rem 0 1rem;font-size:0.85rem;">
+      <thead>
+        <tr style="background:var(--teal);color:var(--white);">
+          <th style="text-align:left;padding:6px 10px;border:1px solid var(--teal-border);">What you are doing</th>
+          <th style="text-align:left;padding:6px 10px;border:1px solid var(--teal-border);"><code>Constants.currentMode</code></th>
+          <th style="text-align:left;padding:6px 10px;border:1px solid var(--teal-border);">build.gradle <code>ROBOT_MODE</code></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="padding:6px 10px;border:1px solid var(--gray-border);">Simulator on your laptop</td>
+          <td style="padding:6px 10px;border:1px solid var(--gray-border);"><code>Mode.SIM</code></td>
+          <td style="padding:6px 10px;border:1px solid var(--gray-border);"><code>RobotMode.SIM</code></td>
+        </tr>
+        <tr style="background:var(--gray-bg);">
+          <td style="padding:6px 10px;border:1px solid var(--gray-border);">Live XRP hardware (bonus)</td>
+          <td style="padding:6px 10px;border:1px solid var(--gray-border);"><code>Mode.REAL</code></td>
+          <td style="padding:6px 10px;border:1px solid var(--gray-border);"><code>RobotMode.XRP</code></td>
+        </tr>
+        <tr>
+          <td style="padding:6px 10px;border:1px solid var(--gray-border);">Replaying a log</td>
+          <td style="padding:6px 10px;border:1px solid var(--gray-border);"><code>Mode.REPLAY</code></td>
+          <td style="padding:6px 10px;border:1px solid var(--gray-border);"><code>RobotMode.REPLAY</code></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>Whenever you finish, set both back to the SIM row. That is the safe state to commit and the state your next simulate session expects.</p>
+
+    <h2>Run your first replay</h2>
+
+    <div class="hf-box hf-warning">
+      <span class="hf-label">Follow the instructor first</span>
+      <p>Watch the full walkthrough on the instructor's screen before doing it yourself. The sequence matters.</p>
+    </div>
+
+    <div class="scope-steps">
+      <div class="scope-step">
+        <div class="scope-step-num">1</div>
+        <div class="scope-step-body">
+          <strong>Set the runtime mode.</strong> In <span class="file-badge">Constants.java</span>, change <code>currentMode</code> to <code>Mode.REPLAY</code>.
+          <div class="code-block"><pre>
+<span class="kw">public static final</span> Mode currentMode = Mode.REPLAY;  <span class="cm-add">// ← changed</span></pre></div>
+        </div>
+      </div>
+      <div class="scope-step">
+        <div class="scope-step-num">2</div>
+        <div class="scope-step-body">
+          <strong>Set the build mode.</strong> In <span class="file-badge">build.gradle</span>, change <code>ROBOT_MODE</code> to <code>RobotMode.REPLAY</code>.
+          <div class="code-block"><pre>
+<span class="kw">def</span> ROBOT_MODE = RobotMode.REPLAY  <span class="cm-add">// ← changed</span></pre></div>
+        </div>
+      </div>
+      <div class="scope-step">
+        <div class="scope-step-num">3</div>
+        <div class="scope-step-body">
+          <strong>List your logs.</strong> In the terminal, run <code>./replay.bat -List</code>. It prints the log files in <code>logs/</code>.
+        </div>
+      </div>
+      <div class="scope-step">
+        <div class="scope-step-num">4</div>
+        <div class="scope-step-body">
+          <strong>Run the replay.</strong> Copy the filename from the list and run <code>./replay.bat <em>filename</em></code> with just the name, no path. The script blanks any leftover extension settings, sets the log path, runs your code against the log, and writes a new <code>_sim.wpilog</code> next to the original.
+        </div>
+      </div>
+      <div class="scope-step">
+        <div class="scope-step-num">5</div>
+        <div class="scope-step-body">
+          <strong>Compare in AdvantageScope.</strong> Open the new <code>_sim.wpilog</code>. Find <code>ReplayOutputs/Scoop/CommandedAngleDeg</code> and compare it to <code>AdvantageKit/RealOutputs/Scoop/CommandedAngleDeg</code> from the original run. They should match exactly: same values, same timestamps.
+        </div>
+      </div>
+      <div class="scope-step">
+        <div class="scope-step-num">6</div>
+        <div class="scope-step-body">
+          <strong>Add a new output and replay the same log.</strong> This is the part that makes replay useful. In <span class="file-badge">Scoop.java</span>, add a new logged value in <code>periodic()</code> right after line 68:
+          <div class="code-block"><pre>
+<span class="ln">68</span>    Logger.recordOutput(<span class="str">"Scoop/Goal"</span>, goal.toString());
+<span class="ln">69</span><span class="line-add">    Logger.recordOutput(<span class="str">"Scoop/NewAngle"</span>, clamped + <span class="num">5.0</span>);</span></pre></div>
+          Save the file. The watch loop from step 4 is still running: it detects the change and replays the log again on its own, so the new value shows up in AdvantageScope without you running anything. You did not touch the robot or the field. You computed a brand new output from the inputs that were recorded the first time.
+        </div>
+      </div>
+      <div class="scope-step">
+        <div class="scope-step-num">7</div>
+        <div class="scope-step-body">
+          <strong>Find the new output.</strong> There is now a <code>ReplayOutputs/Scoop/NewAngle</code> key that did not exist in the original log. Compare it to <code>ReplayOutputs/Scoop/CommandedAngleDeg</code>: it tracks the same shape, offset by exactly 5 degrees. The original run never logged this value, and you produced it anyway, from recorded data, with no robot in the room.
+        </div>
+      </div>
+      <div class="scope-step">
+        <div class="scope-step-num">8</div>
+        <div class="scope-step-body">
+          <strong>Stop the replay.</strong> The replay runs in a watch loop, so it keeps going until you stop it. In the terminal, press <kbd>Ctrl</kbd>+<kbd>C</kbd>. When it asks <code>Terminate batch job (Y/N)?</code>, type <code>Y</code> and press <kbd>Enter</kbd>.
+        </div>
+      </div>
+      <div class="scope-step">
+        <div class="scope-step-num">9</div>
+        <div class="scope-step-body">
+          <strong>Set both knobs back to SIM</strong> when you are done: <code>Constants.currentMode = Mode.SIM</code> and <code>ROBOT_MODE = RobotMode.SIM</code>. You can keep the <code>NewAngle</code> line or remove it; it does not change how the robot drives.
+        </div>
+      </div>
+    </div>
+
+    <div class="hf-box hf-warning">
+      <span class="hf-label">Gotchas worth knowing</span>
+      <p>In Part 4 you checked Sim GUI in the extension picker. Replay is the opposite: it must load no extensions at all. AdvantageKit refuses to replay if any simulation extension is loaded, which is exactly why replay runs through <code>./replay.bat</code> instead of the picker. Use the script, not <em>Simulate Robot Code</em>.</p>
+      <p>The <code>_sim.wpilog</code> file is the replay output, written next to the source log. <code>replay.bat -List</code> hides <code>*_sim.wpilog</code> on purpose, so you cannot accidentally replay a replay.</p>
+      <p>Commit with both knobs on the SIM row. A committed REPLAY or XRP setting breaks the next person’s simulate session.</p>
+    </div>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">If they don't match</span>
+      <p>If <code>RealOutputs/</code> and <code>ReplayOutputs/</code> don't match with unchanged code, replay isn't reading the log correctly. Confirm both knobs are on the REPLAY row and that you launched with <code>./replay.bat</code> rather than <em>Simulate Robot Code</em>.</p>
+    </div>
+
+    <div class="chat-thread">
+      <div class="bubble bubble-q">
+        <div class="bubble-who">Student</div>
+        Do I have to change Constants.java back after replay?
+      </div>
+      <div class="bubble bubble-a">
+        <div class="bubble-who">Yes. Every time.</div>
+        Leaving it on REPLAY and deploying means the robot runs with no hardware outputs, no motor commands. Set both knobs back to the SIM row before your next simulate session, and to the REAL/XRP row before deploying to hardware.
+      </div>
+      <div class="bubble bubble-q">
+        <div class="bubble-who">Student</div>
+        What if I didn't log enough? Like, what if the thing that broke isn't in the log?
+      </div>
+      <div class="bubble bubble-a">
+        <div class="bubble-who">Then you're out of luck for that match.</div>
+        That's why logging discipline matters. If the value isn't in the inputs struct, replay can't reproduce it. If <code>processInputs()</code> wasn't called, the log is empty. Any time you add a sensor to a subsystem, add it to the inputs struct in the same commit.
+      </div>
+    </div>
+
+    <div class="hf-box hf-brain">
+      <span class="hf-label">Before you leave today</span>
+      <p>Set both knobs back to the SIM row: <code>Constants.currentMode = Mode.SIM</code> and build.gradle <code>ROBOT_MODE = RobotMode.SIM</code>. Commit your code. Scoop is now fully IO-pattern with logging and replay working.</p>
+    </div>
+
+  </div><!-- /section-replay -->
+
+  <nav class="section-nav section-nav--bottom">
+    <button class="section-nav-btn active" data-section="concept">Part 1 - The Pattern</button>
+    <button class="section-nav-btn" data-section="snippets">Part 2 - Install Snippets</button>
+    <button class="section-nav-btn" data-section="convert">Part 3 - Convert Scoop</button>
+    <button class="section-nav-btn" data-section="visualize">Part 4 - Visualization</button>
+    <button class="section-nav-btn" data-section="scope">Part 5 - AdvantageScope</button>
+    <button class="section-nav-btn" data-section="replay">Part 6 - Replay</button>
+  </nav>
+
+</div><!-- /page-container -->
+
+<footer class="site-footer"></footer>
+
+<script src="js/site-config.js"></script>
+<script src="js/frc-curriculum.js"></script>
+<script src="diff.js"></script>
+<script>
+/* ── Step builder ─────────────────────────────────────────── */
+function sbToggle(id) {
+  const step = document.getElementById(id);
+  step.classList.toggle('open');
+}
+
+/* ── Annotated code ───────────────────────────────────────── */
+function annToggle(id) {
+  const note = document.getElementById('ann-' + id);
+  const line = note ? note.previousElementSibling : null;
+  if (!note) return;
+  const isOpen = note.classList.contains('open');
+  note.classList.toggle('open', !isOpen);
+  if (line) line.classList.toggle('open', !isOpen);
+}
+
+function annGroupToggle(id) {
+  const desc = document.getElementById('ann-group-' + id);
+  const label = desc ? desc.previousElementSibling : null;
+  if (!desc) return;
+  desc.classList.toggle('open');
+  if (label) label.classList.toggle('open');
+}
+</script>
+<script src="js/version-picker.js"></script>
+</body>
+</html>

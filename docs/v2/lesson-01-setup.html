@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title></title>
+  <link rel="stylesheet" href="frc-curriculum.css">
+</head>
+<body data-lesson="01">
+
+<div class="wip-banner"></div>
+
+<header class="site-header"></header>
+
+<div class="page-container">
+
+  <div class="lesson-header">
+    <div class="lesson-meta"></div>
+    <h1 class="lesson-title"></h1>
+    <div class="lesson-subtitle"></div>
+    <div class="lesson-info-bar"></div>
+  </div>
+
+  <nav class="section-nav">
+    <button class="section-nav-btn active" data-section="install">Part 1A - Install the tools (USB)</button>
+    <button class="section-nav-btn" data-section="install-web">Part 1B - Install the tools (Web)</button>
+    <button class="section-nav-btn" data-section="project">Part 2 - The Lesson01 project</button>
+    <button class="section-nav-btn" data-section="drive">Part 3 - Your first drive</button>
+    <button class="section-nav-btn" data-section="verify">Part 4 - Verify and reference</button>
+  </nav>
+
+  <!-- ═══════════════════════════════════════════════════════
+       PART 1A — INSTALL THE TOOLS (USB)
+       ═══════════════════════════════════════════════════════ -->
+  <div class="lesson-section active" id="section-install">
+
+  <div class="hf-box hf-info">
+    <span class="hf-label">Web learner? You're in the wrong place</span>
+    <p>This section assumes you have a USB drive from your mentor. If you're working through this on your own without a USB drive, switch to <strong>Part 1B - Install the tools (Web)</strong> in the nav above.</p>
+  </div>
+
+    <p>You're about to install WPILib VS Code and WPILib start tools, build a project, and drive a robot that doesn't physically exist.</p>
+
+    <div class="hf-box hf-brain">
+      <span class="hf-label">Installation: </span>
+      <p>WPILib is a big install. Gradle downloads every dependency on the first build. It's slow, but these are the tools we need!</p>
+    </div>
+
+    <h2>What "done" looks like today</h2>
+    <p>Six things need to work before you leave. We're going to do them in order. Each one builds on the last.</p>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <h4>1. WPILib + VS Code installed</h4>
+        <p>The official FRC editor with all the robot tools built in.</p>
+        <p class="aside">Includes Java, libraries, build tools - one big install.</p>
+      </div>
+      <div class="info-card">
+        <h4>2. <strong>First Drive</strong> project builds</h4>
+        <p>Open the <strong>First Drive</strong> project and compile it successfully.</p>
+        <p class="aside">If this works, your code is ready to run in simulation.</p>
+      </div>
+      <div class="info-card">
+        <h4>3. Simulator runs</h4>
+        <p>Simulate the robot code that was just built, control robot modes, map joystick or keyboard to control the robot, and see robot data.</p>
+        <p class="aside">No XRP needed today.</p>
+      </div>
+      <div class="info-card">
+        <h4>4. AdvantageScope launches</h4>
+        <p>Included with WPILib. Lets you see what the robot is doing in real time.</p>
+        <p class="aside">If WPILib is the workshop, AdvantageScope is the dashboard.</p>
+      </div>
+      <div class="info-card">
+        <h4>5. AdvantageScope shows values</h4>
+        <p>Connect to the simulator, drag a value onto the graph, watch it move.</p>
+        <p class="aside">If the number moves when you drive, everything is wired up correctly.</p>
+      </div>
+      <div class="info-card">
+        <h4>6. AdvantageScope simulates in 2D/3D</h4>
+        <p>Add the robot pose to the 2D/3D view and control the robot!</p>
+        <p class="aside">If the robot moves on the screen when you drive, your pose data is making it all the way through.</p>
+      </div>
+      <div class="info-card">
+        <h4>Bonus: Lesson Summary card in hand</h4>
+        <p>Two-page PDF cheat sheet. Saved somewhere you'll actually find it again.</p>
+        <p class="aside">You'll use this every session from now on.</p>
+      </div>
+    </div>
+
+    <div class="hf-box hf-warning">
+      <span class="hf-label">Operating system support</span>
+      <p><strong>Windows, Mac, and Linux are supported.</strong> Instructions below cover windows. Use the Web install instructions if you don't have access to the team USB or if you are using a different operating system.</p>
+    </div>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">If your install fails</span>
+      <p>It happens. Java gets confused, firewalls block downloads, antivirus quarantines installers. If yours breaks and you've spent more than 15 minutes on one issue, switch to a backup laptop and keep going. You can troubleshoot your own machine later with a mentor.</p>
+      <p>Everyone leaves with something working - even if it's on a borrowed laptop.</p>
+    </div>
+
+    <h2>What's on the USB drive</h2>
+    <p>Everything you need is on the USB drive your mentor gave you. <strong>Copy all files to your laptop before you start</strong>. NOTE: It is recommended to put the files <code>C:\Bearbots</code>. You may run into issues if you put the files in Onedrive.</p>
+
+    <ul class="task-list">
+      <li><strong>Web Instructions</strong> - FRC\bearbots-xrp-code\docs\Index <code>.html</code></li>
+      <li><strong>Lesson01-project</strong> - FRC\bearbots-xrp-code\Lesson01\Lesson01-Project <code>.zip</code>, contains the First Drive project.</li>
+      <li><strong>FRC Lesson 01 Summary</strong> - FRC\bearbots-xrp-code\handouts\FRC_Lesson01_Summary_Card <code>.pdf</code></li>
+      <li><strong>7-Zip</strong> - Install\7-zip\7z*-WindowsVersion <code>.exe</code></li>
+      <li><strong>WPILib installer</strong> - Install\WPILib-VSCode\WPILib_Windows-year.* <code>.iso</code></li>
+      <li><strong>VS Code zip file</strong> - Install\WPILib-VSCode\VSCode-win* <code>.zip</code> <strong>(Provided for offline installation)</strong></li>
+      <li><strong>Gradle Cache</strong> - Install\Lesson01\Gradle Cache\caches  <strong>(Provided for offline installation)</strong></li>
+      <li><strong>XRP Firmware</strong> - Install\XRP Firmware\xrp-wpilib-firmware-2.1.0-aa439f0 <code>.uf2</code></li>
+    </ul>
+
+    <p>Pick the right OS version. If you grab the wrong one, the installer won't run.</p>
+
+    <h2>Install WPILib + VS Code</h2>
+
+    <p>WPILib is the official FRC software suite. It includes a special version of VS Code, the Java runtime you need, and every library used by FRC robot code. One installer, everything you need.</p>
+
+    <div class="hf-box hf-warning">
+      <span class="hf-label">This is the slow one</span>
+      <p>The WPILib installer is about 1.5 GB and takes 10-15 minutes to extract and install. If nothing seems to be happening, it's probably still working. Don't cancel it.</p>
+    </div>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">On Windows</span>
+      <p><strong>1.</strong> Right click <code>WPILib_Windows-2026.x.x.iso</code> in the files copied from the USB drive and select <strong>mount</strong></p>
+      <p><strong>2.</strong> Double-click <code>WPILibInstaller.exe</code> to start the installation</p>
+      <p><strong>3.</strong> If Windows asks "Do you want to allow this app to make changes?" &rarr; click <strong>Yes</strong></p>
+      <p><strong>4.</strong> If Windows SmartScreen blocks it &rarr; click <strong>More info</strong>, then <strong>Run anyway</strong></p>
+      <p><strong>5.</strong> Keep the default install path. Don't change it.</p>
+      <p><strong>6.</strong> When asked: <strong>Select the install mode you would like.</strong>. Select Everything.</p>
+      <img src="images/lesson01/installer-options.webp" alt="WPILib installer, install mode.">
+      <p><strong>7.</strong> When asked: <strong>Download VS Code</strong>:</p>
+
+      <div class="toggle-row">
+        <button class="swap-btn"
+          data-show="vscode-offline"
+          data-hide="vscode-online"
+          data-label-swap="⚠ No internet — show offline steps"
+          data-label-back="✓ I have internet — show online steps"
+          data-swapped="false">
+          ⚠ No internet — show offline steps
+        </button>
+      </div>
+
+      <div class="toggle-content hint" id="vscode-online" style="display:block;">
+        <p><strong>ONLINE Steps:</strong></p>
+        <ul class="bullet-list">
+          <li>Select <strong>Download for this computer only (fastest)</strong>, then click <strong>Next</strong>.</li>
+          <img src="images/lesson01/installer-vscode-online.webp" alt="WPILib installer VS Code online option">
+        </ul>
+        <p>When the installer finishes, launch <strong>WPILib VS Code 2026</strong> from your desktop icon (Windows). VS Code opens with a WPILib theme - that's how you know it's the right one.</p>
+      </div>
+
+      <div class="toggle-content hint" id="vscode-offline" style="display:none;">
+        <p><strong>OFFLINE Steps:</strong></p>
+        <ul class="bullet-list">
+          <li>Select <strong>Select existing VS Code archive for offline install on this computer</strong>, then navigate to <strong>Install\VSCode-win*.zip</strong> where this file was saved on your computer.</li>
+          <img src="images/lesson01/installer-vscode-offline.webp" alt="WPILib installer VS Code offline option">
+        </ul>
+        <p><strong>Note:</strong> You will likely get an invalid Hash warning. It is okay — install the version provided. Click <strong>Next</strong> to continue.</p>
+        <p><strong>8.</strong> Open File Explorer and navigate to <code>\Install\Lesson01-Gradle</code> where this file was saved on your computer.</p>
+        <p><strong>9.</strong> Copy the <code>caches</code> folder.</p>
+        <p><strong>10.</strong> Paste it into <code>C:\Users\<em>YourUsername</em>\.gradle\</code> — if prompted to merge folders or replace files, choose <strong>Merge</strong> / <strong>Yes</strong>.</p>
+        <p>When the installer finishes, launch <strong>WPILib VS Code 2026</strong> from your desktop icon (Windows). VS Code opens with a WPILib theme - that's how you know it's the right one.</p>
+        <p>After WPILib VS Code opens, press <kbd>Ctrl+Shift+P</kbd> and type <strong>Java: Clean Java Language Server Workspace</strong>, then select <strong>Reload and delete</strong>. This forces VS Code to index the AdvantageKit libraries from the Gradle cache.</p>
+      </div>
+    </div>
+
+    <div class="hf-box hf-warning">
+      <span class="hf-label">Important: WPILib VS Code is its own installation</span>
+      <p>If you already had VS Code installed, you now have <strong>two of them</strong>. Regular VS Code and WPILib VS Code. They look almost identical, but only the WPILib one has the robot tools.</p>
+      <p><strong>Always use WPILib VS Code 2026 for this curriculum.</strong> Pin it to your taskbar or dock so you don't accidentally open the wrong one.</p>
+    </div>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">Verify extensions are installed.</span>
+      <p>Press <kbd>Ctrl+Shift+X</kbd> to open the Extensions panel. Under <strong>Installed</strong> you should see:</p>
+      <ul>
+        <li>WPILib</li>
+        <li>Language Support for Java</li>
+        <li>Debugger for Java</li>
+        <li>Project Manager for Java</li>
+      </ul>
+      <p>If any are missing, the WPILib installer may not have completed correctly. Re-run it before continuing.</p>
+    </div>
+
+    <div class="hf-box hf-sidebar">
+      <span class="hf-label">There are no dumb questions</span>
+      <p><strong>Q: Why do we need both VS Code and AdvantageScope?</strong></p>
+      <p>VS Code is where you write code. AdvantageScope is where you see what the robot is doing. They're different tools for different jobs.</p>
+      <p><strong>Q: When do we use the real XRP robot?</strong></p>
+      <p>Lesson 04. Today is about getting your laptop ready. The simulator lets us write and test code before we touch any hardware.</p>
+      <p><strong>Q: My install is stuck. Should I cancel?</strong></p>
+      <p>If the progress bar has moved at all in the last 10 minutes, no - wait. If it's been frozen for more than 15 minutes with no disk activity, cancel and try again from the USB drive.</p>
+    </div>
+
+    <div class="hf-box hf-brain">
+      <span class="hf-label">Brain power - before you move on</span>
+      <p>WPILib is installed and AdvantageScope is ready to launch. Next we'll open the <strong>First Drive</strong> project and verify your environment can actually compile robot code.</p>
+    </div>
+
+  </div><!-- /section-install -->
+
+  <!-- ═══════════════════════════════════════════════════════
+      PART 1B — INSTALL THE TOOLS (WEB)
+      ═══════════════════════════════════════════════════════ -->
+  <div class="lesson-section" id="section-install-web">
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">USB learner? You're in the wrong place</span>
+      <p>This section is for self-paced learners downloading everything from the web. If your mentor gave you a USB drive, switch to <strong>Part 1A - Install the tools (USB)</strong> in the nav above.</p>
+    </div>
+
+    <p>You're about to install WPILib VS Code and WPILib start tools, build a project, and drive a robot that doesn't physically exist.</p>
+
+  <div class="info-grid">
+    <div class="info-card">
+      <h4>1. WPILib + VS Code installed</h4>
+      <p>The official FRC editor with all the robot tools built in.</p>
+      <p class="aside">Includes Java, libraries, build tools - one big install.</p>
+    </div>
+    <div class="info-card">
+      <h4>2. <strong>First Drive</strong> project builds</h4>
+      <p>Open the <strong>First Drive</strong> project and compile it successfully.</p>
+      <p class="aside">If this works, your code is ready to run in simulation.</p>
+    </div>
+    <div class="info-card">
+      <h4>3. Simulator runs</h4>
+      <p>Simulate the robot code that was just built, control robot modes, map joystick or keyboard to control the robot, and see robot data.</p>
+      <p class="aside">No XRP needed today.</p>
+    </div>
+    <div class="info-card">
+      <h4>4. AdvantageScope launches</h4>
+      <p>Included with WPILib. Lets you see what the robot is doing in real time.</p>
+      <p class="aside">If WPILib is the workshop, AdvantageScope is the dashboard.</p>
+    </div>
+    <div class="info-card">
+      <h4>5. AdvantageScope shows values</h4>
+      <p>Connect to the simulator, drag a value onto the graph, watch it move.</p>
+      <p class="aside">If the number moves when you drive, everything is wired up correctly.</p>
+    </div>
+    <div class="info-card">
+      <h4>6. AdvantageScope simulates in 2D/3D</h4>
+      <p>Add the robot pose to the 2D/3D view and control the robot!</p>
+      <p class="aside">If the robot moves on the screen when you drive, your pose data is making it all the way through.</p>
+    </div>
+    <div class="info-card">
+      <h4>Bonus: Lesson Summary card in hand</h4>
+      <p>Two-page PDF cheat sheet. Saved somewhere you'll actually find it again.</p>
+      <p class="aside">You'll use this every session from now on.</p>
+    </div>
+  </div>
+
+
+    <h2>What to download</h2>
+    <p>You need two things. Download all before you start the install.</p>
+
+    <ul class="task-list">
+      <li><strong>WPILib installer</strong> &mdash; includes VS Code, no separate download needed.<br>
+        <a href="https://docs.wpilib.org/en/stable/docs/zero-to-robot/step-2/wpilib-setup.html" target="_blank">docs.wpilib.org &rarr; WPILib Installation Guide</a></li>
+      <li><strong>First Drive</strong> Project &mdash; the BearBots XRP project to verify your environment is set up.<br>
+        <a href="https://github.com/Helijason/bearbots-xrp-code/tree/main/Lesson01/First%20Drive" target="_blank">github.com/Helijason/bearbots-xrp-code</a> &rarr; navigate to <strong>Lesson01 &rarr; First Drive</strong>, then click <strong>Code &rarr; Download ZIP</strong></li>
+      <li><strong>XRP Robot 3D Model</strong> &mdash; custom AdvantageScope asset for the BearBots XRP.<br>
+        Go to <a href="https://download-directory.github.io/" target="_blank">download-directory.github.io</a>, paste this URL and press Enter:<br>
+        <code>https://github.com/Helijason/bearbots-xrp-code/tree/main/assets/advantagescope/Robot_XRP</code></li>
+    </ul>
+
+    <h2>Install WPILib + VS Code</h2>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">On Windows</span>
+      <p><strong>1.</strong> Double-click on the downloaded WPILib exe.</p>
+      <p><strong>2.</strong> If Windows asks "Do you want to allow this app to make changes?" &rarr; click <strong>Yes</strong></p>
+      <p><strong>3.</strong> If Windows SmartScreen blocks it &rarr; click <strong>More info</strong>, then <strong>Run anyway</strong></p>
+      <p><strong>4.</strong> Keep the default install path. Don't change it.</p>
+      <p><strong>5.</strong> When asked: <strong>Select the install mode you would like.</strong>. Select Everything.</p>
+      <img src="images/lesson01/installer-options.webp" alt="WPILib installer, install mode.">
+      <p><strong>6.</strong> When asked: <strong>Download VS Code</strong>. Select Download for this computer only (fastest).</p>
+      <img src="images/lesson01/installer-vscode-online.webp" alt="WPILib installer VS Code online option">
+      <p><strong>7.</strong> Click <strong>Execute Install</strong> and wait. The progress bar moves slowly.</p>
+    </div>
+
+    <p>When the installer finishes, launch <strong>WPILib VS Code 2026</strong> from your Start menu (Windows). VS Code opens with a WPILib theme - that's how you know it's the right one.</p>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">Verify extensions are installed</span>
+      <p>Press <kbd>Ctrl+Shift+X</kbd> to open the Extensions panel. Under <strong>Installed</strong> you should see:</p>
+      <ul>
+        <li>WPILib</li>
+        <li>Language Support for Java</li>
+        <li>Debugger for Java</li>
+        <li>Project Manager for Java</li>
+      </ul>
+      <p>If any are missing, the WPILib installer may not have completed correctly. Re-run it before continuing.</p>
+    </div>
+
+    <div class="hf-box hf-warning">
+      <span class="hf-label">Important: WPILib VS Code is its own installation</span>
+      <p>If you already had VS Code installed, you now have <strong>two of them</strong>. Regular VS Code and WPILib VS Code. They look almost identical, but only the WPILib one has the robot tools.</p>
+      <p><strong>Always use WPILib VS Code 2026 for this curriculum.</strong> Pin it to your taskbar or dock so you don't accidentally open the wrong one.</p>
+    </div>
+
+  </div><!-- /section-install-web -->
+
+<!-- ═══════════════════════════════════════════════════════
+       PART 2 — THE FIRST DRIVE PROJECT
+       ═══════════════════════════════════════════════════════ -->
+  <div class="lesson-section" id="section-project">
+
+    <p>The First Drive project is a complete, working robot program. Today you're opening it and verifying your environment can compile it and run in the simulator. You'll explore what's actually inside in <span class="next-lesson-ref"></span>.</p>
+
+<h2>Step 1 - Open the folder in WPILib VS Code</h2>
+
+    <ul class="task-list">
+      <li>Launch <strong>WPILib VS Code 2026</strong> (the WPILib one - not regular VS Code if previously installed.)</li>
+      <li>Click <strong>File &rarr; Open Folder</strong></li>
+      <li>Navigate to <code>C:\FRC\bearbots-xrp-code\lesson01\First Drive</code></li>
+      <li>Click <strong>Select Folder</strong></li>
+    </ul>
+
+    <p>VS Code will ask if you trust the authors. Click <strong>Yes, I trust the authors</strong>.</p>
+
+    <p>You should see a file tree on the left with folders like <code>src</code>, files like <code>build.gradle</code>, and a <code>.wpilib</code> folder. If you see those, the project is open correctly.</p>
+
+    <h2>Step 2 - Build the project</h2>
+
+    <p>This is the moment of truth. If the build works, your environment is healthy.</p>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">How to build</span>
+      <p><strong>1.</strong> Click the WPILib hexagon logo in the top-right corner of VS Code</p>
+      <p><strong>2.</strong> Type <code>WPILib: Build Robot Code</code></p>
+      <p><strong>3.</strong> Press <strong>Enter</strong></p>
+      <p><strong>4.</strong> Watch the terminal at the bottom of VS Code</p>
+    </div>
+
+    <p>The first build is slow - Gradle is downloading every library the project uses (Web users only). Subsequent builds will be faster. When it finishes successfully, you'll see <code>BUILD SUCCESSFUL</code> in the terminal output.</p>
+
+    <div class="hf-box hf-brain">
+      <span class="hf-label">What just happened</span>
+      <p>You compiled real robot code. The Java source files in <code>src/main/java</code> were turned into runnable bytecode. This is the same process you'll run every time you change anything in the project. You don't need to know how it works yet - just know that this is the loop: edit code, build, see if it works.</p>
+    </div>
+
+    <div class="hf-box hf-warning">
+      <span class="hf-label">Build failed?</span>
+      <p>Check these in order:</p>
+      <p><strong>1.</strong> Are you in WPILib VS Code, not regular VS Code?</p>
+      <p><strong>2.</strong> Did you open the <strong>folder</strong>, not just a single file?</p>
+      <p><strong>3.</strong> Did the extract actually create a real folder?</p>
+      <p><strong>4.</strong> Is your internet working (Web Users only)? Gradle needs to download dependencies on first build.</p>
+      <p>If all of those are fine and it's still failing, ask a mentor.</p>
+    </div>
+
+  </div><!-- /section-project -->
+
+
+  <!-- ═══════════════════════════════════════════════════════
+       PART 3 — YOUR FIRST DRIVE
+       ═══════════════════════════════════════════════════════ -->
+  <div class="lesson-section" id="section-drive">
+
+    <p>This is the part you've been working toward. You're going to start the simulator, drive a virtual robot with your keyboard, and see logged values move in real time on a graph. After this, everything else in the curriculum is downhill.</p>
+
+    <div class="hf-box hf-brain">
+      <span class="hf-label">Why drive a robot that doesn't exist?</span>
+      <p>90% of bugs are logic bugs, not hardware bugs. The simulator catches them faster and cheaper, without risk of the robot driving into the scoring table in front of the head referee. Real teams do this. It's not a beginner shortcut.</p>
+    </div>
+
+    <h2>Step 1 - Start the simulator</h2>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">How to launch</span>
+      <p><strong>1.</strong> In WPILib VS Code, click the <strong>WPILib hexagon logo</strong> in the top right corner of VS Code.</p>
+      <p><strong>2.</strong> Type <code>WPILib: Simulate Robot Code</code></p>
+      <p><strong>3.</strong> Press <strong>Enter</strong></p>
+      <p><strong>4.</strong> When prompted, check <strong>halsim_gui</strong> and click OK</p>
+      <p><strong>5.</strong> When prompted to <strong>allow public and private networks to access this app?</strong> (OpenJDK Platform binary), click Allow</p>
+      <p><strong>6.</strong> Wait for the build (it's quick this time - already compiled)</p>
+      <p><strong>7.</strong> A new window will appear: the <strong>Simulation GUI</strong></p>
+      <img src="images/lesson01/robot-simulator.webp" alt="Robot simulator">
+      
+    </div>
+
+    <h2>Step 2 - Set up keyboard driving</h2>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">Wire up the keyboard</span>
+      <p><strong>1.</strong> Find the <strong>System Joysticks</strong> panel in the Simulation GUI</p>
+      <p><strong>2.</strong> Drag <strong>Keyboard 0</strong> from System Joysticks into the <strong>Joysticks</strong> panel (slot 0)</p>
+      <img src="images/lesson01/simulator-keyboard-setup.webp" alt="Setup keyboard for the joystick in the simulator.">
+      <p><strong>3.</strong> Find the <strong>Robot State</strong> panel &rarr; click <strong>Teleoperated</strong></p>
+      <img src="images/lesson01/simulator-robot-state.webp" alt="Simulator robot state.">
+    </div>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <h4>W</h4>
+        <p>Drive forward</p>
+      </div>
+      <div class="info-card">
+        <h4>S</h4>
+        <p>Drive backward</p>
+      </div>
+      <div class="info-card">
+        <h4>A</h4>
+        <p>Turn left</p>
+      </div>
+      <div class="info-card">
+        <h4>D</h4>
+        <p>Turn right</p>
+      </div>
+    </div>
+
+    <div class="hf-box hf-warning">
+      <span class="hf-label">You won't see the robot move on screen</span>
+      <p>The Simulation GUI by itself doesn't show the robot moving - that's what AdvantageScope is for. The robot <em>is</em> receiving your commands. You'll see the proof in a moment. What you will see is data updating in the <strong>Network Tables.</strong></p>
+      <img src="images/lesson01/Simulator-network-tables.webp" alt="Simulator network tables.">
+    </div>
+
+    <h2>Step 3 - Open and connect AdvantageScope</h2>
+
+    <p>Keep the simulator running. Launch AdvantageScope from inside WPILib VS Code — don't close VS Code.</p>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">Launch AdvantageScope</span>
+      <p><strong>1.</strong> In WPILib VS Code, click the <strong>WPILib hexagon logo</strong> in the top right corner of VS Code.</p>
+      <p><strong>2.</strong> Type <code>WPILib: Start Tool</code> and press <strong>Enter</strong></p>
+      <p><strong>3.</strong> Select <strong>AdvantageScope</strong> from the list</p>
+    </div>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">Connect to the simulator</span>
+      <p><strong>1.</strong> In AdvantageScope: <strong>File &rarr; Connect to Simulator</strong> and select <strong>Default: NetworkTables 4 </strong>(or <code>Ctrl+Shift+K</code>)</p>
+      <img src="images/lesson01/AdvantageScope-connect-to-simulator.webp" alt="AdvantageScope connect to simulator.">
+      <p><strong>2.</strong> Look at the top and you'll see a time bar start timing.</p>
+      <p><strong>3.</strong> The left sidebar will populate with log keys (you'll see <code>AdvantageKit/Drive/</code>, <code>AdvantageKit/DriverStation</code>, etc.)</p>
+    </div>
+
+    <h2>Step 4 - Drag values onto the graph</h2>
+
+    <p>The left sidebar in AdvantageScope is now populated with every value your robot is logging. We'll graph two of them.</p>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">Add Data to Graph</span>
+      <p><strong>1.</strong> In the top tabs select the <strong>Line Graph</strong></p>
+      <p><strong>2.</strong> In the left sidebar, expand <strong>AdvantageKit &rarr; Drive</strong></p>
+      <p><strong>3.</strong> You'll see fields like <code>LeftVelocityMetersPerSec</code>, <code>RightVelocityMetersPerSec</code></p>
+      <p><strong>4.</strong> Drag <code>LeftVelocityMetersPerSec</code> onto the <strong>Left Axis</strong> below the main graph area</p>
+      <img src="images/lesson01/AdvantageScope-add-data-linegraph.webp" alt="AdvantageScope add data to graph.">
+      <p><strong>5.</strong> Drag <code>RightVelocityMetersPerSec</code> onto the same <strong>Left Axis</strong> area</p>
+    </div>
+    
+    <h2>Step 5 - Drive and watch</h2>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">Create Data to View</span>
+      <p><strong>1.</strong> Click the Simulation GUI window (so it has keyboard focus)</p>
+      <p><strong>2.</strong> Make sure <strong>Teleoperated</strong> is still enabled</p>
+      <p><strong>3.</strong> Press and hold <strong>W</strong> for a couple seconds, then release</p>
+      <p><strong>4.</strong> Switch to AdvantageScope</p>
+      <p><strong>5.</strong> Both velocity lines should spike up while you held W, then fall back to zero</p>
+      <img src="images/lesson01/AdvantageScope-graph-velocities.webp" alt="AdvantageScope graphing velocities.">
+    </div>
+
+    <div class="hf-box hf-brain">
+      <span class="hf-label">What you just did</span>
+      <p>You ran robot code without a robot. You drove a virtual machine with your keyboard. You logged sensor values to disk and graphed them in real time.</p>
+      <p>If you understand nothing else from today, understand this: <strong>code &rarr; build &rarr; simulate &rarr; drive &rarr; watch values</strong> is the loop. You'll run it hundreds of times.</p>
+    </div>
+
+    <h2>Step 6 - View the robot in 2D</h2>
+
+    <p>Now let's see the robot move on the field.</p>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">Add the robot pose to the 2D field</span>
+      <p><strong>1.</strong> In AdvantageScope, select <strong>2D Field</strong> from the <strong>Top Tabs</strong>.</p>
+      <p><strong>2.</strong> In the left sidebar, expand <strong>AdvantageKit &rarr; RealOutputs &rarr; Drive</strong></p>
+      <p><strong>3.</strong> Find <strong>Robot</strong> &mdash; it will show as <code>Pose - Pose2d</code></p>
+      <img src="images/lesson01/AdvantageScope-2d-Setup.webp" alt="AdvantageScope 2D drive setup.">
+      <p><strong>4.</strong> Drag <strong>Robot</strong> onto the 2D Field view, under <strong>Poses</strong></p>
+      <p><strong>5.</strong> A blue box with an arrow will appear in the top-right corner of the field &mdash; this is called the <strong>Blue Origin</strong></p>
+      <p><strong>6.</strong> Click the Simulation GUI window to give it keyboard focus</p>
+      <p><strong>7.</strong> Drive with <strong>W, S, A, D</strong> and watch the robot icon move on the field</p>
+    </div>
+
+    <h2>Step 7 - View the robot in 3D</h2>
+
+    <p>Switch to <strong>3D Field</strong> in AdvantageScope's top Tabs. The robot pose doesn't carry over automatically - you'll need to add it again. We will add the 2026 kitbot and change it to a custom XRP robot with a working arm.</p>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">Add the robot pose to the 3D field</span>
+      <p><strong>1.</strong> In the left sidebar, expand <strong>AdvantageKit &rarr; RealOutputs &rarr; Drive</strong></p>
+      <p><strong>2.</strong> Drag <strong>Robot</strong> onto the 3D Field view, under <strong>Poses</strong>, (Same as 2D instructions)</p>
+      <img src="images/lesson01/AdvantageScope_3D-Setup1.webp" alt="AdvantageScope 3D drive setup.">
+      <p><strong>3.</strong> Add the arm component. Drag <strong>FinalComponentPoses - Pose3d</strong> into the same box as the drive pose.</p>
+      <img src="images/lesson01/AdvantageScope_3D-Setup2.webp" alt="AdvantageScope 3D arm setup.">
+      <p><strong>4.</strong> Select a custom assets folder from <strong>App &rarr; Use Custom Assets Folder</strong>. <code>Lesson01-Project\assets\advantagescope</code></p>
+      <img src="images/lesson01/AdvantageScope_3D-Custom-Assets.webp" alt="AdvantageScope custom asset folder.">
+      <p><strong>5.</strong> Goto the 3D Field. Right click on the robot pose (top selection) and select the XRP Robot.</p>
+      <img src="images/lesson01/AdvantageScope_3D-Setup3.webp" alt="AdvantageScope select Robot XRP.">
+      <p><strong>6.</strong> Click the Simulation GUI and drive with <strong>W, S, A, D</strong>, and control the arm with <strong>Z, X</strong></p>
+      <img src="images/lesson01/AdvantageScope_3D-Drive.webp" alt="AdvantageScope 3D drive.">
+    </div>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">Navigating the 3D view</span>
+      <p><strong>Left mouse button</strong> &mdash; rotate around the field</p>
+      <p><strong>Scroll wheel</strong> &mdash; zoom in and out</p>
+      <p><strong>Right mouse button</strong> &mdash; drag the field view</p>
+    </div>
+
+    <div class="hf-box hf-brain">
+      <span class="hf-label">AdvantageScope remembers your setup</span>
+      <p>Once you've added the robot pose to the 2D and 3D views, AdvantageScope saves that configuration. Next time you connect, it will already be there. You can always change it later.</p>
+    </div>
+
+    <h2>Quick check</h2>
+    <p>Why do we use the simulator instead of deploying to a real robot every time we test code?</p>
+    <div class="quiz-feedback" id="quiz-feedback-1"></div>
+    <div class="quiz-options">
+      <button class="quiz-btn"
+        data-quiz="1"
+        data-correct="false"
+        data-feedback-wrong="Not quite - the simulator is for testing code, not a replacement for hardware."
+        data-feedback-correct="">Because simulators are more accurate than real robots</button>
+      <button class="quiz-btn"
+        data-quiz="1"
+        data-correct="true"
+        data-feedback-correct="Right - and it lets you test code without batteries, hardware setup, or worrying about breaking something."
+        data-feedback-wrong="">Because simulators are faster and you don't need physical hardware to run them</button>
+      <button class="quiz-btn"
+        data-quiz="1"
+        data-correct="false"
+        data-feedback-wrong="Real robots are required eventually - but not for every test."
+        data-feedback-correct="">Because real robots are not actually used in competition</button>
+    </div>
+
+    <div class="hf-box hf-warning">
+      <span class="hf-label">Stuck? Common issues</span>
+      <p><strong>Robot doesn't respond to keys:</strong> Click on the Simulation GUI window to give it focus. Make sure Teleoperated is still enabled (it disables when the simulator restarts).</p>
+      <p><strong>AdvantageScope won't connect:</strong> The simulator must be running first. Check the bottom-left of AdvantageScope.</p>
+      <p><strong>Values aren't changing:</strong> Did you drag the right fields? You want <code>Drive/LeftVelocityMetersPerSec</code> and <code>Drive/RightVelocityMetersPerSec</code> - not <code>Setpoints</code>.</p>
+      <p><strong>Still stuck:</strong> Ask a mentor. This is a moment to get help, not to grind.</p>
+    </div>
+
+  </div><!-- /section-drive -->
+
+
+  <!-- ═══════════════════════════════════════════════════════
+       PART 4 — VERIFY AND REFERENCE
+       ═══════════════════════════════════════════════════════ -->
+  <div class="lesson-section" id="section-verify">
+
+    <h2>Save the FRC_Lesson01_Summary_Card.pdf</h2>
+
+    <p>The Lesson 01 Summary Card is a two-page reference sheet covering today's key concepts, vocabulary, and what you learned. Add it to your binder — you'll collect one for each lesson.</p>
+
+    <ul class="task-list">
+      <li>Find <code>FRC_Lesson01_Summary_Card.pdf</code> in <code>03 Lesson01\</code> on the USB drive</li>
+      <li>Copy it to your binder folder on this computer</li>
+      <li>Open it in your PDF reader to verify it opens</li>
+    </ul>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">A habit to build</span>
+      <p>Before you ask a mentor "how do I do X?", check the summary card first. The best programmers look things up first. Build that habit now.</p>
+    </div>
+
+    <h2>Setup checklist - before you leave today</h2>
+
+    <p>Run through this list. Every one of these should be true before you leave today.</p>
+
+    <ul class="task-list">
+      <li>WPILib VS Code opens</li>
+      <li>AdvantageScope opens</li>
+      <li><strong>First Drive</strong> project builds successfully <code>BUILD SUCCESSFUL</code></li>
+      <li>Simulator runs and the robot responds to keyboard</li>
+      <li>AdvantageScope says <strong>Connected</strong> and shows velocity values changing when you drive</li>
+      <li>AdvantageScope 2D and 3D field views show the robot moving when you drive</li>
+      <li>Lesson 01 Summary Card is saved and added to your binder</li>
+    </ul>
+
+    <div class="hf-box hf-warning">
+      <span class="hf-label">If any of those don't work</span>
+      <p>The whole rest of the curriculum assumes the first six things work. Use a backup laptop today and troubleshoot your own machine before <span class="next-lesson-ref"></span>. A working setup on a borrowed laptop is better than a broken setup on your own.</p>
+    </div>
+
+    <div class="chat-thread">
+      <div class="bubble bubble-q">
+        <div class="bubble-who">Student</div>
+        I got everything working. Now what?
+      </div>
+    <div class="bubble bubble-a">
+      <div class="bubble-who">Teacher</div>
+      Next <span class="next-lesson-ref"></span> — you'll open the First Drive project and learn what every file actually does. The goal is to understand the structure before we change anything.
+      </div>
+    <div class="bubble bubble-q">
+        <div class="bubble-who">Student</div>
+        Do I need to bring anything?
+      </div>
+      <div class="bubble bubble-a">
+        <div class="bubble-who">Teacher</div>
+        Yes, your laptop with everything we installed today, your power cord, and the summary card. Don't uninstall anything between now and <span class="next-lesson-ref"></span>.
+      </div>
+    </div>
+
+    <div class="hf-box hf-brain">
+      <span class="hf-label">You're done with setup</span>
+      <p>You installed a development environment, compiled real robot code, drove a simulated robot, and watched live data on a graph. Every session from here on, this is already done.</p>
+    </div>
+
+  </div><!-- /section-verify -->
+
+  <nav class="section-nav section-nav--bottom">
+        <button class="section-nav-btn active" data-section="install">Part 1A - Install the tools (USB)</button>
+    <button class="section-nav-btn" data-section="install-web">Part 1B - Install the tools (Web)</button>
+    <button class="section-nav-btn" data-section="project">Part 2 - The Lesson01 project</button>
+    <button class="section-nav-btn" data-section="drive">Part 3 - Your first drive</button>
+    <button class="section-nav-btn" data-section="verify">Part 4 - Verify and reference</button>
+  </nav>
+
+</div><!-- /page-container -->
+<footer class="site-footer"></footer>
+
+<script src="js/site-config.js"></script>
+<script src="js/frc-curriculum.js"></script>
+<script src="js/version-picker.js"></script>
+</body>
+</html>

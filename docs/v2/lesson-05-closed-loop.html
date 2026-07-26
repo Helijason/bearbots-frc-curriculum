@@ -1,0 +1,1745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title></title>
+  <link rel="stylesheet" href="frc-curriculum.css">
+  <link rel="stylesheet" href="diff.css">
+  <style>
+    /* ── Lesson 05 local styles ─────────────────────────────── */
+
+    /* Step builder (same as L03/L04) */
+    .step-builder { margin: 1rem 0; }
+    .sb-step { border: 1px solid var(--gray-border); border-radius: var(--radius-lg); margin-bottom: 0.75rem; overflow: hidden; }
+    .sb-step-header { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; background: var(--gray-bg); cursor: pointer; user-select: none; }
+    .sb-step-header:hover { background: var(--teal-light); }
+    .sb-step-num { width: 28px; height: 28px; border-radius: 50%; background: var(--teal); color: var(--white); font-size: 0.82rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .sb-step-title { font-size: 0.9rem; font-weight: 600; color: var(--dark); flex: 1; }
+    .sb-step-chevron { font-size: 0.8rem; color: var(--muted); transition: transform 0.2s; }
+    .sb-step.open .sb-step-chevron { transform: rotate(90deg); }
+    .sb-step-body { display: none; padding: 0.75rem 1rem 1rem; border-top: 1px solid var(--gray-border); }
+    .sb-step.open .sb-step-body { display: block; }
+    .sb-step-body p { font-size: 0.88rem; color: var(--mid); margin-bottom: 0.6rem; }
+  </style>
+</head>
+<body data-lesson="05">
+
+<div class="wip-banner"></div>
+
+<header class="site-header"></header>
+
+<div class="page-container">
+
+  <div class="lesson-header">
+    <div class="lesson-meta"></div>
+    <h1 class="lesson-title"></h1>
+    <div class="lesson-subtitle"></div>
+    <div class="lesson-info-bar"></div>
+  </div>
+
+  <nav class="section-nav">
+    <button class="section-nav-btn active" data-section="concept">Part 1 - The Concept</button>
+    <button class="section-nav-btn" data-section="build">Part 2 - Build the Elevator</button>
+    <button class="section-nav-btn" data-section="visualize">Part 3 - Visualization</button>
+    <button class="section-nav-btn" data-section="challenge">Part 4 - AdvantageScope</button>
+  </nav>
+
+  <!-- ═══════════════════════════════════════════════════════
+       PART 1 — THE CONCEPT
+       ═══════════════════════════════════════════════════════ -->
+  <div class="lesson-section active" id="section-concept">
+
+    <p>Every subsystem you've built so far - Arm, Scoop - moves the same way: you pick a setpoint, and code either jumps straight there or slews toward it at a fixed rate per program loop. That is what a <a href="https://www.solomotorcontrollers.com/blog/servo-motor/" target="_blank" rel="noopener">hobby servo</a> does - see the SG90 section for how the PWM signal itself sets the position. The controls for angle setpoints are built into the servo.  There is no flexibility in the control.</p>
+
+    <div class="hf-box hf-brain">
+      <span class="hf-label">Your brain is probably thinking this right now</span>
+      <p>"Can't I just do the same thing - set a target height, ramp toward it?"</p>
+      <p>Try it and the carriage either crawls up too slowly to be useful, or slams into the top of its travel and stalls the motor against the hard stop. A servo has its own internal controller doing this work for you. A bare DC motor on a spool does not - there's nothing between "voltage in" and "however fast the motor decides to spin" except gravity, friction, and whatever your code chooses to send. You need to close the loop yourself giving the subsystem a lot of flexibility.</p>
+    </div>
+
+    <h2>Open-loop vs. closed-loop</h2>
+    <p>The motor is made up of two main components. first the DC motor and an encoder. When using an open-loop setter it tells the motor "spin at this voltage" and never checks whether that produced the right result. A closed-loop controller measures the actual position, compares it to the target, and continuously corrects the error. That correction loop - measure, compare, correct, repeat every 20ms - is what "closed-loop control" means.</p>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <h4>Servo (Lesson 04 pattern)</h4>
+        <p>You command an angle. The servo's own internal electronics hold it there. Your code never sees an error term.</p>
+      </div>
+      <div class="info-card">
+        <h4>DC motor + encoder (today)</h4>
+        <p>You command a voltage. Position is whatever physics does with that voltage. Your code has to read the encoder and correct itself, every loop, forever.</p>
+      </div>
+      <div class="info-card">
+        <h4>Why gravity is different this time</h4>
+        <p>An arm swinging on a servo doesn't fight a spool-and-cable elevator's constant downward pull. Holding still costs voltage - even at the target, zero volts means falling.</p>
+      </div>
+    </div>
+
+    <h2>PIDController - "Error Correction" half</h2>
+    <p>WPILib's <code>PIDController</code> takes a measurement and a setpoint, and returns an output correction:</p>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <h4>kP - proportional</h4>
+        <p>Correction scales with how far off you are right now. Bigger error, bigger push. Too high and the carriage overshoots and oscillates; too low and it never quite gets there.</p>
+      </div>
+      <div class="info-card">
+        <h4>kI - integral</h4>
+        <p>Correction accumulates from error that's persisted over time. Fixes steady-state droop. Almost always start at zero - it's the gain most likely to make things worse if you don't need it.</p>
+      </div>
+      <div class="info-card">
+        <h4>kD - derivative</h4>
+        <p>Correction reacts to how fast the error is changing. Damps oscillation from a too-high kP. Also usually starts at zero.</p>
+      </div>
+    </div>
+
+    <h2>Feed forward - "Expected voltage" half</h2>
+    <p>PID alone reacts to error after it happens. Feedforward adds the voltage you already know you'll need, before there's any error to react to - so PID only has to correct the leftover mistake, not do all the work.</p>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">The three feedforward terms</span>
+      <p><strong>kS</strong> - static friction. The minimum voltage to overcome stiction and get the mechanism moving at all.</p>
+      <p><strong>kG</strong> - gravity. The voltage needed just to hold position with zero velocity. For an elevator this is never zero - gravity never stops pulling.</p>
+      <p><strong>kV</strong> - velocity. Extra voltage proportional to how fast you want to move.</p>
+      <p>The snippet you'll use calls <code>feedforward.calculate(0.0)</code> - it asks for zero <em>velocity</em> feedforward because the goal is holding a height, not tracking a moving trajectory. That still leaves kS and kG doing real work every single loop.</p>
+    </div>
+
+    <div class="chat-thread">
+      <div class="bubble bubble-q">
+        <div class="bubble-who">Student</div>
+        If kV is for velocity and we always pass 0.0, why does it exist at all?
+      </div>
+      <div class="bubble bubble-a">
+        <div class="bubble-who">Fair question</div>
+        Because <code>ElevatorFeedforward</code> is a general-purpose class, not one built only for holding still. If you later drive the elevator with a motion profile (a target velocity that isn't zero), kV matters immediately. For today, holding a fixed height, it's along for the ride - tune it last, after kS and kG are solid.
+      </div>
+    </div>
+
+    <h2>Live tuning - and why you delete the tune code when you're done</h2>
+    <p>Guessing four to six gains cold is miserable. The <code>aksubsystem-motor</code> snippet wires each gain to a <code>LoggedNetworkNumber</code> under <code>/Tuning/Elevator/</code>, so you can updaate gains in AdvantageScope, graph apropriate values while the robot runs and watch the response change in real time.</p>
+
+    <div class="hf-box hf-warning">
+      <span class="hf-label">Tune handles are scaffolding, not the final product</span>
+      <p>The snippet's <code>periodic()</code> re-reads all six <code>LoggedNetworkNumber</code>s and rebuilds the controller and feedforward <em>every single loop</em> - that's deliberately wasteful so you can retune live without redeploying. Once you land on gains you like, copy the values into <code>ElevatorConstants</code>, then coment out or delete the <code>LoggedNetworkNumber</code> fields and the two lines in <code>periodic()</code> that read them. Competition code doesn't rebuild a controller 50 times a second for no reason.</p>
+    </div>
+
+    <p>See <a href="https://docs.advantagescope.org/overview/live-sources/tuning-mode/" target="_blank" rel="noopener">AdvantageScope's Tuning Mode documentation</a> for exactly how to toggle tuning mode and edit values live once connected to your simulator or robot.</p>
+
+    <h2>Homing - why an encoder alone isn't enough</h2>
+    <p>An motor's encoder counts <em>relative</em> motion from wherever it was powered on. It has no idea where "zero" actually is unless you tell it. <code>homeCommand()</code> solves this by driving gently toward the bottom hard stop, watching for the motor to stall (moving, then suddenly not), and calling that position zero.</p>
+
+    <div class="hf-box hf-sidebar">
+      <span class="hf-label">Reading the stall detector</span>
+      <p>The <code>BooleanSupplier</code> inside <code>homeCommand()</code> tracks a <code>moved</code> flag so it can't falsely trigger before the carriage starts moving (velocity starts at exactly 0, which would otherwise look identical to "stalled"). Only after velocity has exceeded <code>kHomingMovingMetersPerSec</code> does it start checking for a drop back below <code>kHomingStallMetersPerSec</code>.</p>
+    </div>
+
+    <div class="hf-box hf-brain">
+      <span class="hf-label">Brain power - before you move on</span>
+      <p>Without looking back: name the two WPILib classes this lesson combines, and say in one sentence what each one is responsible for. Then explain why an elevator needs a kG term that an arm on a servo never had to think about.</p>
+    </div>
+
+  </div><!-- /section-concept -->
+
+
+  <!-- ═══════════════════════════════════════════════════════
+       PART 2 — BUILD THE ELEVATOR
+       ═══════════════════════════════════════════════════════ -->
+  <div class="lesson-section" id="section-build">
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">Snippets already installed?</span>
+      <p>This lesson uses the same BearBots snippet file as Lesson 04, with one addition (<code>akconstants-motor</code>). If you installed it for Lesson 04, open the snippet file again and confirm the new entry is there - otherwise follow <a href="lesson-04-io-pattern.html#section-snippets">Lesson 04, Part 2: Install the Snippet File</a> to set it up from scratch.</p>
+    </div>
+
+    <p>
+      Today's starter project is the finished Lesson 04 robot - <span class="file-badge">Arm</span> and <span class="file-badge">Scoop</span> already converted to the IO pattern. By the end of this part, a new <span class="file-badge">Elevator</span> subsystem exists alongside them: five new files, all expanded from snippets, wired into <span class="file-badge">RobotContainer.java</span>.
+    </p>
+    <p>The elevator has one job: hold a commanded height using a DC motor, an encoder, PID, and feedforward. No 2D or 3D visualization yet - that's Part 3. Getting the control loop right comes first.</p>
+
+    <div class="step-builder">
+
+<div class="hf-box hf-info">
+  <span class="hf-label">How to read the code blocks in this lesson</span>
+  <p>Most code below is shown as a before and after. Here is how to read it:</p>
+  <ul>
+    <li><strong>Red</strong> is the old or placeholder version. An old line has no number in the left margin, because you are replacing it.</li>
+    <li><strong>Amber</strong> is the new version. A new line has a number: that is the line as it will appear in your finished file.</li>
+    <li>Only the part that changes is highlighted. The rest of the line stays the same.</li>
+    <li><strong>Green</strong> lines are brand new lines you are adding.</li>
+    <li>Line numbers always match your finished file, so "line 12" is line 12 on your screen.</li>
+    <li>Use the <strong>Copy</strong> button to grab clean code. It leaves out the line numbers and the old red lines.</li>
+    <li>When a block comes from a snippet, the list under it tells you what to type in each spot and whether to press Tab or Escape.</li>
+  </ul>
+</div>
+
+    <!-- ── Step 1: Constants.java — ElevatorHardware ─────────────────── -->
+    <div class="sb-step open" id="sbstep-1">
+      <div class="sb-step-header" onclick="sbToggle('sbstep-1')">
+        <div class="sb-step-num">1</div>
+        <div class="sb-step-title">Add ElevatorHardware to Constants.java</div>
+        <div class="sb-step-chevron">▶</div>
+      </div>
+      <div class="sb-step-body">
+        <p>Hardware port numbers - which PWM channel the motor is on, which DIO channels the encoder uses - live in <span class="file-badge">Constants.java</span>, in their own nested class per subsystem. Add <code>ElevatorHardware</code> right after <code>DriveHardware</code>, before <code>ArmHardware</code>.</p>
+
+<div class="code-window" data-code="    public static final int kRightEncoderChannelB = 7;
+  }
+
+  public static final class ElevatorHardware {
+    private ElevatorHardware() {}
+
+    /** XRP elevator motor PWM channel. */
+    public static final int kElevatorMotorChannel = 2;
+
+    /** XRP elevator encoder DIO channel A. */
+    public static final int kElevatorEncoderChannelA = 8;
+
+    /** XRP elevator encoder DIO channel B. */
+    public static final int kElevatorEncoderChannelB = 9;
+  }
+
+  public static final class ArmHardware {">
+<div class="cw-head"><span class="cw-title">Constants.java — add ElevatorHardware</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<div class="code-region" style="counter-reset: ln 74;">
+<pre class="cb">
+<span class="line">    public static final int kRightEncoderChannelB = 7;</span>
+<span class="line">  }</span>
+<span class="line"></span>
+<span class="line-add">  public static final class ElevatorHardware {</span>
+<span class="line-add">    private ElevatorHardware() {}</span>
+<span class="line-add"></span>
+<span class="line-add">    /** XRP elevator motor PWM channel. */</span>
+<span class="line-add">    public static final int kElevatorMotorChannel = 2;</span>
+<span class="line-add"></span>
+<span class="line-add">    /** XRP elevator encoder DIO channel A. */</span>
+<span class="line-add">    public static final int kElevatorEncoderChannelA = 8;</span>
+<span class="line-add"></span>
+<span class="line-add">    /** XRP elevator encoder DIO channel B. */</span>
+<span class="line-add">    public static final int kElevatorEncoderChannelB = 9;</span>
+<span class="line-add">  }</span>
+<span class="line-add"></span>
+<span class="line">  public static final class ArmHardware {</span>
+</pre></div></div>
+
+        <div class="code-annotation">Channel 2 for the motor (0 and 1 are already Drive's left/right); DIO 8 and 9 for the encoder (4-7 are already Drive's two encoders).</div>
+
+        <p>Build: <code>Ctrl+Shift+P</code> → <em>WPILib: Build Robot Code</em>. Should compile cleanly before moving on.</p>
+      </div>
+    </div><!-- /step 1 -->
+
+    <!-- ── Step 2: ElevatorConstants.java ─────────────────────────────── -->
+    <div class="sb-step" id="sbstep-2">
+      <div class="sb-step-header" onclick="sbToggle('sbstep-2')">
+        <div class="sb-step-num">2</div>
+        <div class="sb-step-title">Create ElevatorConstants.java</div>
+        <div class="sb-step-chevron">▶</div>
+      </div>
+      <div class="sb-step-body">
+        <p style="padding-left:0.6rem;">Right-click the <code>elevator/</code> folder (create it first, under <code>subsystems/</code>), <em>New File</em>, name it <code>ElevatorConstants.java</code>. Type <code>akconstants-motor</code> and press <kbd>Tab</kbd> to expand. This snippet has the most placeholders you've seen yet - it covers gearing, homing, real and sim PID/feedforward, and named height setpoints in one pass.</p>
+
+        <ol style="margin:0.75rem 0;padding-left:1.9rem;">
+          <li style="margin-bottom:0.4rem;padding-left:0.6rem;">Counts per motor shaft rev: <code>12.0</code> stays the same</li>
+          <li style="margin-bottom:0.4rem;padding-left:0.6rem;">Gear ratio: <code>48.75</code> stays the same</li>
+          <li style="margin-bottom:0.4rem;padding-left:0.6rem;">Spool diameter (meters): <code>0.020</code> stays the same</li>
+          <li style="margin-bottom:0.4rem;padding-left:0.6rem;">Homing volts: <code>-1.0</code> stays the same</li>
+          <li style="margin-bottom:0.4rem;padding-left:0.6rem;">Homing stall threshold (m/s): <code>0.002</code> stays the same</li>
+          <li style="margin-bottom:0.4rem;padding-left:0.6rem;">Homing moving threshold (m/s): <code>0.010</code> stays the same</li>
+          <li style="margin-bottom:0.4rem;padding-left:0.6rem;">Homing timeout (s): <code>3.0</code> stays the same</li>
+          <li style="margin-bottom:0.4rem;padding-left:0.6rem;">Real kP: <code>1.0</code> → <code>40.0</code></li>
+          <li style="margin-bottom:0.4rem;padding-left:0.6rem;">Real kI, kD, kS, kG, kV: all <code>0.0</code> - start at zero, tune later</li>
+          <li style="margin-bottom:0.4rem;padding-left:0.6rem;">Sim kP: <code>1.0</code> → <code>25.0</code></li>
+          <li style="margin-bottom:0.4rem;padding-left:0.6rem;">Sim kI, kD, kS, kG, kV: all <code>0.0</code></li>
+          <li style="margin-bottom:0.4rem;padding-left:0.6rem;">First named setpoint: <code>kBottomHeightMeters</code> = <code>0.003</code></li>
+          <li style="margin-bottom:0.4rem;padding-left:0.6rem;">Second named setpoint: <code>kTopHeightMeters</code> = <code>0.127</code></li>
+          <li style="margin-bottom:0.4rem;padding-left:0.6rem;">Extra-setpoint line: <code>// add more named setpoints here, one per line</code> → <code>public static final double kMiddleHeightMeters = 0.064;</code></li>
+          <li style="margin-bottom:0.4rem;padding-left:0.6rem;">Default height: <code>kBottomHeightMeters</code> stays the same</li>
+          <li style="margin-bottom:0.4rem;padding-left:0.6rem;">Min height: <code>0.0</code> stays the same</li>
+          <li style="margin-bottom:0.4rem;padding-left:0.6rem;">Max height: <code>1.0</code> → <code>0.135</code></li>
+          <li style="margin-bottom:0.4rem;padding-left:0.6rem;">Height tolerance: <code>0.005</code> stays the same</li>
+          <li style="margin-bottom:0.4rem;padding-left:0.6rem;">Sim max speed (m/s): <code>0.15</code> stays the same</li>
+          <li style="padding-left:0.6rem;">Gravity volts: <code>0.5</code> stays the same</li>
+        </ol>
+
+        <p style="padding-left:0.6rem;">The result should match this exactly:</p>
+
+<div class="code-window" data-code="// Copyright (c) 2026 BearBots FRC Team 6964
+// Open Source Software; you can modify and/or share it under the terms of
+// the MIT License available in the root directory of this project.
+
+package frc.robot.subsystems.elevator;
+
+public final class ElevatorConstants {
+  private ElevatorConstants() {}
+
+  // Gearbox + encoder conversion. Measure from your mechanism, or read the datasheet.
+  public static final double kCountsPerMotorShaftRev = 12.0;
+  public static final double kGearRatio = 48.75;
+  public static final double kCountsPerOutputRev = kCountsPerMotorShaftRev * kGearRatio;
+  public static final double kSpoolDiameterMeters = 0.020;
+  public static final double kOutputDistancePerRev = Math.PI * kSpoolDiameterMeters;
+  public static final double kEncoderDistancePerPulseMeters = kOutputDistancePerRev / kCountsPerOutputRev;
+
+  // Homing. Gentle voltage toward the hard stop; stall detected once movement starts.
+  public static final double kHomingVolts = -1.0;
+  public static final double kHomingStallMetersPerSec = 0.002;
+  public static final double kHomingMovingMetersPerSec = 0.010;
+  public static final double kHomingTimeoutSecs = 3.0;
+
+  // Real robot PID + feedforward. Tune live via LoggedNetworkNumber, then bake in here.
+  public static final double kPReal = 40.0;
+  public static final double kIReal = 0.0;
+  public static final double kDReal = 0.0;
+  public static final double kSVoltsReal = 0.0;
+  public static final double kGVoltsReal = 0.0;
+  public static final double kVVoltSecPerMeterReal = 0.0;
+
+  // Sim PID + feedforward. Usually needs different gains than the real robot.
+  public static final double kPSim = 25.0;
+  public static final double kISim = 0.0;
+  public static final double kDSim = 0.0;
+  public static final double kSVoltsSim = 0.0;
+  public static final double kGVoltsSim = 0.0;
+  public static final double kVVoltSecPerMeterSim = 0.0;
+
+  // Named setpoints. Bind these directly:
+  //   button.onTrue(xxx.setHeightMetersCommand(ElevatorConstants.kBottomHeightMeters));
+  public static final double kBottomHeightMeters = 0.003;
+  public static final double kTopHeightMeters = 0.127;
+  public static final double kMiddleHeightMeters = 0.064;  // add more named setpoints here, one per line
+
+  // Startup target. periodic drives here until told otherwise.
+  public static final double kDefaultHeightMeters = kBottomHeightMeters;
+
+  // Travel limits. setHeightMeters clamps to this band.
+  public static final double kMinHeightMeters = 0.0;
+  public static final double kMaxHeightMeters = 0.135;
+
+  // PID finish window.
+  public static final double kHeightToleranceMeters = 0.005;
+
+  // Sim-only. Output speed at full voltage - measure or estimate from motor free speed + gearing.
+  public static final double kSimMaxSpeedMetersPerSec = 0.15;
+
+  // Sim-only. Voltage needed just to hold position against gravity (kG feedforward starting point).
+  public static final double kGravityVolts = 0.5;
+}">
+<div class="cw-head"><span class="cw-title">NEW FILE - ElevatorConstants.java (akconstants-motor)</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<div class="code-region" style="counter-reset: ln 0;">
+<pre class="cb">
+<span class="line">// Copyright (c) 2026 BearBots FRC Team 6964</span>
+<span class="line">// Open Source Software; you can modify and/or share it under the terms of</span>
+<span class="line">// the MIT License available in the root directory of this project.</span>
+<span class="line"></span>
+<span class="line">package frc.robot.subsystems.elevator;</span>
+<span class="line"></span>
+<span class="line">public final class ElevatorConstants {</span>
+<span class="line">  private ElevatorConstants() {}</span>
+<span class="line"></span>
+<span class="line">  // Gearbox + encoder conversion. Measure from your mechanism, or read the datasheet.</span>
+<span class="line">  public static final double kCountsPerMotorShaftRev = 12.0;</span>
+<span class="line">  public static final double kGearRatio = 48.75;</span>
+<span class="line">  public static final double kCountsPerOutputRev = kCountsPerMotorShaftRev * kGearRatio;</span>
+<span class="line">  public static final double kSpoolDiameterMeters = 0.020;</span>
+<span class="line">  public static final double kOutputDistancePerRev = Math.PI * kSpoolDiameterMeters;</span>
+<span class="line">  public static final double kEncoderDistancePerPulseMeters = kOutputDistancePerRev / kCountsPerOutputRev;</span>
+<span class="line"></span>
+<span class="line">  // Homing. Gentle voltage toward the hard stop; stall detected once movement starts.</span>
+<span class="line">  public static final double kHomingVolts = -1.0;</span>
+<span class="line">  public static final double kHomingStallMetersPerSec = 0.002;</span>
+<span class="line">  public static final double kHomingMovingMetersPerSec = 0.010;</span>
+<span class="line">  public static final double kHomingTimeoutSecs = 3.0;</span>
+<span class="line"></span>
+<span class="line">  // Real robot PID + feedforward. Tune live via LoggedNetworkNumber, then bake in here.</span>
+<span class="line-old">  public static final double kPReal = <span class="ts-before">1.0</span>;</span>
+<span class="line-new">  public static final double kPReal = <span class="ts-after">40.0</span>;</span>
+<span class="line">  public static final double kIReal = 0.0;</span>
+<span class="line">  public static final double kDReal = 0.0;</span>
+<span class="line">  public static final double kSVoltsReal = 0.0;</span>
+<span class="line">  public static final double kGVoltsReal = 0.0;</span>
+<span class="line">  public static final double kVVoltSecPerMeterReal = 0.0;</span>
+<span class="line"></span>
+<span class="line">  // Sim PID + feedforward. Usually needs different gains than the real robot.</span>
+<span class="line-old">  public static final double kPSim = <span class="ts-before">1.0</span>;</span>
+<span class="line-new">  public static final double kPSim = <span class="ts-after">25.0</span>;</span>
+<span class="line">  public static final double kISim = 0.0;</span>
+<span class="line">  public static final double kDSim = 0.0;</span>
+<span class="line">  public static final double kSVoltsSim = 0.0;</span>
+<span class="line">  public static final double kGVoltsSim = 0.0;</span>
+<span class="line">  public static final double kVVoltSecPerMeterSim = 0.0;</span>
+<span class="line"></span>
+<span class="line">  // Named setpoints. Bind these directly:</span>
+<span class="line">  //   button.onTrue(xxx.setHeightMetersCommand(ElevatorConstants.kBottomHeightMeters));</span>
+<span class="line-old">  public static final double <span class="ts-before">kBottomHeightMeters</span> = <span class="ts-before">0.0</span>;</span>
+<span class="line-new">  public static final double <span class="ts-after">kBottomHeightMeters</span> = <span class="ts-after">0.003</span>;</span>
+<span class="line-old">  public static final double <span class="ts-before">kTopHeightMeters</span> = <span class="ts-before">1.0</span>;</span>
+<span class="line-new">  public static final double <span class="ts-after">kTopHeightMeters</span> = <span class="ts-after">0.127</span>;</span>
+<span class="line-old">  <span class="ts-before">// add more named setpoints here, one per line</span></span>
+<span class="line-new">  <span class="ts-after">public static final double kMiddleHeightMeters = 0.064;</span>  // add more named setpoints here, one per line</span>
+<span class="line"></span>
+<span class="line">  // Startup target. periodic drives here until told otherwise.</span>
+<span class="line">  public static final double kDefaultHeightMeters = kBottomHeightMeters;</span>
+<span class="line"></span>
+<span class="line">  // Travel limits. setHeightMeters clamps to this band.</span>
+<span class="line">  public static final double kMinHeightMeters = 0.0;</span>
+<span class="line-old">  public static final double kMaxHeightMeters = <span class="ts-before">1.0</span>;</span>
+<span class="line-new">  public static final double kMaxHeightMeters = <span class="ts-after">0.135</span>;</span>
+<span class="line"></span>
+<span class="line">  // PID finish window.</span>
+<span class="line">  public static final double kHeightToleranceMeters = 0.005;</span>
+<span class="line"></span>
+<span class="line">  // Sim-only. Output speed at full voltage - measure or estimate from motor free speed + gearing.</span>
+<span class="line">  public static final double kSimMaxSpeedMetersPerSec = 0.15;</span>
+<span class="line"></span>
+<span class="line">  // Sim-only. Voltage needed just to hold position against gravity (kG feedforward starting point).</span>
+<span class="line">  public static final double kGravityVolts = 0.5;</span>
+<span class="line">}</span>
+</pre></div></div>
+
+        <div class="code-annotation">Same shape as <code>ScoopConstants</code> - named setpoints, limits, tolerance - plus everything a PID + feedforward loop needs: gearing math to convert encoder counts to meters, homing thresholds, and separate real/sim gain sets.</div>
+
+        <p>Build: should compile (nothing references it yet).</p>
+      </div>
+    </div><!-- /step 2 -->
+
+    <!-- ── Step 3: ElevatorIO.java ─────────────────────────────────────── -->
+    <div class="sb-step" id="sbstep-3">
+      <div class="sb-step-header" onclick="sbToggle('sbstep-3')">
+        <div class="sb-step-num">3</div>
+        <div class="sb-step-title">Create ElevatorIO.java</div>
+        <div class="sb-step-chevron">▶</div>
+      </div>
+      <div class="sb-step-body">
+        <p style="padding-left:0.6rem;"><span class="file-badge">ElevatorIO.java</span> is the contract. New file, type <code>akio-motor</code>, press <kbd>Tab</kbd>. Every placeholder in this snippet auto-fills from the folder name - nothing to type by hand. Press <kbd>Escape</kbd> once it expands.</p>
+
+<div class="code-window" data-code="// Copyright (c) 2026 BearBots FRC Team 6964
+// Open Source Software; you can modify and/or share it under the terms of
+// the MIT License available in the root directory of this project.
+
+package frc.robot.subsystems.elevator;
+
+import org.littletonrobotics.junction.AutoLog;
+
+public interface ElevatorIO {
+  @AutoLog
+  static class ElevatorIOInputs {
+    public int encoderCount = 0;
+    public double positionMeters = 0.0;
+    public double velocityMetersPerSec = 0.0;
+    public double appliedVolts = 0.0;
+  }
+
+  default void updateInputs(ElevatorIOInputs inputs) {}
+
+  default void setVoltage(double volts) {}
+
+  default void resetEncoder() {}
+
+  default void stop() {
+    setVoltage(0.0);
+  }
+}">
+<div class="cw-head"><span class="cw-title">NEW FILE - ElevatorIO.java (akio-motor)</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<div class="code-region" style="counter-reset: ln 0;">
+<pre class="cb">
+<span class="line">// Copyright (c) 2026 BearBots FRC Team 6964</span>
+<span class="line">// Open Source Software; you can modify and/or share it under the terms of</span>
+<span class="line">// the MIT License available in the root directory of this project.</span>
+<span class="line"></span>
+<span class="line">package frc.robot.subsystems.elevator;</span>
+<span class="line"></span>
+<span class="line">import org.littletonrobotics.junction.AutoLog;</span>
+<span class="line"></span>
+<span class="line">public interface ElevatorIO {</span>
+<span class="line">  @AutoLog</span>
+<span class="line">  static class ElevatorIOInputs {</span>
+<span class="line">    public int encoderCount = 0;</span>
+<span class="line">    public double positionMeters = 0.0;</span>
+<span class="line">    public double velocityMetersPerSec = 0.0;</span>
+<span class="line">    public double appliedVolts = 0.0;</span>
+<span class="line">  }</span>
+<span class="line"></span>
+<span class="line">  default void updateInputs(ElevatorIOInputs inputs) {}</span>
+<span class="line"></span>
+<span class="line">  default void setVoltage(double volts) {}</span>
+<span class="line"></span>
+<span class="line">  default void resetEncoder() {}</span>
+<span class="line"></span>
+<span class="line">  default void stop() {</span>
+<span class="line">    setVoltage(0.0);</span>
+<span class="line">  }</span>
+<span class="line">}</span>
+</pre></div></div>
+
+        <div class="code-annotation">A motor IO tracks four inputs instead of a servo's one: raw encoder count, derived position and velocity, and applied voltage. <code>stop()</code> is a default method now - every implementation gets it for free by calling <code>setVoltage(0.0)</code>.</div>
+      </div>
+    </div><!-- /step 3 -->
+
+    <!-- ── Step 4: ElevatorIOSim.java ──────────────────────────────────── -->
+    <div class="sb-step" id="sbstep-4">
+      <div class="sb-step-header" onclick="sbToggle('sbstep-4')">
+        <div class="sb-step-num">4</div>
+        <div class="sb-step-title">Create ElevatorIOSim.java</div>
+        <div class="sb-step-chevron">▶</div>
+      </div>
+      <div class="sb-step-body">
+        <p style="padding-left:0.6rem;">New file, type <code>akioimpl-motor-sim</code>, press <kbd>Tab</kbd>. Same as Step 3 - every placeholder auto-fills, nothing to type. Press <kbd>Escape</kbd>.</p>
+
+<div class="code-window" data-code="// Copyright (c) 2026 BearBots FRC Team 6964
+// Open Source Software; you can modify and/or share it under the terms of
+// the MIT License available in the root directory of this project.
+
+package frc.robot.subsystems.elevator;
+
+import static frc.robot.Constants.kLoopPeriodSecs;
+import static frc.robot.Constants.kMaxBatteryVoltage;
+import edu.wpi.first.math.MathUtil;
+
+public class ElevatorIOSim implements ElevatorIO {
+  private double appliedVolts = 0.0;
+  private double positionMeters = 0.0;
+  private double velocityMetersPerSec = 0.0;
+
+  @Override
+  public void updateInputs(ElevatorIOInputs inputs) {
+    // Gravity pulls the carriage down: it takes voltage just to hold position.
+    double effectiveVolts = appliedVolts - ElevatorConstants.kGravityVolts;
+
+    // Linear model: velocity scales with effective voltage.
+    velocityMetersPerSec =
+        (effectiveVolts / kMaxBatteryVoltage)
+            * ElevatorConstants.kSimMaxSpeedMetersPerSec;
+
+    // Integrate velocity into position each loop tick.
+    positionMeters +=
+        velocityMetersPerSec * kLoopPeriodSecs;
+
+    // Stop at the physical limits; carriage can't sink through the bottom or fly off the top.
+    double clamped =
+        MathUtil.clamp(
+            positionMeters,
+            ElevatorConstants.kMinHeightMeters,
+            ElevatorConstants.kMaxHeightMeters);
+    // Hit a hard stop: zero velocity so stall-based homing can detect it.
+    if (clamped != positionMeters) {
+      velocityMetersPerSec = 0.0;
+    }
+    positionMeters = clamped;
+
+    inputs.appliedVolts = appliedVolts;
+    inputs.positionMeters = positionMeters;
+    inputs.velocityMetersPerSec = velocityMetersPerSec;
+    inputs.encoderCount =
+        (int) (positionMeters / ElevatorConstants.kEncoderDistancePerPulseMeters);
+  }
+
+  @Override
+  public void setVoltage(double volts) {
+    appliedVolts = volts;
+  }
+
+  @Override
+  public void resetEncoder() {
+    positionMeters = 0.0;
+    velocityMetersPerSec = 0.0;
+  }
+
+  @Override
+  public void stop() {
+    appliedVolts = 0.0;
+  }
+}">
+<div class="cw-head"><span class="cw-title">NEW FILE - ElevatorIOSim.java (akioimpl-motor-sim)</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<div class="code-region" style="counter-reset: ln 0;">
+<pre class="cb">
+<span class="line">// Copyright (c) 2026 BearBots FRC Team 6964</span>
+<span class="line">// Open Source Software; you can modify and/or share it under the terms of</span>
+<span class="line">// the MIT License available in the root directory of this project.</span>
+<span class="line"></span>
+<span class="line">package frc.robot.subsystems.elevator;</span>
+<span class="line"></span>
+<span class="line">import static frc.robot.Constants.kLoopPeriodSecs;</span>
+<span class="line">import static frc.robot.Constants.kMaxBatteryVoltage;</span>
+<span class="line">import edu.wpi.first.math.MathUtil;</span>
+<span class="line"></span>
+<span class="line">public class ElevatorIOSim implements ElevatorIO {</span>
+<span class="line">  private double appliedVolts = 0.0;</span>
+<span class="line">  private double positionMeters = 0.0;</span>
+<span class="line">  private double velocityMetersPerSec = 0.0;</span>
+<span class="line"></span>
+<span class="line">  @Override</span>
+<span class="line">  public void updateInputs(ElevatorIOInputs inputs) {</span>
+<span class="line">    <span class="cm">// Gravity pulls the carriage down: it takes voltage just to hold position.</span></span>
+<span class="line">    double effectiveVolts = appliedVolts - ElevatorConstants.kGravityVolts;</span>
+<span class="line"></span>
+<span class="line">    <span class="cm">// Linear model: velocity scales with effective voltage.</span></span>
+<span class="line">    velocityMetersPerSec =</span>
+<span class="line">        (effectiveVolts / kMaxBatteryVoltage)</span>
+<span class="line">            * ElevatorConstants.kSimMaxSpeedMetersPerSec;</span>
+<span class="line"></span>
+<span class="line">    <span class="cm">// Integrate velocity into position each loop tick.</span></span>
+<span class="line">    positionMeters +=</span>
+<span class="line">        velocityMetersPerSec * kLoopPeriodSecs;</span>
+<span class="line"></span>
+<span class="line">    <span class="cm">// Stop at the physical limits; carriage can't sink through the bottom or fly off the top.</span></span>
+<span class="line">    double clamped =</span>
+<span class="line">        MathUtil.clamp(</span>
+<span class="line">            positionMeters,</span>
+<span class="line">            ElevatorConstants.kMinHeightMeters,</span>
+<span class="line">            ElevatorConstants.kMaxHeightMeters);</span>
+<span class="line">    <span class="cm">// Hit a hard stop: zero velocity so stall-based homing can detect it.</span></span>
+<span class="line">    if (clamped != positionMeters) {</span>
+<span class="line">      velocityMetersPerSec = 0.0;</span>
+<span class="line">    }</span>
+<span class="line">    positionMeters = clamped;</span>
+<span class="line"></span>
+<span class="line">    inputs.appliedVolts = appliedVolts;</span>
+<span class="line">    inputs.positionMeters = positionMeters;</span>
+<span class="line">    inputs.velocityMetersPerSec = velocityMetersPerSec;</span>
+<span class="line">    inputs.encoderCount =</span>
+<span class="line">        (int) (positionMeters / ElevatorConstants.kEncoderDistancePerPulseMeters);</span>
+<span class="line">  }</span>
+<span class="line"></span>
+<span class="line">  @Override</span>
+<span class="line">  public void setVoltage(double volts) {</span>
+<span class="line">    appliedVolts = volts;</span>
+<span class="line">  }</span>
+<span class="line"></span>
+<span class="line">  @Override</span>
+<span class="line">  public void resetEncoder() {</span>
+<span class="line">    positionMeters = 0.0;</span>
+<span class="line">    velocityMetersPerSec = 0.0;</span>
+<span class="line">  }</span>
+<span class="line"></span>
+<span class="line">  @Override</span>
+<span class="line">  public void stop() {</span>
+<span class="line">    appliedVolts = 0.0;</span>
+<span class="line">  }</span>
+<span class="line">}</span>
+</pre></div></div>
+
+        <div class="code-annotation">The sim model integrates velocity into position by hand, every loop - this is the physics a real motor+gearbox+encoder gives you for free. Note it clamps to the constants' min/max height and zeroes velocity at the hard stops, mimicking a real carriage that can't pass through its own frame.</div>
+      </div>
+    </div><!-- /step 4 -->
+
+    <!-- ── Step 5: ElevatorIOXRP.java ──────────────────────────────────── -->
+    <div class="sb-step" id="sbstep-5">
+      <div class="sb-step-header" onclick="sbToggle('sbstep-5')">
+        <div class="sb-step-num">5</div>
+        <div class="sb-step-title">Create ElevatorIOXRP.java</div>
+        <div class="sb-step-chevron">▶</div>
+      </div>
+      <div class="sb-step-body">
+        <p style="padding-left:0.6rem;">New file, type <code>akioimpl-motor-xrp</code>, press <kbd>Tab</kbd>. This one has three real tab stops - the motor and encoder channel numbers.</p>
+
+        <ol style="margin:0.75rem 0;padding-left:1.9rem;">
+          <li style="margin-bottom:0.4rem;padding-left:0.6rem;">Motor channel: <code>kMotorChannel</code> → <code>kElevatorMotorChannel</code></li>
+          <li style="margin-bottom:0.4rem;padding-left:0.6rem;">Encoder channel A: <code>kEncoderChannelA</code> → <code>kElevatorEncoderChannelA</code></li>
+          <li style="padding-left:0.6rem;">Encoder channel B: <code>kEncoderChannelB</code> → <code>kElevatorEncoderChannelB</code></li>
+        </ol>
+
+        <p style="padding-left:0.6rem;">The result should match this exactly:</p>
+
+<div class="code-window" data-code="// Copyright (c) 2026 BearBots FRC Team 6964
+// Open Source Software; you can modify and/or share it under the terms of
+// the MIT License available in the root directory of this project.
+
+package frc.robot.subsystems.elevator;
+
+import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.xrp.XRPMotor;
+import static frc.robot.Constants.ElevatorHardware.*;
+import static frc.robot.Constants.kMaxBatteryVoltage;
+
+public class ElevatorIOXRP implements ElevatorIO {
+  private final XRPMotor motor = new XRPMotor(kElevatorMotorChannel);
+  private final Encoder encoder = new Encoder(kElevatorEncoderChannelA, kElevatorEncoderChannelB);
+
+  private double appliedVolts = 0.0;
+
+  public ElevatorIOXRP() {
+    encoder.setDistancePerPulse(ElevatorConstants.kEncoderDistancePerPulseMeters);
+  }
+
+  @Override
+  public void updateInputs(ElevatorIOInputs inputs) {
+    inputs.encoderCount = encoder.get();
+    inputs.positionMeters = encoder.getDistance();
+    inputs.velocityMetersPerSec = encoder.getRate();
+    inputs.appliedVolts = appliedVolts;
+  }
+
+  @Override
+  public void setVoltage(double volts) {
+    appliedVolts = volts;
+    motor.set(appliedVolts / kMaxBatteryVoltage);
+  }
+
+  @Override
+  public void resetEncoder() {
+    encoder.reset();
+  }
+
+  @Override
+  public void stop() {
+    motor.set(0.0);
+  }
+}">
+<div class="cw-head"><span class="cw-title">NEW FILE - ElevatorIOXRP.java (akioimpl-motor-xrp)</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<div class="code-region" style="counter-reset: ln 0;">
+<pre class="cb">
+<span class="line">// Copyright (c) 2026 BearBots FRC Team 6964</span>
+<span class="line">// Open Source Software; you can modify and/or share it under the terms of</span>
+<span class="line">// the MIT License available in the root directory of this project.</span>
+<span class="line"></span>
+<span class="line">package frc.robot.subsystems.elevator;</span>
+<span class="line"></span>
+<span class="line">import edu.wpi.first.wpilibj.Encoder;</span>
+<span class="line">import edu.wpi.first.wpilibj.xrp.XRPMotor;</span>
+<span class="line">import static frc.robot.Constants.ElevatorHardware.*;</span>
+<span class="line">import static frc.robot.Constants.kMaxBatteryVoltage;</span>
+<span class="line"></span>
+<span class="line">public class ElevatorIOXRP implements ElevatorIO {</span>
+<span class="line-old">  private final XRPMotor motor = new XRPMotor(<span class="ts-before">kMotorChannel</span>);</span>
+<span class="line-new">  private final XRPMotor motor = new XRPMotor(<span class="ts-after">kElevatorMotorChannel</span>);</span>
+<span class="line-old">  private final Encoder encoder = new Encoder(<span class="ts-before">kEncoderChannelA</span>, <span class="ts-before">kEncoderChannelB</span>);</span>
+<span class="line-new">  private final Encoder encoder = new Encoder(<span class="ts-after">kElevatorEncoderChannelA</span>, <span class="ts-after">kElevatorEncoderChannelB</span>);</span>
+<span class="line"></span>
+<span class="line">  private double appliedVolts = 0.0;</span>
+<span class="line"></span>
+<span class="line">  public ElevatorIOXRP() {</span>
+<span class="line">    encoder.setDistancePerPulse(ElevatorConstants.kEncoderDistancePerPulseMeters);</span>
+<span class="line">  }</span>
+<span class="line"></span>
+<span class="line">  @Override</span>
+<span class="line">  public void updateInputs(ElevatorIOInputs inputs) {</span>
+<span class="line">    inputs.encoderCount = encoder.get();</span>
+<span class="line">    inputs.positionMeters = encoder.getDistance();</span>
+<span class="line">    inputs.velocityMetersPerSec = encoder.getRate();</span>
+<span class="line">    inputs.appliedVolts = appliedVolts;</span>
+<span class="line">  }</span>
+<span class="line"></span>
+<span class="line">  @Override</span>
+<span class="line">  public void setVoltage(double volts) {</span>
+<span class="line">    appliedVolts = volts;</span>
+<span class="line">    motor.set(appliedVolts / kMaxBatteryVoltage);</span>
+<span class="line">  }</span>
+<span class="line"></span>
+<span class="line">  @Override</span>
+<span class="line">  public void resetEncoder() {</span>
+<span class="line">    encoder.reset();</span>
+<span class="line">  }</span>
+<span class="line"></span>
+<span class="line">  @Override</span>
+<span class="line">  public void stop() {</span>
+<span class="line">    motor.set(0.0);</span>
+<span class="line">  }</span>
+<span class="line">}</span>
+</pre></div></div>
+
+        <div class="code-annotation">Note the static import <code>Constants.ElevatorHardware.*</code> - that's why <code>kElevatorMotorChannel</code> resolves with no prefix. This class is the only place in the whole subsystem that imports <code>XRPMotor</code> or <code>Encoder</code>.</div>
+      </div>
+    </div><!-- /step 5 -->
+
+    <!-- ── Step 6: Elevator.java ───────────────────────────────────────── -->
+    <div class="sb-step" id="sbstep-6">
+      <div class="sb-step-header" onclick="sbToggle('sbstep-6')">
+        <div class="sb-step-num">6</div>
+        <div class="sb-step-title">Create Elevator.java</div>
+        <div class="sb-step-chevron">▶</div>
+      </div>
+      <div class="sb-step-body">
+        <p style="padding-left:0.6rem;">New file, type <code>aksubsystem-motor</code>, press <kbd>Tab</kbd>. Every placeholder auto-fills from the folder name - this is the biggest file in the lesson and none of it needs manual typing. Press <kbd>Escape</kbd> when it's done expanding.</p>
+
+<div class="code-window" data-code="// Copyright (c) 2026 BearBots FRC Team 6964
+// Open Source Software; you can modify and/or share it under the terms of
+// the MIT License available in the root directory of this project.
+
+package frc.robot.subsystems.elevator;
+
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import java.util.function.BooleanSupplier;
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
+import static frc.robot.Constants.kMaxBatteryVoltage;
+
+import frc.robot.Constants;
+
+public class Elevator extends SubsystemBase {
+  private final ElevatorIO io;
+  private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
+
+  // One controller does the math: error in, volts out. Tolerance decides &quot;close enough&quot;.
+  private final PIDController controller = new PIDController(
+      Constants.currentMode == Constants.Mode.SIM
+          ? ElevatorConstants.kPSim
+          : ElevatorConstants.kPReal,
+      Constants.currentMode == Constants.Mode.SIM
+          ? ElevatorConstants.kISim
+          : ElevatorConstants.kIReal,
+      Constants.currentMode == Constants.Mode.SIM
+          ? ElevatorConstants.kDSim
+          : ElevatorConstants.kDReal);
+
+  // Rebuilt each loop from the tune handles below (ElevatorFeedforward gains are final).
+  private ElevatorFeedforward feedforward = new ElevatorFeedforward(
+      Constants.currentMode == Constants.Mode.SIM
+          ? ElevatorConstants.kSVoltsSim
+          : ElevatorConstants.kSVoltsReal,
+      Constants.currentMode == Constants.Mode.SIM
+          ? ElevatorConstants.kGVoltsSim
+          : ElevatorConstants.kGVoltsReal,
+      Constants.currentMode == Constants.Mode.SIM
+          ? ElevatorConstants.kVVoltSecPerMeterSim
+          : ElevatorConstants.kVVoltSecPerMeterReal);
+
+  // TUNE handles. Bake winners into constants, then delete these + the setPID/feedforward lines.
+  private final LoggedNetworkNumber kP =
+      new LoggedNetworkNumber(&quot;/Tuning/Elevator/kP&quot;, controller.getP());
+  private final LoggedNetworkNumber kI =
+      new LoggedNetworkNumber(&quot;/Tuning/Elevator/kI&quot;, controller.getI());
+  private final LoggedNetworkNumber kD =
+      new LoggedNetworkNumber(&quot;/Tuning/Elevator/kD&quot;, controller.getD());
+  private final LoggedNetworkNumber kS =
+      new LoggedNetworkNumber(&quot;/Tuning/Elevator/kS&quot;, feedforward.getKs());
+  private final LoggedNetworkNumber kG =
+      new LoggedNetworkNumber(&quot;/Tuning/Elevator/kG&quot;, feedforward.getKg());
+  private final LoggedNetworkNumber kV =
+      new LoggedNetworkNumber(&quot;/Tuning/Elevator/kV&quot;, feedforward.getKv());
+
+  private double targetMeters = ElevatorConstants.kDefaultHeightMeters;
+  private boolean homing = false;
+
+  public Elevator(ElevatorIO io) {
+    this.io = io;
+    controller.setTolerance(ElevatorConstants.kHeightToleranceMeters);
+  }
+
+  // Single source of truth. Every setpoint, named or raw, lands here.
+  public void setHeightMeters(double meters) {
+    targetMeters = MathUtil.clamp(
+        meters,
+        ElevatorConstants.kMinHeightMeters,
+        ElevatorConstants.kMaxHeightMeters);
+  }
+
+  // Jump to a height immediately. Bind to a button:
+  //   button.onTrue(elevator.setHeightMetersCommand(ElevatorConstants.kTopHeightMeters));
+  public Command setHeightMetersCommand(double meters) {
+    return runOnce(() -> setHeightMeters(meters));
+  }
+
+  // Go to a height and finish once within tolerance. Use this inside sequences.
+  public Command goToHeightMetersCommand(double meters) {
+    return run(() -> setHeightMeters(meters))
+        .until(this::atGoal)
+        .finallyDo(interrupted -> {
+          // Cancelled early: hold where we are instead of chasing the old target.
+          if (interrupted) setHeightMeters(inputs.positionMeters);
+        });
+  }
+
+  // Stall-stop homing. Drives toward the hard stop, zeros the encoder there.
+  public Command homeCommand() {
+    // Stall-stop, but only after the carriage has actually started moving,
+    // otherwise the initial velocity of 0 ends it on the first loop.
+    BooleanSupplier stalled = new BooleanSupplier() {
+      boolean moved = false;
+      public boolean getAsBoolean() {
+        double v = Math.abs(inputs.velocityMetersPerSec);
+        if (v > ElevatorConstants.kHomingMovingMetersPerSec) moved = true;
+        return moved && v < ElevatorConstants.kHomingStallMetersPerSec;
+      }
+    };
+    return startRun(
+            () -> homing = true,
+            () -> io.setVoltage(ElevatorConstants.kHomingVolts))
+        .until(stalled)
+        .withTimeout(ElevatorConstants.kHomingTimeoutSecs)
+        .finallyDo(() -> {
+              io.stop();
+              io.resetEncoder();
+              setHeightMeters(ElevatorConstants.kDefaultHeightMeters);
+              homing = false;
+            });
+  }
+
+  @AutoLogOutput(key = &quot;Elevator/AtGoal&quot;)
+  public boolean atGoal() {
+    return controller.atSetpoint();
+  }
+
+  public void stop() {
+    io.stop();
+  }
+
+  @Override
+  public void periodic() {
+    io.updateInputs(inputs);
+    Logger.processInputs(&quot;Elevator&quot;, inputs);
+
+    if (homing) return;   // homing owns the motor; skip PID this loop
+
+    Logger.recordOutput(&quot;Elevator/TargetMeters&quot;, targetMeters);
+
+    // TUNE: apply live gains each loop. Delete when you bake.
+    controller.setPID(kP.get(), kI.get(), kD.get());
+    feedforward = new ElevatorFeedforward(kS.get(), kG.get(), kV.get());
+
+    // Feedback (PID) + feedforward (gravity/static hold). velocity setpoint 0 = hold.
+    double volts = controller.calculate(inputs.positionMeters, targetMeters)
+        + feedforward.calculate(0.0);
+    volts = MathUtil.clamp(volts, -kMaxBatteryVoltage, kMaxBatteryVoltage);
+
+    io.setVoltage(volts);
+  }
+}">
+<div class="cw-head"><span class="cw-title">NEW FILE - Elevator.java (aksubsystem-motor)</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<div class="code-region" style="counter-reset: ln 0;">
+<pre class="cb">
+<span class="line">// Copyright (c) 2026 BearBots FRC Team 6964</span>
+<span class="line">// Open Source Software; you can modify and/or share it under the terms of</span>
+<span class="line">// the MIT License available in the root directory of this project.</span>
+<span class="line"></span>
+<span class="line">package frc.robot.subsystems.elevator;</span>
+<span class="line"></span>
+<span class="line">import edu.wpi.first.math.MathUtil;</span>
+<span class="line">import edu.wpi.first.math.controller.ElevatorFeedforward;</span>
+<span class="line">import edu.wpi.first.math.controller.PIDController;</span>
+<span class="line">import edu.wpi.first.wpilibj2.command.Command;</span>
+<span class="line">import edu.wpi.first.wpilibj2.command.SubsystemBase;</span>
+<span class="line">import java.util.function.BooleanSupplier;</span>
+<span class="line">import org.littletonrobotics.junction.AutoLogOutput;</span>
+<span class="line">import org.littletonrobotics.junction.Logger;</span>
+<span class="line">import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;</span>
+<span class="line">import static frc.robot.Constants.kMaxBatteryVoltage;</span>
+<span class="line"></span>
+<span class="line">import frc.robot.Constants;</span>
+<span class="line"></span>
+<span class="line">public class Elevator extends SubsystemBase {</span>
+<span class="line">  private final ElevatorIO io;</span>
+<span class="line">  private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();</span>
+<span class="line"></span>
+<span class="line">  <span class="cm">// One controller does the math: error in, volts out. Tolerance decides "close enough".</span></span>
+<span class="line">  private final PIDController controller = new PIDController(</span>
+<span class="line">      Constants.currentMode == Constants.Mode.SIM</span>
+<span class="line">          ? ElevatorConstants.kPSim</span>
+<span class="line">          : ElevatorConstants.kPReal,</span>
+<span class="line">      Constants.currentMode == Constants.Mode.SIM</span>
+<span class="line">          ? ElevatorConstants.kISim</span>
+<span class="line">          : ElevatorConstants.kIReal,</span>
+<span class="line">      Constants.currentMode == Constants.Mode.SIM</span>
+<span class="line">          ? ElevatorConstants.kDSim</span>
+<span class="line">          : ElevatorConstants.kDReal);</span>
+<span class="line"></span>
+<span class="line">  <span class="cm">// Rebuilt each loop from the tune handles below (ElevatorFeedforward gains are final).</span></span>
+<span class="line">  private ElevatorFeedforward feedforward = new ElevatorFeedforward(</span>
+<span class="line">      Constants.currentMode == Constants.Mode.SIM</span>
+<span class="line">          ? ElevatorConstants.kSVoltsSim</span>
+<span class="line">          : ElevatorConstants.kSVoltsReal,</span>
+<span class="line">      Constants.currentMode == Constants.Mode.SIM</span>
+<span class="line">          ? ElevatorConstants.kGVoltsSim</span>
+<span class="line">          : ElevatorConstants.kGVoltsReal,</span>
+<span class="line">      Constants.currentMode == Constants.Mode.SIM</span>
+<span class="line">          ? ElevatorConstants.kVVoltSecPerMeterSim</span>
+<span class="line">          : ElevatorConstants.kVVoltSecPerMeterReal);</span>
+<span class="line"></span>
+<span class="line">  <span class="cm">// TUNE handles. Bake winners into constants, then delete these + the setPID/feedforward lines.</span></span>
+<span class="line">  private final LoggedNetworkNumber kP =</span>
+<span class="line">      new LoggedNetworkNumber("/Tuning/Elevator/kP", controller.getP());</span>
+<span class="line">  private final LoggedNetworkNumber kI =</span>
+<span class="line">      new LoggedNetworkNumber("/Tuning/Elevator/kI", controller.getI());</span>
+<span class="line">  private final LoggedNetworkNumber kD =</span>
+<span class="line">      new LoggedNetworkNumber("/Tuning/Elevator/kD", controller.getD());</span>
+<span class="line">  private final LoggedNetworkNumber kS =</span>
+<span class="line">      new LoggedNetworkNumber("/Tuning/Elevator/kS", feedforward.getKs());</span>
+<span class="line">  private final LoggedNetworkNumber kG =</span>
+<span class="line">      new LoggedNetworkNumber("/Tuning/Elevator/kG", feedforward.getKg());</span>
+<span class="line">  private final LoggedNetworkNumber kV =</span>
+<span class="line">      new LoggedNetworkNumber("/Tuning/Elevator/kV", feedforward.getKv());</span>
+<span class="line"></span>
+<span class="line">  private double targetMeters = ElevatorConstants.kDefaultHeightMeters;</span>
+<span class="line">  private boolean homing = false;</span>
+<span class="line"></span>
+<span class="line">  public Elevator(ElevatorIO io) {</span>
+<span class="line">    this.io = io;</span>
+<span class="line">    controller.setTolerance(ElevatorConstants.kHeightToleranceMeters);</span>
+<span class="line">  }</span>
+<span class="line"></span>
+<span class="line">  <span class="cm">// Single source of truth. Every setpoint, named or raw, lands here.</span></span>
+<span class="line">  public void setHeightMeters(double meters) {</span>
+<span class="line">    targetMeters = MathUtil.clamp(</span>
+<span class="line">        meters,</span>
+<span class="line">        ElevatorConstants.kMinHeightMeters,</span>
+<span class="line">        ElevatorConstants.kMaxHeightMeters);</span>
+<span class="line">  }</span>
+<span class="line"></span>
+<span class="line">  <span class="cm">// Jump to a height immediately. Bind to a button:</span></span>
+<span class="line">  <span class="cm">//   button.onTrue(elevator.setHeightMetersCommand(ElevatorConstants.kTopHeightMeters));</span></span>
+<span class="line">  public Command setHeightMetersCommand(double meters) {</span>
+<span class="line">    return runOnce(() -&gt; setHeightMeters(meters));</span>
+<span class="line">  }</span>
+<span class="line"></span>
+<span class="line">  <span class="cm">// Go to a height and finish once within tolerance. Use this inside sequences.</span></span>
+<span class="line">  public Command goToHeightMetersCommand(double meters) {</span>
+<span class="line">    return run(() -&gt; setHeightMeters(meters))</span>
+<span class="line">        .until(this::atGoal)</span>
+<span class="line">        .finallyDo(interrupted -&gt; {</span>
+<span class="line">          <span class="cm">// Cancelled early: hold where we are instead of chasing the old target.</span></span>
+<span class="line">          if (interrupted) setHeightMeters(inputs.positionMeters);</span>
+<span class="line">        });</span>
+<span class="line">  }</span>
+<span class="line"></span>
+<span class="line">  <span class="cm">// Stall-stop homing. Drives toward the hard stop, zeros the encoder there.</span></span>
+<span class="line">  public Command homeCommand() {</span>
+<span class="line">    <span class="cm">// Stall-stop, but only after the carriage has actually started moving,</span></span>
+<span class="line">    <span class="cm">// otherwise the initial velocity of 0 ends it on the first loop.</span></span>
+<span class="line">    BooleanSupplier stalled = new BooleanSupplier() {</span>
+<span class="line">      boolean moved = false;</span>
+<span class="line">      public boolean getAsBoolean() {</span>
+<span class="line">        double v = Math.abs(inputs.velocityMetersPerSec);</span>
+<span class="line">        if (v &gt; ElevatorConstants.kHomingMovingMetersPerSec) moved = true;</span>
+<span class="line">        return moved &amp;&amp; v &lt; ElevatorConstants.kHomingStallMetersPerSec;</span>
+<span class="line">      }</span>
+<span class="line">    };</span>
+<span class="line">    return startRun(</span>
+<span class="line">            () -&gt; homing = true,</span>
+<span class="line">            () -&gt; io.setVoltage(ElevatorConstants.kHomingVolts))</span>
+<span class="line">        .until(stalled)</span>
+<span class="line">        .withTimeout(ElevatorConstants.kHomingTimeoutSecs)</span>
+<span class="line">        .finallyDo(() -&gt; {</span>
+<span class="line">              io.stop();</span>
+<span class="line">              io.resetEncoder();</span>
+<span class="line">              setHeightMeters(ElevatorConstants.kDefaultHeightMeters);</span>
+<span class="line">              homing = false;</span>
+<span class="line">            });</span>
+<span class="line">  }</span>
+<span class="line"></span>
+<span class="line">  @AutoLogOutput(key = "Elevator/AtGoal")</span>
+<span class="line">  public boolean atGoal() {</span>
+<span class="line">    return controller.atSetpoint();</span>
+<span class="line">  }</span>
+<span class="line"></span>
+<span class="line">  public void stop() {</span>
+<span class="line">    io.stop();</span>
+<span class="line">  }</span>
+<span class="line"></span>
+<span class="line">  @Override</span>
+<span class="line">  public void periodic() {</span>
+<span class="line">    io.updateInputs(inputs);</span>
+<span class="line">    Logger.processInputs("Elevator", inputs);</span>
+<span class="line"></span>
+<span class="line">    if (homing) return;   <span class="cm">// homing owns the motor; skip PID this loop</span></span>
+<span class="line"></span>
+<span class="line">    Logger.recordOutput("Elevator/TargetMeters", targetMeters);</span>
+<span class="line"></span>
+<span class="line">    <span class="cm">// TUNE: apply live gains each loop. Delete when you bake.</span></span>
+<span class="line">    controller.setPID(kP.get(), kI.get(), kD.get());</span>
+<span class="line">    feedforward = new ElevatorFeedforward(kS.get(), kG.get(), kV.get());</span>
+<span class="line"></span>
+<span class="line">    <span class="cm">// Feedback (PID) + feedforward (gravity/static hold). velocity setpoint 0 = hold.</span></span>
+<span class="line">    double volts = controller.calculate(inputs.positionMeters, targetMeters)</span>
+<span class="line">        + feedforward.calculate(0.0);</span>
+<span class="line">    volts = MathUtil.clamp(volts, -kMaxBatteryVoltage, kMaxBatteryVoltage);</span>
+<span class="line"></span>
+<span class="line">    io.setVoltage(volts);</span>
+<span class="line">  }</span>
+<span class="line">}</span>
+</pre></div></div>
+
+        <div class="code-annotation">This is the whole control loop in one file: PID for feedback, feedforward for the voltage you already know you need, six <code>LoggedNetworkNumber</code> tune handles, and a homing command that takes over the motor when active. No visualization code here yet - Part 3 adds it.</div>
+
+        <p>Build. Should still fail to link - <span class="file-badge">RobotContainer.java</span> doesn't know about <code>Elevator</code> yet. That's next.</p>
+      </div>
+    </div><!-- /step 6 -->
+
+    <!-- ── Step 7: Wire RobotContainer ─────────────────────────────────── -->
+    <div class="sb-step" id="sbstep-7">
+      <div class="sb-step-header" onclick="sbToggle('sbstep-7')">
+        <div class="sb-step-num">7</div>
+        <div class="sb-step-title">Wire up RobotContainer</div>
+        <div class="sb-step-chevron">▶</div>
+      </div>
+      <div class="sb-step-body">
+        <p>Four changes to <span class="file-badge">RobotContainer.java</span>: add the Elevator imports, add the field, construct it in the mode switch, and bind two bumpers plus Start to it.</p>
+
+        <p><strong>Imports</strong> (top of file, alphabetical with the rest):</p>
+<div class="code-window" data-code="import frc.robot.subsystems.drive.DriveIOXRP;
+import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.elevator.ElevatorConstants;
+import frc.robot.subsystems.elevator.ElevatorIO;
+import frc.robot.subsystems.elevator.ElevatorIOSim;
+import frc.robot.subsystems.elevator.ElevatorIOXRP;
+import frc.robot.subsystems.scoop.Scoop;">
+<div class="cw-head"><span class="cw-title">RobotContainer.java — imports</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<div class="code-region" style="counter-reset: ln 29;">
+<pre class="cb">
+<span class="line">import frc.robot.subsystems.drive.DriveIOXRP;</span>
+<span class="line-add">import frc.robot.subsystems.elevator.Elevator;</span>
+<span class="line-add">import frc.robot.subsystems.elevator.ElevatorConstants;</span>
+<span class="line-add">import frc.robot.subsystems.elevator.ElevatorIO;</span>
+<span class="line-add">import frc.robot.subsystems.elevator.ElevatorIOSim;</span>
+<span class="line-add">import frc.robot.subsystems.elevator.ElevatorIOXRP;</span>
+<span class="line">import frc.robot.subsystems.scoop.Scoop;</span>
+</pre></div></div>
+
+        <p><strong>Field + switch</strong>:</p>
+<div class="code-window" data-code="  private final Scoop scoop;
+  private final Elevator elevator;
+  private final XRPOnBoardIO onboardIO = new XRPOnBoardIO();">
+<div class="cw-head"><span class="cw-title">RobotContainer.java — field</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<div class="code-region" style="counter-reset: ln 51;">
+<pre class="cb">
+<span class="line">  private final Scoop scoop;</span>
+<span class="line-add">  private final Elevator elevator;</span>
+<span class="line">  private final XRPOnBoardIO onboardIO = new XRPOnBoardIO();</span>
+</pre></div></div>
+
+<div class="code-window" data-code="      case REAL: // Real hardware
+        drive = new Drive(new DriveIOXRP());
+        arm = new Arm(new ArmIOXRP());
+        scoop = new Scoop(new ScoopIOXRP());
+        elevator = new Elevator(new ElevatorIOXRP());
+        break;
+      case SIM: // Simulated code
+        drive = new Drive(new DriveIOSim());
+        arm = new Arm(new ArmIOSim());
+        scoop = new Scoop(new ScoopIOSim());
+        elevator = new Elevator(new ElevatorIOSim());
+        break;
+      default: // Log replay
+        drive = new Drive(new DriveIO() {});
+        arm = new Arm(new ArmIO() {});
+        scoop = new Scoop(new ScoopIO() {});
+        elevator = new Elevator(new ElevatorIO() {});
+        break;
+    }">
+<div class="cw-head"><span class="cw-title">RobotContainer.java — switch</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<div class="code-region" style="counter-reset: ln 65;">
+<pre class="cb">
+<span class="line">      case REAL: // Real hardware</span>
+<span class="line">        drive = new Drive(new DriveIOXRP());</span>
+<span class="line">        arm = new Arm(new ArmIOXRP());</span>
+<span class="line">        scoop = new Scoop(new ScoopIOXRP());</span>
+<span class="line-add">        elevator = new Elevator(new ElevatorIOXRP());</span>
+<span class="line">        break;</span>
+<span class="line">      case SIM: // Simulated code</span>
+<span class="line">        drive = new Drive(new DriveIOSim());</span>
+<span class="line">        arm = new Arm(new ArmIOSim());</span>
+<span class="line">        scoop = new Scoop(new ScoopIOSim());</span>
+<span class="line-add">        elevator = new Elevator(new ElevatorIOSim());</span>
+<span class="line">        break;</span>
+<span class="line">      default: // Log replay</span>
+<span class="line">        drive = new Drive(new DriveIO() {});</span>
+<span class="line">        arm = new Arm(new ArmIO() {});</span>
+<span class="line">        scoop = new Scoop(new ScoopIO() {});</span>
+<span class="line-add">        elevator = new Elevator(new ElevatorIO() {});</span>
+<span class="line">        break;</span>
+<span class="line">    }</span>
+</pre></div></div>
+
+        <p><strong>Button bindings</strong> (end of <code>configureButtonBindings()</code>):</p>
+<div class="code-window" data-code="    new POVButton(controller, 180) // 2
+        .onTrue(scoop.setAngleDegCommand(ScoopConstants.kDumpAngleDeg));
+
+    // Bumpers — elevator heights.
+    new JoystickButton(controller, XboxController.Button.kRightBumper.value)
+        .onTrue(elevator.setHeightMetersCommand(ElevatorConstants.kTopHeightMeters));
+    new JoystickButton(controller, XboxController.Button.kLeftBumper.value)
+        .onTrue(elevator.setHeightMetersCommand(ElevatorConstants.kBottomHeightMeters));
+
+    // Start — home the elevator.
+    new JoystickButton(controller, XboxController.Button.kStart.value)
+        .onTrue(elevator.homeCommand());
+  }">
+<div class="cw-head"><span class="cw-title">RobotContainer.java — bumper + Start bindings</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<div class="code-region" style="counter-reset: ln 117;">
+<pre class="cb">
+<span class="line">    new POVButton(controller, 180) // 2</span>
+<span class="line">        .onTrue(scoop.setAngleDegCommand(ScoopConstants.kDumpAngleDeg));</span>
+<span class="line"></span>
+<span class="line-add">    // Bumpers — elevator heights.</span>
+<span class="line-add">    new JoystickButton(controller, XboxController.Button.kRightBumper.value)</span>
+<span class="line-add">        .onTrue(elevator.setHeightMetersCommand(ElevatorConstants.kTopHeightMeters));</span>
+<span class="line-add">    new JoystickButton(controller, XboxController.Button.kLeftBumper.value)</span>
+<span class="line-add">        .onTrue(elevator.setHeightMetersCommand(ElevatorConstants.kBottomHeightMeters));</span>
+<span class="line-add"></span>
+<span class="line-add">    // Start — home the elevator.</span>
+<span class="line-add">    new JoystickButton(controller, XboxController.Button.kStart.value)</span>
+<span class="line-add">        .onTrue(elevator.homeCommand());</span>
+<span class="line">  }</span>
+</pre></div></div>
+
+        <div class="code-annotation">Right bumper sends the carriage to top, left bumper to bottom, Start runs the homing routine. There's no getter for <code>scoop</code> or <code>elevator</code> yet - both come back in Part 3, once there's a pose to expose.</div>
+
+        <p>Build and simulate. Right bumper should raise the carriage on the SmartDashboard/AdvantageScope <code>Elevator/TargetMeters</code> plot; left bumper should lower it.</p>
+      </div>
+    </div><!-- /step 7 -->
+
+    </div><!-- /step-builder -->
+
+  </div><!-- /section-build -->
+
+
+  <!-- ═══════════════════════════════════════════════════════
+       PART 3 — VISUALIZATION
+       ═══════════════════════════════════════════════════════ -->
+  <div class="lesson-section" id="section-visualize">
+
+    <p>The elevator works, but it's invisible - no 2D mechanism, no 3D pose, nothing in AdvantageScope's field view. This part brings it to life, and does something Lesson 04 never had to: makes the scoop's pose ride on top of the elevator's, because that's how it's actually mounted.</p>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">See it for yourself</span>
+      <p>Open AdvantageScope and add a <a href="https://docs.advantagescope.org/tab-reference/mechanism/" target="_blank" rel="noopener">Mechanism tab</a> for the 2D view, and a <a href="https://docs.advantagescope.org/tab-reference/3d-field/" target="_blank" rel="noopener">3D Field tab</a> for the composed pose. Both are documented in full on the AdvantageScope site - worth reading once, so you know what's available before you need it under pressure.</p>
+    </div>
+
+    <div class="step-builder">
+
+    <!-- ── Step 1: Elevator.java — add visualization ────────────────────── -->
+    <div class="sb-step open" id="sbstep-v1">
+      <div class="sb-step-header" onclick="sbToggle('sbstep-v1')">
+        <div class="sb-step-num">1</div>
+        <div class="sb-step-title">Add visualization to Elevator.java</div>
+        <div class="sb-step-chevron">▶</div>
+      </div>
+      <div class="sb-step-body">
+        <p>Three additions: new imports, a Mechanism2d canvas + pose field as class members, and two new methods plus two new lines inside <code>periodic()</code>.</p>
+
+<div class="code-window" data-code="import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import java.util.function.BooleanSupplier;
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
+import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
+import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
+import static frc.robot.Constants.kMaxBatteryVoltage;">
+<div class="cw-head"><span class="cw-title">Elevator.java — imports</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<div class="code-region" style="counter-reset: ln 6;">
+<pre class="cb">
+<span class="line">import edu.wpi.first.math.MathUtil;</span>
+<span class="line">import edu.wpi.first.math.controller.ElevatorFeedforward;</span>
+<span class="line">import edu.wpi.first.math.controller.PIDController;</span>
+<span class="line-add">import edu.wpi.first.math.geometry.Pose3d;</span>
+<span class="line-add">import edu.wpi.first.math.geometry.Rotation3d;</span>
+<span class="line-add">import edu.wpi.first.math.util.Units;</span>
+<span class="line-add">import edu.wpi.first.wpilibj.util.Color;</span>
+<span class="line-add">import edu.wpi.first.wpilibj.util.Color8Bit;</span>
+<span class="line">import edu.wpi.first.wpilibj2.command.Command;</span>
+<span class="line">import edu.wpi.first.wpilibj2.command.SubsystemBase;</span>
+<span class="line">import java.util.function.BooleanSupplier;</span>
+<span class="line">import org.littletonrobotics.junction.AutoLogOutput;</span>
+<span class="line">import org.littletonrobotics.junction.Logger;</span>
+<span class="line-add">import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;</span>
+<span class="line-add">import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;</span>
+<span class="line-add">import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;</span>
+<span class="line">import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;</span>
+<span class="line">import static frc.robot.Constants.kMaxBatteryVoltage;</span>
+</pre></div></div>
+
+<div class="code-window" data-code="  private double targetMeters = ElevatorConstants.kDefaultHeightMeters;
+  private boolean homing = false;
+
+  // Mechanism2d canvas: narrow vertical rail, not a square block. Height (0.2) still gives
+  // the 0.135m max travel plenty of room; width is just enough to draw the carriage.
+  // Root is shifted 4 inches forward (+X) to match the elevator's real mounting position.
+  private static final double kForwardOffsetMeters = Units.inchesToMeters(9.5);
+  private final LoggedMechanism2d mechanism =
+      new LoggedMechanism2d(0.1 + kForwardOffsetMeters, 0.2);
+  private final LoggedMechanismRoot2d root =
+      mechanism.getRoot(&quot;ElevatorBase&quot;, 0.05 + kForwardOffsetMeters, 0.02);
+  private final LoggedMechanismLigament2d carriageLigament =
+      root.append(new LoggedMechanismLigament2d(
+          &quot;Carriage&quot;, 0.01, 90, 4, new Color8Bit(Color.kOrange)));
+
+  private Pose3d componentPose = new Pose3d();
+
+  public Elevator(ElevatorIO io) {">
+<div class="cw-head"><span class="cw-title">Elevator.java — Mechanism2d + pose fields</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<div class="code-region" style="counter-reset: ln 69;">
+<pre class="cb">
+<span class="line">  private double targetMeters = ElevatorConstants.kDefaultHeightMeters;</span>
+<span class="line">  private boolean homing = false;</span>
+<span class="line"></span>
+<span class="line-add">  // Mechanism2d canvas: narrow vertical rail, not a square block. Height (0.2) still gives</span>
+<span class="line-add">  // the 0.135m max travel plenty of room; width is just enough to draw the carriage.</span>
+<span class="line-add">  // Root is shifted 4 inches forward (+X) to match the elevator's real mounting position.</span>
+<span class="line-add">  private static final double kForwardOffsetMeters = Units.inchesToMeters(9.5);</span>
+<span class="line-add">  private final LoggedMechanism2d mechanism =</span>
+<span class="line-add">      new LoggedMechanism2d(0.1 + kForwardOffsetMeters, 0.2);</span>
+<span class="line-add">  private final LoggedMechanismRoot2d root =</span>
+<span class="line-add">      mechanism.getRoot("ElevatorBase", 0.05 + kForwardOffsetMeters, 0.02);</span>
+<span class="line-add">  private final LoggedMechanismLigament2d carriageLigament =</span>
+<span class="line-add">      root.append(new LoggedMechanismLigament2d(</span>
+<span class="line-add">          "Carriage", 0.01, 90, 4, new Color8Bit(Color.kOrange)));</span>
+<span class="line-add"></span>
+<span class="line-add">  private Pose3d componentPose = new Pose3d();</span>
+<span class="line-add"></span>
+<span class="line">  public Elevator(ElevatorIO io) {</span>
+</pre></div></div>
+
+<div class="code-window" data-code="  public void stop() {
+    io.stop();
+  }
+
+  /** Returns the current 3D pose of the elevator carriage for AdvantageScope aggregation. */
+  public Pose3d getComponentPose() {
+    return componentPose;
+  }
+
+  /** Returns the current carriage height in meters, for subsystems mounted on the elevator. */
+  public double getPositionMeters() {
+    return inputs.positionMeters;
+  }
+
+  @Override
+  public void periodic() {">
+<div class="cw-head"><span class="cw-title">Elevator.java — new getters</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<div class="code-region" style="counter-reset: ln 143;">
+<pre class="cb">
+<span class="line">  public void stop() {</span>
+<span class="line">    io.stop();</span>
+<span class="line">  }</span>
+<span class="line"></span>
+<span class="line-add">  /** Returns the current 3D pose of the elevator carriage for AdvantageScope aggregation. */</span>
+<span class="line-add">  public Pose3d getComponentPose() {</span>
+<span class="line-add">    return componentPose;</span>
+<span class="line-add">  }</span>
+<span class="line-add"></span>
+<span class="line-add">  /** Returns the current carriage height in meters, for subsystems mounted on the elevator. */</span>
+<span class="line-add">  public double getPositionMeters() {</span>
+<span class="line-add">    return inputs.positionMeters;</span>
+<span class="line-add">  }</span>
+<span class="line-add"></span>
+<span class="line">  @Override</span>
+<span class="line">  public void periodic() {</span>
+</pre></div></div>
+
+<div class="code-window" data-code="  public void periodic() {
+    io.updateInputs(inputs);
+    Logger.processInputs(&quot;Elevator&quot;, inputs);
+
+    // Update 2D visualization. Floor the length so the carriage stays visible at height 0.
+    carriageLigament.setLength(Math.max(inputs.positionMeters, 0.01));
+    Logger.recordOutput(&quot;Elevator/Mechanism2d&quot;, mechanism);
+
+    // Update 3D component pose. Elevator mounts to the XRP frame, shifted 4 inches forward
+    // (+X). Scoop mounts to the elevator, not the frame, and inherits this offset via the
+    // pose composition in Robot.java. PLACEHOLDER Y/base-Z: tune by eye in AdvantageScope.
+    componentPose = new Pose3d(
+        Units.inchesToMeters(4.0), 0.0, inputs.positionMeters, new Rotation3d());
+
+    if (homing) return;   // homing owns the motor; skip PID this loop">
+<div class="cw-head"><span class="cw-title">Elevator.java — periodic() additions</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<div class="code-region" style="counter-reset: ln 158;">
+<pre class="cb">
+<span class="line">  public void periodic() {</span>
+<span class="line">    io.updateInputs(inputs);</span>
+<span class="line">    Logger.processInputs("Elevator", inputs);</span>
+<span class="line"></span>
+<span class="line-add">    // Update 2D visualization. Floor the length so the carriage stays visible at height 0.</span>
+<span class="line-add">    carriageLigament.setLength(Math.max(inputs.positionMeters, 0.01));</span>
+<span class="line-add">    Logger.recordOutput("Elevator/Mechanism2d", mechanism);</span>
+<span class="line-add"></span>
+<span class="line-add">    // Update 3D component pose. Elevator mounts to the XRP frame, shifted 4 inches forward</span>
+<span class="line-add">    // (+X). Scoop mounts to the elevator, not the frame, and inherits this offset via the</span>
+<span class="line-add">    // pose composition in Robot.java. PLACEHOLDER Y/base-Z: tune by eye in AdvantageScope.</span>
+<span class="line-add">    componentPose = new Pose3d(</span>
+<span class="line-add">        Units.inchesToMeters(4.0), 0.0, inputs.positionMeters, new Rotation3d());</span>
+<span class="line-add"></span>
+<span class="line">    if (homing) return;   // homing owns the motor; skip PID this loop</span>
+</pre></div></div>
+
+        <div class="code-annotation">The ligament's <code>setLength</code> is floored at <code>0.01</code> so it never fully vanishes at height zero - a zero-length ligament is invisible in AdvantageScope, which makes the whole mechanism look broken even when the code is correct. The pose's X and Z are real measurements; Y is a placeholder to tune by eye once you see it rendered.</div>
+      </div>
+    </div><!-- /step v1 -->
+
+    <!-- ── Step 2: Scoop.java — add visualization ───────────────────────── -->
+    <div class="sb-step" id="sbstep-v2">
+      <div class="sb-step-header" onclick="sbToggle('sbstep-v2')">
+        <div class="sb-step-num">2</div>
+        <div class="sb-step-title">Add visualization to Scoop.java</div>
+        <div class="sb-step-chevron">▶</div>
+      </div>
+      <div class="sb-step-body">
+        <p>The scoop already draws a 2D ligament and reports a 3D pose - that part came from Lesson 04. What it's missing is a way to know <em>where it's mounted</em>. Add one import, swap the hardcoded canvas numbers for offset-aware constants, and add a method the elevator's height can drive.</p>
+
+<div class="code-window" data-code="import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;">
+<div class="cw-head"><span class="cw-title">Scoop.java — import</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<div class="code-region" style="counter-reset: ln 11;">
+<pre class="cb">
+<span class="line">import edu.wpi.first.math.geometry.Pose3d;</span>
+<span class="line">import edu.wpi.first.math.geometry.Rotation3d;</span>
+<span class="line-add">import edu.wpi.first.math.util.Units;</span>
+<span class="line">import edu.wpi.first.wpilibj.util.Color;</span>
+<span class="line">import edu.wpi.first.wpilibj.util.Color8Bit;</span>
+</pre></div></div>
+
+<div class="code-window" data-code="  private double targetAngleDeg = ScoopConstants.kDefaultAngleDeg;
+
+  // Mechanism2d: height matches Elevator's canvas (0.2) so the elevator height it rides on
+  // (added in setBaseHeightMeters) reads at the correct proportion. Kept wider than tall
+  // since the scoop ligament sweeps side to side, unlike the elevator's straight vertical rail.
+  // Root is shifted 4 inches forward (+X) to match the scoop's real mounting position.
+  private static final double kForwardOffsetMeters = Units.inchesToMeters(11.0);
+  private static final double kRootBaseX = 0.1 + kForwardOffsetMeters;
+  private static final double kRootBaseY = 0.02;
+  private final LoggedMechanism2d mechanism =
+      new LoggedMechanism2d(0.2 + kForwardOffsetMeters, 0.2);
+  private final LoggedMechanismRoot2d root = mechanism.getRoot(&quot;ScoopPivot&quot;, kRootBaseX, kRootBaseY);
+  private final LoggedMechanismLigament2d scoopLigament =
+      root.append(new LoggedMechanismLigament2d(&quot;Scoop&quot;, 0.05, 0, 3.25, new Color8Bit(Color.kDarkGray)));
+  private Pose3d componentPose = new Pose3d();">
+<div class="cw-head"><span class="cw-title">Scoop.java — Mechanism2d canvas + root</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<div class="code-region" style="counter-reset: ln 25;">
+<pre class="cb">
+<span class="line">  private double targetAngleDeg = ScoopConstants.kDefaultAngleDeg;</span>
+<span class="line"></span>
+<span class="line-del">  // Mechanism2d: vertical column on the front of the robot</span>
+<span class="line-del">  private final LoggedMechanism2d mechanism = new LoggedMechanism2d(2, 1);</span>
+<span class="line-del">  private final LoggedMechanismRoot2d root = mechanism.getRoot("ScoopPivot", 1.125, 0.016);</span>
+<span class="line-add">  // Mechanism2d: height matches Elevator's canvas (0.2) so the elevator height it rides on</span>
+<span class="line-add">  // (added in setBaseHeightMeters) reads at the correct proportion. Kept wider than tall</span>
+<span class="line-add">  // since the scoop ligament sweeps side to side, unlike the elevator's straight vertical rail.</span>
+<span class="line-add">  // Root is shifted 4 inches forward (+X) to match the scoop's real mounting position.</span>
+<span class="line-add">  private static final double kForwardOffsetMeters = Units.inchesToMeters(11.0);</span>
+<span class="line-add">  private static final double kRootBaseX = 0.1 + kForwardOffsetMeters;</span>
+<span class="line-add">  private static final double kRootBaseY = 0.02;</span>
+<span class="line-add">  private final LoggedMechanism2d mechanism =</span>
+<span class="line-add">      new LoggedMechanism2d(0.2 + kForwardOffsetMeters, 0.2);</span>
+<span class="line-add">  private final LoggedMechanismRoot2d root = mechanism.getRoot("ScoopPivot", kRootBaseX, kRootBaseY);</span>
+<span class="line">  private final LoggedMechanismLigament2d scoopLigament =</span>
+<span class="line">      root.append(new LoggedMechanismLigament2d("Scoop", 0.05, 0, 3.25, new Color8Bit(Color.kDarkGray)));</span>
+<span class="line">  private Pose3d componentPose = new Pose3d();</span>
+</pre></div></div>
+
+<div class="code-window" data-code="  /** Returns the current 3D pose of the scoop for AdvantageScope aggregation. */
+  public Pose3d getComponentPose() {
+    return componentPose;
+  }
+
+  /**
+   * Shifts the scoop's Mechanism2d root to track the elevator carriage it rides on, so the
+   * 2D scoop ligament visually rises and lowers with the elevator. Called from Robot.java,
+   * which is the only place that knows about both subsystems.
+   */
+  public void setBaseHeightMeters(double heightMeters) {
+    root.setPosition(kRootBaseX, kRootBaseY + heightMeters);
+  }
+}">
+<div class="cw-head"><span class="cw-title">Scoop.java — new method</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<div class="code-region" style="counter-reset: ln 88;">
+<pre class="cb">
+<span class="line">  /** Returns the current 3D pose of the scoop for AdvantageScope aggregation. */</span>
+<span class="line">  public Pose3d getComponentPose() {</span>
+<span class="line">    return componentPose;</span>
+<span class="line">  }</span>
+<span class="line"></span>
+<span class="line-add">  /**</span>
+<span class="line-add">   * Shifts the scoop's Mechanism2d root to track the elevator carriage it rides on, so the</span>
+<span class="line-add">   * 2D scoop ligament visually rises and lowers with the elevator. Called from Robot.java,</span>
+<span class="line-add">   * which is the only place that knows about both subsystems.</span>
+<span class="line-add">   */</span>
+<span class="line-add">  public void setBaseHeightMeters(double heightMeters) {</span>
+<span class="line-add">    root.setPosition(kRootBaseX, kRootBaseY + heightMeters);</span>
+<span class="line-add">  }</span>
+<span class="line">}</span>
+</pre></div></div>
+
+        <div class="code-annotation">The canvas resize and offset constants exist so this Mechanism2d lines up visually with the elevator's - same forward-shift idea as <code>Elevator.java</code>, just measured to the scoop's own mounting point. <code>setBaseHeightMeters</code> doesn't do anything yet - nothing calls it. That's the next step.</div>
+      </div>
+    </div><!-- /step v2 -->
+
+    <!-- ── Step 3: RobotContainer getter ────────────────────────────────── -->
+    <div class="sb-step" id="sbstep-v3">
+      <div class="sb-step-header" onclick="sbToggle('sbstep-v3')">
+        <div class="sb-step-num">3</div>
+        <div class="sb-step-title">Add getElevator()</div>
+        <div class="sb-step-chevron">▶</div>
+      </div>
+      <div class="sb-step-body">
+        <p><span class="file-badge">Robot.java</span> needs to reach both subsystems to aggregate poses and to feed the elevator's height into the scoop. <span class="file-badge">RobotContainer.java</span> already exposes <code>getScoop()</code> - add the matching getter for the elevator (and drop the redundant fully-qualified return type on <code>getScoop()</code> while you're in here).</p>
+
+<div class="code-window" data-code="  public frc.robot.subsystems.arm.Arm getArm() {
+    return arm;
+  }
+
+  public Elevator getElevator() {
+    return elevator;
+  }
+
+  public Scoop getScoop() {
+    return scoop;
+  }
+}">
+<div class="cw-head"><span class="cw-title">RobotContainer.java — add getter</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<div class="code-region" style="counter-reset: ln 146;">
+<pre class="cb">
+<span class="line">  public frc.robot.subsystems.arm.Arm getArm() {</span>
+<span class="line">    return arm;</span>
+<span class="line">  }</span>
+<span class="line"></span>
+<span class="line-add">  public Elevator getElevator() {</span>
+<span class="line-add">    return elevator;</span>
+<span class="line-add">  }</span>
+<span class="line-add"></span>
+<span class="line-old">  public frc.robot.subsystems.scoop.Scoop getScoop() {</span>
+<span class="line-new">  public Scoop getScoop() {</span>
+<span class="line">    return scoop;</span>
+<span class="line">  }</span>
+<span class="line">}</span>
+</pre></div></div>
+      </div>
+    </div><!-- /step v3 -->
+
+    <!-- ── Step 4: Robot.java — compose poses ───────────────────────────── -->
+    <div class="sb-step" id="sbstep-v4">
+      <div class="sb-step-header" onclick="sbToggle('sbstep-v4')">
+        <div class="sb-step-num">4</div>
+        <div class="sb-step-title">Compose the poses in Robot.java</div>
+        <div class="sb-step-chevron">▶</div>
+      </div>
+      <div class="sb-step-body">
+        <p>This is the one place in the whole project that's allowed to know about both <code>Elevator</code> and <code>Scoop</code> at once. Three things happen in <code>robotPeriodic()</code>: feed the elevator's height into the scoop's 2D root, and compose the scoop's local 3D pose onto the elevator's pose using <code>Transform3d</code> instead of just standing it at the origin.</p>
+
+<div class="code-window" data-code="import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Transform3d;">
+<div class="cw-head"><span class="cw-title">Robot.java — import</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<div class="code-region" style="counter-reset: ln 18;">
+<pre class="cb">
+<span class="line">import edu.wpi.first.math.geometry.Pose3d;</span>
+<span class="line-add">import edu.wpi.first.math.geometry.Transform3d;</span>
+</pre></div></div>
+
+<div class="code-window" data-code="    CommandScheduler.getInstance().run();
+
+    // Scoop mounts to the elevator carriage — shift its Mechanism2d root to match, so the
+    // 2D scoop ligament visually rises and lowers with the elevator.
+    robotContainer.getScoop().setBaseHeightMeters(robotContainer.getElevator().getPositionMeters());
+
+    // Aggregate all component poses for AdvantageScope 3D view.
+    // Elevator mounts to the frame; scoop mounts to the elevator carriage, so its pose
+    // rides on top of the elevator's (composition happens here, not inside either subsystem).
+    Pose3d elevatorPose = robotContainer.getElevator().getComponentPose();
+    Pose3d scoopLocalPose = robotContainer.getScoop().getComponentPose();
+    Pose3d scoopPose = elevatorPose.transformBy(
+        new Transform3d(scoopLocalPose.getTranslation(), scoopLocalPose.getRotation()));
+
+    Logger.recordOutput(&quot;FinalComponentPoses&quot;, new Pose3d[] {
+      robotContainer.getArm().getComponentPose(),
+      elevatorPose,
+      scoopPose
+    });
+  }">
+<div class="cw-head"><span class="cw-title">Robot.java — robotPeriodic()</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<div class="code-region" style="counter-reset: ln 84;">
+<pre class="cb">
+<span class="line">    CommandScheduler.getInstance().run();</span>
+<span class="line"></span>
+<span class="line-add">    // Scoop mounts to the elevator carriage — shift its Mechanism2d root to match, so the</span>
+<span class="line-add">    // 2D scoop ligament visually rises and lowers with the elevator.</span>
+<span class="line-add">    robotContainer.getScoop().setBaseHeightMeters(robotContainer.getElevator().getPositionMeters());</span>
+<span class="line-add"></span>
+<span class="line">    // Aggregate all component poses for AdvantageScope 3D view.</span>
+<span class="line-old">    Logger.recordOutput("FinalComponentPoses", new Pose3d[] {</span>
+<span class="line-add">    // Elevator mounts to the frame; scoop mounts to the elevator carriage, so its pose</span>
+<span class="line-add">    // rides on top of the elevator's (composition happens here, not inside either subsystem).</span>
+<span class="line-add">    Pose3d elevatorPose = robotContainer.getElevator().getComponentPose();</span>
+<span class="line-add">    Pose3d scoopLocalPose = robotContainer.getScoop().getComponentPose();</span>
+<span class="line-add">    Pose3d scoopPose = elevatorPose.transformBy(</span>
+<span class="line-add">        new Transform3d(scoopLocalPose.getTranslation(), scoopLocalPose.getRotation()));</span>
+<span class="line-add"></span>
+<span class="line-new">    Logger.recordOutput("FinalComponentPoses", new Pose3d[] {</span>
+<span class="line">      robotContainer.getArm().getComponentPose(),</span>
+<span class="line-del">      robotContainer.getScoop().getComponentPose()</span>
+<span class="line-add">      elevatorPose,</span>
+<span class="line-new" style="background:#FBE6C0;">      scoopPose</span>
+<span class="line">    });</span>
+<span class="line">  }</span>
+</pre></div></div>
+
+        <div class="code-annotation"><code>Transform3d</code> is how WPILib composes one pose relative to another. <code>elevatorPose.transformBy(...)</code> takes the scoop's own local pose (computed inside <code>Scoop.java</code> with no idea the elevator exists) and re-expresses it in field-relative terms, on top of wherever the elevator carriage currently is. This is the same composition pattern you'll use constantly once robots have more than two or three moving mechanisms stacked on each other.</div>
+
+        <p>Build and simulate. Open AdvantageScope's <a href="https://docs.advantagescope.org/tab-reference/mechanism/" target="_blank" rel="noopener">Mechanism tab</a> and drag on <code>Elevator/Mechanism2d</code> and <code>Scoop/Mechanism2d</code> - the scoop ligament should visibly rise and fall as the elevator moves. Then open a <a href="https://docs.advantagescope.org/tab-reference/3d-field/" target="_blank" rel="noopener">3D Field tab</a> and add <code>FinalComponentPoses</code> - all three components (arm, elevator, scoop) should track correctly, with the scoop riding the elevator carriage.</p>
+      </div>
+    </div><!-- /step v4 -->
+
+    </div><!-- /step-builder -->
+
+  </div><!-- /section-visualize -->
+
+
+  <!-- ═══════════════════════════════════════════════════════
+       Part 4 - AdvantageScope
+       ═══════════════════════════════════════════════════════ -->
+  <div class="lesson-section" id="section-challenge">
+
+    <p>Before you tune anything, get your view set up. Three quick checks: confirm the 3D assembly renders correctly, plot the PID loop on a graph, and pull up Tuning Mode alongside it.</p>
+
+    <div class="step-builder">
+
+    <!-- ── Step 1: confirm the 3D assembly ──────────────────────────────── -->
+    <div class="sb-step open" id="sbstep-c1">
+      <div class="sb-step-header" onclick="sbToggle('sbstep-c1')">
+        <div class="sb-step-num">1</div>
+        <div class="sb-step-title">Confirm the assembly renders correctly</div>
+        <div class="sb-step-chevron">▶</div>
+      </div>
+      <div class="sb-step-body">
+        <p>Open a <a href="https://docs.advantagescope.org/tab-reference/3d-field/" target="_blank" rel="noopener">3D Field tab</a> and add these four sources, in this order:</p>
+        <ul class="task-list">
+          <li><strong>Robot</strong> - <code>AdvantageKit/RealOutputs/Drive/Pose</code></li>
+          <li><strong>Component</strong> - <code>AdvantageKit/RealOutputs/FinalComponentPoses</code> (3 values - arm, elevator, scoop)</li>
+          <li><strong>Mechanism</strong> - <code>AdvantageKit/RealOutputs/Scoop/Mechanism2d</code></li>
+          <li><strong>Mechanism</strong> - <code>AdvantageKit/RealOutputs/Elevator/Mechanism2d</code></li>
+        </ul>
+        <p>Command a height change with the bumpers. If the scoop rides up and down with the elevator carriage instead of sitting at a fixed height, Part 3's pose composition is working correctly.</p>
+      </div>
+    </div><!-- /step c1 -->
+
+    <!-- ── Step 2: line graph ───────────────────────────────────────────── -->
+    <div class="sb-step" id="sbstep-c2">
+      <div class="sb-step-header" onclick="sbToggle('sbstep-c2')">
+        <div class="sb-step-num">2</div>
+        <div class="sb-step-title">Set up a Line Graph for the PID response</div>
+        <div class="sb-step-chevron">▶</div>
+      </div>
+      <div class="sb-step-body">
+        <p>Open a <a href="https://docs.advantagescope.org/tab-reference/line-graph/" target="_blank" rel="noopener">Line Graph tab</a> and drag in:</p>
+        <ul class="task-list">
+          <li><strong>Left axis</strong> - <code>AdvantageKit/Elevator/AppliedVolts</code></li>
+          <li><strong>Right axis</strong> - <code>AdvantageKit/Elevator/PositionMeters</code></li>
+          <li><strong>Right axis</strong> - <code>AdvantageKit/RealOutputs/Elevator/TargetMeters</code>, both on the same axis so they overlay directly</li>
+        </ul>
+        <p>Command a height change with the bumpers. The target line jumps instantly; the position line is what actually chases it. The gap between them, and how it closes, is the PID response you'll be reading all through the tiers below.</p>
+      </div>
+    </div><!-- /step c2 -->
+
+    <!-- ── Step 3: tuning mode alongside the graph ─────────────────────── -->
+    <div class="sb-step" id="sbstep-c3">
+      <div class="sb-step-header" onclick="sbToggle('sbstep-c3')">
+        <div class="sb-step-num">3</div>
+        <div class="sb-step-title">Open Tuning Mode alongside the graph</div>
+        <div class="sb-step-chevron">▶</div>
+      </div>
+      <div class="sb-step-body">
+        <p>Open <a href="https://docs.advantagescope.org/overview/live-sources/tuning-mode/" target="_blank" rel="noopener">Tuning Mode</a> in a tab next to your Line Graph. Toggle it on using the switch next to the search bar, then open the <code>Tuning/Elevator</code> branch in the field list - each gain (kP, kI, kD, kS, kG, kV) shows as an editable number box, not a slider. This is the loop you'll repeat for every tier below: type a new value into <code>kP</code>, then command a height change. You should see the AppliedVolts trace and the gap between TargetMeters/PositionMeters change shape as the value changes.</p>
+      </div>
+    </div><!-- /step c3 -->
+
+    </div><!-- /step-builder -->
+
+    <div class="tier-tabs">
+      <button class="tier-tab bronze active" data-tier="bronze">Bronze - I can tune kP by feel</button>
+      <button class="tier-tab silver" data-tier="silver">Silver - I can add a new setpoint</button>
+      <button class="tier-tab gold" data-tier="gold">Gold - I can tune feedforward</button>
+    </div>
+
+    <div>
+
+      <div class="tier-panel bronze active">
+        <span class="tier-label">Bronze - tune kP by feel</span>
+        <p>Toggle on AdvantageScope's <a href="https://docs.advantagescope.org/overview/live-sources/tuning-mode/" target="_blank" rel="noopener">Tuning Mode</a>, then open <code>Tuning/Elevator/kP</code> in the field list and type in new values while commanding the elevator between top and bottom with the bumpers.</p>
+        <ul class="task-list">
+          <li>Drop kP to something clearly too low (e.g. <code>5.0</code>). Command a height change. Describe what you see - does it get there? How fast?</li>
+          <li>Raise kP well above the default (e.g. <code>150.0</code>). Command a height change again. What's different? Listen for the motor - does it sound different?</li>
+          <li>Find a kP value where the carriage reaches its target quickly without visibly overshooting or oscillating. Write down the value.</li>
+          <li>With kP at your chosen value, home the elevator (Start button) and confirm it still settles at the bottom cleanly.</li>
+        </ul>
+        <div class="toggle-row">
+          <button class="toggle-btn" data-target="b1-hint" data-open="Show hint" data-closed="Hide hint">Show hint</button>
+        </div>
+        <div class="toggle-content hint" id="b1-hint">
+          Watch the carriage, not just the number. Oscillation looks like the carriage overshooting the target and bouncing back and forth around it before settling - that's kP too high. Never quite arriving, or arriving very slowly, is kP too low.
+        </div>
+      </div>
+
+      <div class="tier-panel silver">
+        <span class="tier-label">Silver - add a new named height setpoint</span>
+        <p>Three setpoints exist: bottom, middle, top. Add a fourth and wire a button to it.</p>
+        <ul class="task-list">
+          <li>Open <code>ElevatorConstants.java</code>. Add a new named setpoint following the existing pattern, e.g. <code>public static final double kScoringHeightMeters = 0.100;</code></li>
+          <li>Open <code>RobotContainer.java</code>. Bind a currently-unused button (check what's already bound before picking one) to <code>elevator.setHeightMetersCommand(ElevatorConstants.kScoringHeightMeters)</code></li>
+          <li>Build, simulate, press your new button. Confirm the carriage moves to the expected height and the AdvantageScope <code>Elevator/TargetMeters</code> plot shows the new value.</li>
+        </ul>
+        <div class="toggle-row">
+          <button class="toggle-btn" data-target="s1-hint" data-open="Show hint" data-closed="Hide hint">Show hint</button>
+          <button class="toggle-btn" data-target="s1-ans" data-open="Show solution" data-closed="Hide solution">Show solution</button>
+        </div>
+        <div class="toggle-content hint" id="s1-hint">
+          Check <code>kMaxHeightMeters</code> before picking a value - anything above it gets silently clamped by <code>setHeightMeters</code>, which will look like your new button does nothing.
+        </div>
+        <div class="toggle-content answer" id="s1-ans">
+          <pre>// In ElevatorConstants.java, alongside the other named setpoints:
+public static final double kScoringHeightMeters = 0.100;
+
+// In RobotContainer.java's configureButtonBindings(), e.g. on the A button
+// if it's free on your controller layout:
+new JoystickButton(controller, XboxController.Button.kY.value)
+    .onTrue(elevator.setHeightMetersCommand(ElevatorConstants.kScoringHeightMeters));</pre>
+        </div>
+      </div>
+
+      <div class="tier-panel gold">
+        <span class="tier-label">Gold - tune feedforward and explain kG</span>
+        <p>PID alone can hold a height, but watch what it costs. Isolate feedforward's contribution, then tune it properly.</p>
+        <ul class="task-list">
+          <li>With the elevator at rest at a mid-height, set <code>/Tuning/Elevator/kG</code> to <code>0.0</code> in AdvantageScope's Tuning Mode. Does the carriage sag or drift? What is PID doing to compensate?</li>
+          <li>Raise kG from zero in small steps, watching the carriage hold a fixed height after each change. Find the value where the carriage holds steady with minimal correction effort - watch <code>Elevator/TargetMeters</code> vs. the actual measured position for how hard PID is working.</li>
+          <li>Once kG is dialed in, try raising kS slightly. Command very small height changes near the current position - does the carriage respond more crisply to tiny commands?</li>
+          <li>Bake your final kP, kG, and kS values into <code>ElevatorConstants.java</code>, then delete the six <code>LoggedNetworkNumber</code> tune-handle fields and the two lines in <code>periodic()</code> that read them.</li>
+          <li><strong>Explain out loud:</strong> what would happen if you deployed to the real robot with kG still at 0.0? Why does an elevator need this term when Lesson 04's Arm and Scoop never did?</li>
+        </ul>
+        <div class="toggle-row">
+          <button class="toggle-btn" data-target="g1-hint" data-open="Show hint" data-closed="Hide hint">Show hint</button>
+        </div>
+        <div class="toggle-content hint" id="g1-hint">
+          kG is the voltage that exactly cancels gravity at rest. If it's too low, PID's kP term has to constantly fight gravity just to hold still, which shows up as either a small steady-state droop (needs kI to fully fix) or visible strain if kP is pushed high to compensate. If it's too high, the carriage will drift upward at rest instead of holding position. The correct value holds a mid-height with the smallest possible PID correction.
+        </div>
+      </div>
+
+    </div>
+
+  </div><!-- /section-challenge -->
+
+  <nav class="section-nav section-nav--bottom">
+    <button class="section-nav-btn active" data-section="concept">Part 1 - The Concept</button>
+    <button class="section-nav-btn" data-section="build">Part 2 - Build the Elevator</button>
+    <button class="section-nav-btn" data-section="visualize">Part 3 - Visualization</button>
+    <button class="section-nav-btn" data-section="challenge">Part 4 - AdvantageScopee</button>
+  </nav>
+
+</div><!-- /page-container -->
+<footer class="site-footer"></footer>
+
+<script src="js/site-config.js"></script>
+<script src="js/frc-curriculum.js"></script>
+<script src="diff.js"></script>
+<script>
+/* ── Step builder ─────────────────────────────────────────── */
+function sbToggle(id) {
+  const step = document.getElementById(id);
+  step.classList.toggle('open');
+}
+</script>
+<script src="js/version-picker.js"></script>
+</body>
+</html>

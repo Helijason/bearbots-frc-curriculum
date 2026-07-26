@@ -1,0 +1,8 @@
+{
+  "versions": ["v1", "v2"],
+  "stable": "v1",
+  "labels": {
+    "v1": "v1 — Initial Lessons",
+    "v2": "v2 — Updated Lessons"
+  }
+}

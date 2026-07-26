@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title></title>
+  <link rel="stylesheet" href="frc-curriculum.css">
+</head>
+<body data-lesson="07">
+
+<div class="wip-banner"></div>
+
+<header class="site-header"></header>
+
+<div class="page-container">
+
+  <div class="lesson-header">
+    <div class="lesson-meta"></div>
+    <h1 class="lesson-title"></h1>
+    <div class="lesson-subtitle"></div>
+    <div class="lesson-info-bar"></div>
+  </div>
+
+  <nav class="section-nav">
+    <button class="section-nav-btn active" data-section="concept">Part 1 - The concept</button>
+    <button class="section-nav-btn" data-section="pid">Part 2 - Closing the loop</button>
+    <button class="section-nav-btn" data-section="challenge">Part 3 - Try it yourself</button>
+    <button class="section-nav-btn" data-section="lab">Part 4 - Verify and lock</button>
+  </nav>
+
+  <!-- ═══════════════════════════════════════════════════════
+       PART 1 — THE CONCEPT
+       ═══════════════════════════════════════════════════════ -->
+  <div class="lesson-section active" id="section-concept">
+
+    <p>Last lesson, your <code>DriveDistance</code> command set the motors to 0.5 and waited for the encoder to read 1 meter. It worked - sort of. The robot probably overshot to 1.05m, or stopped early at 0.94m. Now we fix that with feedback.</p>
+
+    <p>Today is also the lesson where every concept from Modules 1 and 2 lands: subsystems, the IO pattern, logging, commands, sensors. By the end you'll be able to read real team code and recognize what's going on.</p>
+
+    <div class="hf-box hf-brain">
+      <span class="hf-label">Your brain is probably thinking this right now</span>
+      <p>"My auto worked at 0.5 power. Why complicate it?"</p>
+      <p>It worked once, on a fresh battery, on a clean carpet, going forward. Drop the battery to 11.5V - now 0.5 power moves slower. Run the same code on a slightly rougher surface - you stop short. Run it backward instead of forward - the robot moves at a different speed because the gearbox has different friction. Open loop is "set it and pray." Closed loop measures and adjusts.</p>
+    </div>
+
+    <h2>Open loop vs closed loop - the punchline</h2>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <h4>Open loop - "set and pray"</h4>
+        <p><code>drive.drive(0.5, 0.0)</code></p>
+        <p>You command 50% power. The motor does whatever 50% means today - depends on battery, friction, weight, surface, direction.</p>
+        <p>No correction. If you're off, you stay off.</p>
+        <p class="aside">Fine for: simple movements, prototyping, when accuracy doesn't matter.</p>
+      </div>
+      <div class="info-card">
+        <h4>Closed loop - "measure and adjust"</h4>
+        <p><code>error = target - current; setOutput(error * kP);</code></p>
+        <p>You command a <em>goal</em>. The code reads sensors, compares to the goal, and adjusts the motor output every cycle (50 times per second).</p>
+        <p>Self-correcting. If it's off, self-correcting.</p>
+        <p class="aside">Required for: anything that has to be precise. Tuning determines how well it corrects.</p>
+      </div>
+    </div>
+
+    <h2>The three sensors on the XRP - what each tells you</h2>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <h4>Encoders</h4>
+        <p>"How far has each wheel turned?"</p>
+        <p>Two of them, one per side. Counts pulses as the wheel rotates - converts to inches via a gear-ratio constant.</p>
+        <p>Use for: distance traveled, wheel speed, odometry.</p>
+        <p class="aside">XRP gives <code>getLeftDistanceInch()</code> and <code>getRightDistanceInch()</code>.</p>
+      </div>
+      <div class="info-card">
+        <h4>Gyro</h4>
+        <p>"Which way is the robot pointing?"</p>
+        <p>Single axis on the XRP - reports heading in degrees relative to where it was when last reset.</p>
+        <p>Use for: turning to a heading, holding a heading while driving, detecting collisions.</p>
+        <p class="aside">XRP gives <code>gyro.getAngle()</code> for heading.</p>
+      </div>
+      <div class="info-card">
+        <h4>Reflectance</h4>
+        <p>"Is there a line under the sensor?"</p>
+        <p>Two analog sensors on the bottom - high reading on dark surfaces, low on light. Used for line following.</p>
+        <p>Use for: detecting tape lines, edges of game elements, the auto starting line.</p>
+        <p class="aside">XRP gives left and right reflectance values 0.0&ndash;1.0.</p>
+      </div>
+    </div>
+
+    <h2>Reading sensors - through the IO layer, always</h2>
+
+    <p>You learned this in Lesson 04 but it bears repeating: <em>your subsystem doesn't read sensors directly</em>. It reads them through the IO layer, which fills an inputs struct, which gets logged. Today we add three more fields to that struct.</p>
+
+    <div class="code-block"><pre>
+<span class="kw">@AutoLog</span>
+<span class="kw">public class</span> DriveIOInputs {
+    <span class="cm">// ... existing fields from earlier lessons ...</span>
+    <span class="kw">public double</span> leftPositionMeters = 0.0;
+    <span class="kw">public double</span> rightPositionMeters = 0.0;
+
+    <span class="cm">// new for Lesson 07:</span>
+    <span class="kw">public double</span> leftVelocityMetersPerSec = 0.0;
+    <span class="kw">public double</span> rightVelocityMetersPerSec = 0.0;
+    <span class="kw">public double</span> headingDegrees = 0.0;
+}</pre></div>
+
+    <p>Then in <code>DriveIOXRP.updateInputs()</code>, fill them from the hardware:</p>
+
+    <div class="code-block"><pre>
+inputs.leftPositionMeters     = drivetrain.getLeftDistanceInch() * 0.0254;
+inputs.rightPositionMeters    = drivetrain.getRightDistanceInch() * 0.0254;
+inputs.leftVelocityMetersPerSec  = drivetrain.getLeftEncoderRate() * 0.0254;
+inputs.rightVelocityMetersPerSec = drivetrain.getRightEncoderRate() * 0.0254;
+inputs.headingDegrees         = gyro.getAngle();</pre></div>
+
+    <div class="hf-box hf-warning">
+      <span class="hf-label">Units - this is where bugs live</span>
+      <p>The XRP reports distances in <strong>inches</strong>. Your code probably wants <strong>meters</strong>. <code>1 inch = 0.0254 meters</code>. If you forget the conversion, your "1 meter" auto will travel 39 meters - off the field, through the wall, into the parking lot. The reference card has the conversions; use them.</p>
+    </div>
+
+    <div class="hf-box hf-sidebar">
+      <span class="hf-label">Why log velocities AND positions?</span>
+      <p>Position tells you "how far you've gone." Velocity tells you "how fast you're going." When debugging, you'll want both. If position looks right but velocity is jumpy, you have a sensor noise problem. If velocity looks right but position is wrong, you've got a sign or units bug. Log both, debug faster.</p>
+    </div>
+
+    <div class="hf-box hf-brain">
+      <span class="hf-label">Brain power - before you move on</span>
+      <p>Out loud: name the three sensors, say what each measures, and say which units they report in. If you can't, scroll back up. The next part assumes you know.</p>
+    </div>
+
+  </div><!-- /section-concept -->
+
+
+  <!-- ═══════════════════════════════════════════════════════
+       PART 2 — CLOSING THE LOOP
+       ═══════════════════════════════════════════════════════ -->
+  <div class="lesson-section" id="section-pid">
+
+    <p>You have sensors. You have a target. The bridge between them is a <strong>controller</strong> - code that runs every cycle, reads the current sensor value, compares to the target, and decides what motor output to set. The simplest useful controller is <strong>proportional control</strong>, also known as <em>P</em> control. Once you understand P, you understand 80% of the controllers FRC teams use.</p>
+
+    <div class="hf-box hf-brain">
+      <span class="hf-label">Your brain is probably thinking this right now</span>
+      <p>"PID. I've heard about PID. Three letters, three terms, super-complicated."</p>
+      <p>P is the only term you need today. The "I" and "D" are extensions for special cases - useful, but optional. Real teams ship competition code with just P all the time. Master P first; the others add complexity for specific problems.</p>
+    </div>
+
+    <h2>The P in PID - one line of math</h2>
+
+    <p>Proportional control says: the further you are from the target, the harder you push. Halfway there? Push half as hard. At the target? Don't push at all.</p>
+
+    <div class="code-block"><pre>
+<span class="kw">double</span> error = target - current;        <span class="cm">// how far off are we?</span>
+<span class="kw">double</span> output = error * kP;             <span class="cm">// push proportional to error</span>
+drive.setVoltage(output);                <span class="cm">// apply it</span></pre></div>
+
+    <p>That's it. Three lines. <code>kP</code> is a constant you tune - "how aggressively do I want to correct?" Start with 1.0 and adjust based on what the robot does.</p>
+
+    <h2>Tuning kP - what the symptoms tell you</h2>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <h4>kP too small</h4>
+        <p>Robot creeps to the target slowly. Or never quite reaches it - "stuck at 0.92 meters when target is 1.0." The push isn't strong enough to overcome friction.</p>
+        <p class="aside">Fix: increase kP. Try doubling it.</p>
+      </div>
+      <div class="info-card">
+        <h4>kP just right</h4>
+        <p>Robot drives to the target smoothly, slows down as it approaches, settles within a few millimeters in under a second.</p>
+        <p class="aside">You found it. Stop tuning.</p>
+      </div>
+      <div class="info-card">
+        <h4>kP too big</h4>
+        <p>Robot slams toward the target, overshoots, comes back, overshoots the other way. Oscillates. In extreme cases never settles.</p>
+        <p class="aside">Fix: cut kP in half.</p>
+      </div>
+    </div>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">The tuning loop</span>
+      <p><strong>1.</strong> Start with kP = 1.0</p>
+      <p><strong>2.</strong> Run the auto. Watch in AdvantageScope: graph target alongside current.</p>
+      <p><strong>3.</strong> Too slow? Double kP. Too oscillatory? Halve it.</p>
+      <p><strong>4.</strong> Repeat until current converges smoothly to target.</p>
+      <p>This is the actual workflow on real robots. AdvantageScope is what makes it possible - you can <em>see</em> the response curve and react.</p>
+    </div>
+
+    <h2>A complete closed-loop DriveDistance</h2>
+
+    <p>Here's <code>DriveDistance</code> from Lesson 06, rewritten with proportional control. Same four lifecycle methods, just smarter <code>execute()</code>.</p>
+
+    <div class="code-block"><pre>
+<span class="kw">public class</span> DriveDistance <span class="kw">extends</span> Command {
+    <span class="kw">private final</span> DriveSubsystem drive;
+    <span class="kw">private final</span> <span class="kw">double</span> targetMeters;
+    <span class="kw">private</span> <span class="kw">double</span> startMeters;
+
+    <span class="kw">private static final</span> <span class="kw">double</span> kP        = 4.0;        <span class="cm">// volts per meter of error</span>
+    <span class="kw">private static final</span> <span class="kw">double</span> tolerance = 0.02;       <span class="cm">// 2 cm</span>
+
+    <span class="kw">public</span> DriveDistance(DriveSubsystem drive, <span class="kw">double</span> meters) {
+        <span class="kw">this</span>.drive = drive;
+        <span class="kw">this</span>.targetMeters = meters;
+        addRequirements(drive);
+    }
+
+    <span class="kw">@Override</span> <span class="kw">public void</span> initialize() {
+        startMeters = drive.getLeftPositionMeters();
+    }
+
+    <span class="kw">@Override</span> <span class="kw">public void</span> execute() {
+        <span class="kw">double</span> traveled = drive.getLeftPositionMeters() - startMeters;
+        <span class="kw">double</span> error    = targetMeters - traveled;
+        <span class="kw">double</span> volts    = error * kP;
+        drive.setVoltage(volts, volts);          <span class="cm">// drive both sides equal</span>
+    }
+
+    <span class="kw">@Override</span> <span class="kw">public boolean</span> isFinished() {
+        <span class="kw">double</span> traveled = drive.getLeftPositionMeters() - startMeters;
+        <span class="kw">return</span> Math.abs(targetMeters - traveled) &lt; tolerance;
+    }
+
+    <span class="kw">@Override</span> <span class="kw">public void</span> end(<span class="kw">boolean</span> interrupted) {
+        drive.stop();
+    }
+}</pre></div>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">What's different from Lesson 06?</span>
+      <p><strong>execute()</strong> - instead of setting motors to a fixed 0.5, computes an error and pushes proportionally.</p>
+      <p><strong>isFinished()</strong> - instead of "have we passed the target?", asks "are we within tolerance of the target?" The robot might stop slightly before or after; tolerance covers both.</p>
+      <p>Everything else - the four-method structure, addRequirements, end() stopping the motors - is identical to Lesson 06. The framework didn't change. Just the brain.</p>
+    </div>
+
+    <h2>WPILib's <code>PIDController</code> - same math, less code</h2>
+
+    <p>Once you understand P, you'll find WPILib already wrote it for you. <code>PIDController</code> is a class that does the math, plus tolerance checking and reset handling. Use it when your code starts getting more than 5 lines of error-and-output math.</p>
+
+    <div class="code-block"><pre>
+<span class="kw">private final</span> PIDController pid = <span class="kw">new</span> PIDController(4.0, 0.0, 0.0);  <span class="cm">// kP, kI, kD</span>
+<span class="cm">// ...</span>
+<span class="kw">@Override</span> <span class="kw">public void</span> execute() {
+    <span class="kw">double</span> output = pid.calculate(drive.getLeftPositionMeters(), targetMeters);
+    drive.setVoltage(output, output);
+}
+<span class="kw">@Override</span> <span class="kw">public boolean</span> isFinished() {
+    <span class="kw">return</span> pid.atSetpoint();                <span class="cm">// uses configured tolerance</span>
+}</pre></div>
+
+    <p>Same behavior as the hand-rolled version, but you can pass <code>kI</code> and <code>kD</code> later if you need them. Most teams use this from day one. Now you know what it's doing under the hood.</p>
+
+    <h2>The other two letters - in 60 seconds</h2>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <h4>I - Integral</h4>
+        <p>"What if I keep <em>persistently</em> being a little off?" Sums the error over time and adds it to the output. Solves "I always settle 5cm short" by accumulating that error and pushing harder.</p>
+        <p class="aside">Use when you have steady-state error you can't tune away with P alone.</p>
+      </div>
+      <div class="info-card">
+        <h4>D - Derivative</h4>
+        <p>"How fast is my error changing?" Subtracts a term proportional to the rate of change. Damps oscillation - the robot brakes itself as it approaches the target.</p>
+        <p class="aside">Use when P alone is oscillating and you can't reduce kP without going too slow.</p>
+      </div>
+    </div>
+
+    <p>You will not need I or D today. Most teams don't need them this season. If P is working, ship it.</p>
+
+    <div class="hf-box hf-brain">
+      <span class="hf-label">Brain power - before you move on</span>
+      <p>Without looking back: write the three lines of P-control math. Then say what happens if kP is too small, just right, and too big. Then read the next section.</p>
+    </div>
+
+  </div><!-- /section-pid -->
+
+
+  <!-- ═══════════════════════════════════════════════════════
+       PART 3 — TIERED CHALLENGE
+       ═══════════════════════════════════════════════════════ -->
+  <div class="lesson-section" id="section-challenge">
+
+    <p>Three tiers. Bronze upgrades your existing <code>DriveDistance</code> to closed loop. Silver adds gyro feedback to keep the robot driving straight. Gold writes a complete closed-loop <code>TurnToAngle</code>.</p>
+
+    <div class="tier-tabs">
+      <button class="tier-tab bronze active" data-tier="bronze">Bronze - P-controlled DriveDistance</button>
+      <button class="tier-tab silver" data-tier="silver">Silver - Drive straight with gyro</button>
+      <button class="tier-tab gold" data-tier="gold">Gold - P-controlled TurnToAngle</button>
+    </div>
+
+    <div>
+
+      <div class="tier-panel bronze active">
+        <span class="tier-label">Bronze - replace open-loop with proportional control</span>
+        <p>Take your existing <code>DriveDistance</code> command and convert it from "set 0.5 power" to "compute error and push proportionally."</p>
+        <ul class="task-list">
+          <li>Open <code>DriveDistance.java</code></li>
+          <li>Add a <code>kP</code> constant. Start with <code>4.0</code>.</li>
+          <li>Replace <code>execute()</code> with the three-line P-control math</li>
+          <li>Update <code>isFinished()</code> to use a tolerance check (<code>Math.abs(error) &lt; 0.02</code>)</li>
+          <li>Run a 1-meter auto. Open AdvantageScope. Graph <code>Drive/LeftPositionMeters</code> against your target.</li>
+          <li>Tune <code>kP</code> until the robot settles at the target without overshooting</li>
+        </ul>
+        <div class="toggle-row">
+          <button class="toggle-btn" data-target="b1-hint" data-open="Show hint" data-closed="Hide hint">Show hint</button>
+        </div>
+        <div class="toggle-content hint" id="b1-hint">
+          If your robot doesn't move at all, your kP might be too small - the error times kP isn't producing enough voltage to overcome static friction. Try kP = 8.0. If it overshoots and oscillates, halve kP. The reference implementation in Part 2 uses kP = 4.0; your XRP might need different.
+        </div>
+      </div>
+
+      <div class="tier-panel silver">
+        <span class="tier-label">Silver - close the gyro loop while driving forward</span>
+        <p>Your <code>DriveDistance</code> probably drifts - one motor is slightly stronger than the other, and the robot curves left or right. Add a second proportional controller using the gyro to correct heading drift.</p>
+        <ul class="task-list">
+          <li>In <code>initialize()</code>, also record the starting heading from the gyro</li>
+          <li>In <code>execute()</code>, compute heading error: <code>currentHeading - startHeading</code></li>
+          <li>Compute a rotation correction: <code>headingError * kHeading</code> (try <code>kHeading = 0.05</code>)</li>
+          <li>Set left motor to <code>baseVoltage - rotationCorrection</code>, right to <code>baseVoltage + rotationCorrection</code></li>
+          <li>Run on the carpet. Verify the robot drives straighter than before.</li>
+        </ul>
+        <div class="toggle-row">
+          <button class="toggle-btn" data-target="s1-hint" data-open="Show hint" data-closed="Hide hint">Show hint</button>
+          <button class="toggle-btn" data-target="s1-ans" data-open="Show solution" data-closed="Hide solution">Show solution</button>
+        </div>
+        <div class="toggle-content hint" id="s1-hint">
+          The signs matter. If the robot drifts left, you need to <em>push</em> the left side and <em>cut</em> the right to correct. If your correction makes the drift worse, flip the signs. Don't fight the math - flip the variable.
+        </div>
+        <div class="toggle-content answer" id="s1-ans">
+          <pre>private double startHeading;
+private static final double kP = 4.0;
+private static final double kHeading = 0.05;
+
+@Override public void initialize() {
+    startMeters = drive.getLeftPositionMeters();
+    startHeading = drive.getHeadingDegrees();
+}
+
+@Override public void execute() {
+    double traveled       = drive.getLeftPositionMeters() - startMeters;
+    double distanceError  = targetMeters - traveled;
+    double baseVolts      = distanceError * kP;
+
+    double headingError   = drive.getHeadingDegrees() - startHeading;
+    double rotation       = headingError * kHeading;
+
+    drive.setVoltage(baseVolts - rotation, baseVolts + rotation);
+}</pre>
+        </div>
+      </div>
+
+      <div class="tier-panel gold">
+        <span class="tier-label">Gold - closed-loop TurnToAngle from scratch</span>
+        <p>Use WPILib's <code>PIDController</code> to build a TurnToAngle that turns to a precise heading and stops. This is the version you'd actually use in competition.</p>
+        <ul class="task-list">
+          <li>Create <code>TurnToAngle.java</code>, extends <code>Command</code>, requires <code>drive</code></li>
+          <li>Constructor takes target degrees</li>
+          <li>Create a <code>PIDController(kP, 0.0, 0.0)</code> as a field. Start with kP = 0.05.</li>
+          <li>Call <code>pid.setTolerance(2.0)</code> in the constructor (degrees)</li>
+          <li><code>initialize()</code>: record start heading; call <code>pid.reset()</code></li>
+          <li><code>execute()</code>: <code>double rot = pid.calculate(currentHeading - startHeading, targetDegrees);</code> set left/right motors to <code>-rot, +rot</code></li>
+          <li><code>isFinished()</code>: <code>return pid.atSetpoint();</code></li>
+          <li><code>end()</code>: <code>drive.stop();</code></li>
+          <li>Add to AutoChooser. Verify it turns within 2&deg; of target.</li>
+        </ul>
+        <div class="toggle-row">
+          <button class="toggle-btn" data-target="g1-hint" data-open="Show hint" data-closed="Hide hint">Show hint</button>
+        </div>
+        <div class="toggle-content hint" id="g1-hint">
+          If <code>pid.atSetpoint()</code> never returns true, the robot is oscillating around the target without settling - it briefly satisfies the tolerance but bounces out. <code>setTolerance</code> takes a position tolerance and an optional velocity tolerance; passing both stops <code>atSetpoint()</code> from triggering until the robot is within tolerance AND not moving fast. Try <code>pid.setTolerance(2.0, 5.0)</code>.
+        </div>
+      </div>
+
+    </div>
+
+  </div><!-- /section-challenge -->
+
+
+  <!-- ═══════════════════════════════════════════════════════
+       PART 4 — CODE REVIEW
+       ═══════════════════════════════════════════════════════ -->
+  <div class="lesson-section" id="section-lab">
+
+    <p>Before you touch the field, prove it works in sim. Before you commit your code, record what you tuned and why. These two tools are your gate and your memory.</p>
+
+    <h2>Sim verification checklist — complete before every field run</h2>
+
+    <div class="hf-box hf-warning">
+      <span class="hf-label">The rule</span>
+      <p>If it doesn't pass in sim, it doesn't run on the field. No exceptions. Catching a bug in sim costs 30 seconds. Catching it on the field costs your next match slot.</p>
+    </div>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">Sim verification checklist</span>
+      <p><strong>1. Build succeeds</strong> — <code>Ctrl+Shift+P</code> → WPILib: Build Robot Code → <code>BUILD SUCCESSFUL</code></p>
+      <p><strong>2. Simulator launches</strong> — no errors in System Console on startup</p>
+      <p><strong>3. Auto command initializes</strong> — in AdvantageScope, Commands folder shows your auto command starting</p>
+      <p><strong>4. Auto command ends</strong> — Commands folder shows the command finishing cleanly, not timing out</p>
+      <p><strong>5. Position curve looks right</strong> — graph <code>Drive/LeftPositionMeters</code> — smooth approach, settles near target, no oscillation</p>
+      <p><strong>6. Motors stop</strong> — after command ends, velocity drops to zero in AdvantageScope</p>
+      <p>All six pass? You're cleared for the field.</p>
+    </div>
+
+    <div class="hf-box hf-brain">
+      <span class="hf-label">What the curve tells you</span>
+      <p>Before you run anything on the field, predict what the AdvantageScope position curve will look like. Sketch it in your head: rises smoothly, approaches the target, slows near it, settles. Then run it. If the curve matches your prediction — your mental model is right. If it doesn't — that mismatch is exactly where the bug is. Prediction → run → compare. That's the tuning loop.</p>
+    </div>
+
+    <h2>Field tuning log — one row per run</h2>
+
+    <p>Every field run gets a row. If you don't write it down, you won't remember whether kP = 3.0 or 4.0 was the one that worked — and you'll retune the same thing twice.</p>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <h4>What to record each run</h4>
+        <p><strong>kP:</strong> what value did you use?</p>
+        <p><strong>PARK_DISTANCE_METERS:</strong> what was the constant?</p>
+        <p><strong>Result:</strong> where did it stop? (in zone / short / long / crashed)</p>
+        <p><strong>Curve shape:</strong> smooth / oscillating / creeping / slammed past</p>
+        <p><strong>Next change:</strong> what one thing are you changing and why?</p>
+      </div>
+      <div class="info-card">
+        <h4>The one-change rule</h4>
+        <p>Change exactly one constant per run. If you change kP and distance at the same time and the result improves, you don't know which one fixed it. You don't know which one to keep.</p>
+        <p class="aside">Science: change one variable, observe the result, conclude. Same process.</p>
+      </div>
+    </div>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">What "3 consecutive successful runs" means</span>
+      <p>Don't declare victory after one good run. Run it three times from the same starting position. If it lands in the zone all three times — you're done tuning, write down the values, commit the code. If it misses on run 2 or 3 — you're not done. One lucky run isn't reliability.</p>
+    </div>
+
+    <h2>Strategy lock — before you leave today</h2>
+
+    <ul class="task-list">
+      <li>Auto runs cleanly in sim — all 6 checklist items pass</li>
+      <li>Auto parks reliably on real field — 3 consecutive runs in zone</li>
+      <li>AutoChooser default set to your chosen strategy</li>
+      <li>kP and distance values recorded in your tuning log</li>
+      <li>Constants committed: <code>git commit -m "Competition auto: [strategy] — kP=[value], dist=[value]m"</code></li>
+      <li>Comment added in RobotContainer: <code>// Competition strategy: [Park / Score + Park] — tuned [date]</code></li>
+    </ul>
+
+    <div class="hf-box hf-brain">
+      <span class="hf-label">Last brain power before competition day</span>
+      <p>Competition day is tomorrow. Your auto is committed. Your constants are tuned. The only thing left is execution — autonomous runs itself, and then you drive.</p>
+      <p>Save your eight summary cards somewhere you'll find them. The field tuning log you filled in today is what you reference between matches if something drifts. Keep it with you.</p>
+    </div>
+
+  </div><!-- /section-lab -->
+
+  <nav class="section-nav section-nav--bottom">
+    <button class="section-nav-btn active" data-section="concept">Part 1 - The concept</button>
+    <button class="section-nav-btn" data-section="pid">Part 2 - Closing the loop</button>
+    <button class="section-nav-btn" data-section="challenge">Part 3 - Try it yourself</button>
+    <button class="section-nav-btn" data-section="lab">Part 4 - Verify and lock</button>
+  </nav>
+
+</div><!-- /page-container -->
+<footer class="site-footer"></footer>
+
+<script src="js/site-config.js"></script>
+<script src="js/frc-curriculum.js"></script>
+<script src="js/version-picker.js"></script>
+</body>
+</html>
