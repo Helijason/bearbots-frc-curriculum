@@ -335,6 +335,24 @@ function initBugLab() {
 }
  
 /* ── Init All ─────────────────────────────────────────────── */
+/* ── OS Toggle ────────────────────────────────────────────── */
+function initOsToggle() {
+  const savedOs = localStorage.getItem('frc-os') || 'win';
+  document.body.classList.add('os-' + savedOs);
+  document.querySelectorAll('.os-tab').forEach(btn => {
+    if (btn.dataset.os === savedOs) btn.classList.add('active');
+    btn.addEventListener('click', () => {
+      const os = btn.dataset.os;
+      document.body.classList.remove('os-win', 'os-mac');
+      document.body.classList.add('os-' + os);
+      document.querySelectorAll('.os-tab').forEach(b => {
+        b.classList.toggle('active', b.dataset.os === os);
+      });
+      localStorage.setItem('frc-os', os);
+    });
+  });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   initPage();
   initSectionNav();
@@ -343,4 +361,5 @@ document.addEventListener('DOMContentLoaded', () => {
   initSwapToggles();
   initQuiz();
   initBugLab();
+  initOsToggle();
 });
