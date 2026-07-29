@@ -51,6 +51,26 @@
       <p><code>git pull origin main</code></p>
     </div>
 
+    <div class="hf-box hf-warning">
+      <span class="hf-label">First time only: set up your student work repo</span>
+      <p>Do this once before you start building today. Your mentor has already added you as a collaborator on <code>bearbots-student-work</code>.</p>
+      <div class="win-only">
+        <div class="code-block"><pre>cd C:\Bearbots
+git clone https://github.com/Helijason/bearbots-student-work
+cd bearbots-student-work
+git checkout -b firstname-lastname
+git push -u origin firstname-lastname</pre></div>
+      </div>
+      <div class="mac-only">
+        <div class="code-block"><pre>cd ~/Bearbots
+git clone https://github.com/Helijason/bearbots-student-work
+cd bearbots-student-work
+git checkout -b firstname-lastname
+git push -u origin firstname-lastname</pre></div>
+      </div>
+      <p>Replace <strong>firstname-lastname</strong> with your actual name (e.g., <code>jason-peterson</code>). This creates your personal branch and sets it up so future <code>git push</code> commands know where to send your work.</p>
+    </div>
+
     <h2>Open the Lesson 02 project</h2>
 
     <div class="hf-box hf-info">
@@ -806,20 +826,27 @@ import edu.wpi.first.math.geometry.Transform3d;">
       <li><code>Scoop/Mechanism2d</code> and <code>Elevator/Mechanism2d</code> appear in the Mechanism tab</li>
       <li><code>FinalComponentPoses</code> shows all three components (arm, elevator, scoop) in the 3D Field tab</li>
       <li>Scoop ligament rises and falls with elevator movement</li>
+      <li>Work committed and pushed to your branch on <code>bearbots-student-work</code></li>
     </ul>
 
     <div class="hf-box hf-info">
-      <span class="hf-label">Commit before you leave</span>
+      <span class="hf-label">Commit and push your work before you leave</span>
+      <p>Copy your Scoop and Elevator files into your student work repo, then commit and push so your mentor can review them.</p>
       <div class="win-only">
-        <div class="code-block"><pre>cd C:\Bearbots\bearbots-xrp-code
+        <div class="code-block"><pre>xcopy /E /I C:\Bearbots\bearbots-xrp-code\Lesson02\Activity2\src C:\Bearbots\bearbots-student-work\Lesson02\src
+cd C:\Bearbots\bearbots-student-work
 git add .
-git commit -m "Add Scoop and Elevator subsystems"</pre></div>
+git commit -m "L2: Add Scoop and Elevator subsystems"
+git push</pre></div>
       </div>
       <div class="mac-only">
-        <div class="code-block"><pre>cd ~/Bearbots/bearbots-xrp-code
+        <div class="code-block"><pre>cp -r ~/Bearbots/bearbots-xrp-code/Lesson02/Activity2/src ~/Bearbots/bearbots-student-work/Lesson02/
+cd ~/Bearbots/bearbots-student-work
 git add .
-git commit -m "Add Scoop and Elevator subsystems"</pre></div>
+git commit -m "L2: Add Scoop and Elevator subsystems"
+git push</pre></div>
       </div>
+      <p>After pushing, go to <a href="https://github.com/Helijason/bearbots-student-work" target="_blank">github.com/Helijason/bearbots-student-work</a>, switch to your branch, and confirm your files are there.</p>
     </div>
 
   </div><!-- /section-verify -->

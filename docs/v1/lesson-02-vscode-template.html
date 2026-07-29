@@ -301,81 +301,28 @@
       <p>If you see <code>'git' is not recognized</code> — follow the install steps for your situation.</p>
     </div>
 
-    <div class="swap-container" style="margin-bottom:1rem;">
-      <button class="swap-btn"
-        data-show="git-offline" data-hide="git-online"
-        data-label-swap="Switch to offline install"
-        data-label-back="Switch to online install"
-        data-swapped="false">Switch to offline install</button>
-
-      <div id="git-online">
-        <div class="hf-box hf-info" style="margin-top:0.75rem;">
-          <span class="hf-label">Online — install Git from the web</span>
-          <p><strong>1.</strong> Go to <a href="https://git-scm.com/download/win" target="_blank" rel="noopener">git-scm.com/download/win</a> — download starts automatically</p>
-          <p><strong>2.</strong> Run the installer. Accept all defaults — don't change any options.</p>
-          <p><strong>3.</strong> When finished, <strong>close and reopen VS Code</strong> — the terminal needs to restart to see Git</p>
-          <p><strong>4.</strong> Run <code>git --version</code> again to confirm it works</p>
-          <ul>
-            <li><strong>FILE CLEAN UP:</strong> The install file can be removed after git has been installed.</strong></li>
-          </ul>
-        </div>
-      </div>
-
-      <div id="git-offline" style="display:none;">
-        <div class="hf-box hf-info" style="margin-top:0.75rem;">
-          <span class="hf-label">Offline — install from USB</span>
-          <p><strong>1.</strong> Plug in the USB drive</p>
-          <p><strong>2.</strong> Open File Explorer and navigate to <code>D:\02-Install\git</code></p>
-          <p><strong>3.</strong> Copy the <code>Git-#.##.#-64-bit.exe</code> file to your <strong>Downloads</strong> folder</p>
-          <p><strong>4.</strong> Navigate to your Downloads folder and double-click <code>Git-installer.exe</code></p>
-          <p><strong>5.</strong> Accept all defaults in the installer — don't change any options.</p>
-          <p><strong>6.</strong> When finished, <strong>close and reopen VS Code</strong> — the terminal needs to restart to see Git</p>
-          <p><strong>7.</strong> Run <code>git --version</code> to confirm it worked</p>
-          <ul>
-            <li><strong>FILE CLEAN UP:</strong> The install file can be removed after git has been installed.</strong></li>
-          </ul>
-        </div>
-      </div>
+    <div class="hf-box hf-info">
+      <span class="hf-label">Install Git from the web</span>
+      <p><strong>1.</strong> Go to <a href="https://git-scm.com/download/win" target="_blank" rel="noopener">git-scm.com/download/win</a> — download starts automatically</p>
+      <p><strong>2.</strong> Run the installer. Accept all defaults — don't change any options.</p>
+      <p><strong>3.</strong> When finished, <strong>close and reopen VS Code</strong> — the terminal needs to restart to see Git</p>
+      <p><strong>4.</strong> Run <code>git --version</code> again to confirm it works</p>
     </div>
 
     <p>Now clone the BearBots project. This downloads the entire repository to your machine.</p>
 
-    <div class="swap-container">
-      <button class="swap-btn"
-        data-show="repo-offline" data-hide="repo-online"
-        data-label-swap="Switch to offline setup"
-        data-label-back="Switch to online setup"
-        data-swapped="false">Switch to offline setup</button>
-
-<div id="repo-online">
-        <div class="hf-box hf-info" style="margin-top:0.75rem;">
-          <span class="hf-label">Online — clone from GitHub</span>
-          <p><strong>1.</strong> In the VS Code terminal, create a new folder for FRC files. Run:</p>
-          <div class="code-block"><pre>mkdir C:\FRC</pre></div>
-          <p><strong>2.</strong> Clone the repo into that folder:</p>
-          <div class="code-block"><pre>cd C:\FRC
+    <div class="hf-box hf-info">
+      <span class="hf-label">Clone from GitHub</span>
+      <p><strong>1.</strong> In the VS Code terminal, create a new folder for FRC files. Run:</p>
+      <div class="code-block"><pre>mkdir C:\FRC</pre></div>
+      <p><strong>2.</strong> Clone the repo into that folder:</p>
+      <div class="code-block"><pre>cd C:\FRC
 git clone https://github.com/Helijason/bearbots-xrp-code</pre></div>
-          <p><strong>3.</strong> Wait for the download to finish. You'll see <code>Cloning into 'bearbots-xrp-code'...</code> and then a done message.</p>
-          <p><strong>4.</strong> Open the cloned folder: File → Open Folder → <code>C:\FRC\bearbots-xrp-code</code></p>
-          <div class="hf-box hf-warning" style="margin-top:0.75rem; margin-bottom:0;">
-            <span class="hf-label">Keep it separate</span>
-            <p>This must be a fresh folder separate from Lesson 1. The <code>cd C:\FRC</code> command puts you in the right place — don't clone inside an existing project folder.</p>
-          </div>
-        </div>
-      </div>
-
-      <div id="repo-offline" style="display:none;">
-        <div class="hf-box hf-info" style="margin-top:0.75rem;">
-          <span class="hf-label">Offline — copy from USB</span>
-          <p><strong>1.</strong> Open File Explorer and navigate to the USB drive</p>
-          <p><strong>2.</strong> Copy the <code>FRC</code> folder from the root of the USB drive</p>
-          <p><strong>3.</strong> Paste it into <code>C:\</code></p>
-          <p><strong>4.</strong> Open the copied folder: File → Open Folder → <code>C:\FRC\bearbots-xrp-code</code></p>
-          <div class="hf-box hf-warning" style="margin-top:0.75rem; margin-bottom:0;">
-            <span class="hf-label">Keep it separate</span>
-            <p>This must be a fresh folder separate from Lesson 1. Don't copy into an existing project folder.</p>
-          </div>
-        </div>
+      <p><strong>3.</strong> Wait for the download to finish. You'll see <code>Cloning into 'bearbots-xrp-code'...</code> and then a done message.</p>
+      <p><strong>4.</strong> Open the cloned folder: File → Open Folder → <code>C:\FRC\bearbots-xrp-code</code></p>
+      <div class="hf-box hf-warning" style="margin-top:0.75rem; margin-bottom:0;">
+        <span class="hf-label">Keep it separate</span>
+        <p>This must be a fresh folder separate from Lesson 1. The <code>cd C:\FRC</code> command puts you in the right place — don't clone inside an existing project folder.</p>
       </div>
     </div>
 

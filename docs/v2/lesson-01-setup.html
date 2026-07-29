@@ -154,6 +154,20 @@
 
     <p>The BearBots XRP code and curriculum both live in one GitHub repo. Clone it once — after that, <code>git pull</code> keeps everything up to date.</p>
 
+    <h2>First time: create a GitHub account</h2>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">Steps</span>
+      <p><strong>1.</strong> Go to <a href="https://github.com/signup" target="_blank" rel="noopener">github.com/signup</a></p>
+      <p><strong>2.</strong> Create a free account. Use an email address you'll have long-term — not a school email that expires.</p>
+      <p><strong>3.</strong> Share your GitHub username with your mentor. You'll be added as a collaborator on the student work repo before Lesson 2.</p>
+    </div>
+
+    <div class="hf-box hf-warning">
+      <span class="hf-label">Already have an account?</span>
+      <p>Skip this step. Just share your username with your mentor.</p>
+    </div>
+
     <h2>First time: clone</h2>
 
     <div class="hf-box hf-info">
@@ -173,6 +187,64 @@
       <div class="mac-only">
         <p><strong>4.</strong> Verify: open <strong>Finder</strong> and check that <code>~/Bearbots/bearbots-xrp-code</code> exists (or run <code>ls ~/Bearbots/</code> in the terminal)</p>
       </div>
+    </div>
+
+    <h2>One-time setup: tell Git who you are</h2>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">Run these once per machine</span>
+      <p><strong>1.</strong> In the VS Code terminal, run:</p>
+      <div class="code-block"><pre>git config --global user.name "Your Name"
+git config --global user.email "you@example.com"</pre></div>
+      <p>Use your real name and the email tied to your GitHub account. Git remembers this — you won't need to do it again on this machine.</p>
+    </div>
+
+    <h2>Git basics — your three commands</h2>
+
+    <p>Git tracks changes as snapshots called <strong>commits</strong>. You'll use three commands every session.</p>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">git pull — get the latest</span>
+      <p>Run this at the start of every session. It downloads any updates your mentor pushed since you last worked.</p>
+      <div class="win-only">
+        <div class="code-block"><pre>cd C:\Bearbots\bearbots-xrp-code
+git pull origin main</pre></div>
+      </div>
+      <div class="mac-only">
+        <div class="code-block"><pre>cd ~/Bearbots/bearbots-xrp-code
+git pull origin main</pre></div>
+      </div>
+    </div>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">git add . — stage your changes</span>
+      <p>Tells Git which files to include in the next snapshot. The <code>.</code> means everything changed in this folder.</p>
+      <div class="code-block"><pre>git add .</pre></div>
+    </div>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">git commit — save a snapshot</span>
+      <p>Creates a save point with a short description of what changed. Write something meaningful — you'll thank yourself later.</p>
+      <div class="code-block"><pre>git commit -m "Add Scoop subsystem"</pre></div>
+    </div>
+
+    <div class="hf-box hf-brain">
+      <span class="hf-label">git push — coming in Lesson 2</span>
+      <p>Push uploads your commits to GitHub so your mentor can review your work. You'll set that up in <span class="next-lesson-ref"></span> when you start writing your own code.</p>
+    </div>
+
+    <div class="ref-box">
+      <span class="ref-box-title">Git Quick Reference</span>
+      <table class="ref-table">
+        <tr><td><code>git config --global user.name "Name"</code></td><td>Set your name — once per machine</td></tr>
+        <tr><td><code>git config --global user.email "e@mail"</code></td><td>Set your email — once per machine</td></tr>
+        <tr><td><code>git --version</code></td><td>Confirm Git is installed</td></tr>
+        <tr><td><code>git clone &lt;url&gt;</code></td><td>Download a repo for the first time</td></tr>
+        <tr><td><code>git pull origin main</code></td><td>Get latest updates — run every session</td></tr>
+        <tr><td><code>git add .</code></td><td>Stage all changed files</td></tr>
+        <tr><td><code>git commit -m "msg"</code></td><td>Save a snapshot with a description</td></tr>
+        <tr><td><code>git push</code></td><td>Upload commits to GitHub (Lesson 2)</td></tr>
+      </table>
     </div>
 
     <h2>Install Live Server</h2>
@@ -389,6 +461,7 @@
     <h2>Checklist — before you leave</h2>
 
     <ul class="task-list">
+      <li>GitHub account created and username shared with mentor</li>
       <li>WPILib VS Code opens</li>
       <li>AdvantageScope opens</li>
       <li class="win-only">Repo cloned to <code>C:\Bearbots\bearbots-xrp-code</code></li>
