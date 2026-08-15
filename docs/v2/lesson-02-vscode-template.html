@@ -54,6 +54,7 @@
     <div class="hf-box hf-warning">
       <span class="hf-label">First time only: set up your student work repo</span>
       <p>Do this once before you start building today. Your mentor has already added you as a collaborator on <code>bearbots-student-work</code>.</p>
+      <p><strong>1.</strong> Clone the repo and create your personal branch:</p>
       <div class="win-only">
         <div class="code-block"><pre>cd C:\Bearbots
 git clone https://github.com/Helijason/bearbots-student-work
@@ -68,16 +69,41 @@ cd bearbots-student-work
 git checkout -b firstname-lastname
 git push -u origin firstname-lastname</pre></div>
       </div>
-      <p>Replace <strong>firstname-lastname</strong> with your actual name (e.g., <code>jason-peterson</code>). This creates your personal branch and sets it up so future <code>git push</code> commands know where to send your work.</p>
+      <p>Replace <strong>firstname-lastname</strong> with your actual name (e.g., <code>john-smith</code>). This creates your personal branch and sets it up so future <code>git push</code> commands know where to send your work.</p>
+      <p><strong>2.</strong> Create your personal folder and copy the project template into it:</p>
+      <div class="win-only">
+        <div class="code-block"><pre>cd C:\Bearbots\bearbots-student-work
+mkdir firstname-lastname
+xcopy /E /I "C:\Bearbots\bearbots-xrp-code\V2 Lessons\Lesson02\Template" "firstname-lastname\my-robot"</pre></div>
+      </div>
+      <div class="mac-only">
+        <div class="code-block"><pre>cd ~/Bearbots/bearbots-student-work
+mkdir firstname-lastname
+cp -r ~/Bearbots/bearbots-xrp-code/V2\ Lessons/Lesson02/Template firstname-lastname/my-robot</pre></div>
+      </div>
+      <p>Replace <strong>firstname-lastname</strong> with your name and <strong>my-robot</strong> with a name for your robot. Keep it appropriate — nothing offensive.</p>
+      <p><strong>3.</strong> Commit and push your project:</p>
+      <div class="win-only">
+        <div class="code-block"><pre>cd C:\Bearbots\bearbots-student-work
+git add .
+git commit -m "Add my robot project"
+git push</pre></div>
+      </div>
+      <div class="mac-only">
+        <div class="code-block"><pre>cd ~/Bearbots/bearbots-student-work
+git add .
+git commit -m "Add my robot project"
+git push</pre></div>
+      </div>
     </div>
 
-    <h2>Open the Lesson 02 project</h2>
+    <h2>Open your robot project</h2>
 
     <div class="hf-box hf-info">
       <span class="hf-label">Steps</span>
       <p><strong>1.</strong> In WPILib VS Code: <strong>File &rarr; Open Folder</strong></p>
-      <div class="win-only"><p><strong>2.</strong> Navigate to <code>C:\Bearbots\bearbots-xrp-code\Lesson02\Activity2</code></p></div>
-      <div class="mac-only"><p><strong>2.</strong> Navigate to <code>~/Bearbots/bearbots-xrp-code/Lesson02/Activity2</code></p></div>
+      <div class="win-only"><p><strong>2.</strong> Navigate to <code>C:\Bearbots\bearbots-student-work\firstname-lastname\my-robot</code></p></div>
+      <div class="mac-only"><p><strong>2.</strong> Navigate to <code>~/Bearbots/bearbots-student-work/firstname-lastname/my-robot</code></p></div>
       <p><strong>3.</strong> Click <strong>Select Folder</strong> &rarr; trust the authors</p>
       <p><strong>4.</strong> Build to confirm it compiles: WPILib hexagon &rarr; <code>WPILib: Build Robot Code</code> &rarr; wait for <code>BUILD SUCCESSFUL</code></p>
     </div>
@@ -123,20 +149,25 @@ git push -u origin firstname-lastname</pre></div>
 
     <p><code>RobotContainer.java</code> is where subsystems are wired up. Open it and find where <code>Arm</code> is instantiated:</p>
 
-    <div class="code-block"><pre>arm = new Arm(
-    switch (Constants.currentMode) {
-        case REAL  -> new ArmIOXRP();
-        case SIM   -> new ArmIOSim();
-        default    -> new ArmIO() {};
-    }
-);</pre></div>
+    <div class="code-block"><pre>switch (Constants.currentMode) {
+  case REAL:
+    arm = new Arm(new ArmIOXRP());
+    break;
+  case SIM:
+    arm = new Arm(new ArmIOSim());
+    break;
+  default:
+    arm = new Arm(new ArmIO() {});
+    break;
+}</pre></div>
 
-    <p>The subsystem receives its IO implementation here. Changing <code>currentMode</code> in <code>Constants.java</code> swaps the hardware layer — the subsystem code never changes. You'll wire Scoop and Elevator the same way.</p>
+    <p>The subsystem receives its IO implementation here. Switching modes requires matching changes in two places: <code>currentMode</code> in <code>Constants.java</code> and <code>ROBOT_MODE</code> in <code>build.gradle</code>. The subsystem code never changes. You'll wire Scoop and Elevator the same way.</p>
 
     <div class="hf-box hf-warning">
-      <span class="hf-label">Constants.currentMode must be SIM for today</span>
-      <p>Open <code>Constants.java</code> and confirm: <code>public static final RobotMode currentMode = RobotMode.SIM;</code></p>
-      <p>You're building on a laptop without a robot — SIM mode is required.</p>
+      <span class="hf-label">Both files must be set to SIM for today</span>
+      <p>You're building on a laptop without a robot — SIM mode is required in both places.</p>
+      <p><code>Constants.java</code>: <code>public static final Mode currentMode = Mode.SIM;</code></p>
+      <p><code>build.gradle</code>: <code>def ROBOT_MODE = RobotMode.SIM</code></p>
     </div>
 
   </div><!-- /section-pattern -->
@@ -215,13 +246,17 @@ git push -u origin firstname-lastname</pre></div>
       <p><strong>2.</strong> Add the field alongside the other subsystem fields:</p>
       <div class="code-block"><pre>private final Scoop scoop;</pre></div>
       <p><strong>3.</strong> In the constructor, instantiate it using the same switch pattern as Arm:</p>
-      <div class="code-block"><pre>scoop = new Scoop(
-    switch (Constants.currentMode) {
-        case REAL  -> new ScoopIOXRP();
-        case SIM   -> new ScoopIOSim();
-        default    -> new ScoopIO() {};
-    }
-);</pre></div>
+      <div class="code-block"><pre>switch (Constants.currentMode) {
+  case REAL:
+    scoop = new Scoop(new ScoopIOXRP());
+    break;
+  case SIM:
+    scoop = new Scoop(new ScoopIOSim());
+    break;
+  default:
+    scoop = new Scoop(new ScoopIO() {});
+    break;
+}</pre></div>
       <p><strong>4.</strong> Organize imports: <kbd>Ctrl+Shift+O</kbd></p>
       <p><strong>5.</strong> Save</p>
     </div>
@@ -457,13 +492,17 @@ import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;">
       <p><strong>2.</strong> Add the field:</p>
       <div class="code-block"><pre>private final Elevator elevator;</pre></div>
       <p><strong>3.</strong> Instantiate in the constructor:</p>
-      <div class="code-block"><pre>elevator = new Elevator(
-    switch (Constants.currentMode) {
-        case REAL  -> new ElevatorIOXRP();
-        case SIM   -> new ElevatorIOSim();
-        default    -> new ElevatorIO() {};
-    }
-);</pre></div>
+      <div class="code-block"><pre>switch (Constants.currentMode) {
+  case REAL:
+    elevator = new Elevator(new ElevatorIOXRP());
+    break;
+  case SIM:
+    elevator = new Elevator(new ElevatorIOSim());
+    break;
+  default:
+    elevator = new Elevator(new ElevatorIO() {});
+    break;
+}</pre></div>
       <p><strong>4.</strong> Organize imports: <kbd>Ctrl+Shift+O</kbd></p>
       <p><strong>5.</strong> Save</p>
     </div>
