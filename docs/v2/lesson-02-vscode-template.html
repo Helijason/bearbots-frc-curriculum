@@ -53,8 +53,7 @@
 
     <div class="hf-box hf-warning">
       <span class="hf-label">First time only: set up your student work repo</span>
-      <p>Do this once before you start building today. Your mentor has already added you as a collaborator on <code>bearbots-student-work</code>.</p>
-      <p><strong>1.</strong> Clone the repo and create your personal branch:</p>
+      <p>Do this once before you start building today. Your mentor has already added you as a collaborator on <code>bearbots-student-work</code>. The project template is already on <code>main</code> — you just need to clone it and create your personal branch.</p>
       <div class="win-only">
         <div class="code-block"><pre>cd C:\Bearbots
 git clone https://github.com/Helijason/bearbots-student-work
@@ -69,32 +68,7 @@ cd bearbots-student-work
 git checkout -b firstname-lastname
 git push -u origin firstname-lastname</pre></div>
       </div>
-      <p>Replace <strong>firstname-lastname</strong> with your actual name (e.g., <code>john-smith</code>). This creates your personal branch and sets it up so future <code>git push</code> commands know where to send your work.</p>
-      <p><strong>2.</strong> Create your personal folder and copy the project template into it:</p>
-      <div class="win-only">
-        <div class="code-block"><pre>cd C:\Bearbots\bearbots-student-work
-mkdir firstname-lastname
-xcopy /E /I "C:\Bearbots\bearbots-xrp-code\V2 Lessons\Lesson02\Template" "firstname-lastname\my-robot"</pre></div>
-      </div>
-      <div class="mac-only">
-        <div class="code-block"><pre>cd ~/Bearbots/bearbots-student-work
-mkdir firstname-lastname
-cp -r ~/Bearbots/bearbots-xrp-code/V2\ Lessons/Lesson02/Template firstname-lastname/my-robot</pre></div>
-      </div>
-      <p>Replace <strong>firstname-lastname</strong> with your name and <strong>my-robot</strong> with a name for your robot. Keep it appropriate — nothing offensive.</p>
-      <p><strong>3.</strong> Commit and push your project:</p>
-      <div class="win-only">
-        <div class="code-block"><pre>cd C:\Bearbots\bearbots-student-work
-git add .
-git commit -m "Add my robot project"
-git push</pre></div>
-      </div>
-      <div class="mac-only">
-        <div class="code-block"><pre>cd ~/Bearbots/bearbots-student-work
-git add .
-git commit -m "Add my robot project"
-git push</pre></div>
-      </div>
+      <p>Replace <strong>firstname-lastname</strong> with your actual name (e.g., <code>john-smith</code>). This creates your personal branch off the template and sets it up so future <code>git push</code> commands know where to send your work.</p>
     </div>
 
     <h2>Open your robot project</h2>
@@ -102,8 +76,8 @@ git push</pre></div>
     <div class="hf-box hf-info">
       <span class="hf-label">Steps</span>
       <p><strong>1.</strong> In WPILib VS Code: <strong>File &rarr; Open Folder</strong></p>
-      <div class="win-only"><p><strong>2.</strong> Navigate to <code>C:\Bearbots\bearbots-student-work\firstname-lastname\my-robot</code></p></div>
-      <div class="mac-only"><p><strong>2.</strong> Navigate to <code>~/Bearbots/bearbots-student-work/firstname-lastname/my-robot</code></p></div>
+      <div class="win-only"><p><strong>2.</strong> Navigate to <code>C:\Bearbots\bearbots-student-work</code></p></div>
+      <div class="mac-only"><p><strong>2.</strong> Navigate to <code>~/Bearbots/bearbots-student-work</code></p></div>
       <p><strong>3.</strong> Click <strong>Select Folder</strong> &rarr; trust the authors</p>
       <p><strong>4.</strong> Build to confirm it compiles: WPILib hexagon &rarr; <code>WPILib: Build Robot Code</code> &rarr; wait for <code>BUILD SUCCESSFUL</code></p>
     </div>
@@ -147,27 +121,53 @@ git push</pre></div>
 
     <h2>How it fits together</h2>
 
-    <p><code>RobotContainer.java</code> is where subsystems are wired up. Open it and find where <code>Arm</code> is instantiated:</p>
+    <p><code>RobotContainer.java</code> is where subsystems are wired up. Open it and find the constructor — this is where <code>Drive</code> and <code>Arm</code> are instantiated:</p>
 
-    <div class="code-block"><pre>switch (Constants.currentMode) {
-  case REAL:
-    arm = new Arm(new ArmIOXRP());
-    break;
-  case SIM:
-    arm = new Arm(new ArmIOSim());
-    break;
-  default:
-    arm = new Arm(new ArmIO() {});
-    break;
-}</pre></div>
+<div class="code-window">
+  <div class="cw-head"><span class="cw-title">RobotContainer.java</span></div>
+  <div class="code-region" style="counter-reset: ln 52">
+<pre class="cb">
+<span class="line">switch (Constants.currentMode) {</span>
+<span class="line">  case REAL: // Real hardware</span>
+<span class="line">    drive = new Drive(new DriveIOXRP());</span>
+<span class="line">    arm = new Arm(new ArmIOXRP());</span>
+<span class="line">    break;</span>
+<span class="line">  case SIM: // Simulated code</span>
+<span class="line">    drive = new Drive(new DriveIOSim());</span>
+<span class="line">    arm = new Arm(new ArmIOSim());</span>
+<span class="line">    break;</span>
+<span class="line">  default: // Log replay</span>
+<span class="line">    drive = new Drive(new DriveIO() {});</span>
+<span class="line">    arm = new Arm(new ArmIO() {});</span>
+<span class="line">    break;</span>
+<span class="line">}</span>
+</pre></div></div>
 
     <p>The subsystem receives its IO implementation here. Switching modes requires matching changes in two places: <code>currentMode</code> in <code>Constants.java</code> and <code>ROBOT_MODE</code> in <code>build.gradle</code>. The subsystem code never changes. You'll wire Scoop and Elevator the same way.</p>
 
     <div class="hf-box hf-warning">
       <span class="hf-label">Both files must be set to SIM for today</span>
       <p>You're building on a laptop without a robot — SIM mode is required in both places.</p>
-      <p><code>Constants.java</code>: <code>public static final Mode currentMode = Mode.SIM;</code></p>
-      <p><code>build.gradle</code>: <code>def ROBOT_MODE = RobotMode.SIM</code></p>
+<div class="code-window">
+  <div class="cw-head"><span class="cw-title">Constants.java</span></div>
+  <div class="code-region" style="counter-reset: ln 27">
+<pre class="cb">
+<span class="line">  public enum Mode { REAL, SIM, REPLAY }</span>
+<span class="line">  public static final Mode currentMode = Mode.SIM;          // Simulation mode</span>
+<span class="line">  //public static final Mode simMode = Mode.REAL;           // Real mode</span>
+<span class="line">  //public static final Mode simMode = Mode.REPLAY;         // Replay mode</span>
+</pre></div></div>
+<div class="code-window">
+  <div class="cw-head"><span class="cw-title">build.gradle</span></div>
+  <div class="code-region" style="counter-reset: ln 5">
+<pre class="cb">
+<span class="line">// ─── MANUAL MODE SWITCH ───────────────────────────</span>
+<span class="line">enum RobotMode { SIM, REAL, REPLAY }</span>
+<span class="line">def ROBOT_MODE = RobotMode.SIM</span>
+<span class="line">//def ROBOT_MODE = RobotMode.REAL</span>
+<span class="line">//def ROBOT_MODE = RobotMode.REPLAY</span>
+<span class="line">// ──────────────────────────────────────────────────</span>
+</pre></div></div>
     </div>
 
   </div><!-- /section-pattern -->
