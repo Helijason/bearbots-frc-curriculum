@@ -2,6 +2,51 @@
    Line numbers are CSS generated content (counter), so they are never part of
    the selectable or copyable text. Swap the colours for your lesson palette. */
 
+/* ── Syntax-highlighted code windows (VS Code Dark+) ── */
+.cw-body {
+  background: #1e1e1e;
+  overflow-x: auto;
+}
+
+.cw-body pre {
+  margin: 0;
+  padding: 6px 0;
+  font-size: 12.5px;
+  font-size: 0;
+  counter-reset: ln var(--start);
+}
+
+.ln {
+  display: block;
+  font-size: 12.5px;
+  line-height: 1.35;
+  padding: 0 12px 0 0;
+  white-space: pre;
+}
+
+.ln::before {
+  counter-increment: ln;
+  content: counter(ln);
+  display: inline-block;
+  width: 2.8em;
+  text-align: right;
+  margin-right: 16px;
+  color: #858585;
+  user-select: none;
+  -webkit-user-select: none;
+  border-right: 1px solid #444444;
+  padding-right: 8px;
+}
+
+/* Token colours */
+.d   { color: #d4d4d4; }
+.kw  { color: #569cd6; }
+.cl  { color: #4ec9b0; }
+.cm  { color: #6a9955; }
+.nm  { color: #b5cea8; }
+.fn  { color: #dcdcaa; }
+.va  { color: #9cdcfe; }
+
 .code-window {
   border: 1px solid #CCCCCC;
   border-radius: 6px;

@@ -30,9 +30,10 @@
 
   <nav class="section-nav">
     <button class="section-nav-btn active" data-section="pattern">Part 1 - The subsystem pattern</button>
-    <button class="section-nav-btn" data-section="scoop">Part 2 - Build Scoop</button>
-    <button class="section-nav-btn" data-section="elevator">Part 3 - Build Elevator</button>
-    <button class="section-nav-btn" data-section="verify">Part 4 - Verify</button>
+    <button class="section-nav-btn" data-section="snippets">Part 2 - Install snippets</button>
+    <button class="section-nav-btn" data-section="scoop">Part 3 - Build Scoop</button>
+    <button class="section-nav-btn" data-section="elevator">Part 4 - Build Elevator</button>
+    <button class="section-nav-btn" data-section="verify">Part 5 - Verify</button>
   </nav>
 
   <!-- ═══════════════════════════════════════════════════════
@@ -125,23 +126,8 @@ git push -u origin firstname-lastname</pre></div>
 
 <div class="code-window">
   <div class="cw-head"><span class="cw-title">RobotContainer.java</span></div>
-  <div class="code-region" style="counter-reset: ln 52">
-<pre class="cb">
-<span class="line">switch (Constants.currentMode) {</span>
-<span class="line">  case REAL: // Real hardware</span>
-<span class="line">    drive = new Drive(new DriveIOXRP());</span>
-<span class="line">    arm = new Arm(new ArmIOXRP());</span>
-<span class="line">    break;</span>
-<span class="line">  case SIM: // Simulated code</span>
-<span class="line">    drive = new Drive(new DriveIOSim());</span>
-<span class="line">    arm = new Arm(new ArmIOSim());</span>
-<span class="line">    break;</span>
-<span class="line">  default: // Log replay</span>
-<span class="line">    drive = new Drive(new DriveIO() {});</span>
-<span class="line">    arm = new Arm(new ArmIO() {});</span>
-<span class="line">    break;</span>
-<span class="line">}</span>
-</pre></div></div>
+  <div class="cw-body"><pre style="--start:52"><span class="ln"><span class="kw">switch</span> <span class="d">(</span><span class="cl">Constants</span><span class="d">.</span><span class="va">currentMode</span><span class="d">) {</span></span><span class="ln">  <span class="kw">case</span> <span class="cl">REAL</span><span class="d">:</span> <span class="cm">// Real hardware</span></span><span class="ln">    <span class="va">drive</span> <span class="d">=</span> <span class="kw">new</span> <span class="cl">Drive</span><span class="d">(</span><span class="kw">new</span> <span class="cl">DriveIOXRP</span><span class="d">());</span></span><span class="ln">    <span class="va">arm</span> <span class="d">=</span> <span class="kw">new</span> <span class="cl">Arm</span><span class="d">(</span><span class="kw">new</span> <span class="cl">ArmIOXRP</span><span class="d">());</span></span><span class="ln">    <span class="kw">break</span><span class="d">;</span></span><span class="ln">  <span class="kw">case</span> <span class="cl">SIM</span><span class="d">:</span> <span class="cm">// Simulated code</span></span><span class="ln">    <span class="va">drive</span> <span class="d">=</span> <span class="kw">new</span> <span class="cl">Drive</span><span class="d">(</span><span class="kw">new</span> <span class="cl">DriveIOSim</span><span class="d">());</span></span><span class="ln">    <span class="va">arm</span> <span class="d">=</span> <span class="kw">new</span> <span class="cl">Arm</span><span class="d">(</span><span class="kw">new</span> <span class="cl">ArmIOSim</span><span class="d">());</span></span><span class="ln">    <span class="kw">break</span><span class="d">;</span></span><span class="ln">  <span class="kw">default</span><span class="d">:</span> <span class="cm">// Log replay</span></span><span class="ln">    <span class="va">drive</span> <span class="d">=</span> <span class="kw">new</span> <span class="cl">Drive</span><span class="d">(</span><span class="kw">new</span> <span class="cl">DriveIO</span><span class="d">() {});</span></span><span class="ln">    <span class="va">arm</span> <span class="d">=</span> <span class="kw">new</span> <span class="cl">Arm</span><span class="d">(</span><span class="kw">new</span> <span class="cl">ArmIO</span><span class="d">() {});</span></span><span class="ln">    <span class="kw">break</span><span class="d">;</span></span><span class="ln"><span class="d">}</span></span></pre></div>
+</div>
 
     <p>The subsystem receives its IO implementation here. Switching modes requires matching changes in two places: <code>currentMode</code> in <code>Constants.java</code> and <code>ROBOT_MODE</code> in <code>build.gradle</code>. The subsystem code never changes. You'll wire Scoop and Elevator the same way.</p>
 
@@ -150,39 +136,97 @@ git push -u origin firstname-lastname</pre></div>
       <p>You're building on a laptop without a robot — SIM mode is required in both places.</p>
 <div class="code-window">
   <div class="cw-head"><span class="cw-title">Constants.java</span></div>
-  <div class="code-region" style="counter-reset: ln 27">
-<pre class="cb">
-<span class="line">  public enum Mode { REAL, SIM, REPLAY }</span>
-<span class="line">  public static final Mode currentMode = Mode.SIM;          // Simulation mode</span>
-<span class="line">  //public static final Mode simMode = Mode.REAL;           // Real mode</span>
-<span class="line">  //public static final Mode simMode = Mode.REPLAY;         // Replay mode</span>
-</pre></div></div>
+  <div class="cw-body"><pre style="--start:27"><span class="ln">  <span class="kw">public enum</span> <span class="cl">Mode</span> <span class="d">{</span> <span class="cl">REAL</span><span class="d">,</span> <span class="cl">SIM</span><span class="d">,</span> <span class="cl">REPLAY</span> <span class="d">}</span></span><span class="ln">  <span class="kw">public static final</span> <span class="cl">Mode</span> <span class="va">currentMode</span> <span class="d">=</span> <span class="cl">Mode</span><span class="d">.</span><span class="cl">SIM</span><span class="d">;</span>          <span class="cm">// Simulation mode</span></span><span class="ln">  <span class="cm">//public static final Mode simMode = Mode.REAL;           // Real mode</span></span><span class="ln">  <span class="cm">//public static final Mode simMode = Mode.REPLAY;         // Replay mode</span></span></pre></div>
+</div>
 <div class="code-window">
   <div class="cw-head"><span class="cw-title">build.gradle</span></div>
-  <div class="code-region" style="counter-reset: ln 5">
-<pre class="cb">
-<span class="line">// ─── MANUAL MODE SWITCH ───────────────────────────</span>
-<span class="line">enum RobotMode { SIM, REAL, REPLAY }</span>
-<span class="line">def ROBOT_MODE = RobotMode.SIM</span>
-<span class="line">//def ROBOT_MODE = RobotMode.REAL</span>
-<span class="line">//def ROBOT_MODE = RobotMode.REPLAY</span>
-<span class="line">// ──────────────────────────────────────────────────</span>
-</pre></div></div>
+  <div class="cw-body"><pre style="--start:5"><span class="ln"><span class="cm">// ─── MANUAL MODE SWITCH ───────────────────────────</span></span><span class="ln"><span class="kw">enum</span> <span class="cl">RobotMode</span> <span class="d">{</span> <span class="cl">SIM</span><span class="d">,</span> <span class="cl">REAL</span><span class="d">,</span> <span class="cl">REPLAY</span> <span class="d">}</span></span><span class="ln"><span class="kw">def</span> <span class="va">ROBOT_MODE</span> <span class="d">=</span> <span class="cl">RobotMode</span><span class="d">.</span><span class="cl">SIM</span></span><span class="ln"><span class="cm">//def ROBOT_MODE = RobotMode.REAL</span></span><span class="ln"><span class="cm">//def ROBOT_MODE = RobotMode.REPLAY</span></span><span class="ln"><span class="cm">// ──────────────────────────────────────────────────</span></span></pre></div>
+</div>
     </div>
 
   </div><!-- /section-pattern -->
 
   <!-- ═══════════════════════════════════════════════════════
-       PART 2 — BUILD SCOOP
+       PART 2 — INSTALL SNIPPETS
+       ═══════════════════════════════════════════════════════ -->
+  <div class="lesson-section" id="section-snippets">
+
+    <p>In Parts 3 and 4 you'll build Scoop and Elevator. Instead of typing boilerplate from scratch, you'll use VS Code snippets — keyboard shortcuts that expand into full class templates. The BearBots snippet file is already in the repo you pulled. You just need to copy it into VS Code once.</p>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">What is a VS Code snippet?</span>
+      <p>Type a trigger word in a <code>.java</code> file and press <kbd>Tab</kbd>. VS Code expands it into a full class template with placeholders. Press <kbd>Tab</kbd> again to jump between placeholders — VS Code updates every occurrence of a name at once.</p>
+      <p>FRC teams that maintain snippet libraries type far less boilerplate. The pattern is always the same; only the names and details change.</p>
+      <p>The BearBots snippets are a starting point — they can be extended as your team's code patterns evolve. Any time you find yourself writing the same structure repeatedly, that's a candidate for a new snippet. Over time your <code>java.json</code> becomes a team toolkit: standard skeletons for subsystems, commands, IO layers, and anything else your robot architecture uses, so future programmers can generate correct code from day one.</p>
+      <p>
+        <strong>Learn more:</strong>
+        <a href="https://code.visualstudio.com/docs/editor/userdefinedsnippets" target="_blank" rel="noopener">VS Code snippet syntax reference</a> &mdash;
+        <a href="https://code.visualstudio.com/docs/editor/userdefinedsnippets#_snippet-syntax" target="_blank" rel="noopener">Tabstops, placeholders &amp; transforms</a>
+      </p>
+    </div>
+
+    <h2>Install the XRP snippet file</h2>
+
+    <div class="hf-box hf-warning">
+      <span class="hf-label">Do this once — not every session</span>
+      <p><strong>1.</strong> In WPILib VS Code, open the Command Palette: <kbd>Ctrl+Shift+P</kbd></p>
+      <p><strong>2.</strong> Type <em>Snippets: Configure Snippets</em> and select it, then choose <em>java</em></p>
+      <p><strong>3.</strong> VS Code opens your <code>java.json</code> snippets file</p>
+      <p><strong>4.</strong> Open the BearBots snippet file from the Explorer panel:</p>
+      <div class="win-only"><p><code>C:\Bearbots\bearbots-xrp-code\vscode\snippets\java.json</code></p></div>
+      <div class="mac-only"><p><code>~/Bearbots/bearbots-xrp-code/vscode/snippets/java.json</code></p></div>
+      <p><strong>5.</strong> Select all (<kbd>Ctrl+A</kbd>), copy (<kbd>Ctrl+C</kbd>), switch to your <code>java.json</code> tab, select all, and paste</p>
+      <p><strong>6.</strong> Save (<kbd>Ctrl+S</kbd>) — snippets are active immediately, no restart needed</p>
+    </div>
+
+    <h2>Test that snippets work</h2>
+
+    <div class="hf-box hf-info">
+      <span class="hf-label">Quick check</span>
+      <p><strong>1.</strong> Open any <code>.java</code> file in your project</p>
+      <p><strong>2.</strong> Type <code>akcopyright</code> and press <kbd>Tab</kbd></p>
+      <p><strong>3.</strong> The BearBots copyright header should expand — if it does, snippets are working</p>
+    </div>
+
+    <h2>Snippets for this lesson</h2>
+
+    <p>You will use these triggers in Parts 3 and 4. Each one expands into a complete file template.</p>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <h4>akcopyright</h4>
+        <p>BearBots copyright header. Use at the top of every new file.</p>
+      </div>
+      <div class="info-card">
+        <h4>akio-servo / akio-motor</h4>
+        <p>IO interface template. Defines what the subsystem can do without any hardware details.</p>
+      </div>
+      <div class="info-card">
+        <h4>akioimpl-xrp-servo / akioimpl-motor-xrp</h4>
+        <p>XRP hardware implementation. Talks directly to the servo or motor on the real robot.</p>
+      </div>
+      <div class="info-card">
+        <h4>akioimpl-sim / akioimpl-motor-sim</h4>
+        <p>Simulation implementation. Used when running in sim mode on a laptop.</p>
+      </div>
+      <div class="info-card">
+        <h4>aksubsystem-servo / aksubsystem-motor</h4>
+        <p>Full subsystem class. The main file that wires everything together.</p>
+      </div>
+      <div class="info-card">
+        <h4>akconstants-servo / akconstants-motor</h4>
+        <p>Constants class. Stores tuning values like device numbers and default positions.</p>
+      </div>
+    </div>
+
+  </div><!-- /section-snippets -->
+
+  <!-- ═══════════════════════════════════════════════════════
+       PART 3 — BUILD SCOOP
        ═══════════════════════════════════════════════════════ -->
   <div class="lesson-section" id="section-scoop">
 
     <p>Scoop is a servo subsystem. You'll create four files using VS Code snippets, then wire it into <code>RobotContainer</code>.</p>
-
-    <div class="hf-box hf-info">
-      <span class="hf-label">How snippets work</span>
-      <p>In a new <code>.java</code> file, type the snippet trigger and press <kbd>Tab</kbd>. The snippet expands into a full class template. Tab through the placeholders to fill in names — VS Code updates all occurrences at once.</p>
-    </div>
 
     <h2>Step 1 - Create the scoop folder</h2>
 
@@ -430,7 +474,7 @@ import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;">
   </div><!-- /section-scoop -->
 
   <!-- ═══════════════════════════════════════════════════════
-       PART 3 — BUILD ELEVATOR
+       PART 4 — BUILD ELEVATOR
        ═══════════════════════════════════════════════════════ -->
   <div class="lesson-section" id="section-elevator">
 
@@ -826,7 +870,7 @@ import edu.wpi.first.math.geometry.Transform3d;">
   </div><!-- /section-elevator -->
 
   <!-- ═══════════════════════════════════════════════════════
-       PART 4 — VERIFY
+       PART 5 — VERIFY
        ═══════════════════════════════════════════════════════ -->
   <div class="lesson-section" id="section-verify">
 
@@ -892,9 +936,10 @@ git push</pre></div>
 
   <nav class="section-nav section-nav--bottom">
     <button class="section-nav-btn active" data-section="pattern">Part 1 - The subsystem pattern</button>
-    <button class="section-nav-btn" data-section="scoop">Part 2 - Build Scoop</button>
-    <button class="section-nav-btn" data-section="elevator">Part 3 - Build Elevator</button>
-    <button class="section-nav-btn" data-section="verify">Part 4 - Verify</button>
+    <button class="section-nav-btn" data-section="snippets">Part 2 - Install snippets</button>
+    <button class="section-nav-btn" data-section="scoop">Part 3 - Build Scoop</button>
+    <button class="section-nav-btn" data-section="elevator">Part 4 - Build Elevator</button>
+    <button class="section-nav-btn" data-section="verify">Part 5 - Verify</button>
   </nav>
 
 </div><!-- /page-container -->
